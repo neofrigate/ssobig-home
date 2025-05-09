@@ -1,9 +1,7 @@
-import React from "react";
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Ssobig-Love Buddies",
-};
+import React, { useEffect } from "react";
+import Image from "next/image";
 
 // Icons (Re-defined here for simplicity, consider moving to a shared components file)
 const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -23,19 +21,29 @@ const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+// LinkIcon 컴포넌트를 실제 이미지로 변경
+const LinkIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
+    <Image
+      src="/ssobig_assets/linkIcon.png"
+      alt="링크 아이콘"
+      width={16}
+      height={16}
+      className="w-full h-full"
+    />
+  </div>
+);
+
+// Instagram 아이콘을 실제 이미지로 변경
 const CssInstagramIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="w-6 h-6 flex items-center justify-center" {...props}>
-    <div
-      className="w-full h-full rounded-md flex items-center justify-center"
-      style={{
-        background:
-          "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
-      }}
-    >
-      <div className="w-3 h-3 border-[2px] border-white rounded-full relative">
-        <div className="w-[3px] h-[3px] bg-white rounded-full absolute top-[1.5px] right-[1.5px]"></div>
-      </div>
-    </div>
+  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
+    <Image
+      src="/ssobig_assets/instaIcon.png"
+      alt="인스타그램 아이콘"
+      width={16}
+      height={16}
+      className="w-full h-full"
+    />
   </div>
 );
 
@@ -43,9 +51,14 @@ const LoveBuddiesPage = () => {
   // Placeholder background image URL, replace with actual image
   // const backgroundImageUrl = "/ssobig_assets/러브버디즈 배경.png"; // Example image
 
+  useEffect(() => {
+    // 클라이언트 측에서 문서 제목 설정
+    document.title = "Ssobig-Love Buddies";
+  }, []);
+
   return (
     <div
-      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-center p-4 selection:bg-pink-500 selection:text-white"
+      className="min-h-screen text-white font-sans relative flex flex-col items-start justify-center p-4 selection:bg-pink-500 selection:text-white"
       style={{
         backgroundImage: "url('/ssobig_assets/러브버디즈 배경.jpg')",
         backgroundSize: "cover",
@@ -63,7 +76,7 @@ const LoveBuddiesPage = () => {
       </div>
 
       {/* Content Area */}
-      <main className="z-10 flex flex-col items-center text-center max-w-2xl w-full px-4">
+      <main className="z-10 flex flex-col items-start text-left max-w-2xl w-full px-4 ml-8 sm:ml-16">
         {/* Logo Placeholder - Replace with actual Love Buddies Logo Image/SVG */}
         <div className="mb-4">
           {/* Example: Using text as a placeholder */}
@@ -75,16 +88,17 @@ const LoveBuddiesPage = () => {
             {/* Example of a script-like font */}
             Love Buddies
           </h1>
-          <div className="w-16 h-1 bg-white mx-auto mt-2 rounded-full"></div>
+          <div className="w-16 h-1 bg-white mt-2 rounded-full"></div>
         </div>
 
         {/* Instagram Icon Link */}
         <a
           href="https://www.instagram.com/love___buddies/" // Actual Instagram link
           aria-label="Love Buddies Instagram"
-          className="mb-8 transition-transform hover:scale-110"
+          className="mb-8 transition-transform hover:scale-110 flex items-center gap-1"
         >
-          <CssInstagramIcon />
+          <CssInstagramIcon className="w-5 h-5" />
+          <span className="text-sm">love___buddies</span>
         </a>
 
         {/* Title */}

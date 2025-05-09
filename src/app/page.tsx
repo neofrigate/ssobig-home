@@ -4,37 +4,29 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation"; // Import useRouter
 
-const LinkIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    {...props}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656-5.656l-4-4a4 4 0 00-5.656 5.656l1.102 1.101"
-    ></path>
-  </svg>
+// LinkIcon 컴포넌트를 실제 이미지로 변경
+const LinkIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
+    <Image
+      src="/ssobig_assets/linkIcon.png"
+      alt="링크 아이콘"
+      width={16}
+      height={16}
+      className="w-full h-full"
+    />
+  </div>
 );
 
 // New Instagram Icon based on provided CSS
 const CssInstagramIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="w-4 h-4 flex items-center justify-center" {...props}>
-    <div
-      className="w-full h-full rounded-[4px] flex items-center justify-center"
-      style={{
-        background:
-          "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
-      }}
-    >
-      <div className="w-2 h-2 border-[1.5px] border-white rounded-full relative">
-        <div className="w-[2px] h-[2px] bg-white rounded-full absolute top-[0.5px] right-[0.5px]"></div>
-      </div>
-    </div>
+  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
+    <Image
+      src="/ssobig_assets/instaIcon.png"
+      alt="인스타그램 아이콘"
+      width={16}
+      height={16}
+      className="w-full h-full"
+    />
   </div>
 );
 
@@ -119,12 +111,8 @@ const Card: React.FC<CardProps> = ({
         <div
           className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 ${linkTextClass}`}
         >
-          {linkIconType === "link" && (
-            <LinkIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 text-current" />
-          )}
-          {linkIconType === "instagram" && (
-            <CssInstagramIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
-          )}
+          {linkIconType === "link" && <LinkIcon />}
+          {linkIconType === "instagram" && <CssInstagramIcon />}
           {linkText}
         </div>
       </div>
@@ -147,11 +135,11 @@ export default function Home() {
 
   const brandItems: CardProps[] = [
     {
-      title: "러브버디즈1",
+      title: "러브버디즈",
       description: "매력있고 사람스러운 찐친 만드는 곳",
       linkText: "love___buddies", // Adjusted from love__buddies
       linkHref: "/brand/love_buddies", // Changed to internal link
-      linkIconType: "link", // Changed from "instagram" to "link"
+      linkIconType: "instagram", // 링크 아이콘을 인스타그램 아이콘으로 변경
       imageUrl: "/ssobig_assets/러브버디즈.png",
       imageAreaStyle: { backgroundColor: "#000000" }, // Black background
     },
@@ -160,7 +148,7 @@ export default function Home() {
       description: "퇴근 후 만나는 전문직 비즈니스 네트워킹 모임",
       linkText: "n.o.w.seoul",
       linkHref: "/brand/now_seoul",
-      linkIconType: "link",
+      linkIconType: "instagram", // 링크 아이콘을 인스타그램 아이콘으로 변경
       imageUrl: "/ssobig_assets/나우서울.png",
       imageAreaStyle: {}, // Removed backgroundColor
     },
@@ -169,7 +157,7 @@ export default function Home() {
       description: "TV속 게임을 만들고 플레이하는 커뮤니티",
       linkText: "game_orb",
       linkHref: "/brand/game_orb",
-      linkIconType: "link",
+      linkIconType: "instagram", // 링크 아이콘을 인스타그램 아이콘으로 변경
       imageUrl: "/ssobig_assets/게임오브.png",
       imageAreaStyle: {}, // Removed backgroundColor
     },

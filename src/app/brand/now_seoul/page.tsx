@@ -1,37 +1,31 @@
+"use client";
+
 import React from "react";
+import Image from "next/image";
 
 // Helper components for Icons (copied from src/app/page.tsx)
 // Consider refactoring these into shared components
-const LinkIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    {...props}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656-5.656l-4-4a4 4 0 00-5.656 5.656l1.102 1.101"
-    ></path>
-  </svg>
+const LinkIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
+    <Image
+      src="/ssobig_assets/linkIcon.png"
+      alt="링크 아이콘"
+      width={16}
+      height={16}
+      className="w-full h-full"
+    />
+  </div>
 );
 
 const CssInstagramIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="w-4 h-4 flex items-center justify-center" {...props}>
-    <div
-      className="w-full h-full rounded-[4px] flex items-center justify-center"
-      style={{
-        background:
-          "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
-      }}
-    >
-      <div className="w-2 h-2 border-[1.5px] border-white rounded-full relative">
-        <div className="w-[2px] h-[2px] bg-white rounded-full absolute top-[0.5px] right-[0.5px]"></div>
-      </div>
-    </div>
+  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
+    <Image
+      src="/ssobig_assets/instaIcon.png"
+      alt="인스타그램 아이콘"
+      width={16}
+      height={16}
+      className="w-full h-full"
+    />
   </div>
 );
 
@@ -99,12 +93,8 @@ const Card: React.FC<CardProps> = ({
         rel="noopener noreferrer"
         className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-white/10 active:bg-white/20 ${linkTextClass}`}
       >
-        {linkIconType === "link" && (
-          <LinkIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 text-current" />
-        )}
-        {linkIconType === "instagram" && (
-          <CssInstagramIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
-        )}
+        {linkIconType === "link" && <LinkIcon />}
+        {linkIconType === "instagram" && <CssInstagramIcon />}
         {linkText}
       </a>
     </div>
@@ -153,7 +143,7 @@ export default function NowSeoulPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group"
           >
-            <CssInstagramIcon className="w-5 h-5 mr-2" />
+            <CssInstagramIcon className="w-5 h-5" />
             <span className="text-sm group-hover:underline">n.o.w.seoul</span>
           </a>
         </header>
