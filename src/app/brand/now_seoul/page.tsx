@@ -122,26 +122,31 @@ export default function NowSeoulPage() {
 
   return (
     <div
-      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-center p-4 selection:bg-blue-500 selection:text-white"
+      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-blue-500 selection:text-white"
       style={{
         backgroundImage: "url('/ssobig_assets/나우서울 배경.jpg')", // 사용자: 실제 배경 이미지 URL로 교체하세요.
       }}
     >
       <div className="absolute inset-0 bg-black/60 z-[1]"></div> {/* Overlay */}
       {/* Content takes higher z-index */}
-      <div className="relative z-10 flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
-        <header className="w-full max-w-[620px] mx-auto text-center pt-10 sm:pt-16 pb-8 sm:pb-12">
-          <h1 className="text-5xl sm:text-7xl font-bold text-white mb-2">
-            N.O.W
-          </h1>
-          <p className="text-xl sm:text-2xl text-neutral-300 mb-6">
-            Night Off Work
-          </p>
+      <div className="relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8">
+        <header className="w-full max-w-[620px] mx-auto text-center pt-0">
+          {/* 로고 이미지 */}
+          <div className="mt-[92px] mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center mx-auto">
+            <Image
+              src="/ssobig_assets/brand logo=나우서울.png"
+              alt="나우서울 로고"
+              layout="fill"
+              objectFit="contain"
+              className="mx-auto"
+              priority
+            />
+          </div>
           <a
             href="https://www.instagram.com/n.o.w.seoul/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group"
+            className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group mb-8"
           >
             <CssInstagramIcon className="w-5 h-5" />
             <span className="text-sm group-hover:underline">n.o.w.seoul</span>

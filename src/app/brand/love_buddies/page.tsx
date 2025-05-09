@@ -47,7 +47,7 @@ const LoveBuddiesPage = () => {
 
   return (
     <div
-      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-center p-4 selection:bg-pink-500 selection:text-white"
+      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-pink-500 selection:text-white"
       style={{
         backgroundImage: "url('/ssobig_assets/러브버디즈 배경.jpg')",
         backgroundSize: "cover",
@@ -65,7 +65,7 @@ const LoveBuddiesPage = () => {
       </div>
 
       {/* Content Area */}
-      <main className="z-10 flex flex-col items-center text-center max-w-[620px] w-full px-4">
+      <main className="z-10 flex flex-col items-center text-center max-w-[620px] w-full px-4 pt-0">
         {/* Logo Image */}
         <div className="mt-[92px] mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center">
           <Image

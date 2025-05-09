@@ -137,24 +137,29 @@ export default function GameOrbPage() {
 
   return (
     <div
-      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-center p-4 selection:bg-purple-500 selection:text-white"
+      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-purple-500 selection:text-white"
       style={{ backgroundImage: "url('/ssobig_assets/게임오브 배경.jpg')" }}
     >
       {/* Optional: Main page와 유사한 배경 이미지 및 오버레이를 추가할 수 있습니다. */}
       {/* <div className="absolute inset-0 bg-black/80 z-[1]"></div> */}
 
-      <div className="w-full max-w-[620px] mx-auto z-10 relative text-center pt-12 pb-8">
-        <h1
-          className="text-5xl font-bold text-white mb-6"
-          style={{ fontFamily: "'Playwrite US Trad', cursive" }}
-        >
-          GAME ORB
-        </h1>
+      <div className="w-full max-w-[620px] mx-auto z-10 relative text-center pt-0">
+        {/* 로고 이미지 */}
+        <div className="mt-[92px] mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center mx-auto">
+          <Image
+            src="/ssobig_assets/brand logo=게임오브.png"
+            alt="게임오브 로고"
+            layout="fill"
+            objectFit="contain"
+            className="mx-auto"
+            priority
+          />
+        </div>
         <a
           href="https://www.instagram.com/game_orb/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group"
+          className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group mb-8"
         >
           <CssInstagramIcon className="w-5 h-5 mr-2" />
           <span className="text-sm group-hover:underline">game_orb</span>
