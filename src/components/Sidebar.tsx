@@ -4,10 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-interface SidebarProps {
-  // 필요한 경우 props 추가
-}
-
 // 햄버거 아이콘 컴포넌트
 const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -26,7 +22,7 @@ const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const Sidebar: React.FC<SidebarProps> = () => {
+const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => {
