@@ -1,37 +1,31 @@
-import React from "react";
+"use client";
 
-// Helper components for Icons (copied from src/app/page.tsx)
-// Consider refactoring these into shared components
-const LinkIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    {...props}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656-5.656l-4-4a4 4 0 00-5.656 5.656l1.102 1.101"
-    ></path>
-  </svg>
+import React from "react";
+import Image from "next/image";
+
+// LinkIcon 컴포넌트를 실제 이미지로 변경
+const LinkIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
+    <Image
+      src="/ssobig_assets/linkIcon.png"
+      alt="링크 아이콘"
+      width={16}
+      height={16}
+      className="w-full h-full"
+    />
+  </div>
 );
 
+// Instagram 아이콘을 실제 이미지로 변경
 const CssInstagramIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="w-4 h-4 flex items-center justify-center" {...props}>
-    <div
-      className="w-full h-full rounded-[4px] flex items-center justify-center"
-      style={{
-        background:
-          "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
-      }}
-    >
-      <div className="w-2 h-2 border-[1.5px] border-white rounded-full relative">
-        <div className="w-[2px] h-[2px] bg-white rounded-full absolute top-[0.5px] right-[0.5px]"></div>
-      </div>
-    </div>
+  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
+    <Image
+      src="/ssobig_assets/instaIcon.png"
+      alt="인스타그램 아이콘"
+      width={16}
+      height={16}
+      className="w-full h-full"
+    />
   </div>
 );
 
@@ -48,6 +42,7 @@ interface CardProps {
   titleClass?: string;
   descriptionClass?: string;
   linkTextClass?: string;
+  fullImageCard?: boolean; // 전체 이미지 카드 여부를 나타내는 속성 추가
 }
 
 const Card: React.FC<CardProps> = ({
@@ -59,50 +54,93 @@ const Card: React.FC<CardProps> = ({
   linkHref,
   linkIconType,
   hasImageArea = true,
-  cardBgClass = "bg-neutral-700", // Adjusted for dark page
-  titleClass = "text-neutral-100 font-bold", // Adjusted for dark card on dark page
-  descriptionClass = "text-neutral-300", // Adjusted for dark card on dark page
-  linkTextClass = "text-neutral-300 hover:text-white", // Adjusted for dark card on dark page
-}) => (
-  <div
-    className={`rounded-xl shadow-lg flex flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass}`}
-  >
-    {hasImageArea && (
-      <div
-        className="w-1/3 flex-shrink-0 bg-neutral-600/30 flex items-center justify-center p-3 self-stretch"
-        style={imageAreaStyle} // Allows for backgroundImage
-      >
-        <span className="text-neutral-100 text-center text-xs">
-          {imagePlaceholderText}
-        </span>
-      </div>
-    )}
+  cardBgClass = "bg-neutral-900", // Near black for card
+  titleClass = "text-neutral-100 font-bold",
+  descriptionClass = "text-neutral-300",
+  linkTextClass = "text-neutral-300 hover:text-white",
+  fullImageCard = false, // 기본값은 false
+}) =>
+  fullImageCard ? (
+    // 전체 이미지 카드 스타일
     <div
-      className={`p-3 sm:p-4 flex-grow flex flex-col justify-center ${
-        !hasImageArea ? "items-start" : ""
-      }`}
+      className="rounded-[28px] shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col"
+      style={{
+        boxShadow: "0px 0px 20px 0px rgba(255, 255, 255, 0.50)",
+        height: "326.25px",
+        aspectRatio: "580/326.25",
+      }}
     >
-      <h3 className={`text-sm sm:text-base mb-1 ${titleClass}`}>{title}</h3>
-      <p className={`text-xs mb-1.5 leading-snug ${descriptionClass}`}>
-        {description}
-      </p>
-      <a
-        href={linkHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-black/10 active:bg-black/20 ${linkTextClass}`}
-      >
-        {linkIconType === "link" && (
-          <LinkIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 text-current" />
-        )}
-        {linkIconType === "instagram" && (
-          <CssInstagramIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
-        )}
-        {linkText}
-      </a>
+      <div
+        className="flex-1"
+        style={{
+          ...imageAreaStyle,
+          backgroundImage: imageAreaStyle?.backgroundImage,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      ></div>
+      <div className="bg-white px-4 py-3 text-black">
+        <h3 className="text-base font-bold mb-1">{title}</h3>
+        <div className="flex items-center">
+          <a
+            href={linkHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-neutral-600 group inline-flex items-center"
+          >
+            {linkIconType === "link" && (
+              <LinkIcon className="text-neutral-600" />
+            )}
+            {linkIconType === "instagram" && (
+              <CssInstagramIcon className="text-neutral-600" />
+            )}
+            {linkText}
+          </a>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  ) : (
+    // 기존 카드 스타일
+    <div
+      className={`rounded-xl shadow-lg flex flex-col sm:flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass}`}
+    >
+      {hasImageArea && (
+        <div
+          className="w-full sm:w-1/3 h-48 sm:h-auto flex-shrink-0 bg-neutral-700/50 flex items-center justify-center p-3 self-stretch"
+          style={imageAreaStyle} // Allows for backgroundImage
+        >
+          {/* If imageAreaStyle.backgroundImage is set, placeholder text might be hidden or styled to be an overlay */}
+          {!imageAreaStyle?.backgroundImage && (
+            <span className="text-neutral-100 text-center text-xs">
+              {imagePlaceholderText}
+            </span>
+          )}
+        </div>
+      )}
+      <div
+        className={`p-4 flex-grow flex flex-col justify-center ${
+          !hasImageArea ? "items-start" : ""
+        }`}
+      >
+        <h3 className={`text-base sm:text-lg mb-2 ${titleClass}`}>{title}</h3>
+        <p
+          className={`text-xs sm:text-sm mb-3 leading-relaxed ${descriptionClass}`}
+        >
+          {description}
+        </p>
+        <a
+          href={linkHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-white/10 active:bg-white/20 ${linkTextClass}`}
+        >
+          {linkIconType === "link" && <LinkIcon />}
+          {linkIconType === "instagram" && <CssInstagramIcon />}
+          {linkText}
+        </a>
+      </div>
+    </div>
+  );
 
 export default function GameOrbPage() {
   const gameOrbCards: CardProps[] = [
@@ -115,12 +153,11 @@ export default function GameOrbPage() {
       hasImageArea: true,
       imagePlaceholderText: "데블스플랜 참여",
       imageAreaStyle: {
-        backgroundImage:
-          "url('https://via.placeholder.com/300x200/2a2a2a/ffffff?Text=Hooded+Figure')", // 사용자: 이 URL을 실제 이미지로 교체하세요.
+        backgroundImage: "url('/ssobig_assets/devils_plan_hoodie.png')", // 후드 모양의 디지털 얼굴 이미지로 교체
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundColor: "#2a2a2a",
       },
+      fullImageCard: true, // 전체 이미지 카드로 설정
     },
     {
       title: "게임오브 정모 신청",
@@ -131,55 +168,73 @@ export default function GameOrbPage() {
       hasImageArea: true,
       imagePlaceholderText: "게임오브 정모",
       imageAreaStyle: {
-        backgroundImage:
-          "url('https://via.placeholder.com/300x200/2a2a2a/ffffff?Text=Group+Photo')", // 사용자: 이 URL을 실제 이미지로 교체하세요.
+        backgroundImage: "url('/ssobig_assets/devils_plan_hoodie.png')", // 첫 번째 카드와 동일한 이미지 사용
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundColor: "#2a2a2a",
       },
+      fullImageCard: true, // 전체 이미지 카드로 설정
     },
   ];
 
   return (
     <div
-      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-center p-4 selection:bg-purple-500 selection:text-white"
-      style={{ backgroundImage: "url('/ssobig_assets/게임오브 배경.jpg')" }}
+      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-purple-500 selection:text-white"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(0, 0, 0, 0.80) 0%, rgba(0, 0, 0, 0.40) 100%), url('/ssobig_assets/게임오브 배경.jpg') lightgray 50% / cover no-repeat",
+      }}
     >
       {/* Optional: Main page와 유사한 배경 이미지 및 오버레이를 추가할 수 있습니다. */}
       {/* <div className="absolute inset-0 bg-black/80 z-[1]"></div> */}
 
-      <div className="w-full max-w-2xl mx-auto z-10 relative text-center pt-12 pb-8">
-        <h1
-          className="text-5xl font-bold text-white mb-6"
-          style={{ fontFamily: "'Playwrite US Trad', cursive" }}
-        >
-          GAME ORB
-        </h1>
+      <div className="w-full max-w-[620px] mx-auto z-10 relative text-center pt-0">
+        {/* 로고 이미지 */}
+        <div className="mt-[92px] mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center mx-auto">
+          <Image
+            src="/ssobig_assets/brand logo=게임오브.png"
+            alt="게임오브 로고"
+            layout="fill"
+            objectFit="contain"
+            className="mx-auto"
+            priority
+          />
+        </div>
         <a
           href="https://www.instagram.com/game_orb/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group"
+          className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group mb-8"
+          aria-label="인스타그램으로 이동"
         >
-          <CssInstagramIcon className="w-5 h-5 mr-2" />
-          <span className="text-sm group-hover:underline">game_orb</span>
+          <div className="w-6 h-6">
+            <Image
+              src="/ssobig_assets/instaBigIcon.png"
+              alt="인스타그램 아이콘"
+              width={30}
+              height={30}
+              className="w-full h-full filter brightness-0 invert"
+            />
+          </div>
         </a>
       </div>
 
-      <main className="w-full max-w-2xl mx-auto z-10 relative">
-        <section className="mb-10 md:mb-12 text-center px-4">
-          <h2 className="text-3xl font-bold text-white mb-4">게임오브</h2>
-          <p className="text-base sm:text-lg text-neutral-300 max-w-xl mx-auto leading-relaxed">
-            &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
-            곳!
-            <br />
-            [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
-            모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어 있습니다.
-          </p>
+      <main className="w-full max-w-[620px] mx-auto z-10 relative">
+        <section className="mb-10 md:mb-12 px-4">
+          <div className="text-left w-full max-w-[580px]">
+            <h2 className="text-3xl font-bold text-white mb-4">게임오브</h2>
+            <p className="text-base sm:text-lg text-neutral-300 max-w-md leading-relaxed">
+              &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
+              곳!
+              <br />
+              [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
+              모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어
+              있습니다.
+            </p>
+          </div>
         </section>
 
         <section className="px-4 pb-12">
-          <div className="space-y-5 sm:space-y-6">
+          <div className="space-y-5 sm:space-y-6 max-w-[580px] mx-auto">
             {gameOrbCards.map((item) => (
               <Card key={item.title} {...item} />
             ))}
