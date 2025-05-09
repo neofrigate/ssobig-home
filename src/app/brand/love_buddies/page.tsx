@@ -22,17 +22,6 @@ const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 // LinkIcon 컴포넌트를 실제 이미지로 변경
-const LinkIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
-    <Image
-      src="/ssobig_assets/linkIcon.png"
-      alt="링크 아이콘"
-      width={16}
-      height={16}
-      className="w-full h-full"
-    />
-  </div>
-);
 
 // Instagram 아이콘을 실제 이미지로 변경
 const CssInstagramIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
@@ -58,7 +47,7 @@ const LoveBuddiesPage = () => {
 
   return (
     <div
-      className="min-h-screen text-white font-sans relative flex flex-col items-start justify-center p-4 selection:bg-pink-500 selection:text-white"
+      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-center p-4 selection:bg-pink-500 selection:text-white"
       style={{
         backgroundImage: "url('/ssobig_assets/러브버디즈 배경.jpg')",
         backgroundSize: "cover",
@@ -76,7 +65,7 @@ const LoveBuddiesPage = () => {
       </div>
 
       {/* Content Area */}
-      <main className="z-10 flex flex-col items-start text-left max-w-2xl w-full px-4 ml-8 sm:ml-16">
+      <main className="z-10 flex flex-col items-center text-center max-w-2xl w-full px-4">
         {/* Logo Placeholder - Replace with actual Love Buddies Logo Image/SVG */}
         <div className="mb-4">
           {/* Example: Using text as a placeholder */}
@@ -88,7 +77,7 @@ const LoveBuddiesPage = () => {
             {/* Example of a script-like font */}
             Love Buddies
           </h1>
-          <div className="w-16 h-1 bg-white mt-2 rounded-full"></div>
+          <div className="w-16 h-1 bg-white mx-auto mt-2 rounded-full"></div>
         </div>
 
         {/* Instagram Icon Link */}
@@ -101,26 +90,29 @@ const LoveBuddiesPage = () => {
           <span className="text-sm">love___buddies</span>
         </a>
 
-        {/* Title */}
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
-          러브버디즈
-        </h2>
+        <div className="text-left w-full max-w-md">
+          {/* Title */}
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+            러브버디즈
+          </h2>
 
-        {/* Subtitle */}
-        <p className="text-md sm:text-lg text-neutral-200 mb-1 max-w-md">
-          &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는 곳!
-        </p>
+          {/* Subtitle */}
+          <p className="text-md sm:text-lg text-neutral-200 mb-1 max-w-md">
+            &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
+            곳!
+          </p>
 
-        {/* Description */}
-        <p className="text-sm text-neutral-300 mb-10 max-w-md leading-relaxed">
-          [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이 모여
-          흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어 있습니다
-        </p>
+          {/* Description */}
+          <p className="text-sm text-neutral-300 mb-10 max-w-md leading-relaxed">
+            [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
+            모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어 있습니다
+          </p>
+        </div>
 
         {/* Main Action Button */}
         <a
           href="#" // Placeholder link
-          className="w-full max-w-sm bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 sm:py-4 px-6 rounded-full text-lg sm:text-xl shadow-lg transform transition-all hover:scale-105 duration-300 ease-in-out mb-6 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75"
+          className="flex p-4 justify-center items-center gap-4 w-full max-w-sm rounded-full bg-[#FF7EF7] text-white font-semibold text-lg sm:text-xl shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out mb-6 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75 aspect-[145/14]"
         >
           러브버디즈 콘텐츠 참여하기 🔮
         </a>
@@ -133,7 +125,7 @@ const LoveBuddiesPage = () => {
         {/* Review Event Button */}
         <a
           href="#" // Placeholder link
-          className="w-full max-w-sm bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 sm:py-4 px-6 rounded-full text-lg sm:text-xl shadow-lg transform transition-all hover:scale-105 duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75"
+          className="flex p-4 justify-center items-center gap-4 w-full max-w-sm rounded-full bg-[#FF7EF7] text-white font-semibold text-lg sm:text-xl shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75 aspect-[145/14]"
         >
           [일일남매] 참가후기 이벤트 👀
         </a>
