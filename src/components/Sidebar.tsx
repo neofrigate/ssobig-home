@@ -73,9 +73,17 @@ const Sidebar: React.FC = () => {
               <div className="mb-2 text-sm text-gray-400">Solutions</div>
               <Link
                 href="https://about.ssobig.com"
-                className="block py-2 hover:text-gray-300"
+                className="block py-2 hover:opacity-80 transition-opacity"
               >
-                ssobig tool
+                <div className="h-[30px] relative">
+                  <Image
+                    src="/ssobig_assets/brand logo 2=ssobigtool.png"
+                    alt="ssobig tool"
+                    width={120}
+                    height={30}
+                    className="object-contain"
+                  />
+                </div>
               </Link>
             </div>
 
@@ -83,21 +91,45 @@ const Sidebar: React.FC = () => {
               <div className="mb-2 text-sm text-gray-400">Social Brands</div>
               <Link
                 href="/brand/love_buddies"
-                className="block py-2 hover:text-gray-300"
+                className="block py-2 hover:opacity-80 transition-opacity"
               >
-                Love Buddies
+                <div className="h-[30px] relative">
+                  <Image
+                    src="/ssobig_assets/brand logo 2=러브버디즈.png"
+                    alt="Love Buddies"
+                    width={120}
+                    height={30}
+                    className="object-contain"
+                  />
+                </div>
               </Link>
               <Link
                 href="/brand/now_seoul"
-                className="block py-2 hover:text-gray-300"
+                className="block py-2 hover:opacity-80 transition-opacity"
               >
-                N.O.W.seoul
+                <div className="h-[30px] relative">
+                  <Image
+                    src="/ssobig_assets/brand logo 2=나우서울.png"
+                    alt="N.O.W.seoul"
+                    width={120}
+                    height={30}
+                    className="object-contain"
+                  />
+                </div>
               </Link>
               <Link
                 href="/brand/game_orb"
-                className="block py-2 hover:text-gray-300"
+                className="block py-2 hover:opacity-80 transition-opacity"
               >
-                GAME ORB
+                <div className="h-[30px] relative">
+                  <Image
+                    src="/ssobig_assets/brand logo 2=게임오브.png"
+                    alt="GAME ORB"
+                    width={120}
+                    height={30}
+                    className="object-contain"
+                  />
+                </div>
               </Link>
             </div>
 
@@ -105,11 +137,19 @@ const Sidebar: React.FC = () => {
               <div className="mb-2 text-sm text-gray-400">Community</div>
               <Link
                 href="https://dis.qa/hKclNB"
-                className="block py-2 hover:text-gray-300"
+                className="block py-2 hover:opacity-80 transition-opacity"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                SSOBIGS
+                <div className="h-[30px] relative">
+                  <Image
+                    src="/ssobig_assets/brand logo 2=ssobigs.png"
+                    alt="SSOBIGS"
+                    width={120}
+                    height={30}
+                    className="object-contain"
+                  />
+                </div>
               </Link>
             </div>
           </nav>
