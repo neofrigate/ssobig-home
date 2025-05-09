@@ -143,7 +143,7 @@ export default function GameOrbPage() {
       {/* Optional: Main page와 유사한 배경 이미지 및 오버레이를 추가할 수 있습니다. */}
       {/* <div className="absolute inset-0 bg-black/80 z-[1]"></div> */}
 
-      <div className="w-full max-w-2xl mx-auto z-10 relative text-center pt-12 pb-8">
+      <div className="w-full max-w-[620px] mx-auto z-10 relative text-center pt-12 pb-8">
         <h1
           className="text-5xl font-bold text-white mb-6"
           style={{ fontFamily: "'Playwrite US Trad', cursive" }}
@@ -161,10 +161,10 @@ export default function GameOrbPage() {
         </a>
       </div>
 
-      <main className="w-full max-w-2xl mx-auto z-10 relative">
+      <main className="w-full max-w-[620px] mx-auto z-10 relative">
         <section className="mb-10 md:mb-12 text-center px-4">
           <h2 className="text-3xl font-bold text-white mb-4">게임오브</h2>
-          <p className="text-base sm:text-lg text-neutral-300 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-neutral-300 max-w-[580px] mx-auto leading-relaxed">
             &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
             곳!
             <br />
@@ -174,7 +174,7 @@ export default function GameOrbPage() {
         </section>
 
         <section className="px-4 pb-12">
-          <div className="space-y-5 sm:space-y-6">
+          <div className="space-y-5 sm:space-y-6 max-w-[580px] mx-auto">
             {gameOrbCards.map((item) => (
               <Card key={item.title} {...item} />
             ))}

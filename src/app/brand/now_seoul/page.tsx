@@ -130,7 +130,7 @@ export default function NowSeoulPage() {
       <div className="absolute inset-0 bg-black/60 z-[1]"></div> {/* Overlay */}
       {/* Content takes higher z-index */}
       <div className="relative z-10 flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
-        <header className="w-full max-w-3xl mx-auto text-center pt-10 sm:pt-16 pb-8 sm:pb-12">
+        <header className="w-full max-w-[620px] mx-auto text-center pt-10 sm:pt-16 pb-8 sm:pb-12">
           <h1 className="text-5xl sm:text-7xl font-bold text-white mb-2">
             N.O.W
           </h1>
@@ -148,12 +148,12 @@ export default function NowSeoulPage() {
           </a>
         </header>
 
-        <main className="w-full max-w-3xl mx-auto">
+        <main className="w-full max-w-[620px] mx-auto">
           <section className="mb-10 md:mb-12 text-center px-2 sm:px-4">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
               N.O.W.seoul 나우서울
             </h2>
-            <p className="text-sm sm:text-base text-neutral-300 max-w-xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base text-neutral-300 max-w-[580px] mx-auto leading-relaxed">
               나우서울(N.O.W.seoul)은 &apos;Night Off Work&apos;의 줄임말로,
               퇴근 후 다양한 분야의 전문가들이 모여 아이디어를 나누고, 협업의
               가능성을 발견하는 커뮤니티입니다.
@@ -164,7 +164,7 @@ export default function NowSeoulPage() {
             <h3 className="text-xl sm:text-2xl font-semibold text-white mb-6 text-center">
               나우서울 신청링크
             </h3>
-            <div className="max-w-xl mx-auto">
+            <div className="max-w-[580px] mx-auto">
               <Card {...nowSeoulCard} />
             </div>
           </section>
@@ -173,7 +173,7 @@ export default function NowSeoulPage() {
             <h3 className="text-xl sm:text-2xl font-semibold text-white mb-8 text-center">
               Career Class
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-[580px] mx-auto">
               <div className="bg-neutral-800/70 backdrop-blur-sm p-6 rounded-lg text-center shadow-lg">
                 <h4 className="text-lg font-semibold text-white mb-2">
                   5/10, 5/24
