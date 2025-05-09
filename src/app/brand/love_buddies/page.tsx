@@ -1,6 +1,9 @@
-"use client";
-
 import React from "react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Ssobig-Love Buddies",
+};
 
 // Icons (Re-defined here for simplicity, consider moving to a shared components file)
 const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -38,14 +41,13 @@ const CssInstagramIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
 
 const LoveBuddiesPage = () => {
   // Placeholder background image URL, replace with actual image
-  const backgroundImageUrl =
-    "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1700&q=80"; // Example image
+  // const backgroundImageUrl = "/ssobig_assets/러브버디즈 배경.png"; // Example image
 
   return (
     <div
       className="min-h-screen text-white font-sans relative flex flex-col items-center justify-center p-4 selection:bg-pink-500 selection:text-white"
       style={{
-        backgroundImage: `url(${backgroundImageUrl})`,
+        backgroundImage: "url('/ssobig_assets/러브버디즈 배경.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -79,8 +81,6 @@ const LoveBuddiesPage = () => {
         {/* Instagram Icon Link */}
         <a
           href="https://www.instagram.com/love___buddies/" // Actual Instagram link
-          target="_blank"
-          rel="noopener noreferrer"
           aria-label="Love Buddies Instagram"
           className="mb-8 transition-transform hover:scale-110"
         >
