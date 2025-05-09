@@ -24,17 +24,6 @@ const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // LinkIcon 컴포넌트를 실제 이미지로 변경
 
 // Instagram 아이콘을 실제 이미지로 변경
-const CssInstagramIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
-    <Image
-      src="/ssobig_assets/instaIcon.png"
-      alt="인스타그램 아이콘"
-      width={16}
-      height={16}
-      className="w-full h-full"
-    />
-  </div>
-);
 
 const LoveBuddiesPage = () => {
   // Placeholder background image URL, replace with actual image
@@ -52,6 +41,7 @@ const LoveBuddiesPage = () => {
         backgroundImage: "url('/ssobig_assets/러브버디즈 배경.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       {/* Dark overlay */}
@@ -84,8 +74,15 @@ const LoveBuddiesPage = () => {
           aria-label="Love Buddies Instagram"
           className="mb-8 transition-transform hover:scale-110 flex items-center gap-1"
         >
-          <CssInstagramIcon className="w-5 h-5" />
-          <span className="text-sm">love___buddies</span>
+          <div className="w-6 h-6">
+            <Image
+              src="/ssobig_assets/instaBigIcon.png"
+              alt="인스타그램 아이콘"
+              width={30}
+              height={30}
+              className="w-full h-full filter brightness-0 invert"
+            />
+          </div>
         </a>
 
         <div className="text-left w-full max-w-[580px]">
@@ -109,10 +106,12 @@ const LoveBuddiesPage = () => {
 
         {/* Main Action Button */}
         <a
-          href="#" // Placeholder link
+          href="https://smore.im/form/0j4u3szCcL"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex p-4 justify-center items-center gap-4 w-full max-w-[580px] rounded-full bg-[#FF7EF7] text-white font-semibold text-lg sm:text-xl shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out mb-6 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75 aspect-[145/14]"
         >
-          러브버디즈 콘텐츠 참여하기 🔮
+          러브버디즈 콘텐츠 참여하기 🙋🏻‍♀
         </a>
 
         {/* Reviews Section Title */}
@@ -122,7 +121,9 @@ const LoveBuddiesPage = () => {
 
         {/* Review Event Button */}
         <a
-          href="#" // Placeholder link
+          href="https://smore.im/form/4gwuBM7ukA"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex p-4 justify-center items-center gap-4 w-full max-w-[580px] rounded-full bg-[#FF7EF7] text-white font-semibold text-lg sm:text-xl shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75 aspect-[145/14]"
         >
           [일일남매] 참가후기 이벤트 👀

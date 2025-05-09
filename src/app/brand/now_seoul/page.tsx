@@ -42,6 +42,7 @@ interface CardProps {
   titleClass?: string;
   descriptionClass?: string;
   linkTextClass?: string;
+  fullImageCard?: boolean; // 전체 이미지 카드 여부를 나타내는 속성 추가
 }
 
 const Card: React.FC<CardProps> = ({
@@ -57,74 +58,136 @@ const Card: React.FC<CardProps> = ({
   titleClass = "text-neutral-100 font-bold",
   descriptionClass = "text-neutral-300",
   linkTextClass = "text-neutral-300 hover:text-white",
-}) => (
-  <div
-    className={`rounded-xl shadow-lg flex flex-col sm:flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass}`}
-  >
-    {hasImageArea && (
-      <div
-        className="w-full sm:w-1/3 h-48 sm:h-auto flex-shrink-0 bg-neutral-700/50 flex items-center justify-center p-3 self-stretch"
-        style={imageAreaStyle} // Allows for backgroundImage
-      >
-        {/* If imageAreaStyle.backgroundImage is set, placeholder text might be hidden or styled to be an overlay */}
-        {!imageAreaStyle?.backgroundImage && (
-          <span className="text-neutral-100 text-center text-xs">
-            {imagePlaceholderText}
-          </span>
-        )}
-      </div>
-    )}
-    <div
-      className={`p-4 flex-grow flex flex-col justify-center ${
-        !hasImageArea ? "items-start" : ""
-      }`}
+  fullImageCard = false, // 기본값은 false
+}) =>
+  fullImageCard ? (
+    // 전체 이미지 카드 스타일
+    <a
+      href={linkHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block transition-all duration-300 hover:-translate-y-1"
     >
-      <h3 className={`text-base sm:text-lg mb-2 ${titleClass}`}>{title}</h3>
-      {/* Use dangerouslySetInnerHTML or a similar method if description contains HTML for line breaks */}
-      <p
-        className={`text-xs sm:text-sm mb-3 leading-relaxed ${descriptionClass}`}
-        dangerouslySetInnerHTML={{
-          __html: description.replace(/\n/g, "<br />"),
+      <div
+        className="rounded-[28px] shadow-lg overflow-hidden hover:shadow-xl flex flex-col"
+        style={{
+          boxShadow: "0px 0px 20px 0px rgba(255, 255, 255, 0.50)",
+          height: "326.25px",
+          aspectRatio: "580/326.25",
         }}
-      ></p>
-      <a
-        href={linkHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-white/10 active:bg-white/20 ${linkTextClass}`}
       >
-        {linkIconType === "link" && <LinkIcon />}
-        {linkIconType === "instagram" && <CssInstagramIcon />}
-        {linkText}
-      </a>
+        <div
+          className="flex-1"
+          style={{
+            ...imageAreaStyle,
+            backgroundImage: imageAreaStyle?.backgroundImage,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        ></div>
+        <div className="bg-white px-4 py-3 text-black">
+          <h3 className="text-base font-bold mb-1">{title}</h3>
+          <div className="flex items-center">
+            <div className="text-xs text-neutral-600 group inline-flex items-center">
+              {linkIconType === "link" && (
+                <LinkIcon className="text-neutral-600" />
+              )}
+              {linkIconType === "instagram" && (
+                <CssInstagramIcon className="text-neutral-600" />
+              )}
+              {linkText}
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  ) : (
+    // 기존 카드 스타일
+    <div
+      className={`rounded-xl shadow-lg flex flex-col sm:flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass}`}
+    >
+      {hasImageArea && (
+        <div
+          className="w-full sm:w-1/3 h-48 sm:h-auto flex-shrink-0 bg-neutral-700/50 flex items-center justify-center p-3 self-stretch"
+          style={imageAreaStyle} // Allows for backgroundImage
+        >
+          {/* If imageAreaStyle.backgroundImage is set, placeholder text might be hidden or styled to be an overlay */}
+          {!imageAreaStyle?.backgroundImage && (
+            <span className="text-neutral-100 text-center text-xs">
+              {imagePlaceholderText}
+            </span>
+          )}
+        </div>
+      )}
+      <div
+        className={`p-4 flex-grow flex flex-col justify-center ${
+          !hasImageArea ? "items-start" : ""
+        }`}
+      >
+        <h3 className={`text-base sm:text-lg mb-2 ${titleClass}`}>{title}</h3>
+        {/* Use dangerouslySetInnerHTML or a similar method if description contains HTML for line breaks */}
+        <p
+          className={`text-xs sm:text-sm mb-3 leading-relaxed ${descriptionClass}`}
+          dangerouslySetInnerHTML={{
+            __html: description.replace(/\n/g, "<br />"),
+          }}
+        ></p>
+        <a
+          href={linkHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-white/10 active:bg-white/20 ${linkTextClass}`}
+        >
+          {linkIconType === "link" && <LinkIcon />}
+          {linkIconType === "instagram" && <CssInstagramIcon />}
+          {linkText}
+        </a>
+      </div>
     </div>
-  </div>
-);
+  );
 
 export default function NowSeoulPage() {
   const nowSeoulCard: CardProps = {
     title: "[Meet Up] 목요일 저녁 7시 참여하기",
     description:
       "N.O.W.seoul\n매주 목요일 7:30PM\n지옥철 대신 만나는 새로운 인연과 아이디어",
-    linkText: "about.ssobig.com",
-    linkHref: "https://about.ssobig.com",
+    linkText: "smore.im/form/F0P6EWOhoW",
+    linkHref: "https://smore.im/form/F0P6EWOhoW",
     linkIconType: "link",
     hasImageArea: true,
     imagePlaceholderText: "N.O.W.seoul Meetup",
-    cardBgClass: "bg-neutral-800/80 backdrop-blur-sm", // Card background for the image
     imageAreaStyle: {
-      backgroundImage:
-        "url('https://via.placeholder.com/400x250/1A237E/FFFFFF?Text=N.O.W+Seoul+Meetup+Image')", // 사용자: 실제 이미지 URL로 교체하세요.
+      backgroundImage: "url('/ssobig_assets/now_seoul_regular.png')",
       backgroundSize: "cover",
       backgroundPosition: "center",
     },
+    fullImageCard: true, // 전체 이미지 카드로 설정
+  };
+
+  const careerClassCard: CardProps = {
+    title: "[Class] 토요일 오후 3시 수강신청",
+    description: "N.O.W.seoul 커리어 클래스",
+    linkText: "smore.im/form/I2qQSKCTHm",
+    linkHref: "https://smore.im/form/I2qQSKCTHm",
+    linkIconType: "link",
+    hasImageArea: true,
+    imagePlaceholderText: "N.O.W.seoul Career Class",
+    imageAreaStyle: {
+      backgroundImage: "url('/ssobig_assets/career_class.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    },
+    fullImageCard: true, // 전체 이미지 카드로 설정
   };
 
   return (
     <div
       className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-blue-500 selection:text-white"
       style={{
-        backgroundImage: "url('/ssobig_assets/나우서울 배경.jpg')", // 사용자: 실제 배경 이미지 URL로 교체하세요.
+        backgroundImage: "url('/ssobig_assets/나우서울 배경.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       <div className="absolute inset-0 bg-black/60 z-[1]"></div> {/* Overlay */}
@@ -147,9 +210,17 @@ export default function NowSeoulPage() {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group mb-8"
+            aria-label="인스타그램으로 이동"
           >
-            <CssInstagramIcon className="w-5 h-5" />
-            <span className="text-sm group-hover:underline">n.o.w.seoul</span>
+            <div className="w-6 h-6">
+              <Image
+                src="/ssobig_assets/instaBigIcon.png"
+                alt="인스타그램 아이콘"
+                width={30}
+                height={30}
+                className="w-full h-full filter brightness-0 invert"
+              />
+            </div>
           </a>
         </header>
 
@@ -175,22 +246,8 @@ export default function NowSeoulPage() {
           </section>
 
           <section className="mb-12 px-2 sm:px-0">
-            <h3 className="text-xl sm:text-2xl font-semibold text-white mb-8 text-center">
-              Career Class
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-[580px] mx-auto">
-              <div className="bg-neutral-800/70 backdrop-blur-sm p-6 rounded-lg text-center shadow-lg">
-                <h4 className="text-lg font-semibold text-white mb-2">
-                  5/10, 5/24
-                </h4>
-                <p className="text-neutral-300">15:00~18:00</p>
-              </div>
-              <div className="bg-neutral-800/70 backdrop-blur-sm p-6 rounded-lg text-center shadow-lg">
-                <h4 className="text-lg font-semibold text-white mb-2">
-                  5/17, 5/31
-                </h4>
-                <p className="text-neutral-300">15:00~18:00</p>
-              </div>
+            <div className="max-w-[580px] mx-auto">
+              <Card {...careerClassCard} />
             </div>
           </section>
         </main>
