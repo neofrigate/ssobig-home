@@ -219,15 +219,18 @@ export default function GameOrbPage() {
       </div>
 
       <main className="w-full max-w-[620px] mx-auto z-10 relative">
-        <section className="mb-10 md:mb-12 text-center px-4">
-          <h2 className="text-3xl font-bold text-white mb-4">게임오브</h2>
-          <p className="text-base sm:text-lg text-neutral-300 max-w-[580px] mx-auto leading-relaxed">
-            &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
-            곳!
-            <br />
-            [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
-            모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어 있습니다.
-          </p>
+        <section className="mb-10 md:mb-12 px-4">
+          <div className="text-left w-full max-w-[580px]">
+            <h2 className="text-3xl font-bold text-white mb-4">게임오브</h2>
+            <p className="text-base sm:text-lg text-neutral-300 max-w-md leading-relaxed">
+              &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
+              곳!
+              <br />
+              [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
+              모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어
+              있습니다.
+            </p>
+          </div>
         </section>
 
         <section className="px-4 pb-12">

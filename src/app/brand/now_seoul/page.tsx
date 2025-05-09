@@ -225,19 +225,21 @@ export default function NowSeoulPage() {
         </header>
 
         <main className="w-full max-w-[620px] mx-auto">
-          <section className="mb-10 md:mb-12 text-center px-2 sm:px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-              N.O.W.seoul 나우서울
-            </h2>
-            <p className="text-sm sm:text-base text-neutral-300 max-w-[580px] mx-auto leading-relaxed">
-              나우서울(N.O.W.seoul)은 &apos;Night Off Work&apos;의 줄임말로,
-              퇴근 후 다양한 분야의 전문가들이 모여 아이디어를 나누고, 협업의
-              가능성을 발견하는 커뮤니티입니다.
-            </p>
+          <section className="mb-10 md:mb-12 px-2 sm:px-0">
+            <div className="text-left w-full max-w-[580px]">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                N.O.W.seoul 나우서울
+              </h2>
+              <p className="text-sm sm:text-base text-neutral-300 max-w-md leading-relaxed">
+                나우서울(N.O.W.seoul)은 &apos;Night Off Work&apos;의 줄임말로,
+                퇴근 후 다양한 분야의 전문가들이 모여 아이디어를 나누고, 협업의
+                가능성을 발견하는 커뮤니티입니다.
+              </p>
+            </div>
           </section>
 
           <section className="mb-10 md:mb-12 px-2 sm:px-0">
-            <h3 className="text-xl sm:text-2xl font-semibold text-white mb-6 text-center">
+            <h3 className="text-xl sm:text-2xl font-semibold text-white mb-6 text-left">
               나우서울 신청링크
             </h3>
             <div className="max-w-[580px] mx-auto">
