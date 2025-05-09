@@ -74,8 +74,11 @@ const Card: React.FC<CardProps> = ({
   const handleClick = () => {
     if (linkHref.startsWith("/")) {
       router.push(linkHref);
+    } else if (linkHref.startsWith("http")) {
+      window.open(linkHref, "_blank", "noopener,noreferrer");
     } else {
-      window.location.href = linkHref; // Changed to navigate in the current tab
+      //  만약 다른 종류의 링크가 있다면 여기에 처리 로직 추가
+      console.warn(`Unhandled link type: ${linkHref}`);
     }
   };
 
@@ -86,7 +89,7 @@ const Card: React.FC<CardProps> = ({
     >
       {hasImageArea && (
         <div
-          className="w-1/3 flex-shrink-0 flex items-center justify-center self-stretch"
+          className="w-1/3 flex-shrink-0 flex items-center justify-center self-stretch overflow-hidden"
           style={imageAreaStyle}
         >
           {imageUrl ? (
@@ -95,7 +98,7 @@ const Card: React.FC<CardProps> = ({
               alt={title}
               width={256}
               height={256}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
             />
           ) : (
             <span className="text-neutral-100 text-center text-xs">
@@ -130,7 +133,7 @@ const Card: React.FC<CardProps> = ({
 };
 
 export default function Home() {
-  const brandItems: CardProps[] = [
+  const solutionItems: CardProps[] = [
     {
       title: "Ssobig tool",
       description: "인터렉션 소통, 게임화 제작 툴",
@@ -140,6 +143,9 @@ export default function Home() {
       imageUrl: "/ssobig_assets/쏘빅카드로고.png",
       imageAreaStyle: { backgroundColor: "#000000" }, // Black background
     },
+  ];
+
+  const brandItems: CardProps[] = [
     {
       title: "러브버디즈1",
       description: "매력있고 사람스러운 찐친 만드는 곳",
@@ -174,7 +180,7 @@ export default function Home() {
       title: "쏘빅 커뮤니티",
       description: "쏘빅 커뮤니티",
       linkText: "슬랙링크",
-      linkHref: "#", // Placeholder
+      linkHref: "https://dis.qa/hKclNB", // Placeholder
       linkIconType: "link",
       hasImageArea: false, // No image area for this card
       cardBgClass: "bg-neutral-200",
@@ -190,7 +196,7 @@ export default function Home() {
     // bg-neutral-900 simulates the dark background if no image is set
     // The actual background image (https://ifh.cc/g/kFZATV.jpg) should be set via CSS for linktree-container
     <div
-      className="min-h-screen text-neutral-100 font-sans relative flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8 selection:bg-orange-500 selection:text-white"
+      className="min-h-screen text-neutral-100 font-sans relative flex flex-col items-center pt-[72px] px-4 sm:px-6 lg:px-8 selection:bg-orange-500 selection:text-white"
       style={{
         backgroundImage: "url('/ssobig_assets/러브버디즈 배경.jpg')",
         backgroundSize: "cover",
@@ -198,17 +204,13 @@ export default function Home() {
         backgroundAttachment: "fixed", // Add this for a fixed background
       }}
     >
-      {/* This div simulates the background image with an overlay from the HTML */}
-      <div
-        // Remove backgroundImage style from here
-        className="group relative w-full h-60 sm:h-72 md:h-80 lg:h-96 xl:h-[480px] 2xl:h-[520px] bg-cover bg-center rounded-xl shadow-2xl transition-all duration-500 ease-in-out transform hover:scale-105 overflow-hidden"
-      ></div>
+      {/* This div applies a dark overlay */}
       <div className="absolute inset-0 bg-black/80 z-[1]"></div>
 
       {/* Content Container */}
       <main className="w-full max-w-2xl mx-auto z-10 relative">
         {/* Profile Section */}
-        <header className="text-center pt-8 sm:pt-12 mb-8 md:mb-10">
+        <header className="text-center mb-8 md:mb-10">
           <div
             className="w-20 h-20 md:w-24 md:h-24 bg-black rounded-full mx-auto mb-5 flex items-center justify-center shadow-lg border border-black overflow-hidden"
             // Simulating var(--primary-brand) which was black
@@ -233,16 +235,34 @@ export default function Home() {
           </p>
         </header>
 
-        {/* Brand Section */}
+        {/* Solutions Section */}
         <section className="mb-10 md:mb-12">
           <div className="flex items-center gap-4 sm:gap-5 text-center mb-5 sm:mb-6">
             <hr className="flex-grow border-t border-neutral-500/80" />
-            {/* Using PlaywriteUsTrad font for section titles would require font setup */}
             <h2
               className="text-lg sm:text-xl font-normal text-white shrink-0 px-2"
               style={{ fontFamily: "'Playwrite US Trad', cursive" }}
             >
-              Brand
+              Solutions
+            </h2>
+            <hr className="flex-grow border-t border-neutral-500/80" />
+          </div>
+          <div className="space-y-4 sm:space-y-5">
+            {solutionItems.map((item) => (
+              <Card key={item.title} {...item} />
+            ))}
+          </div>
+        </section>
+
+        {/* Brands Section */}
+        <section className="mb-10 md:mb-12">
+          <div className="flex items-center gap-4 sm:gap-5 text-center mb-5 sm:mb-6">
+            <hr className="flex-grow border-t border-neutral-500/80" />
+            <h2
+              className="text-lg sm:text-xl font-normal text-white shrink-0 px-2"
+              style={{ fontFamily: "'Playwrite US Trad', cursive" }}
+            >
+              Brands
             </h2>
             <hr className="flex-grow border-t border-neutral-500/80" />
           </div>

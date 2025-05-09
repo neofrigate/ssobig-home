@@ -103,7 +103,12 @@ const Sidebar: React.FC = () => {
 
             <div className="mb-6">
               <div className="mb-2 text-sm text-gray-400">Community</div>
-              <Link href="#" className="block py-2 hover:text-gray-300">
+              <Link
+                href="https://dis.qa/hKclNB"
+                className="block py-2 hover:text-gray-300"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 SSOBIGS
               </Link>
             </div>
