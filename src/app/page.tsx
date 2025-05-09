@@ -84,12 +84,12 @@ const Card: React.FC<CardProps> = ({
 
   return (
     <div
-      className={`rounded-xl shadow-lg flex flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass} cursor-pointer`}
+      className={`rounded-xl shadow-lg flex flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass} cursor-pointer h-24`}
       onClick={handleClick}
     >
       {hasImageArea && (
         <div
-          className="w-1/3 flex-shrink-0 flex items-center justify-center self-stretch overflow-hidden"
+          className="w-1/2 flex-shrink-0 flex items-center justify-center self-stretch overflow-hidden"
           style={imageAreaStyle}
         >
           {imageUrl ? (
