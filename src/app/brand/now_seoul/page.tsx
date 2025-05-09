@@ -66,13 +66,12 @@ const Card: React.FC<CardProps> = ({
       href={linkHref}
       target="_blank"
       rel="noopener noreferrer"
-      className="block transition-all duration-300 hover:-translate-y-1"
+      className="block w-full transition-all duration-300 hover:-translate-y-1"
     >
       <div
-        className="rounded-[28px] shadow-lg overflow-hidden hover:shadow-xl flex flex-col"
+        className="rounded-[28px] shadow-lg overflow-hidden hover:shadow-xl flex flex-col w-full"
         style={{
           boxShadow: "0px 0px 20px 0px rgba(255, 255, 255, 0.50)",
-          height: "326.25px",
           aspectRatio: "580/326.25",
         }}
       >

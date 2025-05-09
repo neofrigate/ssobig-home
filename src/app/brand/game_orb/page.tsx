@@ -62,43 +62,49 @@ const Card: React.FC<CardProps> = ({
 }) =>
   fullImageCard ? (
     // 전체 이미지 카드 스타일
-    <div
-      className="rounded-[28px] shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col"
-      style={{
-        boxShadow: "0px 0px 20px 0px rgba(255, 255, 255, 0.50)",
-        height: "326.25px",
-        aspectRatio: "580/326.25",
-      }}
+    <a
+      href={linkHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block w-full transition-all duration-300 hover:-translate-y-1"
     >
       <div
-        className="flex-1"
+        className="rounded-[28px] shadow-lg overflow-hidden hover:shadow-xl flex flex-col w-full"
         style={{
-          ...imageAreaStyle,
-          backgroundImage: imageAreaStyle?.backgroundImage,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          boxShadow: "0px 0px 20px 0px rgba(255, 255, 255, 0.50)",
+          aspectRatio: "580/326.25",
         }}
-      ></div>
-      <div className="bg-white px-4 py-3 text-black">
-        <h3 className="text-base font-bold mb-1">{title}</h3>
-        <div className="flex items-center">
-          <a
-            href={linkHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-neutral-600 group inline-flex items-center"
-          >
-            {linkIconType === "link" && (
-              <LinkIcon className="text-neutral-600" />
-            )}
-            {linkIconType === "instagram" && (
-              <CssInstagramIcon className="text-neutral-600" />
-            )}
-            {linkText}
-          </a>
+      >
+        <div
+          className="flex-1"
+          style={{
+            ...imageAreaStyle,
+            backgroundImage: imageAreaStyle?.backgroundImage,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        ></div>
+        <div className="bg-white px-4 py-3 text-black">
+          <h3 className="text-base font-bold mb-1">{title}</h3>
+          <div className="flex items-center">
+            <a
+              href={linkHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-neutral-600 group inline-flex items-center"
+            >
+              {linkIconType === "link" && (
+                <LinkIcon className="text-neutral-600" />
+              )}
+              {linkIconType === "instagram" && (
+                <CssInstagramIcon className="text-neutral-600" />
+              )}
+              {linkText}
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    </a>
   ) : (
     // 기존 카드 스타일
     <div
@@ -218,8 +224,8 @@ export default function GameOrbPage() {
         </a>
       </div>
 
-      <main className="w-full max-w-[620px] mx-auto z-10 relative">
-        <section className="mb-10 md:mb-12 px-4">
+      <main className="w-full max-w-[620px] mx-auto z-10 relative px-4">
+        <section className="mb-10 md:mb-12">
           <div className="text-left w-full max-w-[580px]">
             <h2 className="text-3xl font-bold text-white mb-4">게임오브</h2>
             <p className="text-base sm:text-lg text-neutral-300 max-w-md leading-relaxed">
@@ -233,7 +239,7 @@ export default function GameOrbPage() {
           </div>
         </section>
 
-        <section className="px-4 pb-12">
+        <section className="pb-12">
           <div className="space-y-5 sm:space-y-6 max-w-[580px] mx-auto">
             {gameOrbCards.map((item) => (
               <Card key={item.title} {...item} />
