@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { HamburgerIcon } from "../../../components/IconComponents";
+import ActionButton from "../../../components/ActionButton";
 
 // LinkIcon 컴포넌트를 실제 이미지로 변경
 
@@ -88,14 +89,14 @@ const LoveBuddiesPage = () => {
         </div>
 
         {/* Main Action Button */}
-        <a
-          href="https://smore.im/form/0j4u3szCcL"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex p-4 justify-center items-center gap-4 w-full max-w-[580px] rounded-full bg-[#FF7EF7] text-white font-semibold text-lg sm:text-xl shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out mb-6 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75 aspect-[145/14]"
+        <ActionButton
+          href="/brand/love_buddies/day_nammae"
+          className="mb-6"
+          target="_self"
+          rel=""
         >
           러브버디즈 콘텐츠 참여하기 🙋🏻‍♀
-        </a>
+        </ActionButton>
 
         {/* Reviews Section Title */}
         <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">
@@ -103,14 +104,9 @@ const LoveBuddiesPage = () => {
         </h3>
 
         {/* Review Event Button */}
-        <a
-          href="https://smore.im/form/4gwuBM7ukA"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex p-4 justify-center items-center gap-4 w-full max-w-[580px] rounded-full bg-[#FF7EF7] text-white font-semibold text-lg sm:text-xl shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-75 aspect-[145/14]"
-        >
+        <ActionButton href="https://smore.im/form/4gwuBM7ukA" className="mb-0">
           [일일남매] 참가후기 이벤트 👀
-        </a>
+        </ActionButton>
       </main>
     </div>
   );
