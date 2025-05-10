@@ -1,24 +1,20 @@
-"use client";
-
-import React, { useEffect } from "react";
-// import Image from "next/image"; // Image 컴포넌트 제거
+import Image from "next/image";
 import { HamburgerIcon } from "../../../../components/IconComponents";
 import ActionButton from "../../../../components/ActionButton";
 
+export const metadata = {
+  title: "Ssobig-Love Buddies-일일남매",
+};
+
+const backgroundImages = [
+  "/images/dayNammae/일일남매_1.jpg",
+  "/images/dayNammae/일일남매_2.jpg",
+  "/images/dayNammae/일일남매_3.jpg",
+  "/images/dayNammae/일일남매_4.jpg",
+  "/images/dayNammae/일일남매_5.jpg",
+];
+
 const DayNammaePage = () => {
-  const backgroundImages = [
-    "/images/dayNammae/일일남매_1.jpg",
-    "/images/dayNammae/일일남매_2.jpg",
-    "/images/dayNammae/일일남매_3.jpg",
-    "/images/dayNammae/일일남매_4.jpg",
-    "/images/dayNammae/일일남매_5.jpg",
-  ];
-
-  useEffect(() => {
-    // 클라이언트 측에서 문서 제목 설정
-    document.title = "Ssobig-Love Buddies-일일남매";
-  }, []);
-
   return (
     <div className="relative h-screen overflow-y-auto snap-y snap-mandatory">
       {/* 각 배경 이미지 섹션 */}
@@ -26,21 +22,24 @@ const DayNammaePage = () => {
         <section
           key={index}
           className="h-screen w-full flex flex-col items-center justify-center relative snap-start snap-always"
-          style={{
-            backgroundImage: `url(${src})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
         >
-          {/* <div className="absolute inset-0 bg-black/70 z-0"></div> */}
+          {/* next/image로 배경 이미지 처리 */}
+          <div className="absolute inset-0 w-full h-full -z-10">
+            <Image
+              src={src}
+              alt={`일일남매 배경 ${index + 1}`}
+              fill
+              style={{ objectFit: "cover", objectPosition: "center" }}
+              priority={index === 0}
+              sizes="100vw"
+            />
+          </div>
 
           {index === 0 && (
             <>
               {/* 첫 번째 섹션에만 로고와 콘텐츠 표시 */}
               <div className="z-10 flex flex-col items-center text-center max-w-[620px] w-full px-4 pt-0">
                 {/* Logo Image 제거*/}
-
                 {/* 일일남매 콘텐츠 제거 */}
               </div>
             </>

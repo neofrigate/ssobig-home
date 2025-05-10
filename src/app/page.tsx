@@ -1,13 +1,14 @@
-"use client";
-
-import React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import MainCard, { MainCardProps } from "../components/MainCard";
+import CardWrapper from "../components/CardWrapper";
+
+export const metadata = {
+  title: "Ssobig Home",
+  description:
+    "인터렉션과 소통, 게임화를 통해 사람들을 연결하는 플랫폼 쏘빅입니다.",
+};
 
 export default function Home() {
-  const router = useRouter();
-
   const solutionItems: MainCardProps[] = [
     {
       title: "Ssobig tool",
@@ -65,27 +66,24 @@ export default function Home() {
     },
   ];
 
-  // Card onClick 핸들러 정의
-  const handleCardClick = (href: string) => {
-    if (href.startsWith("/")) {
-      router.push(href);
-    } else if (href.startsWith("http")) {
-      window.open(href, "_blank", "noopener,noreferrer");
-    } else {
-      console.warn(`Unhandled link type: ${href}`);
-    }
-  };
-
   return (
-    <div
-      className="min-h-screen text-neutral-100 font-sans relative flex flex-col items-center pt-[72px] px-4 sm:px-6 lg:px-8 selection:bg-orange-500 selection:text-white"
-      style={{
-        backgroundImage: "url('/ssobig_assets/러브버디즈 배경.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
+    <div className="min-h-screen text-neutral-100 font-sans relative flex flex-col items-center pt-[72px] px-4 sm:px-6 lg:px-8 selection:bg-orange-500 selection:text-white">
+      {/* 배경 이미지 next/image 적용 */}
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src="/ssobig_assets/러브버디즈 배경.jpg"
+          alt="쏘빅 배경"
+          fill
+          style={{
+            objectFit: "cover",
+            objectPosition: "center",
+          }}
+          priority
+          sizes="100vw"
+          className="fixed"
+        />
+      </div>
+
       {/* 배경에 오버레이 적용 */}
       <div className="absolute inset-0 bg-black/80 z-[1]"></div>
 
@@ -128,13 +126,9 @@ export default function Home() {
           </div>
           <div className="space-y-4 sm:space-y-5">
             {solutionItems.map((item) => (
-              <div
-                key={item.title}
-                onClick={() => handleCardClick(item.linkHref)}
-                className="cursor-pointer"
-              >
+              <CardWrapper key={item.title} href={item.linkHref}>
                 <MainCard {...item} />
-              </div>
+              </CardWrapper>
             ))}
           </div>
         </section>
@@ -153,13 +147,9 @@ export default function Home() {
           </div>
           <div className="space-y-4 sm:space-y-5">
             {brandItems.map((item) => (
-              <div
-                key={item.title}
-                onClick={() => handleCardClick(item.linkHref)}
-                className="cursor-pointer"
-              >
+              <CardWrapper key={item.title} href={item.linkHref}>
                 <MainCard {...item} />
-              </div>
+              </CardWrapper>
             ))}
           </div>
         </section>
@@ -178,13 +168,9 @@ export default function Home() {
           </div>
           <div className="space-y-4 sm:space-y-5">
             {communityItems.map((item) => (
-              <div
-                key={item.title}
-                onClick={() => handleCardClick(item.linkHref)}
-                className="cursor-pointer"
-              >
+              <CardWrapper key={item.title} href={item.linkHref}>
                 <MainCard {...item} />
-              </div>
+              </CardWrapper>
             ))}
           </div>
         </section>
