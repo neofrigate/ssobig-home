@@ -1,46 +1,54 @@
-"use client";
-
-import React, { useEffect } from "react";
-// import Image from "next/image"; // Image 컴포넌트 제거
+import Image from "next/image";
 import { HamburgerIcon } from "../../../../components/IconComponents";
 import ActionButton from "../../../../components/ActionButton";
 
+export const metadata = {
+  title: "Ssobig-Love Buddies-일일남매",
+};
+
+const backgroundImages = [
+  "/images/dayNammae/일일남매_1.jpg",
+  "/images/dayNammae/일일남매_2.jpg",
+  "/images/dayNammae/일일남매_3.jpg",
+  "/images/dayNammae/일일남매_4.jpg",
+  "/images/dayNammae/일일남매_5.jpg",
+];
+
 const DayNammaePage = () => {
-  const backgroundImages = [
-    "/images/dayNammae/일일남매_1.jpg",
-    "/images/dayNammae/일일남매_2.jpg",
-    "/images/dayNammae/일일남매_3.jpg",
-    "/images/dayNammae/일일남매_4.jpg",
-    "/images/dayNammae/일일남매_5.jpg",
-  ];
-
-  useEffect(() => {
-    // 클라이언트 측에서 문서 제목 설정
-    document.title = "Ssobig-Love Buddies-일일남매";
-  }, []);
-
   return (
-    <div className="relative h-screen overflow-y-auto snap-y snap-mandatory">
+    <div className="relative h-screen overflow-y-auto">
       {/* 각 배경 이미지 섹션 */}
       {backgroundImages.map((src, index) => (
         <section
           key={index}
-          className="h-screen w-full flex flex-col items-center justify-center relative snap-start snap-always"
-          style={{
-            backgroundImage: `url(${src})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
+          className="w-full relative flex flex-col items-center m-0 p-0"
         >
-          {/* <div className="absolute inset-0 bg-black/70 z-0"></div> */}
+          {/* 이미지 컨테이너: 모든 margin 제거 (m-0 추가) */}
+          <div className="w-full max-w-[620px] mx-auto m-0">
+            <Image
+              src={src}
+              alt={`일일남매 배경 ${index + 1}`}
+              width={0}
+              height={0}
+              style={{
+                width: "100%",
+                height: "auto",
+                objectFit: "contain",
+                objectPosition: "center",
+                margin: 0,
+                padding: 0,
+                display: "block", // block으로 설정하여 이미지 사이 기본 간격 제거
+              }}
+              priority={index === 0}
+              sizes="(max-width: 620px) 100vw, 620px"
+            />
+          </div>
 
           {index === 0 && (
             <>
-              {/* 첫 번째 섹션에만 로고와 콘텐츠 표시 */}
+              {/* 첫 번째 섹션에만 로고와 콘텐츠 표시 - mt-4 제거 */}
               <div className="z-10 flex flex-col items-center text-center max-w-[620px] w-full px-4 pt-0">
                 {/* Logo Image 제거*/}
-
                 {/* 일일남매 콘텐츠 제거 */}
               </div>
             </>

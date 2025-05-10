@@ -1,8 +1,9 @@
-"use client";
-
-import React from "react";
 import Image from "next/image";
 import Card, { CardProps } from "../../../components/Card";
+
+export const metadata = {
+  title: "Ssobig-N.O.W.seoul 나우서울",
+};
 
 export default function NowSeoulPage() {
   const nowSeoulCard: CardProps = {
@@ -19,7 +20,7 @@ export default function NowSeoulPage() {
       backgroundSize: "cover",
       backgroundPosition: "center",
     },
-    fullImageCard: true, // 전체 이미지 카드로 설정
+    fullImageCard: true,
   };
 
   const careerClassCard: CardProps = {
@@ -35,19 +36,22 @@ export default function NowSeoulPage() {
       backgroundSize: "cover",
       backgroundPosition: "center",
     },
-    fullImageCard: true, // 전체 이미지 카드로 설정
+    fullImageCard: true,
   };
 
   return (
-    <div
-      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-blue-500 selection:text-white"
-      style={{
-        backgroundImage: "url('/ssobig_assets/나우서울 배경.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-blue-500 selection:text-white">
+      {/* 배경 이미지 next/image 적용 */}
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src="/ssobig_assets/나우서울 배경.jpg"
+          alt="나우서울 배경"
+          fill
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          priority
+          sizes="100vw"
+        />
+      </div>
       <div className="absolute inset-0 bg-black/60 z-[1]"></div> {/* Overlay */}
       {/* Content takes higher z-index */}
       <div className="relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8">
@@ -57,8 +61,8 @@ export default function NowSeoulPage() {
             <Image
               src="/ssobig_assets/brand logo=나우서울.png"
               alt="나우서울 로고"
-              layout="fill"
-              objectFit="contain"
+              fill
+              style={{ objectFit: "contain" }}
               className="mx-auto"
               priority
             />
@@ -111,7 +115,6 @@ export default function NowSeoulPage() {
             </div>
           </section>
         </main>
-        {/* 홈으로 돌아가는 링크 또는 푸터 등을 여기에 추가할 수 있습니다. */}
       </div>
     </div>
   );

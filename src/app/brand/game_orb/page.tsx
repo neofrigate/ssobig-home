@@ -1,8 +1,9 @@
-"use client";
-
-import React from "react";
 import Image from "next/image";
 import Card, { CardProps } from "../../../components/Card";
+
+export const metadata = {
+  title: "Ssobig-Game Orb",
+};
 
 export default function GameOrbPage() {
   const gameOrbCards: CardProps[] = [
@@ -15,41 +16,44 @@ export default function GameOrbPage() {
       hasImageArea: true,
       imagePlaceholderText: "데블스플랜 참여",
       imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/devils_plan_hoodie.png')", // 후드 모양의 디지털 얼굴 이미지로 교체
+        backgroundImage: "url('/ssobig_assets/devils_plan_hoodie.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       },
-      fullImageCard: true, // 전체 이미지 카드로 설정
+      fullImageCard: true,
     },
     {
       title: "게임오브 정모 신청",
       description: "커뮤니티 멤버들과 함께하는 정모에 참여하세요.",
       linkText: "about.ssobig.com",
-      linkHref: "https://about.ssobig.com", // 이미지에 따르면 두 카드 모두 같은 링크를 사용합니다.
+      linkHref: "https://about.ssobig.com",
       linkIconType: "link",
       hasImageArea: true,
       imagePlaceholderText: "게임오브 정모",
       imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/devils_plan_hoodie.png')", // 첫 번째 카드와 동일한 이미지 사용
+        backgroundImage: "url('/ssobig_assets/devils_plan_hoodie.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       },
-      fullImageCard: true, // 전체 이미지 카드로 설정
+      fullImageCard: true,
     },
   ];
 
   return (
-    <div
-      className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-purple-500 selection:text-white"
-      style={{
-        background:
-          "linear-gradient(180deg, rgba(0, 0, 0, 0.80) 0%, rgba(0, 0, 0, 0.40) 100%), url('/ssobig_assets/게임오브 배경.jpg') lightgray 50% / cover no-repeat",
-      }}
-    >
-      {/* 햄버거 버튼 제거 */}
-
-      {/* Optional: Main page와 유사한 배경 이미지 및 오버레이를 추가할 수 있습니다. */}
-      {/* <div className="absolute inset-0 bg-black/80 z-[1]"></div> */}
+    <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-purple-500 selection:text-white">
+      {/* 배경 이미지 next/image 적용 */}
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src="/ssobig_assets/게임오브 배경.jpg"
+          alt="게임오브 배경"
+          fill
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          priority
+          sizes="100vw"
+        />
+        {/* 배경 이미지 위에 그라데이션 오버레이 적용 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/40"></div>
+      </div>
 
       <div className="w-full max-w-[620px] mx-auto z-10 relative text-center pt-0">
         {/* 로고 이미지 */}
@@ -57,8 +61,8 @@ export default function GameOrbPage() {
           <Image
             src="/ssobig_assets/brand logo=게임오브.png"
             alt="게임오브 로고"
-            layout="fill"
-            objectFit="contain"
+            fill
+            style={{ objectFit: "contain" }}
             className="mx-auto"
             priority
           />
@@ -105,7 +109,6 @@ export default function GameOrbPage() {
           </div>
         </section>
       </main>
-      {/* 홈으로 돌아가는 링크 등을 여기에 추가할 수 있습니다. */}
     </div>
   );
 }
