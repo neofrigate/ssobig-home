@@ -2,24 +2,7 @@
 
 import React, { useEffect } from "react";
 import Image from "next/image";
-
-// Icons (Re-defined here for simplicity, consider moving to a shared components file)
-const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    {...props}
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="w-8 h-8 text-neutral-100 hover:text-neutral-300 transition-colors"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-    />
-  </svg>
-);
+import { HamburgerIcon } from "../../../components/IconComponents";
 
 // LinkIcon 컴포넌트를 실제 이미지로 변경
 

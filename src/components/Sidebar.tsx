@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
   return (
     <>
       {/* 햄버거 버튼 - 항상 표시 */}
-      <div className="absolute top-6 right-6 sm:top-8 sm:right-8 z-50">
+      <div className="fixed top-6 right-6 sm:top-8 sm:right-8 z-50">
         <button aria-label="메뉴 열기" className="p-2" onClick={toggleSidebar}>
           <HamburgerIcon />
         </button>

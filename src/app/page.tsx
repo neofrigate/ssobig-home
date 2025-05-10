@@ -1,126 +1,13 @@
-"use client"; // Add this at the top
+"use client";
 
-// Helper components for Icons (can be moved to a separate file later)
+import React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // Import useRouter
-
-// LinkIcon 컴포넌트를 실제 이미지로 변경
-const LinkIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
-    <Image
-      src="/ssobig_assets/linkIcon.png"
-      alt="링크 아이콘"
-      width={16}
-      height={16}
-      className="w-full h-full"
-    />
-  </div>
-);
-
-// New Instagram Icon based on provided CSS
-const CssInstagramIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
-    <Image
-      src="/ssobig_assets/instaIcon.png"
-      alt="인스타그램 아이콘"
-      width={16}
-      height={16}
-      className="w-full h-full"
-    />
-  </div>
-);
-
-interface CardProps {
-  imagePlaceholderText?: string; // Text for the image placeholder area
-  imageAreaStyle?: React.CSSProperties; // For background images/colors if needed
-  title: string;
-  description: string;
-  linkText: string;
-  linkHref: string;
-  linkIconType: "link" | "instagram";
-  hasImageArea?: boolean; // To control if the image area is rendered
-  cardBgClass?: string; // e.g. bg-neutral-200 for --background-card
-  titleClass?: string; // e.g. text-neutral-900 for --text-dark
-  descriptionClass?: string; // e.g. text-neutral-700 for --text-gray
-  linkTextClass?: string; // e.g. text-neutral-700 for --text-gray
-  imageUrl?: string; // Add imageUrl property for actual images
-}
-
-const Card: React.FC<CardProps> = ({
-  imagePlaceholderText = "Image Area",
-  imageAreaStyle,
-  title,
-  description,
-  linkText,
-  linkHref,
-  linkIconType,
-  hasImageArea = true, // Default to having an image area
-  cardBgClass = "bg-neutral-200", // from --background-card (originally gray-300)
-  titleClass = "text-neutral-900 font-bold", // from --text-dark, Pretendard-Bold
-  descriptionClass = "text-neutral-700", // from --text-gray, Pretendard-Regular
-  linkTextClass = "text-neutral-700", // from --text-gray, Pretendard-Regular
-  imageUrl,
-}) => {
-  const router = useRouter();
-
-  const handleClick = () => {
-    if (linkHref.startsWith("/")) {
-      router.push(linkHref);
-    } else if (linkHref.startsWith("http")) {
-      window.open(linkHref, "_blank", "noopener,noreferrer");
-    } else {
-      //  만약 다른 종류의 링크가 있다면 여기에 처리 로직 추가
-      console.warn(`Unhandled link type: ${linkHref}`);
-    }
-  };
-
-  return (
-    <div
-      className={`rounded-xl shadow-lg flex flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass} cursor-pointer h-24`}
-      onClick={handleClick}
-    >
-      {hasImageArea && (
-        <div
-          className="w-1/2 flex-shrink-0 flex items-center justify-center self-stretch overflow-hidden"
-          style={imageAreaStyle}
-        >
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={256}
-              height={256}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-neutral-100 text-center text-xs">
-              {imagePlaceholderText}
-            </span>
-          )}
-        </div>
-      )}
-      <div
-        className={`p-3 sm:p-4 flex-grow flex flex-col justify-center ${
-          !hasImageArea ? "items-start" : ""
-        }`}
-      >
-        <h3 className={`text-sm sm:text-base mb-1 ${titleClass}`}>{title}</h3>
-        <p className={`text-xs mb-1.5 leading-snug ${descriptionClass}`}>
-          {description}
-        </p>
-        <div
-          className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 ${linkTextClass}`}
-        >
-          {linkIconType === "link" && <LinkIcon />}
-          {linkIconType === "instagram" && <CssInstagramIcon />}
-          {linkText}
-        </div>
-      </div>
-    </div>
-  );
-};
+import { useRouter } from "next/navigation";
+import Card, { CardProps } from "../components/Card";
 
 export default function Home() {
+  const router = useRouter();
+
   const solutionItems: CardProps[] = [
     {
       title: "Ssobig tool",
@@ -128,8 +15,12 @@ export default function Home() {
       linkText: "about.ssobig.com",
       linkHref: "https://about.ssobig.com",
       linkIconType: "link",
-      imageUrl: "/ssobig_assets/쏘빅카드로고.png",
-      imageAreaStyle: { backgroundColor: "#000000" }, // Black background
+      imageAreaStyle: {
+        backgroundImage: "url('/ssobig_assets/쏘빅카드로고.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundColor: "#000000",
+      },
     },
   ];
 
@@ -137,29 +28,39 @@ export default function Home() {
     {
       title: "러브버디즈",
       description: "매력있고 사람스러운 찐친 만드는 곳",
-      linkText: "love___buddies", // Adjusted from love__buddies
-      linkHref: "/brand/love_buddies", // Changed to internal link
-      linkIconType: "instagram", // 링크 아이콘을 인스타그램 아이콘으로 변경
-      imageUrl: "/ssobig_assets/러브버디즈.png",
-      imageAreaStyle: { backgroundColor: "#000000" }, // Black background
+      linkText: "love___buddies",
+      linkHref: "/brand/love_buddies",
+      linkIconType: "instagram",
+      imageAreaStyle: {
+        backgroundImage: "url('/ssobig_assets/러브버디즈.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundColor: "#000000",
+      },
     },
     {
       title: "N.O.W.seoul 나우서울",
       description: "퇴근 후 만나는 전문직 비즈니스 네트워킹 모임",
       linkText: "n.o.w.seoul",
       linkHref: "/brand/now_seoul",
-      linkIconType: "instagram", // 링크 아이콘을 인스타그램 아이콘으로 변경
-      imageUrl: "/ssobig_assets/나우서울.png",
-      imageAreaStyle: {}, // Removed backgroundColor
+      linkIconType: "instagram",
+      imageAreaStyle: {
+        backgroundImage: "url('/ssobig_assets/나우서울.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      },
     },
     {
       title: "게임오브",
       description: "TV속 게임을 만들고 플레이하는 커뮤니티",
       linkText: "game_orb",
       linkHref: "/brand/game_orb",
-      linkIconType: "instagram", // 링크 아이콘을 인스타그램 아이콘으로 변경
-      imageUrl: "/ssobig_assets/게임오브.png",
-      imageAreaStyle: {}, // Removed backgroundColor
+      linkIconType: "instagram",
+      imageAreaStyle: {
+        backgroundImage: "url('/ssobig_assets/게임오브.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      },
     },
   ];
 
@@ -168,9 +69,9 @@ export default function Home() {
       title: "쏘빅 커뮤니티",
       description: "쏘빅 커뮤니티",
       linkText: "슬랙링크",
-      linkHref: "https://dis.qa/hKclNB", // Placeholder
+      linkHref: "https://dis.qa/hKclNB",
       linkIconType: "link",
-      hasImageArea: false, // No image area for this card
+      hasImageArea: false,
       cardBgClass: "bg-neutral-200",
       titleClass: "text-neutral-900 font-bold",
       descriptionClass: "text-neutral-700",
@@ -178,31 +79,35 @@ export default function Home() {
     },
   ];
 
-  // Using Pretendard and PlaywriteUsTrad requires font setup in layout.tsx or tailwind.config.js
-  // For now, using system sans-serif or existing font settings.
+  // Card onClick 핸들러 정의
+  const handleCardClick = (href: string) => {
+    if (href.startsWith("/")) {
+      router.push(href);
+    } else if (href.startsWith("http")) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      console.warn(`Unhandled link type: ${href}`);
+    }
+  };
+
   return (
-    // bg-neutral-900 simulates the dark background if no image is set
-    // The actual background image (https://ifh.cc/g/kFZATV.jpg) should be set via CSS for linktree-container
     <div
       className="min-h-screen text-neutral-100 font-sans relative flex flex-col items-center pt-[72px] px-4 sm:px-6 lg:px-8 selection:bg-orange-500 selection:text-white"
       style={{
         backgroundImage: "url('/ssobig_assets/러브버디즈 배경.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundAttachment: "fixed", // Add this for a fixed background
+        backgroundAttachment: "fixed",
       }}
     >
-      {/* This div applies a dark overlay */}
+      {/* 배경에 오버레이 적용 */}
       <div className="absolute inset-0 bg-black/80 z-[1]"></div>
 
-      {/* Content Container */}
+      {/* 콘텐츠 컨테이너 */}
       <main className="w-full max-w-2xl mx-auto z-10 relative">
-        {/* Profile Section */}
+        {/* 프로필 섹션 */}
         <header className="text-center mb-8 md:mb-10">
-          <div
-            className="w-20 h-20 md:w-24 md:h-24 bg-black rounded-full mx-auto mb-5 flex items-center justify-center shadow-lg border border-black overflow-hidden"
-            // Simulating var(--primary-brand) which was black
-          >
+          <div className="w-20 h-20 md:w-24 md:h-24 bg-black rounded-full mx-auto mb-5 flex items-center justify-center shadow-lg border border-black overflow-hidden">
             {/* 쏘빅 로고 이미지 */}
             <Image
               src="/ssobig_assets/쏘빅 로고.png"
@@ -223,7 +128,7 @@ export default function Home() {
           </p>
         </header>
 
-        {/* Solutions Section */}
+        {/* Solutions 섹션 */}
         <section className="mb-10 md:mb-12">
           <div className="flex items-center gap-4 sm:gap-5 text-center mb-5 sm:mb-6">
             <hr className="flex-grow border-t border-neutral-500/80" />
@@ -237,12 +142,18 @@ export default function Home() {
           </div>
           <div className="space-y-4 sm:space-y-5">
             {solutionItems.map((item) => (
-              <Card key={item.title} {...item} />
+              <div
+                key={item.title}
+                onClick={() => handleCardClick(item.linkHref)}
+                className="cursor-pointer"
+              >
+                <Card {...item} />
+              </div>
             ))}
           </div>
         </section>
 
-        {/* Brands Section */}
+        {/* Brands 섹션 */}
         <section className="mb-10 md:mb-12">
           <div className="flex items-center gap-4 sm:gap-5 text-center mb-5 sm:mb-6">
             <hr className="flex-grow border-t border-neutral-500/80" />
@@ -256,13 +167,19 @@ export default function Home() {
           </div>
           <div className="space-y-4 sm:space-y-5">
             {brandItems.map((item) => (
-              <Card key={item.title} {...item} />
+              <div
+                key={item.title}
+                onClick={() => handleCardClick(item.linkHref)}
+                className="cursor-pointer"
+              >
+                <Card {...item} />
+              </div>
             ))}
           </div>
         </section>
 
-        {/* Community Section */}
-        <section>
+        {/* Community 섹션 */}
+        <section className="mb-14 md:mb-20">
           <div className="flex items-center gap-4 sm:gap-5 text-center mb-5 sm:mb-6">
             <hr className="flex-grow border-t border-neutral-500/80" />
             <h2
@@ -275,10 +192,21 @@ export default function Home() {
           </div>
           <div className="space-y-4 sm:space-y-5">
             {communityItems.map((item) => (
-              <Card key={item.title} {...item} />
+              <div
+                key={item.title}
+                onClick={() => handleCardClick(item.linkHref)}
+                className="cursor-pointer"
+              >
+                <Card {...item} />
+              </div>
             ))}
           </div>
         </section>
+
+        {/* 푸터 */}
+        <footer className="text-center text-neutral-400 text-xs pb-8">
+          <p>© 2022 ssobig. All rights reserved.</p>
+        </footer>
       </main>
     </div>
   );
