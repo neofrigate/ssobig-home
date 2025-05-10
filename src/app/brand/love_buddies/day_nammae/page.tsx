@@ -16,28 +16,37 @@ const backgroundImages = [
 
 const DayNammaePage = () => {
   return (
-    <div className="relative h-screen overflow-y-auto snap-y snap-mandatory">
+    <div className="relative h-screen overflow-y-auto">
       {/* 각 배경 이미지 섹션 */}
       {backgroundImages.map((src, index) => (
         <section
           key={index}
-          className="h-screen w-full flex flex-col items-center justify-center relative snap-start snap-always"
+          className="w-full relative flex flex-col items-center m-0 p-0"
         >
-          {/* next/image로 배경 이미지 처리 */}
-          <div className="absolute inset-0 w-full h-full -z-10">
+          {/* 이미지 컨테이너: 모든 margin 제거 (m-0 추가) */}
+          <div className="w-full max-w-[620px] mx-auto m-0">
             <Image
               src={src}
               alt={`일일남매 배경 ${index + 1}`}
-              fill
-              style={{ objectFit: "cover", objectPosition: "center" }}
+              width={0}
+              height={0}
+              style={{
+                width: "100%",
+                height: "auto",
+                objectFit: "contain",
+                objectPosition: "center",
+                margin: 0,
+                padding: 0,
+                display: "block", // block으로 설정하여 이미지 사이 기본 간격 제거
+              }}
               priority={index === 0}
-              sizes="100vw"
+              sizes="(max-width: 620px) 100vw, 620px"
             />
           </div>
 
           {index === 0 && (
             <>
-              {/* 첫 번째 섹션에만 로고와 콘텐츠 표시 */}
+              {/* 첫 번째 섹션에만 로고와 콘텐츠 표시 - mt-4 제거 */}
               <div className="z-10 flex flex-col items-center text-center max-w-[620px] w-full px-4 pt-0">
                 {/* Logo Image 제거*/}
                 {/* 일일남매 콘텐츠 제거 */}
