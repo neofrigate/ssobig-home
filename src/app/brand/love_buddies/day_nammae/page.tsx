@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import Image from "next/image";
+// import Image from "next/image"; // Image 컴포넌트 제거
 import { HamburgerIcon } from "../../../../components/IconComponents";
 import ActionButton from "../../../../components/ActionButton";
 
@@ -39,32 +39,9 @@ const DayNammaePage = () => {
             <>
               {/* 첫 번째 섹션에만 로고와 콘텐츠 표시 */}
               <div className="z-10 flex flex-col items-center text-center max-w-[620px] w-full px-4 pt-0">
-                {/* Logo Image */}
-                <div className="mt-[92px] mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center">
-                  <Image
-                    src="/ssobig_assets/brand logo=러브버디즈.png"
-                    alt="러브버디즈 로고"
-                    fill
-                    style={{ objectFit: "contain" }}
-                    className="mx-auto"
-                    priority
-                  />
-                </div>
+                {/* Logo Image 제거*/}
 
-                {/* 일일남매 콘텐츠 */}
-                <div className="text-left w-full max-w-[580px] text-white">
-                  <h2 className="text-3xl sm:text-4xl font-bold mb-3">
-                    일일남매
-                  </h2>
-                  <p className="text-md sm:text-lg text-neutral-200 mb-1 max-w-md">
-                    하루 동안 서로의 매력을 탐색하는 특별한 만남
-                  </p>
-                  <p className="text-sm text-neutral-300 mb-10 max-w-md leading-relaxed">
-                    일일남매는 서로를 깊이 이해하고 성장할 수 있는 특별한 경험을
-                    제공합니다. 하루 동안 서로의 이야기를 나누고, 미션을 함께
-                    수행하며 의미 있는 시간을 보내세요.
-                  </p>
-                </div>
+                {/* 일일남매 콘텐츠 제거 */}
               </div>
             </>
           )}
