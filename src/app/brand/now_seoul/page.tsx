@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Card, { CardProps } from "../../../components/Card";
-import Head from "next/head";
+import Script from "next/script";
 
 export const metadata = {
   title: "Ssobig-N.O.W.seoul 나우서울",
@@ -42,35 +42,32 @@ export default function NowSeoulPage() {
 
   return (
     <>
-      <Head>
-        {/* Meta Pixel Code */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '2385974028469308');
-fbq('track', 'PageView');
-            `,
-          }}
+      {/* Meta Pixel Code */}
+      <Script id="facebook-pixel-now-seoul" strategy="afterInteractive">
+        {`
+          !function(f,b,e,v,n,t,s)
+          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', '2385974028469308');
+          fbq('track', 'PageView');
+        `}
+      </Script>
+      <noscript>
+        <Image
+          height={1}
+          width={1}
+          style={{ display: "none" }}
+          src="https://www.facebook.com/tr?id=2385974028469308&ev=PageView&noscript=1"
+          alt=""
         />
-        <noscript>
-          <Image
-            height={1}
-            width={1}
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=2385974028469308&ev=PageView&noscript=1"
-            alt=""
-          />
-        </noscript>
-        {/* End Meta Pixel Code */}
-      </Head>
+      </noscript>
+      {/* End Meta Pixel Code */}
+
       <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-blue-500 selection:text-white">
         {/* 배경 이미지 next/image 적용 */}
         <div className="absolute inset-0 -z-10">
