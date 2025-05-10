@@ -190,7 +190,7 @@ export default function Home() {
         </section>
 
         {/* 푸터 */}
-        <footer className="text-center text-neutral-400 text-xs pb-8">
+        <footer className="text-left text-neutral-400 text-xs pb-8">
           <p className="footer_p">주식회사 쏘빅</p>
           <p className="footer_p">&nbsp;</p>
           <p className="footer_p">
