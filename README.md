@@ -1,8 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+이 프로젝트는 [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app)으로 시작된 [Next.js](https://nextjs.org) 프로젝트입니다.
 
-## Getting Started
+## 시작하기
 
-First, run the development server:
+먼저 개발 서버를 실행합니다:
 
 ```bash
 npm run dev
@@ -14,23 +14,50 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 [http://localhost:3000](http://localhost:3000)에 접속하여 결과를 확인하세요.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+페이지는 `app/page.tsx`를 수정하여 편집할 수 있으며, 파일을 수정할 때마다 자동으로 업데이트됩니다.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+이 프로젝트는 [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)를 사용하여 새로운 폰트 패밀리 [Geist](https://vercel.com/font)를 자동으로 최적화하고 로드합니다.
 
-## Learn More
+## 프로젝트 구조
 
-To learn more about Next.js, take a look at the following resources:
+프로젝트의 폴더 구조에 대한 간략한 개요입니다:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **`.next/`**: Next.js 빌드 결과물을 저장합니다. 일반적으로 직접 수정할 필요는 없습니다.
+- **`public/`**: 이미지, 폰트 등 정적 에셋을 포함합니다. 이 파일들은 루트 경로 (`/`)에서 제공됩니다.
+- **`src/`**: 대부분의 애플리케이션 코드가 위치하는 곳입니다.
+  - **`src/app/`**: App Router를 사용하는 Next.js 13+의 핵심 애플리케이션 디렉토리입니다. `app` 내부의 각 폴더는 일반적으로 URL 경로에 매핑됩니다.
+    - `page.tsx`: 특정 라우트의 페이지를 나타냅니다.
+    - `layout.tsx`: 페이지를 감싸는 UI 셸을 정의합니다.
+  - **`src/components/`**: 애플리케이션 전체에서 사용되는 재사용 가능한 UI 컴포넌트를 포함합니다.
+- **`node_modules/`**: 모든 프로젝트 종속성(npm 패키지)을 포함합니다.
+- **`package.json`**: 프로젝트 종속성을 나열하고 스크립트(예: `npm run dev`)를 정의합니다.
+- **`tsconfig.json`**: TypeScript 컴파일러의 구성 파일입니다.
+- **`.gitignore`**: Git이 무시해야 하는, 의도적으로 추적되지 않는 파일을 지정합니다.
+- **`next.config.ts`**: Next.js의 구성 파일입니다.
+- **`README.md`**: 현재 이 파일이며, 프로젝트에 대한 정보를 제공합니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 쏘빅 (Ssobig) 프로젝트 소개
 
-## Deploy on Vercel
+이 프로젝트는 쏘빅에서 제공하는 다양한 소셜링 서비스를 소개하고 참여를 돕기 위한 웹사이트입니다.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+쏘빅은 '술 없이도 즐거운 만남'을 모토로, 사람들이 서로 교류하고 의미있는 관계를 형성할 수 있는 다양한 소셜링 이벤트를 제공합니다.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 주요 기능 및 링크
+
+- **다양한 소셜링**:
+  - **러브버디즈**: 매력적이고 사랑스러운 '찐친'들을 만들 수 있는 모임입니다.
+    - 러브버디즈 소개 및 신청: [러브버디즈 콘텐츠 참여하기](https://smore.im/form/0j4u3szCcL) (실제 서비스 페이지에서 확인된 링크)
+    - 참가 후기 이벤트: [[일일남매] 참가후기 이벤트](https://smore.im/form/4gwuBM7ukA) (실제 서비스 페이지에서 확인된 링크)
+  - 다른 소셜링들 (추가 예정)
+- **쏘빅툴 (SsobigTool) 소프트웨어**:
+  - 쏘빅의 소셜링을 더욱 편리하게 즐길 수 있도록 돕는 도구입니다. (자세한 설명 및 링크 추가 예정)
+  - [쏘빅툴 다운로드/접속 링크](#) (여기에 실제 링크를 넣어주세요)
+- **쏘빅 커뮤니티**:
+  - 쏘빅의 다양한 소식과 이벤트 정보를 공유하고, 다른 참가자들과 소통할 수 있는 커뮤니티입니다.
+  - [쏘빅 커뮤니티 슬랙 바로가기](#) (여기에 실제 링크를 넣어주세요)
+
+## 배포 (Deployment)
+
+이 프로젝트는 GitHub `main` 브랜치에 변경 사항이 푸시되면 자동으로 배포됩니다.
