@@ -190,6 +190,8 @@ export default function GameOrbPage() {
           "linear-gradient(180deg, rgba(0, 0, 0, 0.80) 0%, rgba(0, 0, 0, 0.40) 100%), url('/ssobig_assets/게임오브 배경.jpg') lightgray 50% / cover no-repeat",
       }}
     >
+      {/* 햄버거 버튼 제거 */}
+
       {/* Optional: Main page와 유사한 배경 이미지 및 오버레이를 추가할 수 있습니다. */}
       {/* <div className="absolute inset-0 bg-black/80 z-[1]"></div> */}
 
