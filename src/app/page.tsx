@@ -3,40 +3,32 @@
 import React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Card, { CardProps } from "../components/Card";
+import MainCard, { MainCardProps } from "../components/MainCard";
 
 export default function Home() {
   const router = useRouter();
 
-  const solutionItems: CardProps[] = [
+  const solutionItems: MainCardProps[] = [
     {
       title: "Ssobig tool",
       description: "인터렉션 소통, 게임화 제작 툴",
       linkText: "about.ssobig.com",
       linkHref: "https://about.ssobig.com",
       linkIconType: "link",
-      imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/쏘빅카드로고.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundColor: "#000000",
-      },
+      imageUrl: "/ssobig_assets/쏘빅카드로고.png",
+      imageAreaStyle: { backgroundColor: "#000000" },
     },
   ];
 
-  const brandItems: CardProps[] = [
+  const brandItems: MainCardProps[] = [
     {
       title: "러브버디즈",
       description: "매력있고 사람스러운 찐친 만드는 곳",
       linkText: "love___buddies",
       linkHref: "/brand/love_buddies",
       linkIconType: "instagram",
-      imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/러브버디즈.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundColor: "#000000",
-      },
+      imageUrl: "/ssobig_assets/러브버디즈.png",
+      imageAreaStyle: { backgroundColor: "#000000" },
     },
     {
       title: "N.O.W.seoul 나우서울",
@@ -44,11 +36,8 @@ export default function Home() {
       linkText: "n.o.w.seoul",
       linkHref: "/brand/now_seoul",
       linkIconType: "instagram",
-      imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/나우서울.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      },
+      imageUrl: "/ssobig_assets/나우서울.png",
+      imageAreaStyle: {},
     },
     {
       title: "게임오브",
@@ -56,15 +45,12 @@ export default function Home() {
       linkText: "game_orb",
       linkHref: "/brand/game_orb",
       linkIconType: "instagram",
-      imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/게임오브.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      },
+      imageUrl: "/ssobig_assets/게임오브.png",
+      imageAreaStyle: {},
     },
   ];
 
-  const communityItems: CardProps[] = [
+  const communityItems: MainCardProps[] = [
     {
       title: "쏘빅 커뮤니티",
       description: "쏘빅 커뮤니티",
@@ -147,7 +133,7 @@ export default function Home() {
                 onClick={() => handleCardClick(item.linkHref)}
                 className="cursor-pointer"
               >
-                <Card {...item} />
+                <MainCard {...item} />
               </div>
             ))}
           </div>
@@ -172,7 +158,7 @@ export default function Home() {
                 onClick={() => handleCardClick(item.linkHref)}
                 className="cursor-pointer"
               >
-                <Card {...item} />
+                <MainCard {...item} />
               </div>
             ))}
           </div>
@@ -197,7 +183,7 @@ export default function Home() {
                 onClick={() => handleCardClick(item.linkHref)}
                 className="cursor-pointer"
               >
-                <Card {...item} />
+                <MainCard {...item} />
               </div>
             ))}
           </div>
@@ -205,7 +191,49 @@ export default function Home() {
 
         {/* 푸터 */}
         <footer className="text-center text-neutral-400 text-xs pb-8">
-          <p>© 2022 ssobig. All rights reserved.</p>
+          <p className="footer_p">주식회사 쏘빅</p>
+          <p className="footer_p">&nbsp;</p>
+          <p className="footer_p">
+            대표자 : 안민우, 조원철 사업자등록번호 : 140-87-03096
+          </p>
+          <p className="footer_p">전화번호 : 02-2635-7942</p>
+          <p className="footer_e-mail">E-mail : ssobigstudio@gmail.com</p>
+          <p className="footer_p">
+            통신판매업신고번호 : 제2024-서울영등포-0816호
+          </p>
+          <p className="footer_p">
+            주소 : 서울특별시 서초구 사평대로55길 37, (실란트로타워)지하2층
+            (반포동)
+          </p>
+          <p className="footer_p">&nbsp;</p>
+          <p className="footer_p">
+            <a
+              href="https://about.ssobig.com/privacy_policy"
+              style={{ color: "inherit", textDecoration: "underline" }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              개인정보 처리방침
+            </a>
+            <span style={{ margin: "0 5px" }}>|</span>
+            <a
+              href="https://about.ssobig.com/terms_of_service"
+              style={{ color: "inherit", textDecoration: "underline" }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              이용약관
+            </a>
+            <span style={{ margin: "0 5px" }}>|</span>
+            <a
+              href="https://about.ssobig.com/refund_policy"
+              style={{ color: "inherit", textDecoration: "underline" }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              환불정책
+            </a>
+          </p>
         </footer>
       </main>
     </div>
