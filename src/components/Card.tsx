@@ -1,5 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { LinkIcon, CssInstagramIcon } from "./IconComponents";
+import { appendUtmParams } from "../utils/utm";
 
 // Card 컴포넌트의 Props 인터페이스
 export interface CardProps {
@@ -33,11 +36,18 @@ const Card: React.FC<CardProps> = ({
   descriptionClass = "text-neutral-300",
   linkTextClass = "text-neutral-300 hover:text-white",
   fullImageCard = false, // 기본값은 false
-}) =>
-  fullImageCard ? (
+}) => {
+  const [urlWithUtm, setUrlWithUtm] = useState(linkHref);
+
+  useEffect(() => {
+    // 클라이언트 사이드에서만 UTM 파라미터 추가
+    setUrlWithUtm(appendUtmParams(linkHref));
+  }, [linkHref]);
+
+  return fullImageCard ? (
     // 전체 이미지 카드 스타일
     <a
-      href={linkHref}
+      href={urlWithUtm}
       target="_blank"
       rel="noopener noreferrer"
       className="block w-full transition-all duration-300 hover:-translate-y-1"
@@ -104,7 +114,7 @@ const Card: React.FC<CardProps> = ({
           }}
         ></p>
         <a
-          href={linkHref}
+          href={urlWithUtm}
           target="_blank"
           rel="noopener noreferrer"
           className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-white/10 active:bg-white/20 ${linkTextClass}`}
@@ -116,5 +126,6 @@ const Card: React.FC<CardProps> = ({
       </div>
     </div>
   );
+};
 
 export default Card;

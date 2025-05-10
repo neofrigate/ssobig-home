@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import React from "react";
+import { appendUtmParams } from "../utils/utm";
 
 interface CardWrapperProps {
   href: string;
@@ -12,12 +13,15 @@ const CardWrapper: React.FC<CardWrapperProps> = ({ href, children }) => {
   const router = useRouter();
 
   const handleClick = () => {
-    if (href.startsWith("/")) {
-      router.push(href);
-    } else if (href.startsWith("http")) {
-      window.open(href, "_blank", "noopener,noreferrer");
+    // UTM 파라미터를 URL에 추가
+    const urlWithUtm = appendUtmParams(href);
+
+    if (urlWithUtm.startsWith("/")) {
+      router.push(urlWithUtm);
+    } else if (urlWithUtm.startsWith("http")) {
+      window.open(urlWithUtm, "_blank", "noopener,noreferrer");
     } else {
-      console.warn(`Unhandled link type: ${href}`);
+      console.warn(`Unhandled link type: ${urlWithUtm}`);
     }
   };
 
