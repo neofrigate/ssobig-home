@@ -27,7 +27,7 @@ const MainCard: React.FC<MainCardProps> = ({
   title,
   description,
   linkText,
-  linkHref,
+  // linkHref,
   linkIconType,
   hasImageArea = true,
   cardBgClass = "bg-neutral-200", // from --background-card (originally gray-300)
