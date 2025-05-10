@@ -1,6 +1,7 @@
 import Image from "next/image";
 import MainCard, { MainCardProps } from "../components/MainCard";
 import CardWrapper from "../components/CardWrapper";
+import LinkWithUtm from "../components/LinkWithUtm";
 
 export const metadata = {
   title: "Ssobig Home",
@@ -193,32 +194,32 @@ export default function Home() {
           </p>
           <p className="footer_p">&nbsp;</p>
           <p className="footer_p">
-            <a
+            <LinkWithUtm
               href="https://about.ssobig.com/privacy_policy"
               style={{ color: "inherit", textDecoration: "underline" }}
               target="_blank"
               rel="noopener noreferrer"
             >
               개인정보 처리방침
-            </a>
+            </LinkWithUtm>
             <span style={{ margin: "0 5px" }}>|</span>
-            <a
+            <LinkWithUtm
               href="https://about.ssobig.com/terms_of_service"
               style={{ color: "inherit", textDecoration: "underline" }}
               target="_blank"
               rel="noopener noreferrer"
             >
               이용약관
-            </a>
+            </LinkWithUtm>
             <span style={{ margin: "0 5px" }}>|</span>
-            <a
+            <LinkWithUtm
               href="https://about.ssobig.com/refund_policy"
               style={{ color: "inherit", textDecoration: "underline" }}
               target="_blank"
               rel="noopener noreferrer"
             >
               환불정책
-            </a>
+            </LinkWithUtm>
           </p>
         </footer>
       </main>

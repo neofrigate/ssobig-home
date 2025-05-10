@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import LinkWithUtm from "./LinkWithUtm";
 
 // 햄버거 아이콘 컴포넌트
 const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -55,7 +55,7 @@ const Sidebar: React.FC = () => {
         <div className="p-5">
           <div className="flex justify-between items-center mb-10">
             <div className="text-white">
-              <Link href="/" className="flex items-center">
+              <LinkWithUtm href="/" className="flex items-center">
                 <Image
                   src="/ssobig_assets/쏘빅 로고-흑백.png"
                   alt="쏘빅 로고"
@@ -64,14 +64,14 @@ const Sidebar: React.FC = () => {
                   className="w-[51px] h-[32px]"
                   priority
                 />
-              </Link>
+              </LinkWithUtm>
             </div>
           </div>
 
           <nav className="text-white">
             <div className="mb-6">
               <div className="mb-2 text-sm text-gray-400">Solutions</div>
-              <Link
+              <LinkWithUtm
                 href="https://about.ssobig.com"
                 className="block py-2 hover:opacity-80 transition-opacity"
               >
@@ -84,12 +84,12 @@ const Sidebar: React.FC = () => {
                     className="object-contain"
                   />
                 </div>
-              </Link>
+              </LinkWithUtm>
             </div>
 
             <div className="mb-6">
               <div className="mb-2 text-sm text-gray-400">Social Brands</div>
-              <Link
+              <LinkWithUtm
                 href="/brand/love_buddies"
                 className="block py-2 hover:opacity-80 transition-opacity"
               >
@@ -102,8 +102,8 @@ const Sidebar: React.FC = () => {
                     className="object-contain"
                   />
                 </div>
-              </Link>
-              <Link
+              </LinkWithUtm>
+              <LinkWithUtm
                 href="/brand/now_seoul"
                 className="block py-2 hover:opacity-80 transition-opacity"
               >
@@ -116,8 +116,8 @@ const Sidebar: React.FC = () => {
                     className="object-contain"
                   />
                 </div>
-              </Link>
-              <Link
+              </LinkWithUtm>
+              <LinkWithUtm
                 href="/brand/game_orb"
                 className="block py-2 hover:opacity-80 transition-opacity"
               >
@@ -130,12 +130,12 @@ const Sidebar: React.FC = () => {
                     className="object-contain"
                   />
                 </div>
-              </Link>
+              </LinkWithUtm>
             </div>
 
             <div className="mb-6">
               <div className="mb-2 text-sm text-gray-400">Community</div>
-              <Link
+              <LinkWithUtm
                 href="https://dis.qa/hKclNB"
                 className="block py-2 hover:opacity-80 transition-opacity"
                 target="_blank"
@@ -150,7 +150,7 @@ const Sidebar: React.FC = () => {
                     className="object-contain"
                   />
                 </div>
-              </Link>
+              </LinkWithUtm>
             </div>
           </nav>
         </div>
