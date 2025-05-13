@@ -32,7 +32,7 @@ export default function GameOrbPage() {
       hasImageArea: true,
       imagePlaceholderText: "게임오브 정모",
       imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/devils_plan_hoodie.png')",
+        backgroundImage: "url('/ssobig_assets/게임 정모 포스.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       },
