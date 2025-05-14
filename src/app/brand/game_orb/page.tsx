@@ -11,8 +11,8 @@ export default function GameOrbPage() {
     {
       title: "데블스플랜 같은 게임 예능 참여하기!",
       description: "흥미진진한 게임 예능에 지금 바로 참여하세요.",
-      linkText: "about.ssobig.com",
-      linkHref: "https://about.ssobig.com",
+      linkText: "참여하기",
+      linkHref: "/brand/game_orb/devils-plan",
       linkIconType: "link",
       hasImageArea: true,
       imagePlaceholderText: "데블스플랜 참여",
