@@ -25,18 +25,18 @@ export default function Home() {
     {
       title: "러브버디즈",
       description: "매력있고 사람스러운 찐친 만드는 곳",
-      linkText: "love___buddies",
+      linkText: "love_buddies",
       linkHref: "/brand/love_buddies",
-      linkIconType: "instagram",
+      linkIconType: "link",
       imageUrl: "/ssobig_assets/러브버디즈.png",
       imageAreaStyle: { backgroundColor: "#000000" },
     },
     {
       title: "N.O.W.seoul 나우서울",
       description: "퇴근 후 만나는 전문직 비즈니스 네트워킹 모임",
-      linkText: "n.o.w.seoul",
+      linkText: "now_seoul",
       linkHref: "/brand/now_seoul",
-      linkIconType: "instagram",
+      linkIconType: "link",
       imageUrl: "/ssobig_assets/나우서울.png",
       imageAreaStyle: {},
     },
@@ -45,7 +45,7 @@ export default function Home() {
       description: "TV속 게임을 만들고 플레이하는 커뮤니티",
       linkText: "game_orb",
       linkHref: "/brand/game_orb",
-      linkIconType: "instagram",
+      linkIconType: "link",
       imageUrl: "/ssobig_assets/게임오브.png",
       imageAreaStyle: {},
     },
@@ -67,7 +67,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen text-neutral-100 font-sans relative flex flex-col items-center pt-[72px] px-4 sm:px-6 lg:px-8 selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen text-neutral-100 font-sans relative flex flex-col items-center pt-[72px] px-5 selection:bg-orange-500 selection:text-white">
       {/* 배경 이미지 next/image 적용 */}
       <div className="absolute inset-0 -z-10">
         <Image
@@ -112,27 +112,6 @@ export default function Home() {
           </p>
         </header>
 
-        {/* Solutions 섹션 */}
-        <section className="mb-10 md:mb-12">
-          <div className="flex items-center gap-4 sm:gap-5 text-center mb-5 sm:mb-6">
-            <hr className="flex-grow border-t border-neutral-500/80" />
-            <h2
-              className="text-lg sm:text-xl font-normal text-white shrink-0 px-2"
-              style={{ fontFamily: "'Playwrite US Trad', cursive" }}
-            >
-              Solutions
-            </h2>
-            <hr className="flex-grow border-t border-neutral-500/80" />
-          </div>
-          <div className="space-y-4 sm:space-y-5">
-            {solutionItems.map((item) => (
-              <CardWrapper key={item.title} href={item.linkHref}>
-                <MainCard {...item} />
-              </CardWrapper>
-            ))}
-          </div>
-        </section>
-
         {/* Brands 섹션 */}
         <section className="mb-10 md:mb-12">
           <div className="flex items-center gap-4 sm:gap-5 text-center mb-5 sm:mb-6">
@@ -147,6 +126,27 @@ export default function Home() {
           </div>
           <div className="space-y-4 sm:space-y-5">
             {brandItems.map((item) => (
+              <CardWrapper key={item.title} href={item.linkHref}>
+                <MainCard {...item} />
+              </CardWrapper>
+            ))}
+          </div>
+        </section>
+
+        {/* Solutions 섹션 */}
+        <section className="mb-10 md:mb-12">
+          <div className="flex items-center gap-4 sm:gap-5 text-center mb-5 sm:mb-6">
+            <hr className="flex-grow border-t border-neutral-500/80" />
+            <h2
+              className="text-lg sm:text-xl font-normal text-white shrink-0 px-2"
+              style={{ fontFamily: "'Playwrite US Trad', cursive" }}
+            >
+              Solutions
+            </h2>
+            <hr className="flex-grow border-t border-neutral-500/80" />
+          </div>
+          <div className="space-y-4 sm:space-y-5">
+            {solutionItems.map((item) => (
               <CardWrapper key={item.title} href={item.linkHref}>
                 <MainCard {...item} />
               </CardWrapper>
