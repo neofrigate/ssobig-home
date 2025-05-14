@@ -11,7 +11,7 @@ export default function GameOrbPage() {
     {
       title: "REAL GENIUS : 게임 예능 참여하기",
       description: "흥미진진한 게임 예능에 지금 바로 참여하세요.",
-      linkText: "참여하기",
+      linkText: "real_genius",
       linkHref: "/brand/game_orb/real_genius",
       linkIconType: "link",
       hasImageArea: true,
@@ -24,10 +24,10 @@ export default function GameOrbPage() {
       fullImageCard: true,
     },
     {
-      title: "게임오브 정모 신청",
+      title: "게임오브 정모 : 신작게임 데모데이",
       description: "커뮤니티 멤버들과 함께하는 정모에 참여하세요.",
-      linkText: "about.ssobig.com",
-      linkHref: "https://about.ssobig.com",
+      linkText: "form.ssobig.com/gameorb1",
+      linkHref: "https://dis.qa/AYfhB",
       linkIconType: "link",
       hasImageArea: true,
       imagePlaceholderText: "게임오브 정모",
