@@ -114,15 +114,15 @@ export default function GameOrbPage() {
           {/* 텍스트 섹션 */}
           <div className="text-left w-full">
             <h2 className="text-[24px] sm:text-[28px] font-bold text-white mb-[12.26px]">
-              게임오브
+              Game Orb 게임오브
             </h2>
             <p className="text-[14px] sm:text-[16px] text-neutral-300 w-full leading-relaxed">
-              &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
-              곳!
+              TV 게임 예능 프로그램의 짜릿하고 지적인 게임들을 현실에서 더
+              재밌게 구현해내는 곳!
               <br />
-              [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
-              모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어
-              있습니다.
+              &lt;더 지니어스&gt;, &lt;크라임씬&gt;, &lt;피의 게임&gt;,
+              &lt;데블스 플랜&gt;을 보며 느꼈던 두근거림과 감동을 일상의 만남
+              속에 불러와, 참가자들이 주인공이 되어보는 장을 만들고자 합니다.
             </p>
           </div>
         </div>
