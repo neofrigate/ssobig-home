@@ -43,7 +43,11 @@ const Sidebar: React.FC = () => {
         <div className="py-5 flex flex-col h-full">
           <div className="flex justify-between items-center mb-10 px-5">
             <div className="text-white">
-              <LinkWithUtm href="/" className="flex items-center">
+              <LinkWithUtm
+                href="/"
+                className="flex items-center"
+                onClick={toggleSidebar}
+              >
                 <Image
                   src="/ssobig_assets/쏘빅 로고-흑백.png"
                   alt="쏘빅 로고"
@@ -79,26 +83,6 @@ const Sidebar: React.FC = () => {
 
           <nav className="text-white flex-grow overflow-y-auto">
             <div className="mb-6">
-              <div className="mb-2 text-sm text-gray-400 px-5">Solutions</div>
-              <LinkWithUtm
-                href="https://about.ssobig.com"
-                className={`block hover:opacity-80 transition-all ${
-                  isActive("https://about.ssobig.com") ? "bg-white/10" : ""
-                }`}
-              >
-                <div className="h-[60px] relative flex items-center px-5">
-                  <Image
-                    src="/ssobig_assets/brand logo 2=ssobigtool.png"
-                    alt="ssobig tool"
-                    width={120}
-                    height={30}
-                    className="object-contain"
-                  />
-                </div>
-              </LinkWithUtm>
-            </div>
-
-            <div className="mb-6">
               <div className="mb-2 text-sm text-gray-400 px-5">
                 Social Brands
               </div>
@@ -107,6 +91,7 @@ const Sidebar: React.FC = () => {
                 className={`block hover:opacity-80 transition-all ${
                   isActive("/brand/love_buddies") ? "bg-white/10" : ""
                 }`}
+                onClick={toggleSidebar}
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
@@ -123,6 +108,7 @@ const Sidebar: React.FC = () => {
                 className={`block hover:opacity-80 transition-all ${
                   isActive("/brand/now_seoul") ? "bg-white/10" : ""
                 }`}
+                onClick={toggleSidebar}
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
@@ -139,11 +125,33 @@ const Sidebar: React.FC = () => {
                 className={`block hover:opacity-80 transition-all ${
                   isActive("/brand/game_orb") ? "bg-white/10" : ""
                 }`}
+                onClick={toggleSidebar}
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
                     src="/ssobig_assets/brand logo 2=게임오브.png"
                     alt="GAME ORB"
+                    width={120}
+                    height={30}
+                    className="object-contain"
+                  />
+                </div>
+              </LinkWithUtm>
+            </div>
+
+            <div className="mb-6">
+              <div className="mb-2 text-sm text-gray-400 px-5">Solutions</div>
+              <LinkWithUtm
+                href="https://about.ssobig.com"
+                className={`block hover:opacity-80 transition-all ${
+                  isActive("https://about.ssobig.com") ? "bg-white/10" : ""
+                }`}
+                onClick={toggleSidebar}
+              >
+                <div className="h-[60px] relative flex items-center px-5">
+                  <Image
+                    src="/ssobig_assets/brand logo 2=ssobigtool.png"
+                    alt="ssobig tool"
                     width={120}
                     height={30}
                     className="object-contain"
@@ -161,6 +169,7 @@ const Sidebar: React.FC = () => {
                 }`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={toggleSidebar}
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
@@ -195,6 +204,7 @@ const Sidebar: React.FC = () => {
                 style={{ color: "inherit", textDecoration: "underline" }}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={toggleSidebar}
               >
                 개인정보 처리방침
               </LinkWithUtm>
@@ -204,6 +214,7 @@ const Sidebar: React.FC = () => {
                 style={{ color: "inherit", textDecoration: "underline" }}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={toggleSidebar}
               >
                 이용약관
               </LinkWithUtm>
@@ -213,6 +224,7 @@ const Sidebar: React.FC = () => {
                 style={{ color: "inherit", textDecoration: "underline" }}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={toggleSidebar}
               >
                 환불정책
               </LinkWithUtm>

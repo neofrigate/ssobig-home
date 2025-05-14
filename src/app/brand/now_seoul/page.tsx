@@ -65,7 +65,7 @@ export default function NowSeoulPage() {
 
       <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start pb-4 px-0 selection:bg-blue-500 selection:text-white pt-[72px]">
         {/* 배경 이미지 next/image 적용 */}
-        <div className="absolute inset-0 -z-10">
+        <div className="fixed inset-0 -z-10">
           <Image
             src="/ssobig_assets/나우서울 배경.jpg"
             alt="나우서울 배경"
@@ -74,15 +74,14 @@ export default function NowSeoulPage() {
             priority
             sizes="100vw"
           />
+          {/* 배경 이미지 위에 그라데이션 오버레이 적용 */}
+          <div className="fixed inset-0 bg-gradient-to-b from-black to-transparent"></div>
         </div>
-        
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/60 z-0"></div>
-        
-        {/* Content Area */}
-        <main className="z-10 flex flex-col items-center text-center max-w-[620px] w-full p-5">
-          {/* Logo Image */}
-          <div className="mt-4 mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center">
+
+        {/* 이미지 및 컨텐츠 영역 */}
+        <div className="w-full max-w-[620px] mx-auto z-10 relative text-center px-5 pt-5 flex flex-col items-center gap-[30px]">
+          {/* 로고 이미지 */}
+          <div className="w-full max-w-[400px] h-[96px] sm:h-[150px] relative flex justify-center items-center mx-auto">
             <Image
               src="/ssobig_assets/brand logo=나우서울.png"
               alt="나우서울 로고"
@@ -92,57 +91,48 @@ export default function NowSeoulPage() {
               priority
             />
           </div>
-          
-          {/* Instagram Icon Link */}
+
+          {/* 인스타그램 아이콘 */}
           <a
             href="https://www.instagram.com/n.o.w.seoul/"
             target="_blank"
             rel="noopener noreferrer"
-            className="mb-8 transition-transform hover:scale-110 flex items-center gap-1"
+            className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group"
             aria-label="나우서울 인스타그램"
           >
-            <div className="w-6 h-6">
+            <div className="w-[24px] h-[24px]">
               <Image
                 src="/ssobig_assets/instaBigIcon.png"
                 alt="인스타그램 아이콘"
-                width={30}
-                height={30}
+                width={24}
+                height={24}
                 className="w-full h-full filter brightness-0 invert"
               />
             </div>
           </a>
 
+          {/* 텍스트 섹션 */}
           <div className="text-left w-full">
-            {/* Title */}
-            <h2 className="text-[24px] sm:text-[28px] font-bold text-white mb-3">
+            <h2 className="text-[24px] sm:text-[28px] font-bold text-white mb-[12.26px]">
               N.O.W.seoul 나우서울
             </h2>
-
-            {/* Description */}
-            <p className="text-[14px] sm:text-[16px] text-neutral-300 mb-10 w-full leading-relaxed">
+            <p className="text-[14px] sm:text-[16px] text-neutral-300 w-full leading-relaxed">
               나우서울(N.O.W.seoul)은 &apos;Night Off Work&apos;의 줄임말로,
-              퇴근 후 다양한 분야의 전문가들이 모여 아이디어를 나누고,
-              협업의 가능성을 발견하는 커뮤니티입니다.
+              퇴근 후 다양한 분야의 전문가들이 모여 아이디어를 나누고, 협업의
+              가능성을 발견하는 커뮤니티입니다.
             </p>
           </div>
+        </div>
 
-          {/* 참가후기 섹션 위의 여백 */}
-          <div className="h-[25px]"></div>
-
-          {/* 신청 링크 섹션 */}
-          <div className="w-full mb-6">
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">
-              나우서울 신청링크
-            </h3>
-            <div className="w-full mt-4">
+        {/* Content Area */}
+        <main className="w-full max-w-[620px] mx-auto z-10 relative px-5 mt-[30px]">
+          <section className="pb-12">
+            {/* 신청 링크 섹션 */}
+            <div className="w-full space-y-5 sm:space-y-6 max-w-[580px] mx-auto">
               <Card {...nowSeoulCard} />
+              <Card {...careerClassCard} />
             </div>
-          </div>
-          
-          {/* 커리어 클래스 카드 */}
-          <div className="w-full mb-12">
-            <Card {...careerClassCard} />
-          </div>
+          </section>
         </main>
       </div>
     </>

@@ -22,6 +22,21 @@ export default function LoveBuddiesDetailPage() {
 
       {/* 메인 콘텐츠 */}
       <div className="w-full max-w-[620px] mx-auto z-10 px-0 mb-[72px]">
+        {/* 상단 공통 디자인 */}
+        <div className="w-full h-auto">
+          <div className="relative w-full">
+            <Image
+              src="/ssobig_assets/상세 상단 공통 디자인_일일남매.png"
+              alt="일일남매 상단 디자인"
+              width={620}
+              height={0}
+              style={{ width: "100%", height: "auto" }}
+              priority
+              className="rounded-none"
+            />
+          </div>
+        </div>
+
         {/* 상세 이미지 1 */}
         <div className="w-full h-auto">
           <div className="relative w-full">

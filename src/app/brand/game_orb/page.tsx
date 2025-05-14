@@ -12,7 +12,7 @@ export default function GameOrbPage() {
       title: "REAL GENIUS : 게임 예능 참여하기",
       description: "흥미진진한 게임 예능에 지금 바로 참여하세요.",
       linkText: "참여하기",
-      linkHref: "/brand/game_orb/devils-plan",
+      linkHref: "/brand/game_orb/real_genius",
       linkIconType: "link",
       hasImageArea: true,
       imagePlaceholderText: "데블스플랜 참여",
@@ -65,7 +65,7 @@ export default function GameOrbPage() {
 
       <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start pb-4 px-0 selection:bg-purple-500 selection:text-white pt-[72px]">
         {/* 배경 이미지 next/image 적용 */}
-        <div className="absolute inset-0 -z-10">
+        <div className="fixed inset-0 -z-10">
           <Image
             src="/ssobig_assets/게임오브 배경.jpg"
             alt="게임오브 배경"
@@ -75,12 +75,13 @@ export default function GameOrbPage() {
             sizes="100vw"
           />
           {/* 배경 이미지 위에 그라데이션 오버레이 적용 */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/40"></div>
+          <div className="fixed inset-0 bg-gradient-to-b from-black to-transparent"></div>
         </div>
 
-        <div className="w-full max-w-[620px] mx-auto z-10 relative text-center pt-4">
+        {/* 이미지 및 컨텐츠 영역 */}
+        <div className="w-full max-w-[620px] mx-auto z-10 relative text-center px-5 pt-5 flex flex-col items-center gap-[30px]">
           {/* 로고 이미지 */}
-          <div className="mt-4 mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center mx-auto">
+          <div className="w-full max-w-[400px] h-[96px] sm:h-[150px] relative flex justify-center items-center mx-auto">
             <Image
               src="/ssobig_assets/brand logo=게임오브.png"
               alt="게임오브 로고"
@@ -90,49 +91,46 @@ export default function GameOrbPage() {
               priority
             />
           </div>
+
+          {/* 인스타그램 아이콘 */}
           <a
             href="https://www.instagram.com/game_orb/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group mb-8"
+            className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group"
             aria-label="인스타그램으로 이동"
           >
-            <div className="w-6 h-6">
+            <div className="w-[24px] h-[24px]">
               <Image
                 src="/ssobig_assets/instaBigIcon.png"
                 alt="인스타그램 아이콘"
-                width={30}
-                height={30}
+                width={24}
+                height={24}
                 className="w-full h-full filter brightness-0 invert"
               />
             </div>
           </a>
+
+          {/* 텍스트 섹션 */}
+          <div className="text-left w-full">
+            <h2 className="text-[24px] sm:text-[28px] font-bold text-white mb-[12.26px]">
+              게임오브
+            </h2>
+            <p className="text-[14px] sm:text-[16px] text-neutral-300 w-full leading-relaxed">
+              &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
+              곳!
+              <br />
+              [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
+              모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어
+              있습니다.
+            </p>
+          </div>
         </div>
 
-        <main className="w-full max-w-[620px] mx-auto z-10 relative p-5">
-          <section className="mb-10 md:mb-12">
-            <div className="text-left w-full">
-              <h2 className="text-[24px] sm:text-[28px] font-bold text-white mb-4">게임오브</h2>
-              <p className="text-[14px] sm:text-[16px] text-neutral-300 w-full leading-relaxed">
-                &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩
-                만드는 곳!
-                <br />
-                [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
-                모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어
-                있습니다.
-              </p>
-            </div>
-          </section>
-
+        <main className="w-full max-w-[620px] mx-auto z-10 relative px-5 mt-[30px]">
           <section className="pb-12">
-            {/* 참가후기 섹션 위의 여백 */}
-            <div className="h-[25px]"></div>
-
             {/* 신청 링크 섹션 */}
-            <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">
-              게임오브 신청링크
-            </h3>
-            <div className="w-full mt-4 space-y-5 sm:space-y-6 max-w-[580px] mx-auto">
+            <div className="w-full space-y-5 sm:space-y-6 max-w-[580px] mx-auto">
               {gameOrbCards.map((item) => (
                 <Card key={item.title} {...item} />
               ))}

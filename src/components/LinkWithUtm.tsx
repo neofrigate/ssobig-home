@@ -10,6 +10,7 @@ interface LinkWithUtmProps extends LinkProps {
   target?: string;
   rel?: string;
   style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
 const LinkWithUtm: React.FC<LinkWithUtmProps> = ({
@@ -19,6 +20,7 @@ const LinkWithUtm: React.FC<LinkWithUtmProps> = ({
   target,
   rel,
   style,
+  onClick,
   ...props
 }) => {
   const [urlWithUtm, setUrlWithUtm] = useState<string | object>(href);
@@ -37,6 +39,7 @@ const LinkWithUtm: React.FC<LinkWithUtmProps> = ({
       target={target}
       rel={rel}
       style={style}
+      onClick={onClick}
       {...props}
     >
       {children}

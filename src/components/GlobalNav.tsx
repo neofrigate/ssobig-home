@@ -56,7 +56,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
 
   return (
     <div className="fixed top-0 left-0 right-0 h-[72px] z-40">
-      <div className="h-full flex items-center justify-between px-6">
+      <div className="h-full flex items-center justify-between px-5">
         {!isHomePage ? (
           <button aria-label="뒤로 가기" className="p-2" onClick={handleBack}>
             <BackIcon />
