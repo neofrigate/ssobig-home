@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { HamburgerIcon } from "../../../components/IconComponents";
 import ActionButton from "../../../components/ActionButton";
 import Script from "next/script";
+import ImageSlider from "../../../components/ImageSlider";
 
 export const metadata = {
   title: "Ssobig-Love Buddies",
@@ -11,32 +11,27 @@ const LoveBuddiesPage = () => {
   return (
     <>
       {/* Meta Pixel Code */}
-      <Script id="facebook-pixel-love-buddies" strategy="afterInteractive">
-        {`
-          !function(f,b,e,v,n,t,s)
-          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-          n.queue=[];t=b.createElement(e);t.async=!0;
-          t.src=v;s=b.getElementsByTagName(e)[0];
-          s.parentNode.insertBefore(t,s)}(window, document,'script',
-          'https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', '1541266446734040');
-          fbq('track', 'PageView');
-        `}
-      </Script>
-      <noscript>
-        <Image
-          height={1}
-          width={1}
-          style={{ display: "none" }}
-          src="https://www.facebook.com/tr?id=1541266446734040&ev=PageView&noscript=1"
-          alt=""
-        />
-      </noscript>
+      <Script
+        id="facebook-pixel-love-buddies"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '1541266446734040');
+            fbq('track', 'PageView');
+          `,
+        }}
+      />
       {/* End Meta Pixel Code */}
 
-      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start p-4 selection:bg-pink-500 selection:text-white">
+      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start pb-4 px-0 selection:bg-pink-500 selection:text-white pt-[72px]">
         {/* 배경 이미지 next/image 적용 */}
         <div className="absolute inset-0 -z-10">
           <Image
@@ -52,17 +47,10 @@ const LoveBuddiesPage = () => {
         {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/70 z-0"></div>
 
-        {/* Hamburger Menu Icon - positioned top right */}
-        <div className="absolute top-6 right-6 sm:top-8 sm:right-8 z-20">
-          <button aria-label="메뉴 열기" className="p-2">
-            <HamburgerIcon />
-          </button>
-        </div>
-
         {/* Content Area */}
-        <main className="z-10 flex flex-col items-center text-center max-w-[620px] w-full px-4 pt-0">
+        <main className="z-10 flex flex-col items-center text-center max-w-[620px] w-full p-5">
           {/* Logo Image */}
-          <div className="mt-[92px] mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center">
+          <div className="mt-4 mb-4 w-full max-w-[400px] h-[150px] relative flex justify-center items-center">
             <Image
               src="/ssobig_assets/brand logo=러브버디즈.png"
               alt="러브버디즈 로고"
@@ -90,28 +78,25 @@ const LoveBuddiesPage = () => {
             </div>
           </a>
 
-          <div className="text-left w-full max-w-[580px]">
+          <div className="text-left w-full">
             {/* Title */}
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+            <h2 className="text-[24px] sm:text-[28px] font-bold text-white mb-3">
               러브버디즈
             </h2>
 
-            {/* Subtitle */}
-            <p className="text-md sm:text-lg text-neutral-200 mb-1 max-w-md">
+            {/* Subtitle & Description - 합쳐서 하나의 단락으로 */}
+            <p className="text-[14px] sm:text-[16px] text-neutral-300 mb-10 w-full leading-relaxed">
               &apos;술 없이&apos; 매력있고 사랑스러운 &lt;찐친&gt;들 잔뜩 만드는
               곳!
-            </p>
-
-            {/* Description */}
-            <p className="text-sm text-neutral-300 mb-10 max-w-md leading-relaxed">
+              <br />
               [일일남매] [환승연애] 같은 러브버디즈의 모임은 매력적인 남녀들이
               모여 흥미진진하게 서로를 알아갈 수 있는 콘텐츠로 구성되어 있습니다
             </p>
           </div>
-
-          {/* Main Action Button */}
+          
+          {/* 상세 페이지 버튼 */}
           <ActionButton
-            href="/brand/love_buddies/day_nammae"
+            href="/brand/love_buddies/detail"
             className="mb-6"
             target="_self"
             rel=""
@@ -119,18 +104,43 @@ const LoveBuddiesPage = () => {
             러브버디즈 콘텐츠 참여하기 🙋🏻‍♀
           </ActionButton>
 
+          {/* 참가후기 섹션 위의 여백 */}
+          <div className="h-[50px]"></div>
+
           {/* Reviews Section Title */}
-          <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3">
-            참가후기
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+            일일남매 둘러보기
           </h3>
 
-          {/* Review Event Button */}
-          <ActionButton
-            href="https://smore.im/form/4gwuBM7ukA"
-            className="mb-0"
-          >
-            [일일남매] 참가후기 이벤트 👀
-          </ActionButton>
+          {/* 이미지 슬라이더 추가 */}
+          <div className="w-full mt-2 mb-10">
+            <ImageSlider 
+              images={[
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_14.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_15.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_17.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_18.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_19.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_20.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_22.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_23.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_24.png",
+                "/ssobig_assets/러브버디즈 둘러보기/일일남매_25.png"
+              ]}
+              altTexts={[
+                "일일남매 활동 사진 1",
+                "일일남매 활동 사진 2",
+                "일일남매 활동 사진 3",
+                "일일남매 활동 사진 4",
+                "일일남매 활동 사진 5",
+                "일일남매 활동 사진 6",
+                "일일남매 활동 사진 7",
+                "일일남매 활동 사진 8",
+                "일일남매 활동 사진 9",
+                "일일남매 활동 사진 10"
+              ]}
+            />
+          </div>
         </main>
       </div>
     </>

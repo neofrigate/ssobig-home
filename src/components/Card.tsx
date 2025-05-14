@@ -48,19 +48,19 @@ const Card: React.FC<CardProps> = ({
     // 전체 이미지 카드 스타일
     <a
       href={urlWithUtm}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={linkHref.startsWith('/') ? "_self" : "_blank"}
+      rel={linkHref.startsWith('/') ? "" : "noopener noreferrer"}
       className="block w-full transition-all duration-300 hover:-translate-y-1"
     >
       <div
-        className="rounded-[28px] shadow-lg overflow-hidden hover:shadow-xl flex flex-col w-full"
+        className="rounded-[12px] shadow-lg overflow-hidden hover:shadow-xl relative w-full"
         style={{
-          boxShadow: "0px 0px 20px 0px rgba(255, 255, 255, 0.50)",
+          boxShadow: "0px 0px 15px 0px rgba(255, 255, 255, 0.40)",
           aspectRatio: "580/326.25",
         }}
       >
         <div
-          className="flex-1"
+          className="w-full h-full"
           style={{
             ...imageAreaStyle,
             backgroundImage: imageAreaStyle?.backgroundImage,
@@ -68,10 +68,10 @@ const Card: React.FC<CardProps> = ({
             backgroundPosition: "center",
           }}
         ></div>
-        <div className="bg-white px-4 py-3 text-black">
+        <div className="bg-white/90 px-4 py-3 text-black text-left absolute bottom-0 left-0 right-0 z-10">
           <h3 className="text-base font-bold mb-1">{title}</h3>
           <div className="flex items-center">
-            <div className="text-xs text-neutral-600 group inline-flex items-center">
+            <div className="text-[13px] text-neutral-600 group inline-flex items-center">
               {linkIconType === "link" && (
                 <LinkIcon className="text-neutral-600" />
               )}
@@ -115,9 +115,9 @@ const Card: React.FC<CardProps> = ({
         ></p>
         <a
           href={urlWithUtm}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-white/10 active:bg-white/20 ${linkTextClass}`}
+          target={linkHref.startsWith('/') ? "_self" : "_blank"}
+          rel={linkHref.startsWith('/') ? "" : "noopener noreferrer"}
+          className={`text-[13px] transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-white/10 active:bg-white/20 ${linkTextClass}`}
         >
           {linkIconType === "link" && <LinkIcon />}
           {linkIconType === "instagram" && <CssInstagramIcon />}

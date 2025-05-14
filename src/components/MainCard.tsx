@@ -37,7 +37,7 @@ const MainCard: React.FC<MainCardProps> = ({
 }) => {
   return (
     <div
-      className={`rounded-xl shadow-lg flex flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass} cursor-pointer h-24`}
+      className={`rounded-xl shadow-lg flex flex-row overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${cardBgClass} cursor-pointer h-[110px] sm:h-[120px]`}
     >
       {hasImageArea && (
         <div
@@ -64,12 +64,12 @@ const MainCard: React.FC<MainCardProps> = ({
           !hasImageArea ? "items-start" : ""
         }`}
       >
-        <h3 className={`text-sm sm:text-base mb-1 ${titleClass}`}>{title}</h3>
-        <p className={`text-xs mb-1.5 leading-snug ${descriptionClass}`}>
+        <h3 className={`text-[16px] sm:text-[18px] mb-1 ${titleClass}`}>{title}</h3>
+        <p className={`text-[13px] mb-1.5 leading-snug ${descriptionClass}`}>
           {description}
         </p>
         <div
-          className={`text-xs transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 ${linkTextClass}`}
+          className={`text-[13px] transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 ${linkTextClass}`}
         >
           {linkIconType === "link" && <LinkIcon />}
           {linkIconType === "instagram" && <CssInstagramIcon />}

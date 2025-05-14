@@ -91,7 +91,7 @@ export default function Home() {
       {/* 콘텐츠 컨테이너 */}
       <main className="w-full max-w-2xl mx-auto z-10 relative">
         {/* 프로필 섹션 */}
-        <header className="text-center mb-8 md:mb-10">
+        <header className="text-center mb-8 md:mb-10 mt-6">
           <div className="w-20 h-20 md:w-24 md:h-24 bg-black rounded-full mx-auto mb-5 flex items-center justify-center shadow-lg border border-black overflow-hidden">
             {/* 쏘빅 로고 이미지 */}
             <Image
@@ -175,53 +175,6 @@ export default function Home() {
             ))}
           </div>
         </section>
-
-        {/* 푸터 */}
-        <footer className="text-left text-neutral-400 text-xs pb-8">
-          <p className="footer_p">주식회사 쏘빅</p>
-          <p className="footer_p">&nbsp;</p>
-          <p className="footer_p">
-            대표자 : 안민우, 조원철 사업자등록번호 : 140-87-03096
-          </p>
-          <p className="footer_p">전화번호 : 02-2635-7942</p>
-          <p className="footer_e-mail">E-mail : ssobigstudio@gmail.com</p>
-          <p className="footer_p">
-            통신판매업신고번호 : 제2024-서울영등포-0816호
-          </p>
-          <p className="footer_p">
-            주소 : 서울특별시 서초구 사평대로55길 37, (실란트로타워)지하2층
-            (반포동)
-          </p>
-          <p className="footer_p">&nbsp;</p>
-          <p className="footer_p">
-            <LinkWithUtm
-              href="https://about.ssobig.com/privacy_policy"
-              style={{ color: "inherit", textDecoration: "underline" }}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              개인정보 처리방침
-            </LinkWithUtm>
-            <span style={{ margin: "0 5px" }}>|</span>
-            <LinkWithUtm
-              href="https://about.ssobig.com/terms_of_service"
-              style={{ color: "inherit", textDecoration: "underline" }}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              이용약관
-            </LinkWithUtm>
-            <span style={{ margin: "0 5px" }}>|</span>
-            <LinkWithUtm
-              href="https://about.ssobig.com/refund_policy"
-              style={{ color: "inherit", textDecoration: "underline" }}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              환불정책
-            </LinkWithUtm>
-          </p>
-        </footer>
       </main>
     </div>
   );
