@@ -1,7 +1,6 @@
 import Image from "next/image";
 import MainCard, { MainCardProps } from "../components/MainCard";
 import CardWrapper from "../components/CardWrapper";
-import LinkWithUtm from "../components/LinkWithUtm";
 
 export const metadata = {
   title: "Ssobig Home",

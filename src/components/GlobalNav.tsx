@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useRouter, usePathname } from "next/navigation";
-import Image from "next/image";
 
 // 햄버거 아이콘 컴포넌트는 기존 Sidebar 컴포넌트에서 가져옴
 const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -47,10 +46,10 @@ type GlobalNavProps = {
 const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const router = useRouter();
   const pathname = usePathname();
-  
+
   // 홈 페이지에서는 뒤로가기 버튼 숨김
   const isHomePage = pathname === "/";
-  
+
   const handleBack = () => {
     router.back();
   };
@@ -59,24 +58,18 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     <div className="fixed top-0 left-0 right-0 h-[72px] z-40">
       <div className="h-full flex items-center justify-between px-6">
         {!isHomePage ? (
-          <button 
-            aria-label="뒤로 가기" 
-            className="p-2" 
-            onClick={handleBack}
-          >
+          <button aria-label="뒤로 가기" className="p-2" onClick={handleBack}>
             <BackIcon />
           </button>
         ) : (
-          <div className="w-12">{/* 홈페이지에서는 뒤로가기 버튼 공간만 확보 */}</div>
+          <div className="w-12">
+            {/* 홈페이지에서는 뒤로가기 버튼 공간만 확보 */}
+          </div>
         )}
-        
+
         <div className="flex-1"></div>
-        
-        <button 
-          aria-label="메뉴 열기" 
-          className="p-2" 
-          onClick={toggleSidebar}
-        >
+
+        <button aria-label="메뉴 열기" className="p-2" onClick={toggleSidebar}>
           <HamburgerIcon />
         </button>
       </div>
@@ -84,4 +77,4 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   );
 };
 
-export default GlobalNav; 
+export default GlobalNav;

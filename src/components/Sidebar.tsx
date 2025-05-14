@@ -6,24 +6,6 @@ import LinkWithUtm from "./LinkWithUtm";
 import GlobalNav from "./GlobalNav";
 import { usePathname } from "next/navigation";
 
-// 햄버거 아이콘 컴포넌트
-const HamburgerIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    {...props}
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="w-8 h-8 text-neutral-100 hover:text-neutral-300 transition-colors"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-    />
-  </svg>
-);
-
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -35,7 +17,7 @@ const Sidebar: React.FC = () => {
   // 현재 경로와 링크 경로를 비교하여 액티브 상태 확인
   const isActive = (href: string) => {
     // 절대 URL은 pathname과 직접 비교할 수 없으므로 제외
-    if (href.startsWith('http')) return false;
+    if (href.startsWith("http")) return false;
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
@@ -72,9 +54,9 @@ const Sidebar: React.FC = () => {
                 />
               </LinkWithUtm>
             </div>
-            <button 
-              aria-label="메뉴 닫기" 
-              className="p-2 text-white" 
+            <button
+              aria-label="메뉴 닫기"
+              className="p-2 text-white"
               onClick={toggleSidebar}
             >
               <svg
@@ -117,7 +99,9 @@ const Sidebar: React.FC = () => {
             </div>
 
             <div className="mb-6">
-              <div className="mb-2 text-sm text-gray-400 px-5">Social Brands</div>
+              <div className="mb-2 text-sm text-gray-400 px-5">
+                Social Brands
+              </div>
               <LinkWithUtm
                 href="/brand/love_buddies"
                 className={`block hover:opacity-80 transition-all ${
