@@ -79,6 +79,100 @@ export default function RealGeniusPage() {
             </div>
           </div>
 
+          {/* 리얼지니어스 스케줄 박스 */}
+          <div className="w-full mb-8">
+            <div className="bg-black rounded-xl p-6 shadow-lg">
+              <h2 className="text-2xl font-bold text-center text-white mb-4">
+                리얼지니어스 스케줄
+              </h2>
+
+              {/* 가격 및 시간 정보 */}
+              <div className="bg-black/70 rounded-lg p-4 mb-5">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
+                  <p className="text-white font-bold text-lg mb-2 sm:mb-0">
+                    가격: <span className="text-white">28,000원</span>
+                    <span className="text-[#9E4BED]">(오픈특가)</span>
+                  </p>
+                  <p className="text-white font-bold text-lg">
+                    매주 일요일 17:00~20시{" "}
+                    <span className="text-white">(3H)</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* 일정 목록 */}
+              <div className="space-y-3">
+                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
+                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
+                    5/25 (일)
+                  </span>
+                  <span className="text-[#9E4BED] mr-2 text-sm">
+                    17:00~20:00
+                  </span>
+                  <span className="text-white font-bold ml-auto">
+                    불면증 마피아
+                  </span>
+                </div>
+
+                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
+                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
+                    6/1 (일)
+                  </span>
+                  <span className="text-[#9E4BED] mr-2 text-sm">
+                    17:00~20:00
+                  </span>
+                  <span className="text-white font-bold ml-auto">
+                    불면증 마피아
+                  </span>
+                </div>
+
+                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
+                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
+                    6/8 (일)
+                  </span>
+                  <span className="text-[#9E4BED] mr-2 text-sm">
+                    17:00~20:00
+                  </span>
+                  <span className="text-white font-bold ml-auto">바이너리</span>
+                </div>
+
+                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
+                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
+                    6/15 (일)
+                  </span>
+                  <span className="text-[#9E4BED] mr-2 text-sm">
+                    17:00~20:00
+                  </span>
+                  <span className="text-white font-bold ml-auto">바이너리</span>
+                </div>
+
+                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
+                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
+                    6/22 (일)
+                  </span>
+                  <span className="text-[#9E4BED] mr-2 text-sm">
+                    17:00~20:00
+                  </span>
+                  <span className="text-white font-bold ml-auto">
+                    이중 스파이
+                  </span>
+                </div>
+
+                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
+                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
+                    6/29 (일)
+                  </span>
+                  <span className="text-[#9E4BED] mr-2 text-sm">
+                    17:00~20:00
+                  </span>
+                  <span className="text-white font-bold ml-auto">
+                    이중 스파이
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* 소개 섹션 및 나머지 콘텐츠 */}
           <div className="px-5">
             {/* 소개 섹션 */}
@@ -308,10 +402,13 @@ export default function RealGeniusPage() {
                   {/* 불면증 마피아 카드 */}
                   <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-orange-500/30">
                     {/* 3:4 비율 포스터 이미지 영역 */}
-                    <div className="w-full aspect-[3/4] bg-gradient-to-br from-orange-900/80 to-purple-900/80 flex items-center justify-center p-4">
-                      <h3 className="text-xl font-bold text-center text-white">
-                        불면증 마피아
-                      </h3>
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/불면증 마피아.png"
+                        alt="불면증 마피아 포스터"
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
                     </div>
                     {/* 카드 내용 영역 */}
                     <div className="p-3">
@@ -361,12 +458,13 @@ export default function RealGeniusPage() {
                   {/* 바이너리 카드 */}
                   <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-teal-500/30">
                     {/* 3:4 비율 포스터 이미지 영역 */}
-                    <div className="w-full aspect-[3/4] bg-gradient-to-br from-teal-900/80 to-slate-900/80 flex items-center justify-center p-4">
-                      <h3 className="text-xl font-bold text-center text-white">
-                        (출시 예정작)
-                        <br />
-                        바이너리
-                      </h3>
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/바이너리.png"
+                        alt="바이너리 포스터"
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
                     </div>
                     {/* 카드 내용 영역 */}
                     <div className="p-3">
@@ -416,12 +514,13 @@ export default function RealGeniusPage() {
                   {/* 이중 스파이 카드 */}
                   <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-blue-500/30">
                     {/* 3:4 비율 포스터 이미지 영역 */}
-                    <div className="w-full aspect-[3/4] bg-gradient-to-br from-blue-900/80 to-red-900/80 flex items-center justify-center p-4">
-                      <h3 className="text-xl font-bold text-center text-white">
-                        (출시 예정작)
-                        <br />
-                        이중 스파이
-                      </h3>
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/이중 스파이.png"
+                        alt="이중 스파이 포스터"
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
                     </div>
                     {/* 카드 내용 영역 */}
                     <div className="p-3">
