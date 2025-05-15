@@ -9,7 +9,7 @@ export const metadata = {
 export default function GameOrbPage() {
   const gameOrbCards: CardProps[] = [
     {
-      title: "REAL GENIUS : 게임 예능 참여하기",
+      title: "REAL GENIUS : 게임 예능 현실판 참여하기",
       description: "흥미진진한 게임 예능에 지금 바로 참여하세요.",
       linkText: "real_genius",
       linkHref: "/brand/game_orb/real_genius",
@@ -17,7 +17,7 @@ export default function GameOrbPage() {
       hasImageArea: true,
       imagePlaceholderText: "데블스플랜 참여",
       imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/devils_plan_hoodie.png')",
+        backgroundImage: "url('/ssobig_assets/사악한포브.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       },
@@ -134,6 +134,18 @@ export default function GameOrbPage() {
               {gameOrbCards.map((item) => (
                 <Card key={item.title} {...item} />
               ))}
+
+              {/* 추가 참여 버튼 */}
+              <div className="mt-8">
+                <a
+                  href="https://open.kakao.com/o/g9LIA56f"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex p-4 justify-center items-center gap-4 w-full max-w-[580px] rounded-full bg-[#8631EC] hover:bg-[#7128d1] text-white font-bold text-[16px] shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 aspect-[145/14] mx-auto"
+                >
+                  게임오브 비밀 카톡방 🎮
+                </a>
+              </div>
             </div>
           </section>
         </main>
