@@ -243,7 +243,7 @@ export default function RealGeniusPage() {
               <div className="text-center mt-6 text-xl font-bold p-0 rounded-xl">
                 <div className="w-full mb-4 px-0 pt-[40px]">
                   <Image
-                    src="/ssobig_assets/술없이도.Png"
+                    src="/ssobig_assets/술없이도2.png"
                     alt="술없이도 이미지"
                     width={0}
                     height={0}
