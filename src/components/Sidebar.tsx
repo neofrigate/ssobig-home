@@ -218,16 +218,6 @@ const Sidebar: React.FC = () => {
               >
                 이용약관
               </LinkWithUtm>
-              <span style={{ margin: "0 5px" }}>|</span>
-              <LinkWithUtm
-                href="https://about.ssobig.com/refund_policy"
-                style={{ color: "inherit", textDecoration: "underline" }}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={toggleSidebar}
-              >
-                환불정책
-              </LinkWithUtm>
             </p>
           </footer>
         </div>
