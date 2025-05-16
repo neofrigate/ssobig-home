@@ -94,8 +94,8 @@ export default function RealGeniusPage() {
                     <span className="text-[#9E4BED]">(오픈특가)</span>
                   </p>
                   <p className="text-white font-bold text-lg">
-                    매주 일요일 17:00~20시{" "}
-                    <span className="text-white">(3H)</span>
+                    매주 일요일 17:00~20:00{" "}
+                    <span className="text-white">(3시간)</span>
                   </p>
                 </div>
               </div>
@@ -106,68 +106,77 @@ export default function RealGeniusPage() {
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
                     5/25 (일)
                   </span>
-                  <span className="text-[#9E4BED] mr-2 text-sm">
-                    17:00~20:00
-                  </span>
-                  <span className="text-white font-bold ml-auto">
+                  <span className="text-white font-bold flex-grow">
                     불면증 마피아
                   </span>
+                  <div className="flex gap-1">
+                    <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      EASY
+                    </span>
+                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      MIDDLE
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
                     6/1 (일)
                   </span>
-                  <span className="text-[#9E4BED] mr-2 text-sm">
-                    17:00~20:00
-                  </span>
-                  <span className="text-white font-bold ml-auto">
+                  <span className="text-white font-bold flex-grow">
                     불면증 마피아
                   </span>
+                  <div className="flex gap-1">
+                    <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      EASY
+                    </span>
+                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      MIDDLE
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
                     6/8 (일)
                   </span>
-                  <span className="text-[#9E4BED] mr-2 text-sm">
-                    17:00~20:00
+                  <span className="text-white font-bold flex-grow">
+                    이중 스파이
                   </span>
-                  <span className="text-white font-bold ml-auto">바이너리</span>
+                  <div className="flex gap-1">
+                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      MIDDLE
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
                     6/15 (일)
                   </span>
-                  <span className="text-[#9E4BED] mr-2 text-sm">
-                    17:00~20:00
+                  <span className="text-white font-bold flex-grow">
+                    바이너리
                   </span>
-                  <span className="text-white font-bold ml-auto">바이너리</span>
+                  <div className="flex gap-1">
+                    <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      EASY
+                    </span>
+                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      MIDDLE
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
                     6/22 (일)
                   </span>
-                  <span className="text-[#9E4BED] mr-2 text-sm">
-                    17:00~20:00
-                  </span>
-                  <span className="text-white font-bold ml-auto">
-                    이중 스파이
-                  </span>
-                </div>
-
-                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
-                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    6/29 (일)
-                  </span>
-                  <span className="text-[#9E4BED] mr-2 text-sm">
-                    17:00~20:00
-                  </span>
-                  <span className="text-white font-bold ml-auto">
-                    이중 스파이
-                  </span>
+                  <span className="text-white font-bold flex-grow">??????</span>
+                  <div className="flex gap-1">
+                    <span className="bg-orange-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      HARD
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -589,8 +598,8 @@ export default function RealGeniusPage() {
             {/* 연합어때 이미지 */}
             <div className="w-full my-20">
               <Image
-                src="/ssobig_assets/연합어때.png"
-                alt="연합 어때"
+                src="/ssobig_assets/차별화된 전문성.png"
+                alt="차별화된 전문성"
                 width={620}
                 height={0}
                 sizes="100vw"
