@@ -522,7 +522,7 @@ export default function RealGeniusPage() {
                     </div>
                     {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
                     <a
-                      href="https://www.instagram.com/gameorb_official/"
+                      href="https://www.instagram.com/game_orb"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
