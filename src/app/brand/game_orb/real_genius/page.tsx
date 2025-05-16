@@ -107,14 +107,20 @@ export default function RealGeniusPage() {
                     5/25 (일)
                   </span>
                   <span className="text-white font-bold flex-grow">
-                    불면증 마피아
+                    불면증 마피아{" "}
+                    <span
+                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
+                      style={{ fontFamily: "cursive" }}
+                    >
+                      Genius
+                    </span>
                   </span>
                   <div className="flex gap-1">
                     <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
                       EASY
                     </span>
                     <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      MIDDLE
+                      MID
                     </span>
                   </div>
                 </div>
@@ -124,28 +130,20 @@ export default function RealGeniusPage() {
                     6/1 (일)
                   </span>
                   <span className="text-white font-bold flex-grow">
-                    불면증 마피아
+                    불면증 마피아{" "}
+                    <span
+                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
+                      style={{ fontFamily: "cursive" }}
+                    >
+                      Genius
+                    </span>
                   </span>
                   <div className="flex gap-1">
                     <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
                       EASY
                     </span>
                     <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      MIDDLE
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
-                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    6/8 (일)
-                  </span>
-                  <span className="text-white font-bold flex-grow">
-                    이중 스파이
-                  </span>
-                  <div className="flex gap-1">
-                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      MIDDLE
+                      MID
                     </span>
                   </div>
                 </div>
@@ -155,14 +153,17 @@ export default function RealGeniusPage() {
                     6/15 (일)
                   </span>
                   <span className="text-white font-bold flex-grow">
-                    바이너리
+                    슈가빌리지{" "}
+                    <span
+                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
+                      style={{ fontFamily: "cursive" }}
+                    >
+                      Story
+                    </span>
                   </span>
                   <div className="flex gap-1">
                     <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
                       EASY
-                    </span>
-                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      MIDDLE
                     </span>
                   </div>
                 </div>
@@ -170,6 +171,49 @@ export default function RealGeniusPage() {
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
                     6/22 (일)
+                  </span>
+                  <span className="text-white font-bold flex-grow">
+                    바이너리{" "}
+                    <span
+                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
+                      style={{ fontFamily: "cursive" }}
+                    >
+                      Genius
+                    </span>
+                  </span>
+                  <div className="flex gap-1">
+                    <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      EASY
+                    </span>
+                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      MID
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
+                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
+                    6/29 (일)
+                  </span>
+                  <span className="text-white font-bold flex-grow">
+                    이중 스파이{" "}
+                    <span
+                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
+                      style={{ fontFamily: "cursive" }}
+                    >
+                      Genius
+                    </span>
+                  </span>
+                  <div className="flex gap-1">
+                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                      MID
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
+                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
+                    7/6 (일)
                   </span>
                   <span className="text-white font-bold flex-grow">??????</span>
                   <div className="flex gap-1">
@@ -409,55 +453,146 @@ export default function RealGeniusPage() {
               <div className="relative w-full pb-4 overflow-x-auto hide-scrollbar">
                 <div className="inline-flex space-x-4 px-2 py-4">
                   {/* 불면증 마피아 카드 */}
-                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-orange-500/30">
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
                     {/* 3:4 비율 포스터 이미지 영역 */}
                     <div className="w-full aspect-[3/4] relative">
                       <Image
                         src="/ssobig_assets/불면증 마피아.png"
-                        alt="불면증 마피아 포스터"
+                        alt="??????"
                         fill
                         style={{ objectFit: "cover" }}
                       />
                     </div>
                     {/* 카드 내용 영역 */}
-                    <div className="p-3">
+                    <div className="p-3 flex flex-col h-[145px]">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="bg-orange-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                          난이도 : 쉬움
-                        </span>
-                        <span className="text-white text-sm font-bold">
-                          12~30명
-                        </span>
+                        <div>
+                          <span className="font-bold text-white">
+                            불면증 마피아
+                          </span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            EASY
+                          </span>
+                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            MID
+                          </span>
+                        </div>
                       </div>
                       <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
                         밤이 돼도 못 자...? 모두 눈을 뜬 채 능력을 쓰대! 서로의
                         정체는 끝까지 모르니 긴장감 MAX!
                       </p>
-                      <div className="flex justify-between items-center text-xs">
-                        <div>
-                          <span>복잡성</span>
-                          <div className="flex items-center space-x-0.5 mt-1">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                              <div
-                                key={i}
-                                className={`w-2 h-2 rounded-full ${
-                                  i === 3 ? "bg-orange-500" : "bg-white/20"
-                                }`}
-                              />
-                            ))}
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>12~30명</span>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                    {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
+                    <a
+                      href="https://www.instagram.com/gameorb_official/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
+                    >
+                      자세히 보기
+                    </a>
+                  </div>
+
+                  {/* 슈가빌리지 카드 */}
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
+                    {/* 3:4 비율 포스터 이미지 영역 */}
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/슈가빌리지 포스터.png"
+                        alt="슈가빌리지"
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                    {/* 카드 내용 영역 */}
+                    <div className="p-3 flex flex-col h-[145px]">
+                      <div className="flex justify-between items-center mb-2">
                         <div>
-                          <span>전략성</span>
-                          <div className="flex items-center space-x-0.5 mt-1">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                              <div
-                                key={i}
-                                className={`w-2 h-2 rounded-full ${
-                                  i === 3 ? "bg-orange-500" : "bg-white/20"
-                                }`}
-                              />
-                            ))}
+                          <span className="font-bold text-white">
+                            슈가빌리지
+                          </span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            EASY
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
+                        캔디로 유명한 슈가빌리지에 첫 가게를 차리게 된 찰리!
+                        사탕에 독을 탄 사람은 도대체 누구? 내가 주인공이 되는
+                        스토리 게임!
+                      </p>
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 2 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 1 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>8~32명</span>
                           </div>
                         </div>
                       </div>
@@ -465,55 +600,67 @@ export default function RealGeniusPage() {
                   </div>
 
                   {/* 바이너리 카드 */}
-                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-teal-500/30">
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
                     {/* 3:4 비율 포스터 이미지 영역 */}
                     <div className="w-full aspect-[3/4] relative">
                       <Image
                         src="/ssobig_assets/바이너리.png"
-                        alt="바이너리 포스터"
+                        alt="??????"
                         fill
                         style={{ objectFit: "cover" }}
                       />
                     </div>
                     {/* 카드 내용 영역 */}
-                    <div className="p-3">
+                    <div className="p-3 flex flex-col h-[145px]">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="bg-teal-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                          난이도 : 중간
-                        </span>
-                        <span className="text-white text-sm font-bold">
-                          20~100명
-                        </span>
+                        <div>
+                          <span className="font-bold text-white">바이너리</span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            EASY
+                          </span>
+                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            MID
+                          </span>
+                        </div>
                       </div>
                       <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
                         이진법을 결합한 단체 심리전 투표게임?! 시드 숫자를
                         랜덤으로 받아, 동맹이 시시각각 바뀐다!
                       </p>
-                      <div className="flex justify-between items-center text-xs">
-                        <div>
-                          <span>복잡성</span>
-                          <div className="flex items-center space-x-0.5 mt-1">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                              <div
-                                key={i}
-                                className={`w-2 h-2 rounded-full ${
-                                  i === 3 ? "bg-teal-500" : "bg-white/20"
-                                }`}
-                              />
-                            ))}
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div>
-                          <span>전략성</span>
-                          <div className="flex items-center space-x-0.5 mt-1">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                              <div
-                                key={i}
-                                className={`w-2 h-2 rounded-full ${
-                                  i === 3 ? "bg-teal-500" : "bg-white/20"
-                                }`}
-                              />
-                            ))}
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>20~100명</span>
                           </div>
                         </div>
                       </div>
@@ -521,55 +668,127 @@ export default function RealGeniusPage() {
                   </div>
 
                   {/* 이중 스파이 카드 */}
-                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-blue-500/30">
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-purple-500/50">
                     {/* 3:4 비율 포스터 이미지 영역 */}
                     <div className="w-full aspect-[3/4] relative">
                       <Image
                         src="/ssobig_assets/이중 스파이.png"
-                        alt="이중 스파이 포스터"
+                        alt="??????"
                         fill
                         style={{ objectFit: "cover" }}
                       />
                     </div>
                     {/* 카드 내용 영역 */}
-                    <div className="p-3">
+                    <div className="p-3 flex flex-col h-[145px]">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="bg-blue-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                          난이도 : 어려움
-                        </span>
-                        <span className="text-white text-sm font-bold">
-                          12~40명
-                        </span>
+                        <div>
+                          <span className="font-bold text-white">
+                            이중 스파이
+                          </span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            MID
+                          </span>
+                        </div>
                       </div>
                       <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
                         다양한 능력을 쓸 수 있는 심도 있는 팀전 세력전! 흑막으로
                         상대 조직의 보스가 지목 되다면!
                       </p>
-                      <div className="flex justify-between items-center text-xs">
-                        <div>
-                          <span>복잡성</span>
-                          <div className="flex items-center space-x-0.5 mt-1">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                              <div
-                                key={i}
-                                className={`w-2 h-2 rounded-full ${
-                                  i === 3 ? "bg-blue-500" : "bg-white/20"
-                                }`}
-                              />
-                            ))}
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-purple-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 5 ? "bg-purple-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>12~40명</span>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 미스터리 카드 (추가된 카드) */}
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-orange-500/50">
+                    {/* 3:4 비율 포스터 이미지 영역 */}
+                    <div className="w-full aspect-[3/4] relative">
+                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-4xl font-bold text-orange-500">
+                        ?????
+                      </div>
+                    </div>
+                    {/* 카드 내용 영역 */}
+                    <div className="p-3 flex flex-col h-[145px]">
+                      <div className="flex justify-between items-center mb-2">
                         <div>
-                          <span>전략성</span>
-                          <div className="flex items-center space-x-0.5 mt-1">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                              <div
-                                key={i}
-                                className={`w-2 h-2 rounded-full ${
-                                  i === 5 ? "bg-blue-500" : "bg-white/20"
-                                }`}
-                              />
-                            ))}
+                          <span className="font-bold text-white">??????</span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-orange-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            HARD
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
+                        ??????
+                      </p>
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 4 ? "bg-orange-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 5 ? "bg-orange-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>??????</span>
                           </div>
                         </div>
                       </div>
@@ -580,13 +799,13 @@ export default function RealGeniusPage() {
             </div>
 
             {/* 마무리 섹션 */}
-            <div className="text-center mb-10">
-              <h2 className="text-2xl font-bold mb-3">
+            <div className="text-center my-20">
+              <h2 className="text-2xl font-bold mb-5">
                 머리는 짜릿하게, 마음은 즐겁게!
                 <br />
                 게임으로 만나 찐친되는 마법!
               </h2>
-              <p className="text-lg mb-6">
+              <p className="text-lg mb-8">
                 이제 더 이상 화면 밖에서 구경만 하지 마세요!
               </p>
               <p className="text-xl text-[#95BE62] font-bold">
@@ -596,18 +815,7 @@ export default function RealGeniusPage() {
             </div>
 
             {/* 연합어때 이미지 */}
-            <div className="w-full my-20">
-              <Image
-                src="/ssobig_assets/차별화된 전문성.png"
-                alt="차별화된 전문성"
-                width={620}
-                height={0}
-                sizes="100vw"
-                className="w-full rounded-[12px]"
-                style={{ width: "100%", height: "auto" }}
-                priority
-              />
-            </div>
+            <div className="w-full my-24"></div>
 
             {/* FAQ 섹션 */}
             <div className="mb-16">
@@ -709,6 +917,26 @@ export default function RealGeniusPage() {
               </svg>
             </a>
           </div>
+        </div>
+
+        {/* 고정 상담 버튼 */}
+        <div className="fixed bottom-[88px] right-4 md:right-8 z-30">
+          <a
+            href="http://pf.kakao.com/_dJbin/chat"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-[56px] h-[56px] bg-[#9E4BED]/50 hover:bg-[#8341c9]/60 border border-[#9E4BED] text-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105"
+            aria-label="카카오톡 상담하기"
+          >
+            <div className="relative w-[46px] h-[46px]">
+              <Image
+                src="/ssobig_assets/상담포브.png"
+                alt="상담 아이콘"
+                fill
+                sizes="46px"
+              />
+            </div>
+          </a>
         </div>
       </div>
     </>
