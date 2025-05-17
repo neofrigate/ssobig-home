@@ -65,7 +65,7 @@ export default function RealGeniusPage() {
         {/* 메인 콘텐츠 */}
         <div className="w-full max-w-[620px] mx-auto z-10 px-0 mb-[72px]">
           {/* 메인 이미지 */}
-          <div className="w-full h-auto">
+          <div className="w-full h-auto mb-10">
             <div className="relative w-full">
               <Image
                 src="/ssobig_assets/상세 상단 공통 디자인_리얼지니어스.png"
@@ -80,7 +80,7 @@ export default function RealGeniusPage() {
           </div>
 
           {/* 리얼지니어스 스케줄 박스 */}
-          <div className="w-full mb-8">
+          <div className="w-full mb-12">
             <div className="bg-black rounded-xl p-6 shadow-lg">
               <h2 className="text-2xl font-bold text-center text-white mb-4">
                 리얼지니어스 스케줄
@@ -112,7 +112,7 @@ export default function RealGeniusPage() {
                       className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
                       style={{ fontFamily: "cursive" }}
                     >
-                      Genius
+                      Mind
                     </span>
                   </span>
                   <div className="flex gap-1">
@@ -135,7 +135,7 @@ export default function RealGeniusPage() {
                       className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
                       style={{ fontFamily: "cursive" }}
                     >
-                      Genius
+                      Mind
                     </span>
                   </span>
                   <div className="flex gap-1">
@@ -178,7 +178,7 @@ export default function RealGeniusPage() {
                       className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
                       style={{ fontFamily: "cursive" }}
                     >
-                      Genius
+                      Mind
                     </span>
                   </span>
                   <div className="flex gap-1">
@@ -201,7 +201,7 @@ export default function RealGeniusPage() {
                       className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
                       style={{ fontFamily: "cursive" }}
                     >
-                      Genius
+                      Mind
                     </span>
                   </span>
                   <div className="flex gap-1">
@@ -229,11 +229,12 @@ export default function RealGeniusPage() {
           {/* 소개 섹션 및 나머지 콘텐츠 */}
           <div className="px-5">
             {/* 소개 섹션 */}
-            <div className="my-[50px] space-y-4">
+            <div className="my-[50px] space-y-4 text-center">
               <p className="text-lg">
                 <span className="text-[#95BE62] font-semibold">
-                  &quot;데블스 플랜&quot;, &quot;더 지니어스&quot;, &quot;피의
-                  게임&quot;...
+                  &quot;데블스 플랜&quot;, &quot;더 지니어스&quot;,
+                  <br />
+                  &quot;피의 게임&quot;...
                 </span>
                 <br />
                 게임 예능 속 숨 막히는 전략과 반전에 열광하셨나요?
@@ -243,19 +244,24 @@ export default function RealGeniusPage() {
                 혹시{" "}
                 <span className="text-[#95BE62] font-semibold">
                   &quot;나라면 저기서 저렇게 했을 텐데!&quot;
-                </span>{" "}
+                </span>
+                <br />
                 혹은{" "}
                 <span className="text-[#95BE62] font-semibold">
                   &quot;저 게임, 내가 하면 더 잘할 수 있을 것 같은데?&quot;
-                </span>{" "}
+                </span>
+                <br />
                 라고 외치신 적 있으신가요?
               </p>
 
               <p className="text-lg">
                 아니면,{" "}
                 <span className="text-[#95BE62] font-semibold">
-                  &quot;주말에 뭐하지? 새로운 사람들과 재밌게 놀고 싶은데!&quot;
-                </span>{" "}
+                  &quot;주말에 뭐하지?
+                  <br />
+                  새로운 사람들과 재밌게 놀고 싶은데!&quot;
+                </span>
+                <br />
                 하고 생각하셨나요?
               </p>
             </div>
@@ -305,12 +311,12 @@ export default function RealGeniusPage() {
                     style={{
                       width: "100%",
                       height: "auto",
-                      marginBottom: "30px",
+                      marginBottom: "50px",
                     }}
                   />
                 </div>
 
-                <p className="text-base font-bold pb-[40px]">
+                <p className="text-base font-bold pb-[40px] pt-[20px]">
                   😎 &quot;술 없이도 이렇게 재밌게 친해질 수 있다고?&quot;
                   <br />
                   네, 신기할걸요? 🙌
@@ -345,7 +351,7 @@ export default function RealGeniusPage() {
               </p>
 
               {/* 이미지 추가 - img 태그로 변경 */}
-              <div className="w-full my-6">
+              <div className="w-full my-8">
                 <Image
                   src="/ssobig_assets/차별화된 전문성.png"
                   alt="차별화된 전문성"
@@ -357,7 +363,7 @@ export default function RealGeniusPage() {
                 />
               </div>
 
-              <p className="text-lg font-bold text-center text-[#95BE62]">
+              <p className="text-lg font-bold text-center text-[#95BE62] mt-6">
                 뇌지컬 풀가동! 심장은 쫄깃, 웃음은 빵빵! 🤣
               </p>
             </div>
@@ -450,8 +456,8 @@ export default function RealGeniusPage() {
               </p>
 
               {/* 가로 스크롤 카드 레이아웃 */}
-              <div className="relative w-full pb-4 overflow-x-auto hide-scrollbar">
-                <div className="inline-flex space-x-4 px-2 py-4">
+              <div className="relative w-full pb-6 overflow-x-auto hide-scrollbar">
+                <div className="inline-flex space-x-6 px-2 py-6">
                   {/* 불면증 마피아 카드 */}
                   <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
                     {/* 3:4 비율 포스터 이미지 영역 */}
@@ -464,7 +470,7 @@ export default function RealGeniusPage() {
                       />
                     </div>
                     {/* 카드 내용 영역 */}
-                    <div className="p-3 flex flex-col h-[145px]">
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
                       <div className="flex justify-between items-center mb-2">
                         <div>
                           <span className="font-bold text-white">
@@ -507,7 +513,7 @@ export default function RealGeniusPage() {
                                   <div
                                     key={i}
                                     className={`w-2 h-2 rounded-full ${
-                                      i === 3 ? "bg-yellow-500" : "bg-white/20"
+                                      i === 1 ? "bg-yellow-500" : "bg-white/20"
                                     }`}
                                   />
                                 ))}
@@ -543,7 +549,7 @@ export default function RealGeniusPage() {
                       />
                     </div>
                     {/* 카드 내용 영역 */}
-                    <div className="p-3 flex flex-col h-[145px]">
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
                       <div className="flex justify-between items-center mb-2">
                         <div>
                           <span className="font-bold text-white">
@@ -611,7 +617,7 @@ export default function RealGeniusPage() {
                       />
                     </div>
                     {/* 카드 내용 영역 */}
-                    <div className="p-3 flex flex-col h-[145px]">
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
                       <div className="flex justify-between items-center mb-2">
                         <div>
                           <span className="font-bold text-white">바이너리</span>
@@ -679,7 +685,7 @@ export default function RealGeniusPage() {
                       />
                     </div>
                     {/* 카드 내용 영역 */}
-                    <div className="p-3 flex flex-col h-[145px]">
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
                       <div className="flex justify-between items-center mb-2">
                         <div>
                           <span className="font-bold text-white">
@@ -743,7 +749,7 @@ export default function RealGeniusPage() {
                       </div>
                     </div>
                     {/* 카드 내용 영역 */}
-                    <div className="p-3 flex flex-col h-[145px]">
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
                       <div className="flex justify-between items-center mb-2">
                         <div>
                           <span className="font-bold text-white">??????</span>
@@ -884,6 +890,49 @@ export default function RealGeniusPage() {
                       긍정적이고 유쾌한 분들이 대부분입니다. 분위기는 늘
                       화기애애하고 웃음이 넘쳐요! 걱정 말고 오셔서 함께 즐겨요!
                     </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 신청 전 최종 확인 내용 */}
+            <div className="mb-16">
+              <div className="bg-white/10 backdrop-blur-[30px] p-4 md:p-6 rounded-xl">
+                <h2 className="text-2xl font-bold text-center mb-8">
+                  신청 전 최종 확인 내용
+                </h2>
+
+                <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center py-3 border-b border-white/10">
+                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
+                      오시는 길
+                    </span>
+                    <span className="text-white">쏘빅스튜디오</span>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row md:items-center py-3 border-b border-white/10">
+                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
+                      소요시간
+                    </span>
+                    <span className="text-white">3시간</span>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row md:items-start py-3 border-b border-white/10">
+                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
+                      제공사항
+                    </span>
+                    <span className="text-white">
+                      어디에서도 해볼 수 없는 콘텐츠⭐, 간단한 다과 및 음료
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row md:items-start py-3">
+                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
+                      준비물품
+                    </span>
+                    <span className="text-white">
+                      풀충전한 폰 (폰 사용 많음!)
+                    </span>
                   </div>
                 </div>
               </div>
