@@ -11,8 +11,8 @@ export default function NowSeoulPage() {
     title: "[Meet Up] 목요일 저녁 7시 참여하기",
     description:
       "N.O.W.seoul · 매주 목요일 7:30PM · 지옥철 대신 만나는 새로운 인연과 아이디어",
-    linkText: "smore.im/form/F0P6EWOhoW",
-    linkHref: "https://smore.im/form/F0P6EWOhoW",
+    linkText: "form.ssobig.com/nowseoul",
+    linkHref: "https://form.ssobig.com/nowseoul",
     linkIconType: "link",
     hasImageArea: true,
     imagePlaceholderText: "N.O.W.seoul Meetup",
@@ -27,8 +27,8 @@ export default function NowSeoulPage() {
   const careerClassCard: CardProps = {
     title: "[Class] 토요일 오후 3시 수강신청",
     description: "N.O.W.seoul · 커리어 클래스 · 전문가들의 실전 노하우 공유",
-    linkText: "smore.im/form/I2qQSKCTHm",
-    linkHref: "https://smore.im/form/I2qQSKCTHm",
+    linkText: "form.ssobig.com/nowclass",
+    linkHref: "https://form.ssobig.com/nowclass",
     linkIconType: "link",
     hasImageArea: true,
     imagePlaceholderText: "N.O.W.seoul Career Class",

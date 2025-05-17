@@ -922,7 +922,7 @@ export default function RealGeniusPage() {
                       제공사항
                     </span>
                     <span className="text-white">
-                      어디에서도 해볼 수 없는 콘텐츠⭐, 간단한 다과 및 음료
+                      어디에서도 해볼 수 없는 콘텐츠⭐, 간단한 다과 및 음료{" "}
                     </span>
                   </div>
 
@@ -944,7 +944,7 @@ export default function RealGeniusPage() {
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="w-full max-w-[620px] mx-auto">
             <a
-              href="https://dis.qa/rse3db6"
+              href="https://form.ssobig.com/realgenius"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full h-[56px] bg-[#9E4BED] hover:bg-[#8341c9] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg"
