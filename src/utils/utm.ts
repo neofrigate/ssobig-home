@@ -9,6 +9,10 @@ const UTM_PARAMS = [
   "utm_campaign",
   "utm_term",
   "utm_content",
+  "utm_id",
+  "utm_creative",
+  "utm_keyword",
+  "utm_name",
 ];
 
 /**
@@ -57,11 +61,9 @@ export const appendUtmParams = (url: string): string => {
       }
     });
 
-    // 내부 URL일 경우 pathname과 search만 반환
-    const searchString = urlObj.searchParams.toString();
     return isExternalUrl
       ? urlObj.toString()
-      : `${urlObj.pathname}${searchString ? `?${searchString}` : ""}`;
+      : `${urlObj.pathname}${urlObj.search}`;
   } catch (e) {
     console.error("URL 파싱 에러:", e);
     return url;
