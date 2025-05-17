@@ -27,7 +27,7 @@ export default function GameOrbPage() {
       title: "게임오브 정모 : 신작게임 데모데이",
       description: "커뮤니티 멤버들과 함께하는 정모에 참여하세요.",
       linkText: "form.ssobig.com/gameorb1",
-      linkHref: "https://dis.qa/AYfhB",
+      linkHref: "https://form.ssobig.com/gameorb2",
       linkIconType: "link",
       hasImageArea: true,
       imagePlaceholderText: "게임오브 정모",
