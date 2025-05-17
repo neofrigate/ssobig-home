@@ -58,9 +58,10 @@ export const appendUtmParams = (url: string): string => {
     });
 
     // 내부 URL일 경우 pathname과 search만 반환
+    const searchString = urlObj.searchParams.toString();
     return isExternalUrl
       ? urlObj.toString()
-      : `${urlObj.pathname}${urlObj.search}`;
+      : `${urlObj.pathname}${searchString ? `?${searchString}` : ""}`;
   } catch (e) {
     console.error("URL 파싱 에러:", e);
     return url;

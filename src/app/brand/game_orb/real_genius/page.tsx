@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Script from "next/script";
+import LinkWithUtm from "../../../../components/LinkWithUtm";
 
 export const metadata = {
   title: "REAL GENIUS - Game Orb",
@@ -527,14 +528,14 @@ export default function RealGeniusPage() {
                       </div>
                     </div>
                     {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
-                    <a
+                    <LinkWithUtm
                       href="https://www.instagram.com/game_orb"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
                     >
                       자세히 보기
-                    </a>
+                    </LinkWithUtm>
                   </div>
 
                   {/* 슈가빌리지 카드 */}
@@ -943,7 +944,7 @@ export default function RealGeniusPage() {
         {/* 하단 고정 CTA 버튼 */}
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="w-full max-w-[620px] mx-auto">
-            <a
+            <LinkWithUtm
               href="https://form.ssobig.com/realgenius"
               target="_blank"
               rel="noopener noreferrer"
@@ -964,13 +965,13 @@ export default function RealGeniusPage() {
                   d="M9 5l7 7-7 7"
                 />
               </svg>
-            </a>
+            </LinkWithUtm>
           </div>
         </div>
 
         {/* 고정 상담 버튼 */}
         <div className="fixed bottom-[88px] right-4 md:right-8 z-30">
-          <a
+          <LinkWithUtm
             href="http://pf.kakao.com/_dJbin/chat"
             target="_blank"
             rel="noopener noreferrer"
@@ -985,7 +986,7 @@ export default function RealGeniusPage() {
                 sizes="46px"
               />
             </div>
-          </a>
+          </LinkWithUtm>
         </div>
       </div>
     </>
