@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Script from "next/script";
+import LinkWithUtm from "../../../../components/LinkWithUtm";
 
 export const metadata = {
   title: "러브버디즈 상세 - Love Buddies",
@@ -103,7 +104,7 @@ export default function LoveBuddiesDetailPage() {
         {/* 하단 고정 CTA 버튼 */}
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="w-full max-w-[620px] mx-auto">
-            <a
+            <LinkWithUtm
               href="https://form.ssobig.com/lovebuddies"
               target="_blank"
               rel="noopener noreferrer"
@@ -124,7 +125,7 @@ export default function LoveBuddiesDetailPage() {
                   d="M9 5l7 7-7 7"
                 />
               </svg>
-            </a>
+            </LinkWithUtm>
           </div>
         </div>
       </div>
