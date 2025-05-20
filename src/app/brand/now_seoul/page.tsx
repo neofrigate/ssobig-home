@@ -11,8 +11,8 @@ export default function NowSeoulPage() {
     title: "[Meet Up] 목요일 저녁 7시 참여하기",
     description:
       "N.O.W.seoul · 매주 목요일 7:30PM · 지옥철 대신 만나는 새로운 인연과 아이디어",
-    linkText: "form.ssobig.com/nowseoul",
-    linkHref: "https://form.ssobig.com/nowseoul",
+    linkText: "meet-up",
+    linkHref: "/brand/now_seoul/meet-up",
     linkIconType: "link",
     hasImageArea: true,
     imagePlaceholderText: "N.O.W.seoul Meetup",
