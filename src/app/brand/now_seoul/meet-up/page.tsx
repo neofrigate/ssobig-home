@@ -111,7 +111,7 @@ export default function RealGeniusPage() {
                     </p>
                   </div>
                   <div className="text-white font-bold text-lg">
-                    매주 수요일 19:30~22:00
+                    매주 목요일 19:30~22:00
                     <span className="text-white"> (2.5시간)</span>
                   </div>
                 </div>
@@ -121,7 +121,7 @@ export default function RealGeniusPage() {
               <div className="space-y-3">
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    5/22 (수)
+                    5/22 (목)
                   </span>
                   <span className="text-white font-bold">
                     스몰 브랜드 사이드 프로젝트
@@ -131,7 +131,7 @@ export default function RealGeniusPage() {
 
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    5/29 (수)
+                    5/29 (목)
                   </span>
                   <span className="text-white font-bold">AI & 업무 자동화</span>
                   <span className="flex-grow"></span>
@@ -142,7 +142,7 @@ export default function RealGeniusPage() {
 
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    6/5 (수)
+                    6/5 (목)
                   </span>
                   <span className="text-white font-bold">
                     생성형 AI와 콘텐츠 제작
@@ -155,7 +155,7 @@ export default function RealGeniusPage() {
 
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    6/12 (수)
+                    6/12 (목)
                   </span>
                   <span className="text-white font-bold">
                     AI를 활용한 협업 프로세스 구축
