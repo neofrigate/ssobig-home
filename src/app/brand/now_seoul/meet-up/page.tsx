@@ -40,11 +40,20 @@ export default function RealGeniusPage() {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '681386597924392');
+            fbq('init', '2385974028469308');
             fbq('track', 'PageView');
           `,
         }}
       />
+      <noscript>
+        <img
+          height="1"
+          width="1"
+          style={{ display: "none" }}
+          src="https://www.facebook.com/tr?id=2385974028469308&ev=PageView&noscript=1"
+          alt=""
+        />
+      </noscript>
       {/* End Meta Pixel Code */}
 
       <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start px-0 selection:bg-purple-500 selection:text-white">
