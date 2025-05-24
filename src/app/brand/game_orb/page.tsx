@@ -9,7 +9,7 @@ export const metadata = {
 export default function GameOrbPage() {
   const gameOrbCards: CardProps[] = [
     {
-      title: "REAL GENIUS : 게임 예능 현실판 참여하기",
+      title: "SOCIAL GENIUS : 게임 예능 현실판 참여하기",
       description: "흥미진진한 게임 예능에 지금 바로 참여하세요.",
       linkText: "real_genius",
       linkHref: "/brand/game_orb/real_genius",
@@ -17,7 +17,7 @@ export default function GameOrbPage() {
       hasImageArea: true,
       imagePlaceholderText: "데블스플랜 참여",
       imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/사악한포브.png')",
+        backgroundImage: "url('/ssobig_assets/소셜지니어스.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       },
