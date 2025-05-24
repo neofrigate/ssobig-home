@@ -4,7 +4,7 @@ import LinkWithUtm from "../../../../components/LinkWithUtm";
 
 export const metadata = {
   title: "REAL GENIUS - Game Orb",
-  description: "당신이 주인공이 되는 게임예능 현실판 - 리얼 지니어스",
+  description: "당신이 주인공이 되는 게임예능 현실판 - 소셜 지니어스",
 };
 
 export default function RealGeniusPage() {
@@ -84,7 +84,7 @@ export default function RealGeniusPage() {
           <div className="w-full mb-12">
             <div className="bg-black rounded-xl p-6 shadow-lg">
               <h2 className="text-2xl font-bold text-center text-white mb-4">
-                리얼지니어스 스케줄
+                소셜지니어스 스케줄
               </h2>
 
               {/* 가격 및 시간 정보 */}
@@ -103,29 +103,6 @@ export default function RealGeniusPage() {
 
               {/* 일정 목록 */}
               <div className="space-y-3">
-                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
-                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    5/25 (일)
-                  </span>
-                  <span className="text-white font-bold flex-grow">
-                    불면증 마피아{" "}
-                    <span
-                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
-                      style={{ fontFamily: "cursive" }}
-                    >
-                      Mind
-                    </span>
-                  </span>
-                  <div className="flex gap-1">
-                    <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      EASY
-                    </span>
-                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      MID
-                    </span>
-                  </div>
-                </div>
-
                 <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
                   <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
                     6/1 (일)
@@ -529,7 +506,7 @@ export default function RealGeniusPage() {
                     </div>
                     {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
                     <LinkWithUtm
-                      href="https://www.instagram.com/game_orb"
+                      href="https://www.instagram.com/p/DKB9qCYv5q7/?img_index=1"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
@@ -604,6 +581,15 @@ export default function RealGeniusPage() {
                         </div>
                       </div>
                     </div>
+                    {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
+                    <LinkWithUtm
+                      href="https://www.instagram.com/p/DKB-DzTPSjf/?img_index=1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
+                    >
+                      자세히 보기
+                    </LinkWithUtm>
                   </div>
 
                   {/* 바이너리 카드 */}
@@ -864,8 +850,7 @@ export default function RealGeniusPage() {
                   {/* Q3 */}
                   <div>
                     <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q3: &apos;데블스 플랜&apos;처럼 경쟁이 너무 치열하고
-                      배신이 중요할까요?
+                      Q3: 방송처럼 경쟁이 너무 치열하고 배신이 중요할까요?
                     </h3>
                     <p className="text-sm md:text-base text-[#F4F4F4] font-light">
                       TV 프로그램의 흥미로운 요소(전략, 심리)는 가져오지만,{" "}
@@ -874,9 +859,9 @@ export default function RealGeniusPage() {
                       게임의 긴장감과 반전의 묘미는 살아있지만, 모두가 함께
                       즐기고 좋은 관계를 형성하는 것이 저희의 최우선 목표입니다.
                       과도한 스트레스보다는 유쾌한 심리전과 빛나는 협동을
-                      즐겨주세요! (가끔은 &quot;맘놓고빡겜&quot; 모드가 있을
-                      수도 있지만, 기본은 &quot;다 함께 즐겁게&quot;랍니다!
-                      🔥➡️😊)
+                      즐겨주세요! (&apos;맘 놓고 빡겜할 수 있는&apos; 모드는
+                      별도로 준비할 예정이에요! 소셜지니어스에서는 &apos;다 함께
+                      즐겁게&apos; 즐기는 데 중점을 뒀습니다! 🔥➡️😊)
                     </p>
                   </div>
 
