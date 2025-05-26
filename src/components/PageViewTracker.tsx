@@ -1,8 +1,17 @@
 "use client";
 
+import { Suspense } from "react";
 import useGoogleAnalytics from "../hooks/useGoogleAnalytics";
 
-export default function PageViewTracker() {
+function PageViewTrackerInner() {
   useGoogleAnalytics();
   return null;
+}
+
+export default function PageViewTracker() {
+  return (
+    <Suspense fallback={null}>
+      <PageViewTrackerInner />
+    </Suspense>
+  );
 }
