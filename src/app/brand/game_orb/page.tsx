@@ -1,11 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Card, { CardProps } from "../../../components/Card";
 import Script from "next/script";
 import { trackLinkClick } from "../../../utils/gtag";
-
-export const metadata = {
-  title: "Ssobig-Game Orb",
-};
 
 export default function GameOrbPage() {
   const gameOrbCards: CardProps[] = [
