@@ -22,6 +22,10 @@ export default function NowSeoulPage() {
       backgroundPosition: "center",
     },
     fullImageCard: true,
+    // 추적 정보 추가
+    brandPage: "now_seoul",
+    buttonType: "meetup_cta",
+    destination: "internal_page",
   };
 
   const careerClassCard: CardProps = {
@@ -38,6 +42,10 @@ export default function NowSeoulPage() {
       backgroundPosition: "center",
     },
     fullImageCard: true,
+    // 추적 정보 추가
+    brandPage: "now_seoul",
+    buttonType: "class_cta",
+    destination: "smore_form",
   };
 
   return (

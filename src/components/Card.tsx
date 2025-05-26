@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { LinkIcon, CssInstagramIcon } from "./IconComponents";
 import { appendUtmParams } from "../utils/utm";
+import { trackLinkClick } from "../utils/gtag";
 
 // Card 컴포넌트의 Props 인터페이스
 export interface CardProps {
@@ -19,6 +20,10 @@ export interface CardProps {
   descriptionClass?: string;
   linkTextClass?: string;
   fullImageCard?: boolean; // 전체 이미지 카드 여부
+  // 추적을 위한 새로운 props
+  brandPage?: string;
+  buttonType?: string;
+  destination?: string;
 }
 
 // 재사용 가능한 Card 컴포넌트
@@ -36,6 +41,9 @@ const Card: React.FC<CardProps> = ({
   descriptionClass = "text-neutral-300",
   linkTextClass = "text-neutral-300 hover:text-white",
   fullImageCard = false, // 기본값은 false
+  brandPage,
+  buttonType,
+  destination,
 }) => {
   const [urlWithUtm, setUrlWithUtm] = useState(linkHref);
 
@@ -48,9 +56,18 @@ const Card: React.FC<CardProps> = ({
     // 전체 이미지 카드 스타일
     <a
       href={urlWithUtm}
-      target={linkHref.startsWith('/') ? "_self" : "_blank"}
-      rel={linkHref.startsWith('/') ? "" : "noopener noreferrer"}
+      target={linkHref.startsWith("/") ? "_self" : "_blank"}
+      rel={linkHref.startsWith("/") ? "" : "noopener noreferrer"}
       className="block w-full transition-all duration-300 hover:-translate-y-1"
+      onClick={() =>
+        trackLinkClick({
+          linkUrl: urlWithUtm,
+          linkText: title,
+          brandPage,
+          buttonType,
+          destination,
+        })
+      }
     >
       <div
         className="rounded-[12px] shadow-lg overflow-hidden hover:shadow-xl relative w-full"
@@ -115,9 +132,18 @@ const Card: React.FC<CardProps> = ({
         ></p>
         <a
           href={urlWithUtm}
-          target={linkHref.startsWith('/') ? "_self" : "_blank"}
-          rel={linkHref.startsWith('/') ? "" : "noopener noreferrer"}
+          target={linkHref.startsWith("/") ? "_self" : "_blank"}
+          rel={linkHref.startsWith("/") ? "" : "noopener noreferrer"}
           className={`text-[13px] transition-colors duration-200 group inline-flex items-center mt-auto rounded px-1 py-0.5 hover:bg-white/10 active:bg-white/20 ${linkTextClass}`}
+          onClick={() =>
+            trackLinkClick({
+              linkUrl: urlWithUtm,
+              linkText: title,
+              brandPage,
+              buttonType,
+              destination,
+            })
+          }
         >
           {linkIconType === "link" && <LinkIcon />}
           {linkIconType === "instagram" && <CssInstagramIcon />}

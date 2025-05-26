@@ -102,6 +102,9 @@ const LoveBuddiesPage = () => {
             className="mb-6"
             target="_self"
             rel=""
+            brandPage="love_buddies"
+            buttonType="main_cta"
+            destination="internal_page"
           >
             러브버디즈 콘텐츠 참여하기 🙋🏻‍♀
           </ActionButton>

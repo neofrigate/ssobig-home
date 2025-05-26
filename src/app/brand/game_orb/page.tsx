@@ -1,10 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Card, { CardProps } from "../../../components/Card";
 import Script from "next/script";
-
-export const metadata = {
-  title: "Ssobig-Game Orb",
-};
+import { trackLinkClick } from "../../../utils/gtag";
 
 export default function GameOrbPage() {
   const gameOrbCards: CardProps[] = [
@@ -22,6 +21,10 @@ export default function GameOrbPage() {
         backgroundPosition: "center",
       },
       fullImageCard: true,
+      // 추적 정보 추가
+      brandPage: "game_orb",
+      buttonType: "social_genius_cta",
+      destination: "internal_page",
     },
     {
       title: "게임오브 정모 : 신작게임 데모데이",
@@ -37,6 +40,10 @@ export default function GameOrbPage() {
         backgroundPosition: "center",
       },
       fullImageCard: true,
+      // 추적 정보 추가
+      brandPage: "game_orb",
+      buttonType: "meetup_cta",
+      destination: "smore_form",
     },
   ];
 
@@ -142,6 +149,15 @@ export default function GameOrbPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex p-4 justify-center items-center gap-4 w-full max-w-[580px] rounded-full bg-[#8631EC] hover:bg-[#7128d1] text-white font-bold text-[16px] shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 aspect-[145/14] mx-auto"
+                  onClick={() =>
+                    trackLinkClick({
+                      linkUrl: "https://open.kakao.com/o/g9LIA56f",
+                      linkText: "게임오브 비밀 카톡방",
+                      brandPage: "game_orb",
+                      buttonType: "kakao_chat_cta",
+                      destination: "external_chat",
+                    })
+                  }
                 >
                   게임오브 비밀 카톡방 🎮
                 </a>
