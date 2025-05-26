@@ -4,6 +4,8 @@ import "./globals.css";
 import Sidebar from "../components/Sidebar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import GoogleAnalytics from "../components/GoogleAnalytics";
+import PageViewTracker from "../components/PageViewTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +39,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <GoogleAnalytics />
+        <PageViewTracker />
         <Sidebar />
         {children}
         <SpeedInsights />
