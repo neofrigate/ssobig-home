@@ -71,6 +71,7 @@ export const trackLinkClick = ({
     const utmSource = urlParams.get("utm_source") || "direct";
     const utmMedium = urlParams.get("utm_medium") || "none";
     const utmCampaign = urlParams.get("utm_campaign") || "none";
+    const utmId = urlParams.get("utm_id") || "none";
 
     window.gtag("event", "cta_click", {
       event_category: "engagement",
@@ -81,6 +82,7 @@ export const trackLinkClick = ({
       utm_source: utmSource,
       utm_medium: utmMedium,
       utm_campaign: utmCampaign,
+      utm_id: utmId,
       click_url: linkUrl,
       page_location: window.location.href,
       page_title: document.title,
