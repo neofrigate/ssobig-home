@@ -81,10 +81,19 @@ export default function LoveBuddiesDetailPage() {
               const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
               const dateStr = dateMatch ? dateMatch[1] : "";
 
-              // 게임명 추출 (시간 부분 제거)
-              const cleanTitle = title
+              // 시간 추출
+              const timeMatch = title.match(/\d+:\d+/);
+              const timeStr = timeMatch ? timeMatch[0] : "";
+
+              // 게임명 추출 (날짜와 시간 부분 제거)
+              const gameTitle = title
                 .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
                 .trim();
+
+              // 시간을 포함한 제목 생성
+              const cleanTitle = timeStr
+                ? `${timeStr} ${gameTitle}`
+                : gameTitle;
 
               updatedSchedule.push({
                 date: dateStr,
