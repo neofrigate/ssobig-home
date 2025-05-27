@@ -12,11 +12,38 @@ declare global {
 
 export const GA_MEASUREMENT_ID = "G-RN7MB0CJZS";
 
-// 페이지뷰 추적
+// 페이지뷰 추적 (UTM 파라미터 포함)
 export const pageview = (url: string) => {
   if (typeof window !== "undefined" && window.gtag && GA_MEASUREMENT_ID) {
+    // UTM 파라미터 추출
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get("utm_source") || "direct";
+    const utmMedium = urlParams.get("utm_medium") || "none";
+    const utmCampaign = urlParams.get("utm_campaign") || "none";
+    const utmId = urlParams.get("utm_id") || "none";
+    const utmTerm = urlParams.get("utm_term") || "none";
+    const utmContent = urlParams.get("utm_content") || "none";
+
+    // 기본 페이지뷰 설정
     window.gtag("config", GA_MEASUREMENT_ID, {
       page_path: url,
+      page_title: document.title,
+      page_location: window.location.href,
+    });
+
+    // UTM 파라미터가 있는 경우 별도 이벤트로 기록
+    window.gtag("event", "page_view", {
+      event_category: "engagement",
+      event_label: "page_view_with_utm",
+      page_path: url,
+      utm_source: utmSource,
+      utm_medium: utmMedium,
+      utm_campaign: utmCampaign,
+      utm_id: utmId,
+      utm_term: utmTerm,
+      utm_content: utmContent,
+      page_location: window.location.href,
+      page_title: document.title,
     });
   }
 };
