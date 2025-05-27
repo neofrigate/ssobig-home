@@ -253,8 +253,8 @@ export default function LoveBuddiesDetailPage() {
           </div>
 
           {/* 러브버디즈 스케줄 박스 */}
-          <div className="w-full mb-10">
-            <div className="bg-black rounded-xl p-4 shadow-lg">
+          <div className="w-full">
+            <div className="bg-black p-4 shadow-lg">
               <h2 className="text-xl font-bold text-center text-white mb-3">
                 💕 러브버디즈 스케줄
               </h2>
