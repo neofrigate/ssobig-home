@@ -81,10 +81,19 @@ export default function LoveBuddiesDetailPage() {
               const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
               const dateStr = dateMatch ? dateMatch[1] : "";
 
-              // 게임명 추출 (시간 부분 제거)
-              const cleanTitle = title
+              // 시간 추출
+              const timeMatch = title.match(/\d+:\d+/);
+              const timeStr = timeMatch ? timeMatch[0] : "";
+
+              // 게임명 추출 (날짜와 시간 부분 제거)
+              const gameTitle = title
                 .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
                 .trim();
+
+              // 시간을 포함한 제목 생성
+              const cleanTitle = timeStr
+                ? `${timeStr} ${gameTitle}`
+                : gameTitle;
 
               updatedSchedule.push({
                 date: dateStr,
@@ -244,8 +253,8 @@ export default function LoveBuddiesDetailPage() {
           </div>
 
           {/* 러브버디즈 스케줄 박스 */}
-          <div className="w-full mb-10">
-            <div className="bg-black rounded-xl p-4 shadow-lg">
+          <div className="w-full">
+            <div className="bg-black p-4 shadow-lg">
               <h2 className="text-xl font-bold text-center text-white mb-3">
                 💕 러브버디즈 스케줄
               </h2>
