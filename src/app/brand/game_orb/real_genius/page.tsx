@@ -1,13 +1,194 @@
+"use client";
+
 import Image from "next/image";
 import Script from "next/script";
+import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
+import { useState, useEffect } from "react";
 
-export const metadata = {
-  title: "REAL GENIUS - Game Orb",
-  description: "당신이 주인공이 되는 게임예능 현실판 - 소셜 지니어스",
-};
+interface ScheduleItem {
+  date: string;
+  title: string;
+  difficulty: string;
+  applicants: {
+    total: number;
+    female: number;
+    male: number;
+  };
+  maxCapacity: number;
+}
 
 export default function RealGeniusPage() {
+  const [scheduleData, setScheduleData] = useState<ScheduleItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [lastUpdateTime, setLastUpdateTime] = useState<string>(() => {
+    const now = new Date();
+    return `UPDATE : ${now.getFullYear()}.${String(now.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}.${String(now.getDate()).padStart(2, "0")} ${String(
+      now.getHours()
+    ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  });
+
+  // Google Sheets에서 데이터 가져오기
+  useEffect(() => {
+    const fetchSheetData = async () => {
+      console.log("🔄 Google Sheets 데이터 가져오기 시작...");
+      try {
+        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1562356640`;
+        console.log("📡 요청 URL:", url);
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const csvText = await response.text();
+        console.log("📄 CSV 데이터:", csvText.substring(0, 500));
+        const rows = csvText.split("\n").slice(1); // 헤더 제외
+        console.log("📊 총 행 수:", rows.length);
+        const updatedSchedule: ScheduleItem[] = [];
+
+        rows.forEach((row, index) => {
+          if (row.trim()) {
+            const cols = row.split(",");
+            const title = cols[1]?.replace(/"/g, "").trim(); // B열: 선택 항목
+            const cColumnValue = cols[2]?.replace(/"/g, "").trim(); // C열: 노출 체크박스 원시값
+            const isChecked = cColumnValue === "TRUE"; // 정확한 TRUE 문자열 체크
+            const maxCapacity = parseInt(cols[3]) || 20; // D열: 최대인원
+            const total = parseInt(cols[4]) || 0; // E열: 합계
+            const female = parseInt(cols[5]) || 0; // F열: 여자
+            const male = parseInt(cols[6]) || 0; // G열: 남자
+
+            console.log(
+              `📋 행 ${
+                index + 1
+              } - 제목: "${title}", C열 원시값: "${cColumnValue}", 체크상태: ${isChecked}, 최대인원: ${maxCapacity}, 합계: ${total}, 여자: ${female}, 남자: ${male}`
+            );
+
+            // C열이 정확히 TRUE이고 제목이 유효한 경우에만 표시
+            if (
+              isChecked &&
+              title &&
+              title !== "선택 항목" &&
+              title.length > 0
+            ) {
+              console.log(`✅ 표시 대상으로 추가: ${title}`);
+
+              // 날짜 추출 (괄호 안의 날짜)
+              const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
+              const dateStr = dateMatch ? dateMatch[1] : "";
+
+              // 게임명 추출
+              const gameName = title
+                .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
+                .trim();
+
+              // 난이도 추정 (게임명에 따라)
+              let difficulty = "EASY";
+              if (
+                gameName.includes("바이너리") ||
+                gameName.includes("이중스파이")
+              ) {
+                difficulty = "MID";
+              } else if (gameName.includes("??????")) {
+                difficulty = "HARD";
+              }
+
+              updatedSchedule.push({
+                date: dateStr,
+                title: gameName,
+                difficulty,
+                applicants: {
+                  total,
+                  female,
+                  male,
+                },
+                maxCapacity,
+              });
+            } else {
+              console.log(
+                `❌ 제외된 항목: 제목="${title}", 체크상태=${isChecked}, C열값="${cColumnValue}"`
+              );
+            }
+          }
+        });
+
+        console.log(`📝 파싱 완료 - 총 ${updatedSchedule.length}개 일정 발견`);
+        console.log("✨ 업데이트된 스케줄 데이터:", updatedSchedule);
+
+        console.log("🔄 React state 업데이트 중...");
+        setScheduleData(updatedSchedule);
+        setIsLoading(false);
+        console.log("✅ 데이터 업데이트 완료!");
+
+        if (updatedSchedule.length === 0) {
+          console.log(
+            "⚠️ 표시할 데이터가 없습니다. C열 체크박스가 체크된 항목이 있는지 확인하세요."
+          );
+        }
+
+        // 업데이트 시간 설정
+        const now = new Date();
+        const updateTimeString = `UPDATE : ${now.getFullYear()}.${String(
+          now.getMonth() + 1
+        ).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} ${String(
+          now.getHours()
+        ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        setLastUpdateTime(updateTimeString);
+      } catch (error) {
+        console.error("❌ Google Sheets 데이터 가져오기 실패:", error);
+        console.error("🔍 에러 상세:", {
+          message: error instanceof Error ? error.message : "알 수 없는 오류",
+          timestamp: new Date().toISOString(),
+        });
+        setIsLoading(false); // 에러가 발생해도 로딩 상태 해제
+      }
+    };
+
+    fetchSheetData();
+  }, []);
+
+  // 참가자 차트 컴포넌트
+  const ApplicantChart = ({
+    applicants,
+    maxCapacity,
+  }: {
+    applicants: { total: number; female: number; male: number };
+    maxCapacity: number;
+  }) => {
+    const femalePercentage =
+      maxCapacity > 0 ? (applicants.female / maxCapacity) * 100 : 0;
+    const malePercentage =
+      maxCapacity > 0 ? (applicants.male / maxCapacity) * 100 : 0;
+    const emptyPercentage = Math.max(
+      0,
+      100 - femalePercentage - malePercentage
+    );
+
+    return (
+      <div className="p-2 bg-black/30 rounded-lg">
+        {/* 누적 바 차트 */}
+        <div className="flex h-2 bg-white/10 rounded-full overflow-hidden">
+          <div
+            className="transition-all duration-700 ease-out bg-[#FF69B4]"
+            style={{ width: `${femalePercentage}%` }}
+          />
+          <div
+            className="transition-all duration-700 ease-out bg-[#4A90E2]"
+            style={{ width: `${malePercentage}%` }}
+          />
+          <div
+            className="bg-white/5"
+            style={{ width: `${emptyPercentage}%` }}
+          />
+        </div>
+      </div>
+    );
+  };
   const reviews = [
     {
       text: "드라마틱한 전개의 연속이라 시간 가는 줄 몰랐어요! 이렇게 흥미진진할 줄 몰랐네요!",
@@ -25,6 +206,13 @@ export default function RealGeniusPage() {
 
   return (
     <>
+      <Head>
+        <title>REAL GENIUS - Game Orb</title>
+        <meta
+          name="description"
+          content="당신이 주인공이 되는 게임예능 현실판 - 소셜 지니어스"
+        />
+      </Head>
       {/* Meta Pixel Code */}
       <Script
         id="facebook-pixel"
@@ -99,108 +287,114 @@ export default function RealGeniusPage() {
                     <span className="text-white">(3시간)</span>
                   </p>
                 </div>
+
+                {/* 범례 */}
+                <div className="flex flex-wrap gap-2 justify-end mt-6 mb-3">
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#FF69B4]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#FF69B4]" />
+                    <span className="text-white/90">여자</span>
+                  </div>
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
+                    <span className="text-white/90">남자</span>
+                  </div>
+                </div>
               </div>
 
               {/* 일정 목록 */}
-              <div className="space-y-3">
-                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
-                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    6/1 (일)
-                  </span>
-                  <span className="text-white font-bold flex-grow">
-                    불면증 마피아{" "}
-                    <span
-                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
-                      style={{ fontFamily: "cursive" }}
-                    >
-                      Mind
-                    </span>
-                  </span>
-                  <div className="flex gap-1">
-                    <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      EASY
-                    </span>
-                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      MID
-                    </span>
+              <div className="space-y-2">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-white/60 text-sm">
+                      📅 스케줄 정보를 불러오는 중...
+                    </div>
                   </div>
-                </div>
+                ) : scheduleData.length === 0 ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-white/60 text-sm">
+                      📅 현재 예정된 스케줄이 없습니다
+                    </div>
+                  </div>
+                ) : (
+                  scheduleData.map((schedule, index) => {
+                    const getDifficultyColor = (difficulty: string) => {
+                      switch (difficulty) {
+                        case "EASY":
+                          return "bg-yellow-500/80";
+                        case "MID":
+                          return "bg-purple-500/80";
+                        case "HARD":
+                          return "bg-red-500/80";
+                        default:
+                          return "bg-gray-500/80";
+                      }
+                    };
 
-                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
-                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    6/15 (일)
-                  </span>
-                  <span className="text-white font-bold flex-grow">
-                    슈가빌리지{" "}
-                    <span
-                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
-                      style={{ fontFamily: "cursive" }}
-                    >
-                      Story
-                    </span>
-                  </span>
-                  <div className="flex gap-1">
-                    <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      EASY
-                    </span>
-                  </div>
-                </div>
+                    // 게임별 스타일 텍스트 설정
+                    const getGameStyle = (title: string) => {
+                      if (
+                        title.includes("마피아") ||
+                        title.includes("바이너리") ||
+                        title.includes("스파이")
+                      ) {
+                        return "Mind";
+                      } else if (title.includes("슈가빌리지")) {
+                        return "Story";
+                      }
+                      return "";
+                    };
 
-                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
-                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    6/22 (일)
-                  </span>
-                  <span className="text-white font-bold flex-grow">
-                    바이너리{" "}
-                    <span
-                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
-                      style={{ fontFamily: "cursive" }}
-                    >
-                      Mind
-                    </span>
-                  </span>
-                  <div className="flex gap-1">
-                    <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      EASY
-                    </span>
-                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      MID
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
-                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    6/29 (일)
-                  </span>
-                  <span className="text-white font-bold flex-grow">
-                    이중 스파이{" "}
-                    <span
-                      className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
-                      style={{ fontFamily: "cursive" }}
-                    >
-                      Mind
-                    </span>
-                  </span>
-                  <div className="flex gap-1">
-                    <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      MID
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center p-3 rounded-lg bg-black/50 hover:bg-black/80 transition-colors">
-                  <span className="font-medium text-[#F4F4F4] mr-2 w-[90px]">
-                    7/6 (일)
-                  </span>
-                  <span className="text-white font-bold flex-grow">??????</span>
-                  <div className="flex gap-1">
-                    <span className="bg-orange-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                      HARD
-                    </span>
-                  </div>
-                </div>
+                    return (
+                      <div
+                        key={index}
+                        className="rounded-lg bg-black/50 hover:bg-black/80 transition-colors"
+                      >
+                        <div className="flex items-center justify-between p-3">
+                          <div className="flex items-center space-x-4">
+                            <span className="font-medium text-[#F4F4F4] min-w-[80px]">
+                              {schedule.date}
+                            </span>
+                            <span className="text-white font-bold flex-grow">
+                              {schedule.title}{" "}
+                              {getGameStyle(schedule.title) && (
+                                <span
+                                  className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
+                                  style={{ fontFamily: "cursive" }}
+                                >
+                                  {getGameStyle(schedule.title)}
+                                </span>
+                              )}
+                            </span>
+                            <span
+                              className={`${getDifficultyColor(
+                                schedule.difficulty
+                              )} text-white px-2 py-0.5 rounded-full text-xs font-bold`}
+                            >
+                              {schedule.difficulty}
+                            </span>
+                          </div>
+                          <span className="text-[#9E4BED] font-bold text-sm">
+                            {schedule.applicants.total}/{schedule.maxCapacity}명
+                          </span>
+                        </div>
+                        <ApplicantChart
+                          applicants={schedule.applicants}
+                          maxCapacity={schedule.maxCapacity}
+                        />
+                      </div>
+                    );
+                  })
+                )}
               </div>
+
+              {/* 업데이트 시간 표시 */}
+              {lastUpdateTime && (
+                <div className="text-right mt-3 pr-3">
+                  <span className="text-white/60 text-xs">
+                    {lastUpdateTime}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
