@@ -92,6 +92,9 @@ const Sidebar: React.FC = () => {
                   isActive("/brand/love_buddies") ? "bg-white/10" : ""
                 }`}
                 onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="navigation"
+                destination="internal_page"
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
@@ -109,6 +112,9 @@ const Sidebar: React.FC = () => {
                   isActive("/brand/now_seoul") ? "bg-white/10" : ""
                 }`}
                 onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="navigation"
+                destination="internal_page"
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
@@ -126,6 +132,9 @@ const Sidebar: React.FC = () => {
                   isActive("/brand/game_orb") ? "bg-white/10" : ""
                 }`}
                 onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="navigation"
+                destination="internal_page"
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
@@ -147,6 +156,9 @@ const Sidebar: React.FC = () => {
                   isActive("https://about.ssobig.com") ? "bg-white/10" : ""
                 }`}
                 onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="navigation"
+                destination="external"
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
@@ -170,6 +182,9 @@ const Sidebar: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="navigation"
+                destination="external"
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
@@ -205,6 +220,9 @@ const Sidebar: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="footer_link"
+                destination="external"
               >
                 개인정보 처리방침
               </LinkWithUtm>
@@ -215,6 +233,9 @@ const Sidebar: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="footer_link"
+                destination="external"
               >
                 이용약관
               </LinkWithUtm>

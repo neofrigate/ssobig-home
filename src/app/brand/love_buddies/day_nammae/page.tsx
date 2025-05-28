@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Script from "next/script";
+import LinkWithUtm from "../../../../components/LinkWithUtm";
 
 export const metadata = {
   title: "일일남매 - Love Buddies",
@@ -255,11 +256,14 @@ export default function DayNammaePage() {
         {/* 하단 고정 CTA 버튼 */}
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="w-full max-w-[620px] mx-auto">
-            <a
+            <LinkWithUtm
               href="https://smore.im/form/0j4u3szCcL"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full h-[56px] bg-[#FF6B9F] hover:bg-[#e45a8b] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg"
+              brandPage="love_buddies"
+              buttonType="day_nammae_cta"
+              destination="smore_form"
             >
               일일남매 참여하기 🙋🏻‍♀
               <svg
@@ -276,7 +280,7 @@ export default function DayNammaePage() {
                   d="M9 5l7 7-7 7"
                 />
               </svg>
-            </a>
+            </LinkWithUtm>
           </div>
         </div>
       </div>

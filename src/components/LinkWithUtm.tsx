@@ -3,6 +3,7 @@
 import Link, { LinkProps } from "next/link";
 import { useEffect, useState } from "react";
 import { appendUtmParams } from "../utils/utm";
+import { trackLinkClick } from "../utils/gtag";
 
 interface LinkWithUtmProps extends LinkProps {
   children: React.ReactNode;
@@ -11,6 +12,9 @@ interface LinkWithUtmProps extends LinkProps {
   rel?: string;
   style?: React.CSSProperties;
   onClick?: () => void;
+  brandPage?: string;
+  buttonType?: string;
+  destination?: string;
 }
 
 const LinkWithUtm: React.FC<LinkWithUtmProps> = ({
@@ -21,6 +25,9 @@ const LinkWithUtm: React.FC<LinkWithUtmProps> = ({
   rel,
   style,
   onClick,
+  brandPage,
+  buttonType,
+  destination,
   ...props
 }) => {
   const [urlWithUtm, setUrlWithUtm] = useState<string | object>(href);
@@ -32,6 +39,24 @@ const LinkWithUtm: React.FC<LinkWithUtmProps> = ({
     }
   }, [href]);
 
+  const handleClick = () => {
+    // GA 추적
+    if (typeof href === "string") {
+      trackLinkClick({
+        linkUrl: typeof urlWithUtm === "string" ? urlWithUtm : href,
+        linkText: typeof children === "string" ? children : "LinkWithUtm",
+        brandPage,
+        buttonType,
+        destination,
+      });
+    }
+
+    // 기존 onClick 핸들러 실행
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <Link
       href={urlWithUtm}
@@ -39,7 +64,7 @@ const LinkWithUtm: React.FC<LinkWithUtmProps> = ({
       target={target}
       rel={rel}
       style={style}
-      onClick={onClick}
+      onClick={handleClick}
       {...props}
     >
       {children}

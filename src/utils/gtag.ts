@@ -3,8 +3,8 @@
 declare global {
   interface Window {
     gtag: (
-      command: "config" | "event" | "js" | "consent",
-      targetId: string,
+      command: "config" | "event" | "js" | "consent" | "set",
+      targetId: string | Record<string, unknown>,
       config?: Record<string, unknown>
     ) => void;
   }
@@ -12,17 +12,48 @@ declare global {
 
 export const GA_MEASUREMENT_ID = "G-RN7MB0CJZS";
 
-// 페이지뷰 추적 (UTM 파라미터 포함)
+// UTM 파라미터를 사용자 속성으로 설정하는 함수 (세션당 한 번만)
+const setUtmUserProperties = () => {
+  if (typeof window === "undefined") return;
+
+  // 이미 설정했는지 확인 (세션당 한 번만)
+  const utmAlreadySet = sessionStorage.getItem("utm_properties_set");
+  if (utmAlreadySet) return;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const utmSource = urlParams.get("utm_source");
+  const utmMedium = urlParams.get("utm_medium");
+  const utmCampaign = urlParams.get("utm_campaign");
+  const utmId = urlParams.get("utm_id");
+  const utmTerm = urlParams.get("utm_term");
+  const utmContent = urlParams.get("utm_content");
+
+  // UTM 파라미터가 하나라도 있으면 사용자 속성으로 설정
+  if (utmSource || utmMedium || utmCampaign || utmId || utmTerm || utmContent) {
+    const userProperties: Record<string, string> = {};
+
+    if (utmSource) userProperties.utm_source = utmSource;
+    if (utmMedium) userProperties.utm_medium = utmMedium;
+    if (utmCampaign) userProperties.utm_campaign = utmCampaign;
+    if (utmId) userProperties.utm_id = utmId;
+    if (utmTerm) userProperties.utm_term = utmTerm;
+    if (utmContent) userProperties.utm_content = utmContent;
+
+    // 사용자 속성 설정
+    window.gtag("set", {
+      user_properties: userProperties,
+    });
+
+    // 설정 완료 표시 (세션 동안 유지)
+    sessionStorage.setItem("utm_properties_set", "true");
+  }
+};
+
+// 페이지뷰 추적 (UTM을 사용자 속성으로 설정)
 export const pageview = (url: string) => {
   if (typeof window !== "undefined" && window.gtag && GA_MEASUREMENT_ID) {
-    // UTM 파라미터 추출
-    const urlParams = new URLSearchParams(window.location.search);
-    const utmSource = urlParams.get("utm_source") || "direct";
-    const utmMedium = urlParams.get("utm_medium") || "none";
-    const utmCampaign = urlParams.get("utm_campaign") || "none";
-    const utmId = urlParams.get("utm_id") || "none";
-    const utmTerm = urlParams.get("utm_term") || "none";
-    const utmContent = urlParams.get("utm_content") || "none";
+    // UTM 파라미터를 사용자 속성으로 설정 (첫 방문 시에만)
+    setUtmUserProperties();
 
     // 기본 페이지뷰 설정
     window.gtag("config", GA_MEASUREMENT_ID, {
@@ -31,17 +62,11 @@ export const pageview = (url: string) => {
       page_location: window.location.href,
     });
 
-    // UTM 파라미터가 있는 경우 별도 이벤트로 기록
+    // 페이지뷰 이벤트 (UTM 정보는 사용자 속성으로 자동 연결됨)
     window.gtag("event", "page_view", {
       event_category: "engagement",
-      event_label: "page_view_with_utm",
+      event_label: "page_view",
       page_path: url,
-      utm_source: utmSource,
-      utm_medium: utmMedium,
-      utm_campaign: utmCampaign,
-      utm_id: utmId,
-      utm_term: utmTerm,
-      utm_content: utmContent,
       page_location: window.location.href,
       page_title: document.title,
     });
@@ -78,7 +103,7 @@ export const trackButtonClick = (buttonName: string) => {
   });
 };
 
-// 개선된 링크 클릭 추적 함수
+// 개선된 링크 클릭 추적 함수 (UTM 파라미터 제거, 사용자 속성으로 자동 연결됨)
 export const trackLinkClick = ({
   linkUrl,
   linkText,
@@ -93,23 +118,12 @@ export const trackLinkClick = ({
   destination?: string;
 }) => {
   if (typeof window !== "undefined" && window.gtag && GA_MEASUREMENT_ID) {
-    // UTM 파라미터 추출
-    const urlParams = new URLSearchParams(window.location.search);
-    const utmSource = urlParams.get("utm_source") || "direct";
-    const utmMedium = urlParams.get("utm_medium") || "none";
-    const utmCampaign = urlParams.get("utm_campaign") || "none";
-    const utmId = urlParams.get("utm_id") || "none";
-
     window.gtag("event", "cta_click", {
       event_category: "engagement",
       event_label: linkText,
       brand_page: brandPage || "unknown",
       button_type: buttonType || "unknown",
       destination: destination || "external",
-      utm_source: utmSource,
-      utm_medium: utmMedium,
-      utm_campaign: utmCampaign,
-      utm_id: utmId,
       click_url: linkUrl,
       page_location: window.location.href,
       page_title: document.title,
@@ -137,20 +151,17 @@ export const trackFormSubmit = (formName: string) => {
 export const trackSMoreFormClick = ({
   brandPage,
   buttonType,
-  utmSource,
 }: {
   brandPage: string;
   buttonType: string;
-  utmSource?: string;
 }) => {
   if (typeof window !== "undefined" && window.gtag && GA_MEASUREMENT_ID) {
-    // 전환 이벤트 발송
+    // 전환 이벤트 발송 (UTM은 사용자 속성으로 자동 연결됨)
     window.gtag("event", "conversion", {
       event_category: "conversion",
       event_label: "smore_form_click",
       brand_page: brandPage,
       button_type: buttonType,
-      utm_source: utmSource || "direct",
       value: 1,
     });
   }

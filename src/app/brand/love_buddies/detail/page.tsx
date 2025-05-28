@@ -379,6 +379,9 @@ export default function LoveBuddiesDetailPage() {
               target="_blank"
               rel="noopener noreferrer"
               className="w-full h-[56px] bg-[#FF6B9F] hover:bg-[#e45a8b] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg"
+              brandPage="love_buddies"
+              buttonType="detail_main_cta"
+              destination="smore_form"
             >
               러브버디즈 참여하기 🙋🏻‍♀
               <svg
@@ -407,6 +410,9 @@ export default function LoveBuddiesDetailPage() {
             rel="noopener noreferrer"
             className="w-[56px] h-[56px] bg-[#FF6B9F]/50 hover:bg-[#e45a8b]/60 border border-[#FF6B9F] text-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105"
             aria-label="카카오톡 상담하기"
+            brandPage="love_buddies"
+            buttonType="kakao_consultation"
+            destination="external_chat"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

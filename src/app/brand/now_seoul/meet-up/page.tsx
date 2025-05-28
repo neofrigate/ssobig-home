@@ -893,6 +893,9 @@ export default function RealGeniusPage() {
               target="_blank"
               rel="noopener noreferrer"
               className="w-full h-[56px] bg-[#101F50] hover:bg-[#0A1838] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg"
+              brandPage="now_seoul"
+              buttonType="meetup_main_cta"
+              destination="smore_form"
             >
               나우서울 참여하기
               <svg
@@ -921,6 +924,9 @@ export default function RealGeniusPage() {
             rel="noopener noreferrer"
             className="w-[56px] h-[56px] bg-[#101F50]/50 hover:bg-[#0A1838]/60 border border-[#101F50] text-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105"
             aria-label="카카오톡 상담하기"
+            brandPage="now_seoul"
+            buttonType="kakao_consultation"
+            destination="external_chat"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
