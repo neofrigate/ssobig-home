@@ -1128,6 +1128,9 @@ export default function RealGeniusPage() {
               target="_blank"
               rel="noopener noreferrer"
               className="w-full h-[56px] bg-[#9E4BED] hover:bg-[#8341c9] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg"
+              brandPage="game_orb"
+              buttonType="real_genius_main_cta"
+              destination="smore_form"
             >
               지금 바로 참여하기
               <svg
@@ -1156,6 +1159,9 @@ export default function RealGeniusPage() {
             rel="noopener noreferrer"
             className="w-[56px] h-[56px] bg-[#9E4BED]/50 hover:bg-[#8341c9]/60 border border-[#9E4BED] text-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105"
             aria-label="카카오톡 상담하기"
+            brandPage="game_orb"
+            buttonType="kakao_consultation"
+            destination="external_chat"
           >
             <div className="relative w-[46px] h-[46px]">
               <Image
