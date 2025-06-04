@@ -1150,29 +1150,6 @@ export default function RealGeniusPage() {
             </LinkWithUtm>
           </div>
         </div>
-
-        {/* 고정 상담 버튼 */}
-        <div className="fixed bottom-[88px] right-4 md:right-8 z-30">
-          <LinkWithUtm
-            href="http://pf.kakao.com/_dJbin/chat"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-[56px] h-[56px] bg-[#9E4BED]/50 hover:bg-[#8341c9]/60 border border-[#9E4BED] text-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-105"
-            aria-label="카카오톡 상담하기"
-            brandPage="game_orb"
-            buttonType="kakao_consultation"
-            destination="external_chat"
-          >
-            <div className="relative w-[46px] h-[46px]">
-              <Image
-                src="/ssobig_assets/상담포브.png"
-                alt="상담 아이콘"
-                fill
-                sizes="46px"
-              />
-            </div>
-          </LinkWithUtm>
-        </div>
       </div>
     </>
   );
