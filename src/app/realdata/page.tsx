@@ -479,28 +479,21 @@ export default function RealDataPage() {
       }
     );
 
-    const tooltipText = chartData
-      .filter((item) => item.count > 0)
-      .map((item) => `${item.label}: ${item.count}명`)
-      .join(", ");
-
     return (
-      <div className="p-2 bg-black/30 rounded-lg">
-        <div className="flex h-4 bg-white/10 rounded-full overflow-hidden relative group">
-          {chartData.map(
-            (item) =>
-              item.count > 0 && (
-                <div
-                  key={item.job}
-                  className="transition-all duration-700 ease-out"
-                  style={{
-                    width: `${item.percentage}%`,
-                    backgroundColor: item.color,
-                  }}
-                  title={`${item.label}: ${item.count}명`}
-                />
-              )
-          )}
+      <div className="px-3 py-2 bg-black/30 rounded-none">
+        {/* 누적 바 차트 */}
+        <div className="flex h-2 bg-white/10 rounded-full overflow-hidden">
+          {chartData.map((item) => (
+            <div
+              key={item.job}
+              className="transition-all duration-700 ease-out"
+              style={{
+                width: `${item.percentage}%`,
+                backgroundColor: item.color,
+              }}
+            />
+          ))}
+          {/* 빈 공간 표시 */}
           <div
             className="bg-white/5"
             style={{
@@ -510,13 +503,6 @@ export default function RealDataPage() {
               )}%`,
             }}
           />
-
-          {/* 호버 툴팁 */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap max-w-xs">
-              {tooltipText}
-            </div>
-          </div>
         </div>
       </div>
     );
@@ -594,14 +580,14 @@ export default function RealDataPage() {
         <div className="flex h-2 bg-white/10 rounded-full overflow-hidden relative group">
           {applicants.participants > 0 && (
             <div
-              className="transition-all duration-700 ease-out bg-[#4A90E2]"
+              className="transition-all duration-700 ease-out bg-[#7343F8]"
               style={{ width: `${participantsPercentage}%` }}
               title={`참가자: ${applicants.participants}명`}
             />
           )}
           {applicants.creators > 0 && (
             <div
-              className="transition-all duration-700 ease-out bg-[#FF6B9F]"
+              className="transition-all duration-700 ease-out bg-[#2BAE6C]"
               style={{ width: `${creatorsPercentage}%` }}
               title={`제작자: ${applicants.creators}명`}
             />
@@ -727,13 +713,13 @@ export default function RealDataPage() {
 
           {/* 나우서울 밋업 스케줄 박스 */}
           <div className="w-full mb-12">
-            <div className="bg-white/5 rounded-xl p-3 shadow-lg">
-              <h2 className="text-2xl font-bold text-center text-white mb-3">
+            <div className="bg-white/5 rounded-xl p-6 shadow-lg">
+              <h2 className="text-2xl font-bold text-center text-white mb-4">
                 나우서울 밋업 스케줄
               </h2>
 
               {/* 가격 및 시간 정보 */}
-              <div className="rounded-lg p-3 mb-3">
+              <div className="bg-black/70 rounded-lg p-4 mb-5">
                 <div className="flex flex-col space-y-4">
                   <div>
                     <div className="flex items-center flex-wrap">
@@ -741,18 +727,15 @@ export default function RealDataPage() {
                         가격:
                       </span>
                       <span className="line-through text-gray-400 text-lg mr-2">
-                        21,000원
+                        35,000원
                       </span>
                       <span className="text-[#FFAC3A] font-bold text-xl">
-                        15,000원
+                        25,000원
                       </span>
                       <span className="bg-[#FFAC3A] text-black px-2 py-0.5 rounded-full text-xs font-bold ml-2">
-                        얼리버드
+                        할인
                       </span>
                     </div>
-                    <p className="text-xs text-gray-300 mt-1">
-                      * 얼리버드 혜택은 선착순 마감됩니다
-                    </p>
                   </div>
                   <div className="text-white font-bold text-lg">
                     매주 목요일 19:30~22:00
@@ -786,7 +769,7 @@ export default function RealDataPage() {
               </div>
 
               {/* 일정 목록 */}
-              <div className="space-y-2">
+              <div className="space-y-6">
                 {nowSeoulLoading ? (
                   <div className="flex items-center justify-center py-6">
                     <div className="text-white/60 text-sm">
@@ -808,12 +791,12 @@ export default function RealDataPage() {
                     return (
                       <div
                         key={index}
-                        className="rounded-lg hover:bg-black/30 transition-colors"
+                        className="rounded-none bg-black/50 hover:bg-black/80 transition-colors"
                       >
-                        <div className="flex items-center justify-between p-3">
+                        <div className="flex items-center justify-between px-3 pt-3 pb-1">
                           <div className="flex items-center space-x-4">
                             <span className="font-medium text-[#F4F4F4] min-w-[80px]">
-                              {schedule.date}
+                              {schedule.date} (목)
                             </span>
                             <span className="text-white font-bold">
                               {schedule.title}
@@ -835,7 +818,7 @@ export default function RealDataPage() {
 
               {/* 업데이트 시간 표시 */}
               {nowSeoulUpdateTime && (
-                <div className="text-right mt-3 pr-3">
+                <div className="text-right mt-3 pr-6 pb-3">
                   <span className="text-white/60 text-xs">
                     {nowSeoulUpdateTime}
                   </span>
@@ -986,7 +969,7 @@ export default function RealDataPage() {
                   <div className="mb-2 sm:mb-0">
                     <p className="text-white font-bold text-lg">
                       가격:{" "}
-                      <span className="text-[#8B5CF6]">플레이어 10,000원</span>
+                      <span className="text-[#8B5CF6]">플레이어 20,000원</span>
                     </p>
                     <p className="text-[#10B981] font-bold text-sm">
                       출품자 무료 ✨
@@ -998,21 +981,14 @@ export default function RealDataPage() {
                   </p>
                 </div>
 
-                <div className="text-center mt-3 p-2 bg-black/20 rounded-lg">
-                  <p className="text-white/90 text-sm">
-                    📍 쏘빅 스튜디오 (신논현역 5분 거리)
-                  </p>
-                  <p className="text-white/90 text-sm mt-1">정원: 최대 50명</p>
-                </div>
-
                 {/* 범례 */}
                 <div className="flex flex-wrap gap-2 justify-end mt-6 mb-3">
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
-                    <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#7343F8]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#7343F8]" />
                     <span className="text-white/90">참가자</span>
                   </div>
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#FF6B9F]/20">
-                    <div className="w-2 h-2 rounded-full bg-[#FF6B9F]" />
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#2BAE6C]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#2BAE6C]" />
                     <span className="text-white/90">제작자</span>
                   </div>
                 </div>

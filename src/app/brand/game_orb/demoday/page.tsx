@@ -241,11 +241,11 @@ export default function DemoDayPage() {
         {/* 누적 바 차트 */}
         <div className="flex h-2 bg-white/10 rounded-full overflow-hidden">
           <div
-            className="transition-all duration-700 ease-out bg-[#4A90E2]"
+            className="transition-all duration-700 ease-out bg-[#7343F8]"
             style={{ width: `${participantsPercentage}%` }}
           />
           <div
-            className="transition-all duration-700 ease-out bg-[#FF6B9F]"
+            className="transition-all duration-700 ease-out bg-[#2BAE6C]"
             style={{ width: `${creatorsPercentage}%` }}
           />
           <div
@@ -350,7 +350,7 @@ export default function DemoDayPage() {
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
                   <p className="text-white font-bold text-lg mb-2 sm:mb-0">
                     가격: <span className="text-white">플레이어 20,000원</span>
-                    <span className="text-[#9E4BED]"> / 출품자 무료</span>
+                    <span className="text-[#2BAE6C]"> / 출품자 무료</span>
                   </p>
                   <p className="text-white font-bold text-lg">
                     매월 마지막 주말 <span className="text-white">(5시간)</span>
@@ -359,13 +359,13 @@ export default function DemoDayPage() {
 
                 {/* 범례 */}
                 <div className="flex flex-wrap gap-2 justify-end mt-3">
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
-                    <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#7343F8]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#7343F8]" />
                     <span className="text-white/90">참가자</span>
                   </div>
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#FF6B9F]/20">
-                    <div className="w-2 h-2 rounded-full bg-[#FF6B9F]" />
-                    <span className="text-white/90">제작자</span>
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#2BAE6C]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#2BAE6C]" />
+                    <span className="text-white/90">출품자</span>
                   </div>
                 </div>
               </div>
@@ -434,7 +434,7 @@ export default function DemoDayPage() {
                     .sort()
                     .map((round) => (
                       <div key={round} className="mb-6">
-                        <h4 className="text-lg font-bold text-[#9E4BED] mb-3">
+                        <h4 className="text-lg font-bold text-[#2BAE6C] mb-3">
                           [{round}] 출품작
                         </h4>
                         <div className="space-y-1">
@@ -668,7 +668,7 @@ export default function DemoDayPage() {
                 href="https://form.ssobig.com/gameorb3"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 h-[56px] bg-[#4A7C59] hover:bg-[#3d6648] text-white font-bold px-4 rounded-[100px] flex items-center justify-center transition-colors text-base"
+                className="flex-1 h-[56px] bg-[#2BAE6C] hover:bg-[#239456] text-white font-bold px-4 rounded-[100px] flex items-center justify-center transition-colors text-base"
                 brandPage="game_orb"
                 buttonType="demoday_submit_cta"
                 destination="smore_form"
