@@ -1,5 +1,8 @@
 import Image from "next/image";
 import Card, { CardProps } from "../../../components/Card";
+import ProfileSlider, {
+  ProfileCardProps,
+} from "../../../components/ProfileSlider";
 
 export const metadata = {
   title: "Ssobig-N.O.W.seoul 나우서울",
@@ -27,25 +30,50 @@ export default function NowSeoulPage() {
     destination: "internal_page",
   };
 
-  const careerClassCard: CardProps = {
-    title: "[Class] 토요일 오후 3시 수강신청",
-    description: "N.O.W.seoul · 커리어 클래스 · 전문가들의 실전 노하우 공유",
-    linkText: "form.ssobig.com/nowclass",
-    linkHref: "https://form.ssobig.com/nowclass",
-    linkIconType: "link",
-    hasImageArea: true,
-    imagePlaceholderText: "N.O.W.seoul Career Class",
-    imageAreaStyle: {
-      backgroundImage: "url('/ssobig_assets/career_class.png')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
+  const participantProfiles: ProfileCardProps[] = [
+    {
+      name: "김민수",
+      role: "UX 디자이너",
+      company: "스타트업 A",
+      description:
+        "새로운 아이디어와 인사이트를 얻고, 다양한 분야의 전문가들과 네트워킹할 수 있어서 정말 만족스러워요!",
     },
-    fullImageCard: true,
-    // 추적 정보 추가
-    brandPage: "now_seoul",
-    buttonType: "class_cta",
-    destination: "smore_form",
-  };
+    {
+      name: "박지영",
+      role: "프로덕트 매니저",
+      company: "테크 기업 B",
+      description:
+        "퇴근 후 의미있는 시간을 보낼 수 있고, 업계 트렌드와 실무 노하우를 공유받아서 많은 도움이 되고 있습니다.",
+    },
+    {
+      name: "이준호",
+      role: "마케팅 디렉터",
+      company: "광고 에이전시 C",
+      description:
+        "비슷한 고민을 가진 동료들과 만나서 서로의 경험을 나누고, 새로운 관점을 얻을 수 있는 소중한 시간이에요.",
+    },
+    {
+      name: "최서연",
+      role: "데이터 분석가",
+      company: "핀테크 D",
+      description:
+        "업무에서는 만날 수 없는 다양한 직군의 사람들과 교류하며, 시야를 넓힐 수 있어서 참여하게 되었습니다.",
+    },
+    {
+      name: "정태현",
+      role: "개발자",
+      company: "IT 스타트업 E",
+      description:
+        "실무진들과의 솔직한 대화와 networking이 가능해서 개인적, 전문적 성장에 큰 도움이 되고 있어요.",
+    },
+    {
+      name: "한지민",
+      role: "브랜드 매니저",
+      company: "소비재 기업 F",
+      description:
+        "업계 선배님들의 조언을 듣고, 커리어 방향성에 대해 고민해볼 수 있는 좋은 기회라고 생각합니다.",
+    },
+  ];
 
   return (
     <>
@@ -116,7 +144,21 @@ export default function NowSeoulPage() {
             {/* 신청 링크 섹션 */}
             <div className="w-full space-y-5 sm:space-y-6 max-w-[580px] mx-auto">
               <Card {...nowSeoulCard} />
-              <Card {...careerClassCard} />
+            </div>
+          </section>
+
+          {/* 참여자 프로필 섹션 */}
+          <section className="pb-12">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                이런분들이 참여해요
+              </h2>
+              <p className="text-neutral-300 text-sm sm:text-base">
+                다양한 분야의 전문가들이 함께하는 N.O.W.seoul
+              </p>
+            </div>
+            <div className="w-full">
+              <ProfileSlider profiles={participantProfiles} />
             </div>
           </section>
         </main>
