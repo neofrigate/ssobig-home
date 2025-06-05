@@ -17,12 +17,32 @@ interface GameOfDemoScheduleItem {
   maxCapacity: number;
 }
 
+interface GameSubmissionItem {
+  round: string;
+  gameName: string;
+  author: string;
+  minPlayers: number;
+  maxPlayers: number;
+  duration: string;
+  genre: string;
+}
+
+interface GroupedSubmissions {
+  [key: string]: GameSubmissionItem[];
+}
+
 export default function DemoDayPage() {
   // 게임오브데모데이 상태
   const [gameOfDemoData, setGameOfDemoData] = useState<
     GameOfDemoScheduleItem[]
   >([]);
   const [gameOfDemoLoading, setGameOfDemoLoading] = useState(true);
+
+  // 출품작 데이터 상태
+  const [submissionsData, setSubmissionsData] = useState<GroupedSubmissions>(
+    {}
+  );
+  const [submissionsLoading, setSubmissionsLoading] = useState(true);
 
   // 게임오브데모데이 데이터 가져오기
   useEffect(() => {
@@ -87,6 +107,118 @@ export default function DemoDayPage() {
     fetchGameOfDemoData();
   }, []);
 
+  // 출품작 데이터 가져오기
+  useEffect(() => {
+    const fetchSubmissionsData = async () => {
+      console.log("🔄 출품작 Google Sheets 데이터 가져오기 시작...");
+      try {
+        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1631169733`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const csvText = await response.text();
+        console.log(
+          "📄 출품작 CSV 원본 데이터 (첫 1000자):",
+          csvText.substring(0, 1000)
+        );
+        const rows = csvText.split("\n").slice(1); // 헤더 제외
+        console.log("📊 출품작 총 행 수:", rows.length);
+        const groupedData: GroupedSubmissions = {};
+
+        rows.forEach((row) => {
+          if (row.trim()) {
+            const cols = row.split(",");
+            const roundInfo = cols[0]?.replace(/"/g, "").trim(); // A열: 회차 정보
+            const gameName = cols[1]?.replace(/"/g, "").trim(); // B열: 게임명
+            const author = cols[2]?.replace(/"/g, "").trim(); // C열: 작가명
+            const checkValue = cols[3]?.replace(/"/g, "").trim(); // D열: ✅확인 완료 체크박스
+            const isChecked =
+              checkValue === "TRUE" ||
+              checkValue === "✓" ||
+              checkValue === "true" ||
+              checkValue === "1"; // 여러 체크 값 처리
+            const minPlayers = parseInt(cols[4]) || 0; // E열: 최소 인원
+            const maxPlayers = parseInt(cols[5]) || 0; // F열: 최대 인원
+            const duration = cols[6]?.replace(/"/g, "").trim(); // G열: 시간
+            const genre = cols[7]?.replace(/"/g, "").trim(); // H열: 장르
+
+            console.log(`📋 출품작 행 분석:`, {
+              roundInfo,
+              gameName,
+              author,
+              checkValue,
+              isChecked,
+              minPlayers,
+              maxPlayers,
+              duration,
+              genre,
+              fullRow: cols,
+            });
+
+            // 체크된 항목이고 게임명이 있고 회차 정보가 포함된 경우에만 처리
+            if (
+              isChecked &&
+              gameName &&
+              gameName.length > 0 &&
+              roundInfo &&
+              roundInfo.includes("[") &&
+              roundInfo.includes("회]")
+            ) {
+              // 회차 정보 추출 (예: [11회], [12회])
+              const roundMatch = roundInfo.match(/\[(\d+회)\]/);
+              const round = roundMatch ? roundMatch[1] : "";
+
+              console.log(`✅ 출품작 추가:`, { round, gameName, author });
+
+              if (round) {
+                if (!groupedData[round]) {
+                  groupedData[round] = [];
+                }
+
+                groupedData[round].push({
+                  round,
+                  gameName,
+                  author,
+                  minPlayers,
+                  maxPlayers,
+                  duration,
+                  genre,
+                });
+              }
+            } else {
+              console.log(`❌ 출품작 제외:`, {
+                isChecked,
+                hasGameName: !!gameName,
+                gameNameLength: gameName?.length,
+                hasRoundInfo:
+                  roundInfo &&
+                  roundInfo.includes("[") &&
+                  roundInfo.includes("회]"),
+                roundInfo,
+                checkValue,
+              });
+            }
+          }
+        });
+
+        console.log(`📝 최종 그룹화된 데이터:`, groupedData);
+
+        setSubmissionsData(groupedData);
+        setSubmissionsLoading(false);
+        console.log("✅ 출품작 데이터 업데이트 완료!");
+      } catch (error) {
+        console.error("❌ 출품작 데이터 가져오기 실패:", error);
+        setSubmissionsLoading(false);
+      }
+    };
+
+    fetchSubmissionsData();
+  }, []);
+
   // 차트 컴포넌트
   const GameOfDemoApplicantChart = ({
     applicants,
@@ -105,46 +237,21 @@ export default function DemoDayPage() {
     );
 
     return (
-      <div className="p-2 bg-black/30 rounded-lg mb-2">
-        <div className="flex h-3 bg-white/10 rounded-full overflow-hidden relative group">
-          {applicants.participants > 0 && (
-            <div
-              className="transition-all duration-700 ease-out bg-[#4A90E2]"
-              style={{ width: `${participantsPercentage}%` }}
-              title={`참가자: ${applicants.participants}명`}
-            />
-          )}
-          {applicants.creators > 0 && (
-            <div
-              className="transition-all duration-700 ease-out bg-[#FF6B9F]"
-              style={{ width: `${creatorsPercentage}%` }}
-              title={`제작자: ${applicants.creators}명`}
-            />
-          )}
+      <div className="p-1 bg-black/30 rounded-lg">
+        {/* 누적 바 차트 */}
+        <div className="flex h-2 bg-white/10 rounded-full overflow-hidden">
+          <div
+            className="transition-all duration-700 ease-out bg-[#4A90E2]"
+            style={{ width: `${participantsPercentage}%` }}
+          />
+          <div
+            className="transition-all duration-700 ease-out bg-[#FF6B9F]"
+            style={{ width: `${creatorsPercentage}%` }}
+          />
           <div
             className="bg-white/5"
             style={{ width: `${emptyPercentage}%` }}
           />
-
-          {/* 호버 툴팁 */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-              참가자: {applicants.participants}명, 제작자: {applicants.creators}
-              명
-            </div>
-          </div>
-        </div>
-
-        {/* 범례 */}
-        <div className="flex justify-center gap-4 mt-2">
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
-            <span className="text-white/80 text-xs">참가자</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 rounded-full bg-[#FF6B9F]" />
-            <span className="text-white/80 text-xs">제작자</span>
-          </div>
         </div>
       </div>
     );
@@ -164,16 +271,6 @@ export default function DemoDayPage() {
       author: "플레이어 C님",
     },
   ];
-
-  // 다음 스케줄 정보 가져오기
-  const getNextSchedule = () => {
-    if (gameOfDemoData.length > 0) {
-      return gameOfDemoData[0]; // 첫 번째 항목을 다음 스케줄로 사용
-    }
-    return null;
-  };
-
-  const nextSchedule = getNextSchedule();
 
   return (
     <>
@@ -224,7 +321,7 @@ export default function DemoDayPage() {
         {/* 메인 콘텐츠 */}
         <div className="w-full max-w-[620px] mx-auto z-10 px-0 mb-[72px]">
           {/* 메인 이미지 */}
-          <div className="w-full h-auto mb-10">
+          <div className="w-full h-auto mb-0">
             <div className="relative w-full">
               <Image
                 src="/ssobig_assets/상세 상단 공통 디자인_데모데이.png"
@@ -240,112 +337,129 @@ export default function DemoDayPage() {
 
           {/* 데모데이 정보 박스 */}
           <div className="w-full mb-12">
-            <div className="bg-black rounded-xl p-6 shadow-lg">
+            <div className="bg-black rounded-none p-6 shadow-lg">
               <h2 className="text-2xl font-bold text-center text-white mb-4">
                 게임오브 소셜링 데모데이
               </h2>
 
-              {/* 실시간 스케줄 정보 */}
-              {gameOfDemoLoading ? (
-                <div className="bg-black/70 rounded-lg p-4 mb-5">
-                  <div className="text-center">
-                    <p className="text-white/60 text-sm">
-                      📅 스케줄 정보를 불러오는 중...
-                    </p>
+              {/* 가격 및 시간 정보 */}
+              <div
+                className="bg-black/70 rounded-lg p-6
+               mb-0"
+              >
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
+                  <p className="text-white font-bold text-lg mb-2 sm:mb-0">
+                    가격: <span className="text-white">플레이어 20,000원</span>
+                    <span className="text-[#9E4BED]"> / 출품자 무료</span>
+                  </p>
+                  <p className="text-white font-bold text-lg">
+                    매월 마지막 주말 <span className="text-white">(5시간)</span>
+                  </p>
+                </div>
+
+                {/* 범례 */}
+                <div className="flex flex-wrap gap-2 justify-end mt-3">
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
+                    <span className="text-white/90">참가자</span>
+                  </div>
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#FF6B9F]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#FF6B9F]" />
+                    <span className="text-white/90">제작자</span>
                   </div>
                 </div>
-              ) : nextSchedule ? (
-                <div className="space-y-4">
-                  {/* 다음 스케줄 정보 */}
-                  <div className="bg-black/70 rounded-lg p-4 mb-5">
-                    <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
-                      <p className="text-white font-bold text-lg mb-2 sm:mb-0">
-                        가격:{" "}
-                        <span className="text-white">플레이어 10,000원</span>
-                        <span className="text-[#9E4BED]"> / 출품자 무료</span>
-                      </p>
-                      <p className="text-white font-bold text-lg">
-                        {nextSchedule.date} 13:00~18:00{" "}
-                        <span className="text-white">(5시간)</span>
-                      </p>
-                    </div>
+              </div>
 
-                    <div className="text-center mt-4 mb-4">
-                      <p className="text-white font-bold text-xl mb-2">
-                        📍 쏘빅 스튜디오 (신논현역 5분 거리)
-                      </p>
-                      <p className="text-white font-bold text-lg">
-                        정원: 최대 {nextSchedule.maxCapacity}명
-                      </p>
+              {/* 일정 목록 */}
+              <div className="space-y-1">
+                {gameOfDemoLoading ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="text-white/60 text-sm">
+                      📅 스케줄 정보를 불러오는 중...
                     </div>
-
-                    {/* 실시간 참가자 현황 */}
-                    <div className="text-center mb-3">
-                      <p className="text-[#9E4BED] font-bold text-lg">
-                        현재 신청자: {nextSchedule.applicants.total}/
-                        {nextSchedule.maxCapacity}명
-                      </p>
-                    </div>
-
-                    <GameOfDemoApplicantChart
-                      applicants={nextSchedule.applicants}
-                      maxCapacity={nextSchedule.maxCapacity}
-                    />
                   </div>
-
-                  {/* 전체 스케줄 목록 (1개 이상일 때만 표시) */}
-                  {gameOfDemoData.length > 1 && (
-                    <div className="bg-black/50 rounded-lg p-4">
-                      <h3 className="text-white font-bold text-center mb-3">
-                        📅 전체 스케줄
-                      </h3>
-                      <div className="space-y-2">
-                        {gameOfDemoData.map((schedule, index) => (
-                          <div
-                            key={index}
-                            className="bg-white/10 rounded-lg p-3"
-                          >
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-white font-medium">
-                                {schedule.title}
-                              </span>
-                              <span className="text-[#9E4BED] font-bold text-sm">
-                                {schedule.applicants.total}/
-                                {schedule.maxCapacity}명
-                              </span>
-                            </div>
-                            <GameOfDemoApplicantChart
-                              applicants={schedule.applicants}
-                              maxCapacity={schedule.maxCapacity}
-                            />
-                          </div>
-                        ))}
+                ) : gameOfDemoData.length === 0 ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="text-white/60 text-sm">
+                      📅 다음 스케줄이 곧 공개됩니다!
+                    </div>
+                  </div>
+                ) : (
+                  gameOfDemoData.map((schedule, index) => (
+                    <div
+                      key={index}
+                      className="rounded-lg bg-black/50 hover:bg-black/80 transition-colors"
+                    >
+                      <div className="flex items-center justify-between px-3 py-2">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-white font-normal flex-grow text-s">
+                            {schedule.title}
+                          </span>
+                        </div>
+                        <span className="text-[#9E4BED] font-normal text-s">
+                          {schedule.applicants.total}/{schedule.maxCapacity}명
+                        </span>
+                      </div>
+                      <div className="px-3 pb-2">
+                        <GameOfDemoApplicantChart
+                          applicants={schedule.applicants}
+                          maxCapacity={schedule.maxCapacity}
+                        />
                       </div>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-black/70 rounded-lg p-4 mb-5">
-                  <div className="text-center">
-                    <p className="text-white font-bold text-lg mb-2">
-                      가격:{" "}
-                      <span className="text-white">플레이어 10,000원</span>
-                      <span className="text-[#9E4BED]"> / 출품자 무료</span>
-                    </p>
-                    <p className="text-white/60 text-sm">
-                      📅 다음 스케줄이 곧 공개됩니다!
-                    </p>
-                    <div className="text-center mt-4">
-                      <p className="text-white font-bold text-xl mb-2">
-                        📍 쏘빅 스튜디오 (신논현역 5분 거리)
-                      </p>
-                      <p className="text-white font-bold text-lg">
-                        정원: 최대 50명
-                      </p>
+                  ))
+                )}
+              </div>
+
+              {/* 출품작 리스트 */}
+              <div className="mt-6 pt-6 border-t border-white/20">
+                <h3 className="text-xl font-bold text-center text-white mb-4">
+                  🎮 출품작 리스트
+                </h3>
+
+                {submissionsLoading ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="text-white/60 text-sm">
+                      🎮 출품작 정보를 불러오는 중...
                     </div>
                   </div>
-                </div>
-              )}
+                ) : Object.keys(submissionsData).length === 0 ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="text-white/60 text-sm">
+                      🎮 현재 등록된 출품작이 없습니다
+                    </div>
+                  </div>
+                ) : (
+                  Object.keys(submissionsData)
+                    .sort()
+                    .map((round) => (
+                      <div key={round} className="mb-6">
+                        <h4 className="text-lg font-bold text-[#9E4BED] mb-3">
+                          [{round}] 출품작
+                        </h4>
+                        <div className="space-y-1">
+                          {submissionsData[round].map((submission, index) => (
+                            <div
+                              key={index}
+                              className="bg-black/30 rounded-lg p-2.5"
+                            >
+                              <div className="text-white font-medium text-base mb-1">
+                                {submission.gameName}
+                              </div>
+                              <div className="text-white/70 text-sm">
+                                {submission.author} (
+                                {submission.minPlayers === submission.maxPlayers
+                                  ? `${submission.minPlayers}명`
+                                  : `${submission.minPlayers}~${submission.maxPlayers}명`}
+                                , {submission.duration}, {submission.genre})
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                )}
+              </div>
             </div>
           </div>
 
@@ -440,87 +554,6 @@ export default function DemoDayPage() {
               </div>
             </div>
 
-            {/* 대상 추천 섹션 */}
-            <div className="mb-10 bg-purple-500/10 backdrop-blur-[30px] p-6 rounded-xl border border-purple-500/50">
-              <div className="mb-4 inline-block">
-                <h3 className="text-xl font-extrabold text-[#9E4BED]">
-                  🎯 이런 분들께 특히 추천합니다!
-                </h3>
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-white">
-                  • 만든 게임의 객관적인 피드백이 절실한 게임 창작자
-                </p>
-                <p className="text-white">
-                  • 더지니어스, 크라임씬, 머더미스터리 등을 좋아하는 게임 애호가
-                </p>
-                <p className="text-white">
-                  • 새로운 게임을 가장 먼저 경험하고 싶은 얼리어답터
-                </p>
-                <p className="text-white">
-                  • 오프라인 게임 문화 발전에 기여하고 싶은 씬메이커
-                </p>
-                <p className="text-white">
-                  • 같은 취향의 사람들과 깊이 있는 교류를 원하는 분
-                </p>
-              </div>
-            </div>
-
-            {/* 기대 효과 섹션 */}
-            <div className="mb-10 bg-purple-500/10 backdrop-blur-[30px] p-6 rounded-xl border border-purple-500/50">
-              <div className="mb-4 inline-block">
-                <h3 className="text-xl font-extrabold text-[#9E4BED]">
-                  ✨ 기대 효과/특장점
-                </h3>
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-white">
-                  <span className="font-bold text-[#95BE62]">창작자:</span> 50명
-                  규모 테스터풀의 다각도 피드백으로 게임 완성도 대폭 향상
-                </p>
-                <p className="text-white">
-                  <span className="font-bold text-[#95BE62]">플레이어:</span>{" "}
-                  게임 예능 방송보다 재미있는 신작들을 가장 먼저 체험
-                </p>
-                <p className="text-white">
-                  <span className="font-bold text-[#95BE62]">네트워킹:</span>{" "}
-                  진심으로 게임을 사랑하는 사람들과의 의미있는 만남
-                </p>
-                <p className="text-white">
-                  <span className="font-bold text-[#95BE62]">문화 기여:</span>{" "}
-                  오프라인 게임 문화 발전에 직접 참여하는 보람
-                </p>
-              </div>
-            </div>
-
-            {/* 주최자 소개 섹션 */}
-            <div className="mb-10 bg-purple-500/10 backdrop-blur-[30px] p-6 rounded-xl border border-purple-500/50">
-              <div className="mb-4 inline-block">
-                <h3 className="text-xl font-extrabold text-[#9E4BED]">
-                  👋 주최자 소개
-                </h3>
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-white font-bold text-lg">
-                  안녕하세요, 게임 기획자 평일입니다.
-                </p>
-                <p className="text-white">
-                  보드게임카페와 동호회를 8년간 운영하며 보드게임 2종을 출판하여
-                  일본까지 수출한 경험이 있습니다. 최근 2년간은 팀과 함께
-                  지니어스류, 크라임씬류 게임을 기획하여 연 2억 정도의 매출을
-                  달성했습니다.
-                </p>
-                <p className="text-[#95BE62] font-bold">
-                  &quot;훌륭한 게임이 나왔으면 하는 마음&quot;에서 시작된 이
-                  모임을 통해, 게임 문화를 사랑하는 창작자와 플레이어들이 서로
-                  도움을 주고받으며 함께 성장할 수 있기를 바랍니다.
-                </p>
-              </div>
-            </div>
-
             {/* FAQ 섹션 */}
             <div className="mb-16">
               <div className="bg-white/10 backdrop-blur-[30px] p-4 md:p-6 rounded-xl">
@@ -573,17 +606,6 @@ export default function DemoDayPage() {
                 <div className="space-y-4">
                   <div className="flex flex-col md:flex-row md:items-center py-3 border-b border-white/10">
                     <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
-                      일정
-                    </span>
-                    <span className="text-white">
-                      {nextSchedule
-                        ? `${nextSchedule.date} 13:00-18:00 (5시간)`
-                        : "다음 스케줄 확인 중..."}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col md:flex-row md:items-center py-3 border-b border-white/10">
-                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
                       장소
                     </span>
                     <span className="text-white">
@@ -620,13 +642,18 @@ export default function DemoDayPage() {
             {/* 마무리 섹션 */}
             <div className="text-center my-20">
               <h2 className="text-2xl font-bold mb-5">
-                게임 예능 방송보다 재밌는 게임들을 더 많이 뿜어내는,
+                게임 예능 방송보다
                 <br />
-                그런 소중하고 독특한 모임이 될 수 있도록 최선을 다하겠습니다!
+                재밌는 게임들을 더 많이 뿜어내는,
+                <br />
+                그런 소중하고 독특한 모임이 될 수 있도록
+                <br />
+                최선을 다하겠습니다!
               </h2>
               <p className="text-lg mb-8">
-                여러분의 참여 하나하나가 오프라인 게임 문화 발전에 큰 기여가
-                됩니다.
+                여러분의 참여 하나하나가
+                <br />
+                오프라인 게임 문화 발전에 큰 기여가 됩니다.
               </p>
               <p className="text-xl text-[#95BE62] font-bold">곧 뵙겠습니다!</p>
             </div>
@@ -636,31 +663,58 @@ export default function DemoDayPage() {
         {/* 하단 고정 CTA 버튼 */}
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="w-full max-w-[620px] mx-auto">
-            <LinkWithUtm
-              href="https://form.ssobig.com/demoday"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full h-[56px] bg-[#9E4BED] hover:bg-[#8341c9] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg"
-              brandPage="game_orb"
-              buttonType="demoday_main_cta"
-              destination="smore_form"
-            >
-              지금 바로 참여하기
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 ml-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            <div className="flex gap-2">
+              <LinkWithUtm
+                href="https://form.ssobig.com/gameorb3"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 h-[56px] bg-[#4A7C59] hover:bg-[#3d6648] text-white font-bold px-4 rounded-[100px] flex items-center justify-center transition-colors text-base"
+                brandPage="game_orb"
+                buttonType="demoday_submit_cta"
+                destination="smore_form"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </LinkWithUtm>
+                게임 출품하기
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </LinkWithUtm>
+              <LinkWithUtm
+                href="https://form.ssobig.com/gameorb2"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 h-[56px] bg-[#9E4BED] hover:bg-[#8341c9] text-white font-bold px-4 rounded-[100px] flex items-center justify-center transition-colors text-base"
+                brandPage="game_orb"
+                buttonType="demoday_participate_cta"
+                destination="smore_form"
+              >
+                일반 참가하기
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </LinkWithUtm>
+            </div>
           </div>
         </div>
       </div>
