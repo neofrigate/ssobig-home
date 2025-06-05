@@ -4,8 +4,152 @@ import Image from "next/image";
 import Script from "next/script";
 import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
+import React, { useState, useEffect } from "react";
+
+interface GameOfDemoScheduleItem {
+  date: string;
+  title: string;
+  applicants: {
+    total: number;
+    participants: number;
+    creators: number;
+  };
+  maxCapacity: number;
+}
 
 export default function DemoDayPage() {
+  // 게임오브데모데이 상태
+  const [gameOfDemoData, setGameOfDemoData] = useState<
+    GameOfDemoScheduleItem[]
+  >([]);
+  const [gameOfDemoLoading, setGameOfDemoLoading] = useState(true);
+
+  // 게임오브데모데이 데이터 가져오기
+  useEffect(() => {
+    const fetchGameOfDemoData = async () => {
+      console.log("🔄 게임오브데모데이 Google Sheets 데이터 가져오기 시작...");
+      try {
+        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=265032622`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const csvText = await response.text();
+        const rows = csvText.split("\n").slice(1);
+        const updatedSchedule: GameOfDemoScheduleItem[] = [];
+
+        rows.forEach((row) => {
+          if (row.trim()) {
+            const cols = row.split(",");
+            const title = cols[1]?.replace(/"/g, "").trim();
+            const cColumnValue = cols[2]?.replace(/"/g, "").trim();
+            const isChecked = cColumnValue === "TRUE";
+            const maxCapacity = parseInt(cols[3]) || 50;
+            const total = parseInt(cols[4]) || 0;
+            const participants = parseInt(cols[5]) || 0;
+            const creators = parseInt(cols[6]) || 0;
+
+            if (
+              isChecked &&
+              title &&
+              title !== "선택 항목" &&
+              title.length > 0
+            ) {
+              // 제목에서 날짜 추출 (예: [12회] 6월 28일 토요일 13시~18시)
+              const dateMatch = title.match(/(\d+월\s*\d+일\s*[^0-9]*)/);
+              const dateStr = dateMatch ? dateMatch[1].trim() : "";
+
+              updatedSchedule.push({
+                date: dateStr,
+                title: title,
+                applicants: {
+                  total,
+                  participants,
+                  creators,
+                },
+                maxCapacity,
+              });
+            }
+          }
+        });
+
+        setGameOfDemoData(updatedSchedule);
+        setGameOfDemoLoading(false);
+      } catch (error) {
+        console.error("❌ 게임오브데모데이 데이터 가져오기 실패:", error);
+        setGameOfDemoLoading(false);
+      }
+    };
+
+    fetchGameOfDemoData();
+  }, []);
+
+  // 차트 컴포넌트
+  const GameOfDemoApplicantChart = ({
+    applicants,
+    maxCapacity,
+  }: {
+    applicants: { total: number; participants: number; creators: number };
+    maxCapacity: number;
+  }) => {
+    const participantsPercentage =
+      maxCapacity > 0 ? (applicants.participants / maxCapacity) * 100 : 0;
+    const creatorsPercentage =
+      maxCapacity > 0 ? (applicants.creators / maxCapacity) * 100 : 0;
+    const emptyPercentage = Math.max(
+      0,
+      100 - participantsPercentage - creatorsPercentage
+    );
+
+    return (
+      <div className="p-2 bg-black/30 rounded-lg mb-2">
+        <div className="flex h-3 bg-white/10 rounded-full overflow-hidden relative group">
+          {applicants.participants > 0 && (
+            <div
+              className="transition-all duration-700 ease-out bg-[#4A90E2]"
+              style={{ width: `${participantsPercentage}%` }}
+              title={`참가자: ${applicants.participants}명`}
+            />
+          )}
+          {applicants.creators > 0 && (
+            <div
+              className="transition-all duration-700 ease-out bg-[#FF6B9F]"
+              style={{ width: `${creatorsPercentage}%` }}
+              title={`제작자: ${applicants.creators}명`}
+            />
+          )}
+          <div
+            className="bg-white/5"
+            style={{ width: `${emptyPercentage}%` }}
+          />
+
+          {/* 호버 툴팁 */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+              참가자: {applicants.participants}명, 제작자: {applicants.creators}
+              명
+            </div>
+          </div>
+        </div>
+
+        {/* 범례 */}
+        <div className="flex justify-center gap-4 mt-2">
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
+            <span className="text-white/80 text-xs">참가자</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 rounded-full bg-[#FF6B9F]" />
+            <span className="text-white/80 text-xs">제작자</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const reviews = [
     {
       text: "게임 창작자로서 정말 유익한 피드백을 받을 수 있었어요! 이런 기회가 더 많았으면 좋겠네요.",
@@ -20,6 +164,16 @@ export default function DemoDayPage() {
       author: "플레이어 C님",
     },
   ];
+
+  // 다음 스케줄 정보 가져오기
+  const getNextSchedule = () => {
+    if (gameOfDemoData.length > 0) {
+      return gameOfDemoData[0]; // 첫 번째 항목을 다음 스케줄로 사용
+    }
+    return null;
+  };
+
+  const nextSchedule = getNextSchedule();
 
   return (
     <>
@@ -91,28 +245,107 @@ export default function DemoDayPage() {
                 게임오브 소셜링 데모데이
               </h2>
 
-              {/* 일정 및 가격 정보 */}
-              <div className="bg-black/70 rounded-lg p-4 mb-5">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
-                  <p className="text-white font-bold text-lg mb-2 sm:mb-0">
-                    가격: <span className="text-white">플레이어 10,000원</span>
-                    <span className="text-[#9E4BED]"> / 출품자 무료</span>
-                  </p>
-                  <p className="text-white font-bold text-lg">
-                    5월 18일(일) 13:00~18:00{" "}
-                    <span className="text-white">(5시간)</span>
-                  </p>
+              {/* 실시간 스케줄 정보 */}
+              {gameOfDemoLoading ? (
+                <div className="bg-black/70 rounded-lg p-4 mb-5">
+                  <div className="text-center">
+                    <p className="text-white/60 text-sm">
+                      📅 스케줄 정보를 불러오는 중...
+                    </p>
+                  </div>
                 </div>
+              ) : nextSchedule ? (
+                <div className="space-y-4">
+                  {/* 다음 스케줄 정보 */}
+                  <div className="bg-black/70 rounded-lg p-4 mb-5">
+                    <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
+                      <p className="text-white font-bold text-lg mb-2 sm:mb-0">
+                        가격:{" "}
+                        <span className="text-white">플레이어 10,000원</span>
+                        <span className="text-[#9E4BED]"> / 출품자 무료</span>
+                      </p>
+                      <p className="text-white font-bold text-lg">
+                        {nextSchedule.date} 13:00~18:00{" "}
+                        <span className="text-white">(5시간)</span>
+                      </p>
+                    </div>
 
-                <div className="text-center mt-4">
-                  <p className="text-white font-bold text-xl mb-2">
-                    📍 쏘빅 스튜디오 (신논현역 5분 거리)
-                  </p>
-                  <p className="text-white font-bold text-lg">
-                    정원: 최대 50명
-                  </p>
+                    <div className="text-center mt-4 mb-4">
+                      <p className="text-white font-bold text-xl mb-2">
+                        📍 쏘빅 스튜디오 (신논현역 5분 거리)
+                      </p>
+                      <p className="text-white font-bold text-lg">
+                        정원: 최대 {nextSchedule.maxCapacity}명
+                      </p>
+                    </div>
+
+                    {/* 실시간 참가자 현황 */}
+                    <div className="text-center mb-3">
+                      <p className="text-[#9E4BED] font-bold text-lg">
+                        현재 신청자: {nextSchedule.applicants.total}/
+                        {nextSchedule.maxCapacity}명
+                      </p>
+                    </div>
+
+                    <GameOfDemoApplicantChart
+                      applicants={nextSchedule.applicants}
+                      maxCapacity={nextSchedule.maxCapacity}
+                    />
+                  </div>
+
+                  {/* 전체 스케줄 목록 (1개 이상일 때만 표시) */}
+                  {gameOfDemoData.length > 1 && (
+                    <div className="bg-black/50 rounded-lg p-4">
+                      <h3 className="text-white font-bold text-center mb-3">
+                        📅 전체 스케줄
+                      </h3>
+                      <div className="space-y-2">
+                        {gameOfDemoData.map((schedule, index) => (
+                          <div
+                            key={index}
+                            className="bg-white/10 rounded-lg p-3"
+                          >
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-white font-medium">
+                                {schedule.title}
+                              </span>
+                              <span className="text-[#9E4BED] font-bold text-sm">
+                                {schedule.applicants.total}/
+                                {schedule.maxCapacity}명
+                              </span>
+                            </div>
+                            <GameOfDemoApplicantChart
+                              applicants={schedule.applicants}
+                              maxCapacity={schedule.maxCapacity}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              ) : (
+                <div className="bg-black/70 rounded-lg p-4 mb-5">
+                  <div className="text-center">
+                    <p className="text-white font-bold text-lg mb-2">
+                      가격:{" "}
+                      <span className="text-white">플레이어 10,000원</span>
+                      <span className="text-[#9E4BED]"> / 출품자 무료</span>
+                    </p>
+                    <p className="text-white/60 text-sm">
+                      📅 다음 스케줄이 곧 공개됩니다!
+                    </p>
+                    <div className="text-center mt-4">
+                      <p className="text-white font-bold text-xl mb-2">
+                        📍 쏘빅 스튜디오 (신논현역 5분 거리)
+                      </p>
+                      <p className="text-white font-bold text-lg">
+                        정원: 최대 50명
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -343,7 +576,9 @@ export default function DemoDayPage() {
                       일정
                     </span>
                     <span className="text-white">
-                      5월 18일(일) 13:00-18:00 (5시간)
+                      {nextSchedule
+                        ? `${nextSchedule.date} 13:00-18:00 (5시간)`
+                        : "다음 스케줄 확인 중..."}
                     </span>
                   </div>
 

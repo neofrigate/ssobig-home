@@ -39,6 +39,17 @@ interface RealGeniusScheduleItem {
   maxCapacity: number;
 }
 
+interface GameOfDemoScheduleItem {
+  date: string;
+  title: string;
+  applicants: {
+    total: number;
+    participants: number;
+    creators: number;
+  };
+  maxCapacity: number;
+}
+
 export default function RealDataPage() {
   // 러브버디즈 상태
   const [loveBuddiesData, setLoveBuddiesData] = useState<
@@ -59,6 +70,13 @@ export default function RealDataPage() {
   >([]);
   const [realGeniusLoading, setRealGeniusLoading] = useState(true);
   const [realGeniusUpdateTime, setRealGeniusUpdateTime] = useState<string>("");
+
+  // 게임오브데모데이 상태
+  const [gameOfDemoData, setGameOfDemoData] = useState<
+    GameOfDemoScheduleItem[]
+  >([]);
+  const [gameOfDemoLoading, setGameOfDemoLoading] = useState(true);
+  const [gameOfDemoUpdateTime, setGameOfDemoUpdateTime] = useState<string>("");
 
   // 러브버디즈 데이터 가져오기
   useEffect(() => {
@@ -297,6 +315,77 @@ export default function RealDataPage() {
     fetchRealGeniusData();
   }, []);
 
+  // 게임오브데모데이 데이터 가져오기
+  useEffect(() => {
+    const fetchGameOfDemoData = async () => {
+      console.log("🔄 게임오브데모데이 Google Sheets 데이터 가져오기 시작...");
+      try {
+        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=265032622`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const csvText = await response.text();
+        const rows = csvText.split("\n").slice(1);
+        const updatedSchedule: GameOfDemoScheduleItem[] = [];
+
+        rows.forEach((row) => {
+          if (row.trim()) {
+            const cols = row.split(",");
+            const title = cols[1]?.replace(/"/g, "").trim();
+            const cColumnValue = cols[2]?.replace(/"/g, "").trim();
+            const isChecked = cColumnValue === "TRUE";
+            const maxCapacity = parseInt(cols[3]) || 50;
+            const total = parseInt(cols[4]) || 0;
+            const participants = parseInt(cols[5]) || 0;
+            const creators = parseInt(cols[6]) || 0;
+
+            if (
+              isChecked &&
+              title &&
+              title !== "선택 항목" &&
+              title.length > 0
+            ) {
+              // 제목에서 날짜 추출 (예: [12회] 6월 28일 토요일 13시~18시)
+              const dateMatch = title.match(/(\d+월\s*\d+일\s*[^0-9]*)/);
+              const dateStr = dateMatch ? dateMatch[1].trim() : "";
+
+              updatedSchedule.push({
+                date: dateStr,
+                title: title,
+                applicants: {
+                  total,
+                  participants,
+                  creators,
+                },
+                maxCapacity,
+              });
+            }
+          }
+        });
+
+        setGameOfDemoData(updatedSchedule);
+        setGameOfDemoLoading(false);
+
+        const now = new Date();
+        const updateTimeString = `UPDATE : ${now.getFullYear()}.${String(
+          now.getMonth() + 1
+        ).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} ${String(
+          now.getHours()
+        ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+        setGameOfDemoUpdateTime(updateTimeString);
+      } catch (error) {
+        console.error("❌ 게임오브데모데이 데이터 가져오기 실패:", error);
+        setGameOfDemoLoading(false);
+      }
+    };
+
+    fetchGameOfDemoData();
+  }, []);
+
   // 러브버디즈 참가자 차트 컴포넌트
   const LoveBuddiesApplicantChart = ({
     applicants,
@@ -476,6 +565,57 @@ export default function RealDataPage() {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
               여자: {applicants.female}명, 남자: {applicants.male}명
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // 게임오브데모데이 참가자 차트 컴포넌트
+  const GameOfDemoApplicantChart = ({
+    applicants,
+    maxCapacity,
+  }: {
+    applicants: { total: number; participants: number; creators: number };
+    maxCapacity: number;
+  }) => {
+    const participantsPercentage =
+      maxCapacity > 0 ? (applicants.participants / maxCapacity) * 100 : 0;
+    const creatorsPercentage =
+      maxCapacity > 0 ? (applicants.creators / maxCapacity) * 100 : 0;
+    const emptyPercentage = Math.max(
+      0,
+      100 - participantsPercentage - creatorsPercentage
+    );
+
+    return (
+      <div className="p-2 bg-black/30 rounded-lg">
+        <div className="flex h-2 bg-white/10 rounded-full overflow-hidden relative group">
+          {applicants.participants > 0 && (
+            <div
+              className="transition-all duration-700 ease-out bg-[#4A90E2]"
+              style={{ width: `${participantsPercentage}%` }}
+              title={`참가자: ${applicants.participants}명`}
+            />
+          )}
+          {applicants.creators > 0 && (
+            <div
+              className="transition-all duration-700 ease-out bg-[#FF6B9F]"
+              style={{ width: `${creatorsPercentage}%` }}
+              title={`제작자: ${applicants.creators}명`}
+            />
+          )}
+          <div
+            className="bg-white/5"
+            style={{ width: `${emptyPercentage}%` }}
+          />
+
+          {/* 호버 툴팁 */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+              참가자: {applicants.participants}명, 제작자: {applicants.creators}
+              명
             </div>
           </div>
         </div>
@@ -827,6 +967,104 @@ export default function RealDataPage() {
                 <div className="text-right mt-3 pr-3">
                   <span className="text-white/60 text-xs">
                     {realGeniusUpdateTime}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 게임오브데모데이 스케줄 박스 */}
+          <div className="w-full mb-12">
+            <div className="bg-white/5 rounded-xl p-6 shadow-lg">
+              <h2 className="text-2xl font-bold text-center text-white mb-4">
+                🎮 게임오브소셜링 데모데이
+              </h2>
+
+              {/* 가격 및 시간 정보 */}
+              <div className="rounded-lg p-4 mb-5">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
+                  <div className="mb-2 sm:mb-0">
+                    <p className="text-white font-bold text-lg">
+                      가격:{" "}
+                      <span className="text-[#8B5CF6]">플레이어 10,000원</span>
+                    </p>
+                    <p className="text-[#10B981] font-bold text-sm">
+                      출품자 무료 ✨
+                    </p>
+                  </div>
+                  <p className="text-white font-bold text-lg">
+                    일요일 13:00~18:00{" "}
+                    <span className="text-white">(5시간)</span>
+                  </p>
+                </div>
+
+                <div className="text-center mt-3 p-2 bg-black/20 rounded-lg">
+                  <p className="text-white/90 text-sm">
+                    📍 쏘빅 스튜디오 (신논현역 5분 거리)
+                  </p>
+                  <p className="text-white/90 text-sm mt-1">정원: 최대 50명</p>
+                </div>
+
+                {/* 범례 */}
+                <div className="flex flex-wrap gap-2 justify-end mt-6 mb-3">
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
+                    <span className="text-white/90">참가자</span>
+                  </div>
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#FF6B9F]/20">
+                    <div className="w-2 h-2 rounded-full bg-[#FF6B9F]" />
+                    <span className="text-white/90">제작자</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 일정 목록 */}
+              <div className="space-y-2">
+                {gameOfDemoLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-white/60 text-sm">
+                      📅 스케줄 정보를 불러오는 중...
+                    </div>
+                  </div>
+                ) : gameOfDemoData.length === 0 ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-white/60 text-sm">
+                      📅 현재 예정된 스케줄이 없습니다
+                    </div>
+                  </div>
+                ) : (
+                  gameOfDemoData.map((schedule, index) => (
+                    <div
+                      key={index}
+                      className="rounded-lg hover:bg-black/30 transition-colors"
+                    >
+                      <div className="flex items-center justify-between p-3">
+                        <div className="flex items-center space-x-4">
+                          <span className="font-medium text-[#F4F4F4] min-w-[80px]">
+                            {schedule.date}
+                          </span>
+                          <span className="text-white font-bold flex-grow">
+                            {schedule.title}
+                          </span>
+                        </div>
+                        <span className="text-[#8B5CF6] font-bold text-sm">
+                          {schedule.applicants.total}/{schedule.maxCapacity}명
+                        </span>
+                      </div>
+                      <GameOfDemoApplicantChart
+                        applicants={schedule.applicants}
+                        maxCapacity={schedule.maxCapacity}
+                      />
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* 업데이트 시간 표시 */}
+              {gameOfDemoUpdateTime && (
+                <div className="text-right mt-3 pr-3">
+                  <span className="text-white/60 text-xs">
+                    {gameOfDemoUpdateTime}
                   </span>
                 </div>
               )}
