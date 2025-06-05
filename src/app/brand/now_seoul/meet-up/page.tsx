@@ -224,9 +224,9 @@ export default function RealGeniusPage() {
     );
 
     return (
-      <div className="p-2 bg-black/30 rounded-lg">
+      <div className="px-3 py-2 bg-black/30 rounded-none">
         {/* 누적 바 차트 */}
-        <div className="flex h-4 bg-white/10 rounded-full overflow-hidden">
+        <div className="flex h-2 bg-white/10 rounded-full overflow-hidden">
           {chartData.map((item) => (
             <div
               key={item.job}
@@ -309,7 +309,7 @@ export default function RealGeniusPage() {
         {/* 메인 콘텐츠 */}
         <div className="w-full max-w-[620px] mx-auto z-10 px-0 mb-[72px]">
           {/* 메인 이미지 */}
-          <div className="w-full h-auto mb-10">
+          <div className="w-full h-auto mb-0">
             <div className="relative w-full">
               <Image
                 src="/ssobig_assets/나우서울 상세 상단.jpg"
@@ -326,14 +326,14 @@ export default function RealGeniusPage() {
           </div>
 
           {/* 나우서울 밋업 스케줄 박스 */}
-          <div className="w-full mb-12 px-5">
-            <div className="bg-black rounded-xl p-3 shadow-lg">
-              <h2 className="text-2xl font-bold text-center text-white mb-3">
+          <div className="w-full mb-12 px-0">
+            <div className="bg-black rounded-none p-0 shadow-lg">
+              <h2 className="text-2xl font-bold text-center text-white mb-3 px-3 pt-8">
                 나우서울 밋업 스케줄
               </h2>
 
               {/* 가격 및 시간 정보 */}
-              <div className="bg-black/70 rounded-lg p-3 mb-3">
+              <div className="bg-black/70 rounded-none p-3 mb-3 mx-3">
                 <div className="flex flex-col space-y-4">
                   <div>
                     <div className="flex items-center flex-wrap">
@@ -341,18 +341,15 @@ export default function RealGeniusPage() {
                         가격:
                       </span>
                       <span className="line-through text-gray-400 text-lg mr-2">
-                        21,000원
+                        35,000원
                       </span>
                       <span className="text-[#FFAC3A] font-bold text-xl">
-                        15,000원
+                        25,000원
                       </span>
                       <span className="bg-[#FFAC3A] text-black px-2 py-0.5 rounded-full text-xs font-bold ml-2">
-                        얼리버드
+                        할인
                       </span>
                     </div>
-                    <p className="text-xs text-gray-300 mt-1">
-                      * 얼리버드 혜택은 선착순 마감됩니다
-                    </p>
                   </div>
                   <div className="text-white font-bold text-lg">
                     매주 목요일 19:30~22:00
@@ -386,7 +383,7 @@ export default function RealGeniusPage() {
               </div>
 
               {/* 일정 목록 */}
-              <div className="space-y-2">
+              <div className="space-y-6 px-3">
                 {scheduleData.map((schedule, index) => {
                   const total = Object.values(schedule.applicants).reduce(
                     (sum: number, count: number) => sum + count,
@@ -395,12 +392,12 @@ export default function RealGeniusPage() {
                   return (
                     <div
                       key={index}
-                      className="rounded-lg bg-black/50 hover:bg-black/80 transition-colors"
+                      className="rounded-none bg-black/50 hover:bg-black/80 transition-colors"
                     >
-                      <div className="flex items-center justify-between p-3">
+                      <div className="flex items-center justify-between px-3 pt-3 pb-1">
                         <div className="flex items-center space-x-4">
                           <span className="font-medium text-[#F4F4F4] min-w-[80px]">
-                            {schedule.date}
+                            {schedule.date} (목)
                           </span>
                           <span className="text-white font-bold">
                             {schedule.title}
@@ -419,9 +416,57 @@ export default function RealGeniusPage() {
                 })}
               </div>
 
+              {/* 참여 조건 */}
+              <div className="mt-10 -mx-3">
+                <div className="mx-9 px-3 py-2 bg-[#FFAC3A]/20 rounded-lg border border-[#FFAC3A]/50">
+                  <p className="text-[#FFAC3A] font-bold text-sm mb-1">
+                    📋 참여 조건
+                  </p>
+                  <p className="text-white text-sm">
+                    3년차 이상의 경력을 가지신 분들만 참여 가능합니다
+                  </p>
+                </div>
+              </div>
+
+              {/* 주제별 모집 이유 설명 */}
+              <div className="mt-4 -mx-3">
+                <div className="mx-9 px-3 py-2 bg-white/5 rounded-lg border border-white/10">
+                  <h5 className="text-[#FFAC3A] font-bold text-sm mb-3 flex items-center">
+                    💡 왜 매회 다른 주제로 진행할까요?
+                  </h5>
+                  <div className="space-y-2 text-white/90 text-sm">
+                    <p className="flex items-start">
+                      <span className="text-[#FFAC3A] mr-2">•</span>
+                      <span>
+                        <strong>관심사가 비슷한 사람들과 더 깊은 대화</strong>가
+                        가능해요
+                      </span>
+                    </p>
+                    <p className="flex items-start">
+                      <span className="text-[#FFAC3A] mr-2">•</span>
+                      <span>
+                        <strong>나와 잘 맞는 사람을 찾기</strong> 훨씬
+                        쉬워집니다
+                      </span>
+                    </p>
+                    <p className="flex items-start">
+                      <span className="text-[#FFAC3A] mr-2">•</span>
+                      <span>
+                        <strong>요즘 가장 핫한 주제만 엄선</strong>해서 진행해요
+                      </span>
+                    </p>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <span className="text-[#FFAC3A] text-xs font-medium bg-[#FFAC3A]/10 px-3 py-1 rounded-full">
+                      관심 있는 주제 회차에 참여하세요! 🎯
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* 업데이트 시간 표시 */}
               {lastUpdateTime && (
-                <div className="text-right mt-3 pr-3">
+                <div className="text-right mt-3 pr-6 pb-3">
                   <span className="text-white/60 text-xs">
                     {lastUpdateTime}
                   </span>
@@ -436,77 +481,87 @@ export default function RealGeniusPage() {
             <div className="my-[60px] space-y-8">
               <div className="text-center">
                 <h3 className="text-3xl md:text-4xl font-bold text-[#FFAC3A] mb-5 tracking-tight">
-                  Night Off Work,
+                  퇴근 후, 다들 여기 모인다
                   <br />
-                  Turn ON Your
-                  <span className="animate-pulse">____</span>
+                  <span className="animate-pulse text-white">
+                    지금 이 순간에도
+                  </span>
                 </h3>
 
                 <p className="text-lg md:text-xl leading-relaxed mx-auto max-w-[520px]">
-                  퇴근 후 당신의 무엇이든 깨우는 시간이 되기를 바랍니다
+                  <span className="font-bold text-[#FFAC3A]">N잡 시대</span>,
+                  새로운 사이드 프로젝트를 찾는다면?
+                  <br />
+                  당신이 놓치고 있는 기회들이 여기에 있습니다
                 </p>
 
-                <div className="mt-4 inline-block bg-gradient-to-r from-[#FFAC3A]/20 to-[#FFAC3A]/5 px-6 py-3 rounded-full">
+                <div className="mt-4 inline-block bg-gradient-to-r from-[#FFAC3A]/20 to-[#FFAC3A]/5 px-6 py-3 rounded-full border border-[#FFAC3A]/30">
                   <span className="text-[#FFAC3A] font-medium text-lg">
-                    의미 있는 인연과 아이디어를 나누는
+                    🔥 인맥 확장 • 새로운 기회 • 협업 파트너 발굴
                     <br />
-                    비즈니스 네트워킹
+                    <span className="text-sm text-white/90">
+                      지금 이 순간에도 누군가는 연결되고 있습니다
+                    </span>
                   </span>
                 </div>
               </div>
 
-              <div className="bg-black/40 backdrop-blur-md p-6 rounded-2xl shadow-inner border border-white/5">
+              <div className="bg-gradient-to-br from-[#FFAC3A]/10 via-black/40 to-black/60 backdrop-blur-md p-6 rounded-2xl shadow-inner border border-[#FFAC3A]/20">
                 <h4 className="text-xl font-bold mb-5 text-center text-white">
-                  혹시 이런 경험 있으신가요?
+                  🔥 지금 이 순간, 당신이 놓치고 있는 것들
                 </h4>
 
                 <div className="space-y-5">
                   <div className="flex items-start">
-                    <span className="text-[#FFAC3A] text-2xl mr-3">❝</span>
+                    <span className="text-[#FFAC3A] text-2xl mr-3">🚀</span>
                     <p className="text-base md:text-lg text-white/90">
                       <span className="text-[#FFAC3A] font-medium">
-                        네트워킹이라니, 어색하고 부담스럽지 않을까?
+                        다른 사람들은 이미 새로운 인연과 아이디어를 얻고 있다
                       </span>
                       <br />
                       <span className="text-sm text-white/70 mt-1 block">
-                        처음 만나는 사람들과의 대화가 부담스럽게 느껴지시나요?
+                        매주 목요일, 다양한 직업의 사람들과 깊은 대화를 나누고
+                        있어요
                       </span>
                     </p>
                   </div>
 
                   <div className="flex items-start">
-                    <span className="text-[#FFAC3A] text-2xl mr-3">❝</span>
+                    <span className="text-[#FFAC3A] text-2xl mr-3">💡</span>
                     <p className="text-base md:text-lg text-white/90">
                       <span className="text-[#FFAC3A] font-medium">
-                        술자리만 되어버리는 네트워킹 모임, 형식적인 만남
+                        N잡 시대, 새로운 일을 해볼까 고민하는 사람들이 모인다
                       </span>
                       <br />
                       <span className="text-sm text-white/70 mt-1 block">
-                        의미 있는 연결을 원하셨는데 기대에 미치지 못했던 경험이
-                        있으신가요?
+                        사이드 프로젝트부터 커리어 전환까지, 다양한 가능성을
+                        탐색하고 있어요
                       </span>
                     </p>
                   </div>
 
                   <div className="flex items-start">
-                    <span className="text-[#FFAC3A] text-2xl mr-3">❝</span>
+                    <span className="text-[#FFAC3A] text-2xl mr-3">⏰</span>
                     <p className="text-base md:text-lg text-white/90">
                       <span className="text-[#FFAC3A] font-medium">
-                        모임의 취지는 좋았는데 몰입하기 어려웠다
+                        &quot;나중에 해야지&quot;하는 동안 기회는 다른 사람에게
+                        간다
                       </span>
                       <br />
                       <span className="text-sm text-white/70 mt-1 block">
-                        루즈한 진행과 불분명한 목적으로 시간이 아깝게 느껴진
-                        적이 있으신가요?
+                        매회 선착순 마감되는 이유가 있습니다. 지금 결정하지
+                        않으면 놓쳐요
                       </span>
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-6 text-center">
-                  <p className="text-lg font-bold text-white">
-                    걱정 마세요, 나우서울은 다릅니다{" "}
-                    <span className="text-xl">✨</span>
+                <div className="mt-6 text-center bg-[#FFAC3A]/10 p-4 rounded-xl border border-[#FFAC3A]/30">
+                  <p className="text-lg font-bold text-[#FFAC3A] mb-2">
+                    ⚡ 지금 신청하지 않으면 후회할 것들
+                  </p>
+                  <p className="text-sm text-white/90">
+                    새로운 관점 • 다양한 인맥 • 영감과 아이디어 • 성장 기회
                   </p>
                 </div>
               </div>
@@ -532,39 +587,55 @@ export default function RealGeniusPage() {
                   />
                 </div>
 
-                <p className="text-base font-bold pb-[40px] pt-[20px]">
-                  &quot;의미 있는 네트워킹을 통한 전문가 커뮤니티&quot;
+                <p className="text-lg font-bold pb-[40px] pt-[20px] text-center leading-relaxed">
+                  <span className="text-[#FFAC3A] text-xl">
+                    매주 목요일, 누군가는 새로운 기회를 잡고 있다
+                  </span>
                   <br />
-                  가치 있는 연결이 만들어지는 곳
+                  <span className="text-white text-lg">
+                    다음 주인공은 당신일 수도 있습니다
+                  </span>
                   <br />
-                  <br />
-                  &quot;진정한 연결과 성장&quot;이 우리의 가치입니다
+                  <span className="text-white/80 text-base">
+                    지금 결정하지 않으면 놓쳐요 ⏰
+                  </span>
                 </p>
               </div>
             </div>
 
             {/* 포인트 1 섹션 */}
-            <div className="mb-10 bg-[#101F50]/10 backdrop-blur-[30px] p-6 rounded-xl border border-[#101F50]/50">
+            <div className="mb-10 bg-gradient-to-br from-[#FFAC3A]/15 via-[#101F50]/10 to-black/60 backdrop-blur-[30px] p-6 rounded-xl border border-[#FFAC3A]/30">
               <div className="mb-4 inline-block">
                 <h3 className="text-xl font-extrabold text-[#FFAC3A]">
                   Point.1
                 </h3>
               </div>
               <h4 className="text-xl font-bold text-white mb-4">
-                밀도 높은 네트워킹 설계
+                🌟 새로운 인연과 아이디어를 만나는 곳
+                <span className="text-[#FFAC3A] text-sm block mt-2 font-medium">
+                  ※ 3년차 이상 경력자만 참여 가능 (더 깊이 있는 대화를 위해)
+                </span>
               </h4>
               <p className="mb-4">
-                기존 비즈니스 모임의 얕은 대화, 제한된 네트워크, 술자리 중심
-                문화에서 벗어나{" "}
                 <span className="font-bold text-[#FFAC3A]">
-                  진정한 네트워킹의 가치
-                </span>
-                에 집중합니다.
+                  &quot;다른 사람들은 어떻게 살고 있을까?&quot;
+                </span>{" "}
+                궁금하셨나요?
+                <br />
+                개발자, 디자이너, 마케터, 기획자들의{" "}
+                <span className="font-bold text-[#FFAC3A]">진짜 이야기</span>를
+                들어보세요.
               </p>
               <p className="mb-4">
-                자체 개발 앱으로 프로필 카드를 작성하고, 다양한 직무의
-                참가자들과 효과적으로 만날 수 있도록 자리를 배치합니다. 관심사가
-                비슷한 사람들을 쉽게 찾을 수 있어 의미 있는 연결이 가능합니다.
+                &quot;나도 혹시 부업을 시작할 수 있을까?&quot; &quot;사이드
+                프로젝트는 어떻게 하는 거지?&quot;
+                <br />
+                이런 궁금증이 있으시다면 완벽한 자리입니다.
+                <span className="font-bold text-[#FFAC3A]">
+                  {" "}
+                  새로운 관점과 영감
+                </span>
+                을 얻어가세요.
               </p>
 
               {/* 이미지 추가 - img 태그로 변경 */}
@@ -580,15 +651,23 @@ export default function RealGeniusPage() {
                 />
               </div>
 
-              <p className="text-lg font-bold text-center text-[#FFAC3A] mt-6">
-                &quot;내가 성장하고, 남도 성장시키는&quot;
-                <br />
-                밀도 높은 커뮤니티 🤝
-              </p>
+              <div className="text-center mt-6 bg-[#FFAC3A]/10 p-4 rounded-xl border border-[#FFAC3A]/30">
+                <p className="text-lg font-bold text-[#FFAC3A] mb-2">
+                  💭 이런 생각 해보신 적 있나요?
+                </p>
+                <p className="text-sm text-white/90">
+                  &quot;다른 직업 사람들은 어떻게 생각하지?&quot; • &quot;나도
+                  뭔가 시작해볼까?&quot; • &quot;새로운 영감이 필요해&quot;
+                  <br />
+                  <span className="font-bold text-[#FFAC3A] text-base mt-2 block">
+                    바로 여기서 답을 찾을 수 있어요 ✨
+                  </span>
+                </p>
+              </div>
             </div>
 
             {/* 포인트 2 섹션 */}
-            <div className="mb-10 bg-[#101F50]/10 backdrop-blur-[30px] p-6 rounded-xl border border-[#101F50]/50">
+            <div className="mb-10 bg-gradient-to-br from-[#FFAC3A]/15 via-[#101F50]/10 to-black/60 backdrop-blur-[30px] p-6 rounded-xl border border-[#FFAC3A]/30">
               <div className="mb-4 inline-block">
                 <h3 className="text-xl font-extrabold text-[#FFAC3A]">
                   Point.2
@@ -700,47 +779,6 @@ export default function RealGeniusPage() {
               </div>
             </div>
 
-            {/* 포인트 3 섹션 */}
-            <div className="mb-10 bg-[#101F50]/10 backdrop-blur-[30px] p-6 rounded-xl border border-[#101F50]/50">
-              <div className="mb-4 inline-block">
-                <h3 className="text-xl font-extrabold text-[#FFAC3A]">
-                  Point.3
-                </h3>
-              </div>
-              <h4 className="text-xl font-bold text-white mb-4">
-                지속 가능한 커뮤니티
-              </h4>
-              <p className="mb-5">
-                나우서울 Meet Up은 일회성 모임이 아닌, 지속적인 관계 형성을
-                목표로 합니다. 첫 만남 이후에도 참가자들 간의 연결을 유지할 수
-                있는 다양한 채널과 후속 이벤트를 제공합니다.
-              </p>
-
-              <div className="bg-white/5 p-5 rounded-xl mb-6">
-                <h5 className="font-bold text-[#FFAC3A] mb-3">
-                  네트워킹 후속 지원
-                </h5>
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <span className="text-[#FFAC3A] mr-2">•</span>
-                    <span>참가자 연락처 공유 시스템 (선택적)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-[#FFAC3A] mr-2">•</span>
-                    <span>커뮤니티 온라인 그룹 초대</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-[#FFAC3A] mr-2">•</span>
-                    <span>다음 Meet Up 및 관련 이벤트 우선 알림</span>
-                  </li>
-                </ul>
-              </div>
-
-              <p className="text-lg font-bold text-center text-[#FFAC3A] mt-6">
-                &quot;한 번의 만남, 지속적인 연결, 함께하는 성장&quot;
-              </p>
-            </div>
-
             {/* 고객 후기 섹션 */}
             <div className="my-20">
               <h2 className="text-2xl font-bold text-center mb-12 text-white">
@@ -822,7 +860,7 @@ export default function RealGeniusPage() {
                       Q1: 네트워킹이 너무 어색하지 않을까요? 처음인데
                       괜찮을까요?
                     </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-light">
+                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
                       걱정 마세요! 저희{" "}
                       <span className="font-bold">나우서울</span>의 모든 밋업은
                       &apos;자연스러운 연결&apos;을 모토로 설계되었습니다.
@@ -838,7 +876,7 @@ export default function RealGeniusPage() {
                     <h3 className="text-lg md:text-xl font-bold text-white mb-3">
                       Q2: 혼자 참여해도 괜찮을까요? 어색할 것 같아요.
                     </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-light">
+                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
                       물론입니다! 대부분의 참가자가 혼자 오십니다. 저희 밋업은
                       소규모 그룹(4~6명)으로 진행되어 모두가 균등하게 발언
                       기회를 갖고, 서로의 이야기에 귀 기울일 수 있는 환경을
@@ -852,7 +890,7 @@ export default function RealGeniusPage() {
                     <h3 className="text-lg md:text-xl font-bold text-white mb-3">
                       Q3: 일반적인 비즈니스 미팅과는 어떤 차별점이 있나요?
                     </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-light">
+                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
                       일반 비즈니스 미팅은 종종 형식적이고 표면적인 관계에
                       그치지만,
                       <span className="font-bold"> 나우서울</span> 밋업은 진정성
@@ -869,14 +907,27 @@ export default function RealGeniusPage() {
                     <h3 className="text-lg md:text-xl font-bold text-white mb-3">
                       Q4: 어떤 사람들이 주로 참여하나요? 분위기는 어떤가요?
                     </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-light">
-                      디자인, 개발, 마케팅, 기획, 비즈니스 등 다양한 분야의
-                      전문가들이 참여합니다. 주니어부터 시니어까지 다양한 경력의
-                      참가자들이 모이지만, 공통점은 성장과 협업에 대한 열린
-                      태도를 가진 분들이라는 점입니다. 분위기는 진지하면서도
-                      편안하고, 상호 존중하는 환경에서 유익한 대화가 오가는 것이
-                      특징입니다. 평균적으로 25-40세 전문가들이 많이 참여하시며,
-                      매 회 새로운 만남을 경험하실 수 있습니다.
+                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
+                      3년차 이상의 디자인, 개발, 마케팅, 기획, 비즈니스 등
+                      다양한 분야 전문가들이 참여합니다. 공통점은 새로운 것에
+                      대한 호기심과 성장 욕구를 가진 분들이라는 점이에요.
+                      분위기는 진지하면서도 편안하고, 서로의 이야기에 귀
+                      기울이며 자연스럽게 대화가 이어집니다. 25-40세 직장인들이
+                      많이 참여하시며, 매회 새로운 관점과 인사이트를 얻어가실 수
+                      있습니다.
+                    </p>
+                  </div>
+
+                  {/* Q5 */}
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
+                      Q5: 술과 음식을 제공하나요?
+                    </h3>
+                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
+                      간단한 다과와 음료만 제공됩니다. 술과 음식보다 훨씬 가치
+                      있는 사람들과, 그들에게 집중할 수 있는 콘텐츠를
+                      준비했습니다. 깊이 알아가는 이야기 꽃을 피울 텐데, 인근 찐
+                      맛집으로 이야기 더 나누러 가시죠! 😊
                     </p>
                   </div>
                 </div>
@@ -892,12 +943,12 @@ export default function RealGeniusPage() {
               href="https://form.ssobig.com/nowseoul"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full h-[56px] bg-[#101F50] hover:bg-[#0A1838] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg"
+              className="w-full h-[56px] bg-[#101F50] hover:bg-[#0A1838] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg shadow-lg hover:shadow-xl"
               brandPage="now_seoul"
               buttonType="meetup_main_cta"
               destination="smore_form"
             >
-              나우서울 참여하기
+              🔥 지금 기회 잡기 (선착순 마감)
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"
