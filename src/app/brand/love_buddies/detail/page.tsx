@@ -5,6 +5,7 @@ import Script from "next/script";
 import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
 import { useState, useEffect } from "react";
+import { FAQSection } from "../../../../components/FAQ";
 
 interface ScheduleItem {
   date: string;
@@ -344,7 +345,7 @@ export default function LoveBuddiesDetailPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/일일남매 상세1.jpg"
+                src="/ssobig_assets/상세_1.png"
                 alt="일일남매 상세 1"
                 width={620}
                 height={1200}
@@ -359,7 +360,7 @@ export default function LoveBuddiesDetailPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/일일남매 상세 2.png"
+                src="/ssobig_assets/상세_2.png"
                 alt="일일남매 상세 2"
                 width={620}
                 height={1200}
@@ -368,6 +369,51 @@ export default function LoveBuddiesDetailPage() {
                 className="rounded-none"
               />
             </div>
+          </div>
+
+          {/* FAQ 섹션 */}
+          <div className="w-full mt-6 mb-20">
+            <FAQSection
+              title="💕 자주 묻는 질문"
+              questions={[
+                {
+                  question: "[러브버디즈]는 어떻게 신청하나요?",
+                  answer:
+                    "페이지 하단의 <러브버디즈 참여하기> 버튼을 클릭하고<br/>양식에 맞춰 답변을 제출해주시면 됩니다!<br/>신청 후 발송되는 안내 문자에 따라 결제까지 마쳐주셔야 최종 신청 완료이니,<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>꼭 안내 문자 확인 후 결제 부탁드립니다!</strong>",
+                },
+                {
+                  question: "[러브버디즈] 참가자 무드가 궁금해요!",
+                  answer:
+                    '<strong>"다정한 사람들과 함께 행복하지기"</strong><br/><br/>저희의 꿈을 실현하기 위해 러브버디즈의 모든 콘텐츠는 승인제로 운영됩니다.<br/><br/>참가하시는 분께서 신청해주실 때 사전 질문에 대한 답변과 매력이 드러난 사진을 보내주시게 되요.<br/><br/>저희는 24시간 내로 세심하게 꼼꼼히 읽어보고,<br/>러브버디즈와 결이 맞는 분들만 모실 수 있도록 최선을 다해요.<br/><br/>앞으로도,여러분의 소중한 시간과 마음을 위해 믿고 올 수 있는 모임을 만들게요 : )',
+                },
+                {
+                  question: "[러브버디즈] 지각시 참여가 어렵나요?",
+                  answer:
+                    "사전에 고지 드렸듯이 모임 15분 이후에는 참여가 매우 어렵습니다.<br/><br/>콘텐츠가 촘촘하게 구성되어 중간부터 참여하기가 어려운 구조입니다.<br/>다른 분들이 이미 현장에서 기다리고 계서 모임이 지연되는걸 막고자<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>최대 15분까지</strong> 진행 대기 후 모임을 시작하고 있습니다.<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>지각의 경우 환불은 불가능</strong>하니곡 시간에 맞춰 현장에 도착부탁드립니다 : )",
+                },
+                {
+                  question:
+                    "[러브버디즈] 다른 참가자 연락처가 궁금해요! or 연락처 전달이 가능한가요?",
+                  answer:
+                    "모임이 완료되면 참가자분들이 신청 시 제출한 데이터 중<br/>필수 데이터(성함, 전화번호)를 제외한 모든 정보가 폐기처리되어<br/>따로 식별할 수 있는 방법이 없습니다ㅠㅠ.<br/><br/>또한 개인정보 문제상 다른 참가자분들의 정보를 임의로 전달해드리는<br/>어려운 점 양해 부탁드립니다.",
+                },
+                {
+                  question: "모임 공지와 장소는 어떻게 확인하나요?",
+                  answer:
+                    "모임은 전용 웹앱을 통해 진행됩니다.<br/>모임 전용 웹앱 링크에 접속하시면 장소 및 공지를 확인하실 수 있으니<br/>꼭 접속 후 확인 부탁드립니다!<br/>모임 링크는 모임 하루 전날 일괄 전송드리고 있습니다 :)",
+                },
+                {
+                  question: "음식과 술을 주나요?",
+                  answer:
+                    "저희 모임은 서로를 알아가는 시간에 최대한 집중할 수 있도록<br/>콘텐츠에 많은 신경을 썼어요!<br/><br/>몰입을 위해 모임중엔 음식이 따로 제공되지 않고<br/>모임이 끝난 뒤, 희망자에 한해 2차 장소로 이동해<br/>식사 및 주류를 즐기는 시간을 가져요 :)<br/><br/>가능하시면 식사를 하고 오시는걸 추천해요!<br/>(간단한 다과류와 물은 구비되어 있습니다😊)",
+                },
+                {
+                  question: "정확히 종료시간에 끝나나요?",
+                  answer:
+                    "모임은 2시간 30분 정도 진행합니다!<br/><br/>다만, 당일 상황에 따라 약간의 변동이 있을 수 있어요.<br/>모임 특성상 시간이 지날수록 점점 더 궁금한 사람이 많아지실 거에요!<br/>끝나고 2차에 많이 가시니까 스케줄에 참고해주시면 좋아요 : )",
+                },
+              ]}
+            />
           </div>
         </div>
 
