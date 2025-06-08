@@ -589,7 +589,8 @@ export default function DemoDayPage() {
                     </h3>
                     <p className="text-sm md:text-base text-[#F4F4F4] font-light">
                       아니요, 현장에서 설명해드립니다. 다만 미리 확인하고
-                      싶으시다면 신청 링크에서 출품작 정보를 확인하실 수 있어요.
+                      싶으시다면 위의 출품작 리스트에서 게임 정보를 확인하실 수
+                      있어요.
                     </p>
                   </div>
                 </div>
