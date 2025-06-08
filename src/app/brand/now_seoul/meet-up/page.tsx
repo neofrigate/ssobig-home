@@ -4,6 +4,7 @@ import Image from "next/image";
 import Script from "next/script";
 import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
+import { FAQSection } from "../../../../components/FAQ";
 import { useState, useEffect } from "react";
 
 interface ScheduleItem {
@@ -19,6 +20,55 @@ interface ScheduleItem {
   };
   maxCapacity: number;
 }
+
+// FAQ 질문 데이터
+const faqQuestions = [
+  {
+    question: "[나우서울]은 어떻게 신청하나요?",
+    answer:
+      "페이지 하단의 <지금 기회 잡기> 버튼을 클릭하고<br/>양식에 맞춰 답변을 제출해주시면 됩니다!<br/>신청 후 발송되는 안내 문자에 따라 결제까지 마쳐주셔야 최종 신청 완료이니,<br/>꼭 안내 문자 확인 후 결제 부탁드립니다!",
+  },
+  {
+    question: "[나우서울] 네트워킹, 혼자 참여 가능한가요?",
+    answer:
+      "물론입니다! 대부분의 참가자가 혼자 오십니다.<br/>저희 밋업은 소규모 그룹(4~6명)으로 진행되어 모두가 균등하게 발언 기회를 갖고, 서로의 이야기에 귀 기울일 수 있는 환경을 제공합니다.<br/>오히려 혼자 오시면 더 다양한 분들과 새로운 관계를 맺을 수 있어<br/>네트워킹 효과가 극대화됩니다!",
+  },
+  {
+    question: "[나우서울] 어떤 분들이 참여하시나요?",
+    answer:
+      "3년차 이상의 디자인, 개발, 마케팅, 기획, 비즈니스 등<br/>다양한 분야 전문가들이 참여합니다.<br/>공통점은 새로운 것에 대한 호기심과 성장 욕구를 가진 분들이라는 점이에요.<br/>분위기는 진지하면서도 편안하고,<br/>서로의 이야기에 귀 기울이며 자연스럽게 대화가 이어집니다.<br/>25-40세 직장인들이 많이 참여하시며, 매회 새로운 관점과 인사이트를 얻어가실 수 있습니다.",
+  },
+  {
+    question: "[나우서울] 다른 네트워킹과의 차별점이 무엇인가요?",
+    answer:
+      "일반 비즈니스 미팅은 종종 형식적이고 표면적인 관계에 그치지만,<br/>나우서울 밋업은 진정성 있는 관계 형성에 중점을 둡니다.<br/><br/>30분 룰로 깊이 있는 대화와 다양한 관점을 경험할 수 있으며,<br/>철저히 참가자 중심의 설계로 모든 분이 가치 있는 연결을 만들어갑니다.<br/><br/>실제 프로젝트 협업, 멘토링, 정보 교류까지 이어지는 실질적인 네트워킹이 이루어집니다.",
+  },
+  {
+    question: "네트워킹이 너무 어색하지 않을까요? 처음인데 괜찮을까요?",
+    answer:
+      "걱정 마세요! 저희 나우서울의 모든 밋업은<br/>'자연스러운 연결'을 모토로 설계되었습니다.<br/>체계적인 세션 구성과 전문 퍼실리테이터의 가이드로 대화가 자연스럽게 이어집니다.<br/>관심사와 직무 기반 테이블 매칭으로 공통 주제부터 대화를 시작할 수 있어<br/>어색함이 빠르게 사라진답니다.",
+  },
+  {
+    question: "지각 시 참여가 어려나요?",
+    answer:
+      "사전에 고지 드렸듯이 모임 15분 이후에는 참여가 매우 어렵습니다.<br/><br/>콘텐츠가 촘촘하게 구성되어 중간부터 참여하기가 어려운 구조입니다.<br/>다른 분들이 이미 현장에서 기다리고 계셔 모임이 지연되는걸 막고자<br/><strong style='background-color: #FFAC3A; color: black; padding: 2px 4px; border-radius: 4px;'>최대 15분까지</strong> 진행 대기 후 모임을 시작하고 있습니다.<br/><strong style='background-color: #FFAC3A; color: black; padding: 2px 4px; border-radius: 4px;'>지각의 경우 환불은 불가능</strong>하니 꼭 시간에 맞춰 현장에 도착 부탁드립니다 : )",
+  },
+  {
+    question: "음식과 술을 제공하나요?",
+    answer:
+      "간단한 다과와 음료만 제공됩니다.<br/>술과 음식보다 훨씬 가치 있는 사람들과, 그들에게 집중할 수 있는 콘텐츠를 준비했습니다.<br/><br/>몰입을 위해 모임중엔 음식이 따로 제공되지 않고<br/>모임이 끝난 뒤, 희망자에 한해 2차 장소로 이동해<br/>식사 및 주류를 즐기는 시간을 가져요 :)<br/><br/>깊이 알아가는 이야기 꽃을 피울 텐데, 인근 찐 맛집으로 이야기 더 나누러 가시죠! 😊",
+  },
+  {
+    question: "정확한 종료시간에 끝나나요?",
+    answer:
+      "모임은 2시간 30분 정도 진행됩니다!<br/><br/>다만, 당일 상황에 따라 약간의 변동이 있을 수 있어요.<br/>모임 특성상 시간이 지날수록 점점 더 궁금한 사람이 많아지실 거예요!<br/>끝나고 2차에 많이 가시니까 스케줄에 참고해주시면 좋아요 :)",
+  },
+  {
+    question: "모임 공지와 장소는 어떻게 확인하나요?",
+    answer:
+      "모임은 전용 웹앱을 통해 진행됩니다.<br/>모임 전용 웹앱 링크에 접속하시면 장소 및 공지를 확인하실 수 있으니<br/>꼭 접속 후 확인 부탁드립니다!<br/>모임 링크는 모임 하루 전날 카카오톡으로 일괄 전송드리고 있습니다 :)",
+  },
+];
 
 export default function RealGeniusPage() {
   const [scheduleData, setScheduleData] = useState([
@@ -845,94 +895,40 @@ export default function RealGeniusPage() {
             {/* 연합어때 이미지 */}
             <div className="w-full my-24"></div>
 
-            {/* FAQ 섹션 */}
+            {/* 신청 전 최종 확인 내용 */}
             <div className="mb-16">
-              {/* Single FAQ box for all questions */}
               <div className="bg-white/10 backdrop-blur-[30px] p-4 md:p-6 rounded-xl">
-                <h2 className="text-2xl font-bold text-center mb-8">
-                  자주 묻는 질문들
+                <h2 className="text-xl font-bold mb-4 text-center">
+                  신청 전 최종 확인 내용
                 </h2>
-
-                <div className="space-y-8">
-                  {/* Q1 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q1: 네트워킹이 너무 어색하지 않을까요? 처음인데
-                      괜찮을까요?
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
-                      걱정 마세요! 저희{" "}
-                      <span className="font-bold">나우서울</span>의 모든 밋업은
-                      &apos;자연스러운 연결&apos;을 모토로 설계되었습니다.
-                      체계적인 세션 구성과 전문 퍼실리테이터의 가이드로 대화가
-                      자연스럽게 이어집니다. 관심사와 직무 기반 테이블 매칭으로
-                      공통 주제부터 대화를 시작할 수 있어 어색함이 빠르게
-                      사라진답니다.
-                    </p>
+                <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row justify-between border-b border-white/10 pb-2">
+                    <span className="font-bold text-[#FFAC3A]">
+                      참가자 지각
+                    </span>
+                    <span>
+                      당일 지각 시간 정확히 나우서울 서비스센터에 알림! 15분
+                      지각 이후 입장 불가
+                    </span>
                   </div>
-
-                  {/* Q2 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q2: 혼자 참여해도 괜찮을까요? 어색할 것 같아요.
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
-                      물론입니다! 대부분의 참가자가 혼자 오십니다. 저희 밋업은
-                      소규모 그룹(4~6명)으로 진행되어 모두가 균등하게 발언
-                      기회를 갖고, 서로의 이야기에 귀 기울일 수 있는 환경을
-                      제공합니다. 오히려 혼자 오시면 더 다양한 분들과 새로운
-                      관계를 맺을 수 있어 네트워킹 효과가 극대화됩니다!
-                    </p>
+                  <div className="flex flex-col md:flex-row justify-between border-b border-white/10 pb-2">
+                    <span className="font-bold text-[#FFAC3A]">소요시간</span>
+                    <span>2시간 30분 ~ 3시간</span>
                   </div>
-
-                  {/* Q3 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q3: 일반적인 비즈니스 미팅과는 어떤 차별점이 있나요?
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
-                      일반 비즈니스 미팅은 종종 형식적이고 표면적인 관계에
-                      그치지만,
-                      <span className="font-bold"> 나우서울</span> 밋업은 진정성
-                      있는 관계 형성에 중점을 둡니다. 30분 룰로 깊이 있는 대화와
-                      다양한 관점을 경험할 수 있으며, 철저히 참가자 중심의
-                      설계로 모든 분이 가치 있는 연결을 만들어갑니다. 실제
-                      프로젝트 협업, 멘토링, 정보 교류까지 이어지는 실질적인
-                      네트워킹이 이루어집니다.
-                    </p>
+                  <div className="flex flex-col md:flex-row justify-between border-b border-white/10 pb-2">
+                    <span className="font-bold text-[#FFAC3A]">제공사항</span>
+                    <span>체계적인 네트워킹 콘텐츠, 다과 및 음료</span>
                   </div>
-
-                  {/* Q4 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q4: 어떤 사람들이 주로 참여하나요? 분위기는 어떤가요?
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
-                      3년차 이상의 디자인, 개발, 마케팅, 기획, 비즈니스 등
-                      다양한 분야 전문가들이 참여합니다. 공통점은 새로운 것에
-                      대한 호기심과 성장 욕구를 가진 분들이라는 점이에요.
-                      분위기는 진지하면서도 편안하고, 서로의 이야기에 귀
-                      기울이며 자연스럽게 대화가 이어집니다. 25-40세 직장인들이
-                      많이 참여하시며, 매회 새로운 관점과 인사이트를 얻어가실 수
-                      있습니다.
-                    </p>
-                  </div>
-
-                  {/* Q5 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q5: 술과 음식을 제공하나요?
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-normal">
-                      간단한 다과와 음료만 제공됩니다. 술과 음식보다 훨씬 가치
-                      있는 사람들과, 그들에게 집중할 수 있는 콘텐츠를
-                      준비했습니다. 깊이 알아가는 이야기 꽃을 피울 텐데, 인근 찐
-                      맛집으로 이야기 더 나누러 가시죠! 😊
-                    </p>
+                  <div className="flex flex-col md:flex-row justify-between border-b border-white/10 pb-2">
+                    <span className="font-bold text-[#FFAC3A]">준비물품</span>
+                    <span>충전된 폰, 명함 (선택)</span>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* FAQ 섹션 */}
+            <FAQSection questions={faqQuestions} />
           </div>
         </div>
 

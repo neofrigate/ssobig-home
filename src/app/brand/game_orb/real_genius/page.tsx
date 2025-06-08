@@ -4,6 +4,7 @@ import Image from "next/image";
 import Script from "next/script";
 import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
+import { FAQSection } from "../../../../components/FAQ";
 import { useState, useEffect } from "react";
 
 interface ScheduleItem {
@@ -17,6 +18,55 @@ interface ScheduleItem {
   };
   maxCapacity: number;
 }
+
+// FAQ 질문 데이터
+const faqQuestions = [
+  {
+    question: "어떻게 신청하나요?",
+    answer:
+      "페이지 하단의 <지금 바로 참여하기> 버튼을 클릭하고<br/>양식에 맞춰 답변을 제출해주시면 됩니다!<br/>신청 후 발송되는 안내 문자에 따라 결제까지 마쳐주셔야 최종 신청 완료이니,<br/>꼭 안내 문자 확인 후 결제 부탁드립니다!",
+  },
+  {
+    question: "혼자 참여 가능한가요?",
+    answer:
+      "물론이죠!<br/>대부분 혼자 오시고, 오히려 새로운 사람들과 게임하다 보면 금방 친해지세요!<br/>익명성과 '함께 게임을 즐긴다'는 목표가 어색함을 눈 녹이듯 사라지게 할 거예요.<br/>새로운 찐친을 만들 절호의 기회!",
+  },
+  {
+    question: "어떤 분들이 참여하시나요?",
+    answer:
+      "정말 다양하고 매력적인 분들이 많이 찾아주세요!<br/>게임을 좋아하고, 새로운 사람들과의 즐거운 만남을 기대하는 긍정적이고 유쾌한 분들이 대부분입니다.<br/>분위기는 늘 화기애애하고 웃음이 넘쳐요! <br/>걱정 말고 오셔서 함께 즐겨요!",
+  },
+  {
+    question: "지각 시 참여가 어려나요?",
+    answer:
+      "사전에 고지 드렸듯이 모임 15분 이후에는 참여가 매우 어렵습니다.<br/><br/>콘텐츠가 촘촘하게 구성되어 중간부터 참여하기가 어려운 구조입니다.<br/>다른 분들이 이미 현장에서 기다리고 계셔 모임이 지연되는걸 막고자<br/><strong style='background-color: #9E4BED; color: white; padding: 2px 4px; border-radius: 4px;'>최대 15분까지</strong> 진행 대기 후 모임을 시작하고 있습니다.<br/><strong style='background-color: #9E4BED; color: white; padding: 2px 4px; border-radius: 4px;'>지각의 경우 환불은 불가능</strong>하니 꼭 시간에 맞춰 현장에 도착 부탁드립니다 : )",
+  },
+  {
+    question: "방송처럼 경쟁이 너무 치열할까봐 걱정대요!",
+    answer:
+      "TV 프로그램의 흥미로운 요소(전략, 심리)는 가져오지만,<br/>게임오브는 '소셜 활동'에 훨씬 더 큰 방점을 찍고 있어요!<br/><br/>물론 게임의 긴장감과 반전의 묘미는 살아있지만,<br/>모두가 함께 즐기고 좋은 관계를 형성하는 것이 저희의 최우선 목표입니다.<br/><br/>과도한 스트레스보다는 유쾌한 심리전과 빛나는 협동을 즐겨주세요!<br/>(맘 놓고 빡겜할 수 있는 '빡크게임'은 별도로 준비할 예정이에요!<br/>지금의 소셜지니어스에서는 '다 함께 재밌게' 즐기는 데 중점을 뒀습니다! 🔥⬅😊)",
+  },
+  {
+    question: "게임 잘 못하는데 괜찮을까요?",
+    answer:
+      "걱정 마세요!<br/>저희 게임오브의 모든 게임은 '쉽고 재미있게!'를 모토로 만들어졌습니다.<br/>게임 시작 전 충분한 설명과 연습 시간도 드리고,<br/>진행자가 친절하게 도와드릴 거예요. 핵심은 좋은 사람들과 재밌는 소통!",
+  },
+  {
+    question: "음식과 술을 쥬시오?",
+    answer:
+      "저희 모임은 서로를 알아가는 시간에 최대한 집중할 수 있도록<br/>콘텐츠에 많은 신경을 썼어요!<br/><br/>몰입을 위해 모임중엔 음식이 따로 제공되지 않고<br/>모임이 끝난 뒤, 희망자에 한해 2차 장소로 이동해<br/>식사 및 주류를 즐기는 시간을 가져요 :)<br/><br/>가능하시다면 식사를 하고 오시는걸 추천해요!<br/>(간단한 다과류와 물은 구비되어 있습니다😊)",
+  },
+  {
+    question: "정확시 종료시간에 끝나나요?",
+    answer:
+      "모임은 2시간 30분 정도 진행됩니다!<br/><br/>다만, 당일 상황에 따라 약간의 변동이 있을 수 있어요.<br/>모임 특성상 시간이 지날수록 점점 더 궁금한 사람이 많아지실 거예요!<br/>끝나고 2차에 많이 가시니까 스케줄에 참고해주시면 좋아요 :)",
+  },
+  {
+    question: "모임 공지와 장소는 어떻게 확인하나요?",
+    answer:
+      "모임은 전용 웹앱을 통해 진행됩니다.<br/>모임 전용 웹앱 링크에 접속하시면 장소 및 공지를 확인하실 수 있으니<br/>꼭 접속 후 확인 부탁드립니다!<br/>모임 링크는 모임 하루 전날 톡립톡으로 일괄 전송드리고 있습니다 :)",
+  },
+];
 
 export default function RealGeniusPage() {
   const [scheduleData, setScheduleData] = useState<ScheduleItem[]>([]);
@@ -653,9 +703,6 @@ export default function RealGeniusPage() {
                           <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
                             EASY
                           </span>
-                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                            MID
-                          </span>
                         </div>
                       </div>
                       <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
@@ -693,7 +740,7 @@ export default function RealGeniusPage() {
                             </div>
                           </div>
                           <div className="text-xs text-gray-300 text-right">
-                            <span>12~30명</span>
+                            <span>12~24명</span>
                           </div>
                         </div>
                       </div>
@@ -792,7 +839,7 @@ export default function RealGeniusPage() {
                     <div className="w-full aspect-[3/4] relative">
                       <Image
                         src="/ssobig_assets/바이너리.png"
-                        alt="??????"
+                        alt="바이너리"
                         fill
                         style={{ objectFit: "cover" }}
                       />
@@ -804,9 +851,6 @@ export default function RealGeniusPage() {
                           <span className="font-bold text-white">바이너리</span>
                         </div>
                         <div className="flex gap-1 justify-end">
-                          <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                            EASY
-                          </span>
                           <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
                             MID
                           </span>
@@ -852,6 +896,15 @@ export default function RealGeniusPage() {
                         </div>
                       </div>
                     </div>
+                    {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
+                    <LinkWithUtm
+                      href="https://www.instagram.com/p/DKl3Ev6PqzK"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
+                    >
+                      자세히 보기
+                    </LinkWithUtm>
                   </div>
 
                   {/* 이중 스파이 카드 */}
@@ -1004,77 +1057,6 @@ export default function RealGeniusPage() {
             {/* 연합어때 이미지 */}
             <div className="w-full my-24"></div>
 
-            {/* FAQ 섹션 */}
-            <div className="mb-16">
-              {/* Single FAQ box for all questions */}
-              <div className="bg-white/10 backdrop-blur-[30px] p-4 md:p-6 rounded-xl">
-                <h2 className="text-2xl font-bold text-center mb-8">
-                  자주 묻는 질문들
-                </h2>
-
-                <div className="space-y-8">
-                  {/* Q1 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q1: 게임이 너무 어렵지 않을까요? 처음인데 괜찮을까요?
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-light">
-                      걱정 마세요! 저희{" "}
-                      <span className="font-bold">게임오브</span>의 모든 게임은
-                      &apos;쉽고 재미있게!&apos;를 모토로 만들어졌습니다. 게임
-                      시작 전 충분한 설명과 연습 시간도 드리고, 호스트가
-                      친절하게 도와드릴 거예요. 핵심은 두뇌 풀가동과 즐거운
-                      소통!
-                    </p>
-                  </div>
-
-                  {/* Q2 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q2: 혼자 참여해도 괜찮을까요? 어색할 것 같아요.
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-light">
-                      물론이죠! 대부분 혼자 오시고, 오히려 새로운 사람들과 팀도
-                      되고 게임하다 보면 금방 친해지세요! 익명성과 &apos;함께
-                      게임을 즐긴다&apos;는 공통의 목표가 어색함을 눈 녹이듯
-                      사라지게 할 거예요. 새로운 찐친을 만들 절호의 기회!
-                    </p>
-                  </div>
-
-                  {/* Q3 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q3: 방송처럼 경쟁이 너무 치열하고 배신이 중요할까요?
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-light">
-                      TV 프로그램의 흥미로운 요소(전략, 심리)는 가져오지만,{" "}
-                      <span className="font-bold">게임오브</span>는
-                      &apos;소셜링&apos;에 훨씬 더 큰 방점을 찍고 있어요! 물론
-                      게임의 긴장감과 반전의 묘미는 살아있지만, 모두가 함께
-                      즐기고 좋은 관계를 형성하는 것이 저희의 최우선 목표입니다.
-                      과도한 스트레스보다는 유쾌한 심리전과 빛나는 협동을
-                      즐겨주세요! (&apos;맘 놓고 빡겜할 수 있는&apos; 모드는
-                      별도로 준비할 예정이에요! 소셜지니어스에서는 &apos;다 함께
-                      즐겁게&apos; 즐기는 데 중점을 뒀습니다! 🔥➡️😊)
-                    </p>
-                  </div>
-
-                  {/* Q4 */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-3">
-                      Q4: 어떤 사람들이 주로 오나요? 분위기는 어떤가요?
-                    </h3>
-                    <p className="text-sm md:text-base text-[#F4F4F4] font-light">
-                      정말 다양하고 매력적인 분들이 많이 찾아주세요! 게임을
-                      좋아하고, 새로운 사람들과의 즐거운 만남을 기대하는
-                      긍정적이고 유쾌한 분들이 대부분입니다. 분위기는 늘
-                      화기애애하고 웃음이 넘쳐요! 걱정 말고 오셔서 함께 즐겨요!
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* 신청 전 최종 확인 내용 */}
             <div className="mb-16">
               <div className="bg-white/10 backdrop-blur-[30px] p-4 md:p-6 rounded-xl">
@@ -1117,6 +1099,9 @@ export default function RealGeniusPage() {
                 </div>
               </div>
             </div>
+
+            {/* FAQ 섹션 */}
+            <FAQSection questions={faqQuestions} />
           </div>
         </div>
 
