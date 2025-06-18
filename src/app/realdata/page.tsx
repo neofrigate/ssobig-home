@@ -190,8 +190,8 @@ export default function RealDataPage() {
     
     // 나우서울 이벤트
     nowSeoulData.forEach(schedule => {
-      // 나우서울은 제목에서 날짜를 파싱해야 함
-      const dateMatch = schedule.title.match(/(\d+)월\s*(\d+)일/);
+      // 나우서울은 date 필드에서 날짜를 파싱 (예: "12월 25일")
+      const dateMatch = schedule.date.match(/(\d+)월\s*(\d+)일/);
       if (dateMatch) {
         const month = parseInt(dateMatch[1]) - 1;
         const day = parseInt(dateMatch[2]);
@@ -247,6 +247,10 @@ export default function RealDataPage() {
   // 현재 표시할 년월
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  
+  // 선택된 날짜와 모달 상태
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedEvents, setSelectedEvents] = useState<CalendarEvent[]>([]);
 
   // 러브버디즈 데이터 가져오기
   useEffect(() => {
@@ -392,8 +396,8 @@ export default function RealDataPage() {
                 
                 // 날짜 필터링 적용
                 if (isDateInRange(fullDate)) {
-                  const dayOfWeekMatch = title.match(/\(([^)]+)\)/);
-                  const dateStr = dayOfWeekMatch ? dayOfWeekMatch[1] : "";
+                  // 날짜 문자열 형식 맞추기 (예: "12월 25일")
+                  const dateStr = `${month}월 ${day}일`;
 
                   updatedSchedule.push({
                     date: dateStr,
@@ -891,62 +895,62 @@ export default function RealDataPage() {
 
         {viewMode === 'calendar' ? (
           // 캘린더 뷰
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-white/5 rounded-xl p-6 shadow-lg">
+          <div className="max-w-7xl mx-auto px-2 md:px-0">
+            <div className="bg-white/5 rounded-xl p-3 md:p-6 shadow-lg">
               {/* 필터 체크박스 */}
-              <div className="flex flex-wrap gap-4 justify-center mb-6">
-                <label className="flex items-center gap-2 cursor-pointer">
+              <div className="flex flex-wrap gap-2 md:gap-4 justify-center mb-4 md:mb-6">
+                <label className="flex items-center gap-1 md:gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={filters.loveBuddies}
                     onChange={(e) => setFilters({...filters, loveBuddies: e.target.checked})}
-                    className="w-4 h-4 rounded"
+                    className="w-3 h-3 md:w-4 md:h-4 rounded"
                   />
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FF69B4' }}></div>
-                    <span className="text-white">러브버디즈</span>
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <div className="w-3 h-3 md:w-4 md:h-4 rounded" style={{ backgroundColor: '#FF69B4' }}></div>
+                    <span className="text-xs md:text-base text-white">러브버디즈</span>
                   </div>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-1 md:gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={filters.nowSeoul}
                     onChange={(e) => setFilters({...filters, nowSeoul: e.target.checked})}
-                    className="w-4 h-4 rounded"
+                    className="w-3 h-3 md:w-4 md:h-4 rounded"
                   />
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FFAC3A' }}></div>
-                    <span className="text-white">나우서울</span>
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <div className="w-3 h-3 md:w-4 md:h-4 rounded" style={{ backgroundColor: '#FFAC3A' }}></div>
+                    <span className="text-xs md:text-base text-white">나우서울</span>
                   </div>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-1 md:gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={filters.realGenius}
                     onChange={(e) => setFilters({...filters, realGenius: e.target.checked})}
-                    className="w-4 h-4 rounded"
+                    className="w-3 h-3 md:w-4 md:h-4 rounded"
                   />
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#9E4BED' }}></div>
-                    <span className="text-white">소셜지니어스</span>
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <div className="w-3 h-3 md:w-4 md:h-4 rounded" style={{ backgroundColor: '#9E4BED' }}></div>
+                    <span className="text-xs md:text-base text-white">소셜지니어스</span>
                   </div>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-1 md:gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={filters.gameOfDemo}
                     onChange={(e) => setFilters({...filters, gameOfDemo: e.target.checked})}
-                    className="w-4 h-4 rounded"
+                    className="w-3 h-3 md:w-4 md:h-4 rounded"
                   />
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#8B5CF6' }}></div>
-                    <span className="text-white">게임오브데모데이</span>
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <div className="w-3 h-3 md:w-4 md:h-4 rounded" style={{ backgroundColor: '#8B5CF6' }}></div>
+                    <span className="text-xs md:text-base text-white">게임오브데모데이</span>
                   </div>
                 </label>
               </div>
 
               {/* 캘린더 헤더 */}
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-4 md:mb-6">
                 <button
                   onClick={() => {
                     if (currentMonth === 0) {
@@ -956,11 +960,11 @@ export default function RealDataPage() {
                       setCurrentMonth(currentMonth - 1);
                     }
                   }}
-                  className="text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
+                  className="text-white hover:bg-white/10 p-1 md:p-2 rounded-lg transition-colors"
                 >
                   ◀
                 </button>
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-lg md:text-2xl font-bold text-white">
                   {currentYear}년 {currentMonth + 1}월
                 </h2>
                 <button
@@ -972,7 +976,7 @@ export default function RealDataPage() {
                       setCurrentMonth(currentMonth + 1);
                     }
                   }}
-                  className="text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
+                  className="text-white hover:bg-white/10 p-1 md:p-2 rounded-lg transition-colors"
                 >
                   ▶
                 </button>
@@ -981,14 +985,14 @@ export default function RealDataPage() {
               {/* 요일 헤더 */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                  <div key={day} className="text-center text-white/60 text-sm font-semibold py-2">
+                  <div key={day} className="text-center text-white/60 text-xs md:text-sm font-semibold py-1 md:py-2">
                     {day}
                   </div>
                 ))}
               </div>
 
               {/* 캘린더 그리드 */}
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-1 md:gap-2">
                 {(() => {
                   const calendarDays = getCalendarDays(currentYear, currentMonth);
                   const allEvents = getAllEventsForCalendar();
@@ -1019,7 +1023,15 @@ export default function RealDataPage() {
                     return (
                       <div
                         key={index}
-                        className={`min-h-[150px] p-2 rounded-lg border transition-all ${
+                        onClick={() => {
+                          if (day.events.length > 0) {
+                            setSelectedDate(day.date);
+                            setSelectedEvents(day.events);
+                          }
+                        }}
+                        className={`min-h-[80px] md:min-h-[150px] p-1 md:p-2 rounded-lg border transition-all overflow-hidden ${
+                          day.events.length > 0 ? 'cursor-pointer' : ''
+                        } ${
                           day.isCurrentMonth
                             ? isToday
                               ? 'bg-white/20 border-white'
@@ -1027,41 +1039,56 @@ export default function RealDataPage() {
                             : 'bg-black/10 border-white/5'
                         } ${!isInRange && 'opacity-30'}`}
                       >
-                        <div className={`text-sm font-semibold mb-2 ${
+                        <div className={`text-xs md:text-sm font-semibold mb-1 md:mb-2 ${
                           day.isCurrentMonth ? 'text-white' : 'text-white/40'
                         } ${isToday && 'text-yellow-400'}`}>
                           {day.date.getDate()}
                         </div>
                         
-                        {/* 이벤트 표시 */}
-                        <div className="space-y-1.5">
-                          {day.events.map((event, eventIndex) => {
-                            const getApplicantInfo = () => {
-                              if (event.applicants.female !== undefined && event.applicants.male !== undefined) {
-                                return `여${event.applicants.female} 남${event.applicants.male}`;
-                              } else if (event.applicants.participants !== undefined && event.applicants.creators !== undefined) {
-                                return `참${event.applicants.participants} 제${event.applicants.creators}`;
-                              } else if (event.applicants.total !== undefined) {
-                                return `총${event.applicants.total}명`;
-                              }
-                              return '';
-                            };
-                            
-                            return (
+                        {/* 이벤트 표시 - 모바일에서는 간략하게 */}
+                        <div className="space-y-0.5 md:space-y-1.5">
+                          {/* 모바일: 점으로 표시, 데스크톱: 전체 표시 */}
+                          <div className="md:hidden flex flex-wrap gap-1">
+                            {day.events.map((event, eventIndex) => (
                               <div
                                 key={eventIndex}
-                                className="text-xs p-1.5 rounded"
-                                style={{ backgroundColor: event.color + '30', borderLeft: `3px solid ${event.color}` }}
-                              >
-                                <div className="font-medium text-white leading-relaxed">
-                                  {event.title}
+                                className="w-1.5 h-1.5 rounded-full"
+                                style={{ backgroundColor: event.color }}
+                                title={event.title}
+                              />
+                            ))}
+                          </div>
+                          
+                          {/* 데스크톱 뷰 */}
+                          <div className="hidden md:block space-y-1.5">
+                            {day.events.map((event, eventIndex) => {
+                              const getApplicantInfo = () => {
+                                if (event.applicants.female !== undefined && event.applicants.male !== undefined) {
+                                  return `여${event.applicants.female} 남${event.applicants.male}`;
+                                } else if (event.applicants.participants !== undefined && event.applicants.creators !== undefined) {
+                                  return `참${event.applicants.participants} 제${event.applicants.creators}`;
+                                } else if (event.applicants.total !== undefined) {
+                                  return `총${event.applicants.total}명`;
+                                }
+                                return '';
+                              };
+                              
+                              return (
+                                <div
+                                  key={eventIndex}
+                                  className="text-xs p-1.5 rounded"
+                                  style={{ backgroundColor: event.color + '30', borderLeft: `3px solid ${event.color}` }}
+                                >
+                                  <div className="font-medium text-white leading-relaxed">
+                                    {event.title}
+                                  </div>
+                                  <div className="text-white/70 text-[10px] mt-0.5">
+                                    {getApplicantInfo()} / {event.maxCapacity}명
+                                  </div>
                                 </div>
-                                <div className="text-white/70 text-[10px] mt-0.5">
-                                  {getApplicantInfo()} / {event.maxCapacity}명
-                                </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
                     );
@@ -1069,38 +1096,151 @@ export default function RealDataPage() {
                 })()}
               </div>
 
+              {/* 날짜 상세 정보 모달 */}
+              {selectedDate && selectedEvents.length > 0 && (
+                <div 
+                  className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+                  onClick={() => setSelectedDate(null)}
+                >
+                  <div 
+                    className="bg-black/95 rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-xl font-bold text-white">
+                        {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일 스케줄
+                      </h3>
+                      <button
+                        onClick={() => setSelectedDate(null)}
+                        className="text-white/60 hover:text-white text-2xl"
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {selectedEvents.map((event, index) => {
+                        const getBrandName = () => {
+                          switch(event.type) {
+                            case 'loveBuddies': return '러브버디즈';
+                            case 'nowSeoul': return '나우서울';
+                            case 'realGenius': return '소셜지니어스';
+                            case 'gameOfDemo': return '게임오브데모데이';
+                            default: return '';
+                          }
+                        };
+
+                        const getDetailedInfo = () => {
+                          if (event.applicants.female !== undefined && event.applicants.male !== undefined) {
+                            return (
+                              <div className="flex gap-4 text-sm">
+                                <span className="text-pink-400">여성: {event.applicants.female}명</span>
+                                <span className="text-blue-400">남성: {event.applicants.male}명</span>
+                                <span className="text-white/60">총 {event.applicants.female + event.applicants.male}/{event.maxCapacity}명</span>
+                              </div>
+                            );
+                          } else if (event.applicants.participants !== undefined && event.applicants.creators !== undefined) {
+                            return (
+                              <div className="flex gap-4 text-sm">
+                                <span className="text-purple-400">참가자: {event.applicants.participants}명</span>
+                                <span className="text-green-400">제작자: {event.applicants.creators}명</span>
+                                <span className="text-white/60">총 {event.applicants.participants + event.applicants.creators}/{event.maxCapacity}명</span>
+                              </div>
+                            );
+                          } else if (event.applicants.total !== undefined) {
+                            return (
+                              <div className="text-sm">
+                                <span className="text-white/60">총 {event.applicants.total}/{event.maxCapacity}명</span>
+                              </div>
+                            );
+                          }
+                          return null;
+                        };
+
+                        return (
+                          <div 
+                            key={index}
+                            className="bg-white/5 rounded-lg p-4 border-l-4"
+                            style={{ borderColor: event.color }}
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <div 
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: event.color }}
+                              />
+                              <span className="text-sm font-medium" style={{ color: event.color }}>
+                                {getBrandName()}
+                              </span>
+                            </div>
+                            <h4 className="text-lg font-semibold text-white mb-2">
+                              {event.title}
+                            </h4>
+                            {getDetailedInfo()}
+                            
+                            {/* 참가율 표시 */}
+                            <div className="mt-3">
+                              <div className="flex justify-between text-xs text-white/60 mb-1">
+                                <span>참가율</span>
+                                <span>
+                                  {Math.round(((event.applicants.total || 
+                                    ((event.applicants.female ?? 0) + (event.applicants.male ?? 0)) || 
+                                    ((event.applicants.participants ?? 0) + (event.applicants.creators ?? 0)) || 0) 
+                                    / event.maxCapacity) * 100)}%
+                                </span>
+                              </div>
+                              <div className="w-full bg-white/10 rounded-full h-2">
+                                <div 
+                                  className="h-full rounded-full transition-all"
+                                  style={{ 
+                                    width: `${Math.min(100, ((event.applicants.total || 
+                                      ((event.applicants.female ?? 0) + (event.applicants.male ?? 0)) || 
+                                      ((event.applicants.participants ?? 0) + (event.applicants.creators ?? 0)) || 0) 
+                                      / event.maxCapacity) * 100)}%`,
+                                    backgroundColor: event.color
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
         ) : (
           // 리스트 뷰
-          <div className="space-y-8 max-w-4xl mx-auto">
+          <div className="space-y-6 md:space-y-8 max-w-4xl mx-auto px-2 md:px-4">
             {/* 러브버디즈 스케줄 박스 */}
             <div className="w-full">
-            <div className="bg-white/5 p-4 shadow-lg">
-              <h2 className="text-xl font-bold text-center text-white mb-3">
+            <div className="bg-white/5 p-3 md:p-4 shadow-lg rounded-xl">
+              <h2 className="text-lg md:text-xl font-bold text-center text-white mb-3">
                 💕 러브버디즈 스케줄
               </h2>
 
               {/* 가격 및 시간 정보 */}
-              <div className="rounded-lg p-3 mb-4">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-2">
-                  <p className="text-white font-bold text-base mb-1 sm:mb-0">
-                    가격: <span className="text-white">35,000원</span>
-                    <span className="text-[#FF6B9F]">(특가)</span>
-                  </p>
-                  <p className="text-white font-bold text-base">
-                    평일/주말 다양한 시간대{" "}
-                    <span className="text-white">(3시간)</span>
-                  </p>
+              <div className="rounded-lg p-2 md:p-3 mb-3 md:mb-4">
+                <div className="flex flex-col gap-2 text-sm md:text-base">
+                  <div className="flex justify-between items-center">
+                    <span className="text-white font-bold">
+                      가격: <span className="text-[#FF6B9F]">35,000원</span>
+                    </span>
+                    <span className="text-white font-bold">
+                      3시간
+                    </span>
+                  </div>
                 </div>
 
                 {/* 범례 */}
-                <div className="flex flex-wrap gap-2 justify-end mt-3">
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#FF69B4]/20">
+                <div className="flex gap-2 justify-center mt-2 md:mt-3">
+                  <div className="flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-full text-xs border border-white/20 bg-[#FF69B4]/20">
                     <div className="w-2 h-2 rounded-full bg-[#FF69B4]" />
                     <span className="text-white/90">여자</span>
                   </div>
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
+                  <div className="flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
                     <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
                     <span className="text-white/90">남자</span>
                   </div>
@@ -1127,20 +1267,20 @@ export default function RealDataPage() {
                       key={index}
                       className="rounded-lg hover:bg-black/30 transition-colors"
                     >
-                      <div className="flex items-center justify-between px-3 py-2">
-                        <div className="flex items-center space-x-3">
-                          <span className="font-medium text-[#F4F4F4] min-w-[100px] text-sm">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between px-2 md:px-3 py-2">
+                        <div className="flex flex-col md:flex-row md:items-center md:space-x-3">
+                          <span className="font-medium text-[#F4F4F4] text-xs md:text-sm md:min-w-[100px]">
                             {schedule.year} {schedule.date}
                           </span>
-                          <span className="text-white font-bold flex-grow text-sm">
+                          <span className="text-white font-bold text-sm md:text-sm mt-1 md:mt-0">
                             {schedule.title}
                           </span>
                         </div>
-                        <span className="text-[#FF6B9F] font-bold text-xs">
+                        <span className="text-[#FF6B9F] font-bold text-xs mt-1 md:mt-0">
                           {schedule.applicants.total}/{schedule.maxCapacity}명
                         </span>
                       </div>
-                      <div className="px-3 pb-2">
+                      <div className="px-2 md:px-3 pb-2">
                         <LoveBuddiesApplicantChart
                           applicants={schedule.applicants}
                           maxCapacity={schedule.maxCapacity}
@@ -1163,43 +1303,43 @@ export default function RealDataPage() {
           </div>
 
           {/* 나우서울 밋업 스케줄 박스 */}
-          <div className="w-full mb-12">
-            <div className="bg-white/5 rounded-xl p-6 shadow-lg">
-              <h2 className="text-2xl font-bold text-center text-white mb-4">
+          <div className="w-full">
+            <div className="bg-white/5 rounded-xl p-3 md:p-6 shadow-lg">
+              <h2 className="text-lg md:text-2xl font-bold text-center text-white mb-3 md:mb-4">
                 나우서울 밋업 스케줄
               </h2>
 
               {/* 가격 및 시간 정보 */}
-              <div className="bg-black/70 rounded-lg p-4 mb-5">
-                <div className="flex flex-col space-y-4">
-                  <div>
-                    <div className="flex items-center flex-wrap">
-                      <span className="text-white font-bold text-lg mr-2">
+              <div className="bg-black/70 rounded-lg p-3 md:p-4 mb-3 md:mb-5">
+                <div className="flex flex-col gap-2 md:gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-white font-bold text-sm md:text-lg">
                         가격:
                       </span>
-                      <span className="line-through text-gray-400 text-lg mr-2">
+                      <span className="line-through text-gray-400 text-sm md:text-lg">
                         35,000원
                       </span>
-                      <span className="text-[#FFAC3A] font-bold text-xl">
+                      <span className="text-[#FFAC3A] font-bold text-base md:text-xl">
                         25,000원
                       </span>
-                      <span className="bg-[#FFAC3A] text-black px-2 py-0.5 rounded-full text-xs font-bold ml-2">
-                        할인
-                      </span>
                     </div>
+                    <span className="bg-[#FFAC3A] text-black px-2 py-0.5 rounded-full text-xs font-bold">
+                      할인
+                    </span>
                   </div>
-                  <div className="text-white font-bold text-lg">
-                    매주 목요일 19:30~22:00
+                  <div className="text-white font-bold text-sm md:text-lg">
+                    목요일 19:30~22:00
                     <span className="text-white"> (2.5시간)</span>
                   </div>
                 </div>
 
                 {/* 태그 형태 범례 */}
-                <div className="flex flex-wrap gap-2 justify-end mt-6 mb-3">
+                <div className="flex flex-wrap gap-1 md:gap-2 justify-center mt-3 md:mt-6 mb-2 md:mb-3">
                   {Object.entries(jobLabels).map(([job, label]) => (
                     <div
                       key={job}
-                      className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20"
+                      className="flex items-center gap-1 px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs border border-white/20"
                       style={{
                         backgroundColor: `${
                           jobColors[job as keyof typeof jobColors]
@@ -1207,7 +1347,7 @@ export default function RealDataPage() {
                       }}
                     >
                       <div
-                        className="w-2 h-2 rounded-full"
+                        className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full"
                         style={{
                           backgroundColor:
                             jobColors[job as keyof typeof jobColors],
@@ -1220,7 +1360,7 @@ export default function RealDataPage() {
               </div>
 
               {/* 일정 목록 */}
-              <div className="space-y-6">
+              <div className="space-y-3 md:space-y-6">
                 {nowSeoulLoading ? (
                   <div className="flex items-center justify-center py-6">
                     <div className="text-white/60 text-sm">
@@ -1244,16 +1384,16 @@ export default function RealDataPage() {
                         key={index}
                         className="rounded-none bg-black/50 hover:bg-black/80 transition-colors"
                       >
-                        <div className="flex items-center justify-between px-3 pt-3 pb-1">
-                          <div className="flex items-center space-x-4">
-                            <span className="font-medium text-[#F4F4F4] min-w-[110px]">
-                              {schedule.year} {schedule.date} (목)
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between px-2 md:px-3 pt-2 md:pt-3 pb-1">
+                          <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+                            <span className="font-medium text-[#F4F4F4] text-xs md:text-base md:min-w-[110px]">
+                              {schedule.year} {schedule.date}
                             </span>
-                            <span className="text-white font-bold">
+                            <span className="text-white font-bold text-sm md:text-base mt-1 md:mt-0">
                               {schedule.title}
                             </span>
                           </div>
-                          <span className="text-[#FFAC3A] font-bold text-sm">
+                          <span className="text-[#FFAC3A] font-bold text-xs md:text-sm mt-1 md:mt-0">
                             {total}/{schedule.maxCapacity}명
                           </span>
                         </div>
@@ -1279,32 +1419,35 @@ export default function RealDataPage() {
           </div>
 
           {/* 소셜지니어스 스케줄 박스 */}
-          <div className="w-full mb-12">
-            <div className="bg-white/5 rounded-xl p-6 shadow-lg">
-              <h2 className="text-2xl font-bold text-center text-white mb-4">
+          <div className="w-full">
+            <div className="bg-white/5 rounded-xl p-3 md:p-6 shadow-lg">
+              <h2 className="text-lg md:text-2xl font-bold text-center text-white mb-3 md:mb-4">
                 소셜지니어스 스케줄
               </h2>
 
               {/* 가격 및 시간 정보 */}
-              <div className="rounded-lg p-4 mb-5">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
-                  <p className="text-white font-bold text-lg mb-2 sm:mb-0">
-                    가격: <span className="text-white">28,000원</span>
-                    <span className="text-[#9E4BED]">(오픈특가)</span>
-                  </p>
-                  <p className="text-white font-bold text-lg">
-                    매주 일요일 17:00~20:00{" "}
-                    <span className="text-white">(3시간)</span>
+              <div className="rounded-lg p-2 md:p-4 mb-3 md:mb-5">
+                <div className="flex flex-col gap-2 text-sm md:text-lg">
+                  <div className="flex justify-between items-center">
+                    <span className="text-white font-bold">
+                      가격: <span className="text-[#9E4BED]">28,000원</span>
+                    </span>
+                    <span className="text-white font-bold">
+                      3시간
+                    </span>
+                  </div>
+                  <p className="text-white/80 text-xs md:text-base">
+                    일요일 17:00~20:00
                   </p>
                 </div>
 
                 {/* 범례 */}
-                <div className="flex flex-wrap gap-2 justify-end mt-6 mb-3">
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#FF69B4]/20">
+                <div className="flex gap-2 justify-center mt-2 md:mt-6 mb-2 md:mb-3">
+                  <div className="flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-full text-xs border border-white/20 bg-[#FF69B4]/20">
                     <div className="w-2 h-2 rounded-full bg-[#FF69B4]" />
                     <span className="text-white/90">여자</span>
                   </div>
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
+                  <div className="flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-full text-xs border border-white/20 bg-[#4A90E2]/20">
                     <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
                     <span className="text-white/90">남자</span>
                   </div>
@@ -1340,49 +1483,31 @@ export default function RealDataPage() {
                       }
                     };
 
-                    const getGameStyle = (title: string) => {
-                      if (
-                        title.includes("마피아") ||
-                        title.includes("바이너리") ||
-                        title.includes("스파이")
-                      ) {
-                        return "Mind";
-                      } else if (title.includes("슈가빌리지")) {
-                        return "Story";
-                      }
-                      return "";
-                    };
 
                     return (
                       <div
                         key={index}
                         className="rounded-lg hover:bg-black/30 transition-colors"
                       >
-                        <div className="flex items-center justify-between p-3">
-                          <div className="flex items-center space-x-4">
-                            <span className="font-medium text-[#F4F4F4] min-w-[100px]">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between p-2 md:p-3">
+                          <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+                            <span className="font-medium text-[#F4F4F4] text-xs md:text-base md:min-w-[100px]">
                               {schedule.year} {schedule.date}
                             </span>
-                            <span className="text-white font-bold flex-grow">
-                              {schedule.title}{" "}
-                              {getGameStyle(schedule.title) && (
-                                <span
-                                  className="font-serif italic text-sm text-[#9E4BED] transform -rotate-2 font-thin"
-                                  style={{ fontFamily: "cursive" }}
-                                >
-                                  {getGameStyle(schedule.title)}
-                                </span>
-                              )}
-                            </span>
-                            <span
-                              className={`${getDifficultyColor(
-                                schedule.difficulty
-                              )} text-white px-2 py-0.5 rounded-full text-xs font-bold`}
-                            >
-                              {schedule.difficulty}
-                            </span>
+                            <div className="flex items-center gap-2 mt-1 md:mt-0">
+                              <span className="text-white font-bold text-sm md:text-base">
+                                {schedule.title}
+                              </span>
+                              <span
+                                className={`${getDifficultyColor(
+                                  schedule.difficulty
+                                )} text-white px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold`}
+                              >
+                                {schedule.difficulty}
+                              </span>
+                            </div>
                           </div>
-                          <span className="text-[#9E4BED] font-bold text-sm">
+                          <span className="text-[#9E4BED] font-bold text-xs md:text-sm mt-1 md:mt-0">
                             {schedule.applicants.total}/{schedule.maxCapacity}명
                           </span>
                         </div>
@@ -1408,37 +1533,37 @@ export default function RealDataPage() {
           </div>
 
           {/* 게임오브데모데이 스케줄 박스 */}
-          <div className="w-full mb-12">
-            <div className="bg-white/5 rounded-xl p-6 shadow-lg">
-              <h2 className="text-2xl font-bold text-center text-white mb-4">
+          <div className="w-full">
+            <div className="bg-white/5 rounded-xl p-3 md:p-6 shadow-lg">
+              <h2 className="text-lg md:text-2xl font-bold text-center text-white mb-3 md:mb-4">
                 🎮 게임오브소셜링 데모데이
               </h2>
 
               {/* 가격 및 시간 정보 */}
-              <div className="rounded-lg p-4 mb-5">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
-                  <div className="mb-2 sm:mb-0">
-                    <p className="text-white font-bold text-lg">
-                      가격:{" "}
-                      <span className="text-[#8B5CF6]">플레이어 20,000원</span>
-                    </p>
-                    <p className="text-[#10B981] font-bold text-sm">
-                      출품자 무료 ✨
+              <div className="rounded-lg p-2 md:p-4 mb-3 md:mb-5">
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                    <div>
+                      <p className="text-white font-bold text-sm md:text-lg">
+                        <span className="text-[#8B5CF6]">플레이어 20,000원</span>
+                      </p>
+                      <p className="text-[#10B981] font-bold text-xs md:text-sm">
+                        출품자 무료 ✨
+                      </p>
+                    </div>
+                    <p className="text-white font-bold text-sm md:text-lg">
+                      일요일 13:00~18:00 <span className="text-white/80">(5시간)</span>
                     </p>
                   </div>
-                  <p className="text-white font-bold text-lg">
-                    일요일 13:00~18:00{" "}
-                    <span className="text-white">(5시간)</span>
-                  </p>
                 </div>
 
                 {/* 범례 */}
-                <div className="flex flex-wrap gap-2 justify-end mt-6 mb-3">
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#7343F8]/20">
+                <div className="flex gap-2 justify-center mt-3 md:mt-6 mb-2 md:mb-3">
+                  <div className="flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-full text-xs border border-white/20 bg-[#7343F8]/20">
                     <div className="w-2 h-2 rounded-full bg-[#7343F8]" />
                     <span className="text-white/90">참가자</span>
                   </div>
-                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20 bg-[#2BAE6C]/20">
+                  <div className="flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-full text-xs border border-white/20 bg-[#2BAE6C]/20">
                     <div className="w-2 h-2 rounded-full bg-[#2BAE6C]" />
                     <span className="text-white/90">제작자</span>
                   </div>
@@ -1465,16 +1590,16 @@ export default function RealDataPage() {
                       key={index}
                       className="rounded-lg hover:bg-black/30 transition-colors"
                     >
-                      <div className="flex items-center justify-between p-3">
-                        <div className="flex items-center space-x-4">
-                          <span className="font-medium text-[#F4F4F4] min-w-[120px]">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between p-2 md:p-3">
+                        <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+                          <span className="font-medium text-[#F4F4F4] text-xs md:text-base md:min-w-[120px]">
                             {schedule.year}년 {schedule.date}
                           </span>
-                          <span className="text-white font-bold flex-grow">
+                          <span className="text-white font-bold text-sm md:text-base mt-1 md:mt-0">
                             {schedule.title}
                           </span>
                         </div>
-                        <span className="text-[#8B5CF6] font-bold text-sm">
+                        <span className="text-[#8B5CF6] font-bold text-xs md:text-sm mt-1 md:mt-0">
                           {schedule.applicants.total}/{schedule.maxCapacity}명
                         </span>
                       </div>
@@ -1499,12 +1624,12 @@ export default function RealDataPage() {
           </div>
 
             {/* 내부용 정보 */}
-            <div className="w-full mt-12">
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-600">
-                <h3 className="text-lg font-bold text-white mb-2">
+            <div className="w-full mt-8 md:mt-12">
+              <div className="bg-gray-800/50 rounded-xl p-3 md:p-4 border border-gray-600">
+                <h3 className="text-base md:text-lg font-bold text-white mb-2">
                   📋 내부 참고사항
                 </h3>
-                <ul className="text-white/80 text-sm space-y-1">
+                <ul className="text-white/80 text-xs md:text-sm space-y-1">
                   <li>• 이 페이지는 내부 관리용입니다</li>
                   <li>• 실시간 스케줄 현황을 확인할 수 있습니다</li>
                   <li>
