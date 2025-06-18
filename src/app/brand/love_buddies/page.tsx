@@ -106,7 +106,20 @@ const LoveBuddiesPage = () => {
             buttonType="main_cta"
             destination="internal_page"
           >
-            러브버디즈 콘텐츠 참여하기 🙋🏻‍♀
+            🙋🏻‍♀️[일일남매] 콘텐츠 참여하기!
+          </ActionButton>
+
+          {/* 알파남매 온라인 마니또 바로가기 버튼 */}
+          <ActionButton
+            href="/brand/love_buddies/alpha"
+            className="mb-6"
+            target="_self"
+            rel=""
+            brandPage="love_buddies"
+            buttonType="alpha_cta"
+            destination="internal_page"
+          >
+            💌Top3 알파남매 사전신청하기
           </ActionButton>
 
           {/* 참가후기 섹션 위의 여백 */}
