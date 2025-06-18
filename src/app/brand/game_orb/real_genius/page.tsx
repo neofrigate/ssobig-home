@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 
 interface ScheduleItem {
   date: string;
+  time: string;
   title: string;
   difficulty: string;
   applicants: {
@@ -119,7 +120,29 @@ export default function RealGeniusPage() {
               } - 제목: "${title}", C열 원시값: "${cColumnValue}", 체크상태: ${isChecked}, 최대인원: ${maxCapacity}, 합계: ${total}, 여자: ${female}, 남자: ${male}`
             );
 
-            // C열이 정확히 TRUE이고 제목이 유효한 경우에만 표시
+            // 날짜 추출 (괄호 안의 날짜)
+            const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
+            const dateStr = dateMatch ? dateMatch[1] : "";
+            // 시간 추출 (예: 17:00)
+            const timeMatch = title.match(/(\d{1,2}:\d{2})/);
+            const timeStr = timeMatch ? timeMatch[1] : "";
+
+            // 게임명 추출
+            const gameName = title
+              .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
+              .trim();
+
+            // 난이도 추정 (게임명에 따라)
+            let difficulty = "EASY";
+            if (
+              gameName.includes("바이너리") ||
+              gameName.includes("이중스파이")
+            ) {
+              difficulty = "MID";
+            } else if (gameName.includes("??????")) {
+              difficulty = "HARD";
+            }
+
             if (
               isChecked &&
               title &&
@@ -128,28 +151,9 @@ export default function RealGeniusPage() {
             ) {
               console.log(`✅ 표시 대상으로 추가: ${title}`);
 
-              // 날짜 추출 (괄호 안의 날짜)
-              const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
-              const dateStr = dateMatch ? dateMatch[1] : "";
-
-              // 게임명 추출
-              const gameName = title
-                .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
-                .trim();
-
-              // 난이도 추정 (게임명에 따라)
-              let difficulty = "EASY";
-              if (
-                gameName.includes("바이너리") ||
-                gameName.includes("이중스파이")
-              ) {
-                difficulty = "MID";
-              } else if (gameName.includes("??????")) {
-                difficulty = "HARD";
-              }
-
               updatedSchedule.push({
                 date: dateStr,
+                time: timeStr,
                 title: gameName,
                 difficulty,
                 applicants: {
@@ -333,8 +337,7 @@ export default function RealGeniusPage() {
                     <span className="text-[#9E4BED]">(오픈특가)</span>
                   </p>
                   <p className="text-white font-bold text-lg">
-                    매주 일요일 17:00~20:00{" "}
-                    <span className="text-white">(3시간)</span>
+                    매주 일요일 <span className="text-white">(3시간)</span>
                   </p>
                 </div>
 
@@ -402,7 +405,7 @@ export default function RealGeniusPage() {
                         <div className="flex items-center justify-between p-3">
                           <div className="flex items-center space-x-4">
                             <span className="font-medium text-[#F4F4F4] min-w-[80px]">
-                              {schedule.date}
+                              {schedule.date} {schedule.time}
                             </span>
                             <span className="text-white font-bold flex-grow">
                               {schedule.title}{" "}
