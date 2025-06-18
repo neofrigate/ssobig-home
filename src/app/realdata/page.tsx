@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 
 interface LoveBuddiesScheduleItem {
   date: string;
+  year: number;
   title: string;
   applicants: {
     total: number;
@@ -15,6 +16,7 @@ interface LoveBuddiesScheduleItem {
 
 interface NowSeoulScheduleItem {
   date: string;
+  year: number;
   title: string;
   hasEarlyBird: boolean;
   applicants: {
@@ -29,6 +31,7 @@ interface NowSeoulScheduleItem {
 
 interface RealGeniusScheduleItem {
   date: string;
+  year: number;
   title: string;
   difficulty: string;
   applicants: {
@@ -41,6 +44,7 @@ interface RealGeniusScheduleItem {
 
 interface GameOfDemoScheduleItem {
   date: string;
+  year: number;
   title: string;
   applicants: {
     total: number;
@@ -50,7 +54,39 @@ interface GameOfDemoScheduleItem {
   maxCapacity: number;
 }
 
+interface CalendarEvent {
+  date: Date;
+  type: 'loveBuddies' | 'nowSeoul' | 'realGenius' | 'gameOfDemo';
+  title: string;
+  applicants: {
+    total?: number;
+    female?: number;
+    male?: number;
+    participants?: number;
+    creators?: number;
+  };
+  maxCapacity: number;
+  color: string;
+}
+
+interface CalendarDay {
+  date: Date;
+  isCurrentMonth: boolean;
+  events: CalendarEvent[];
+}
+
 export default function RealDataPage() {
+  // 뷰 모드 상태 ('list' | 'calendar')
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  
+  // 필터 상태
+  const [filters, setFilters] = useState({
+    loveBuddies: true,
+    nowSeoul: true,
+    realGenius: true,
+    gameOfDemo: true
+  });
+  
   // 러브버디즈 상태
   const [loveBuddiesData, setLoveBuddiesData] = useState<
     LoveBuddiesScheduleItem[]
@@ -78,6 +114,140 @@ export default function RealDataPage() {
   const [gameOfDemoLoading, setGameOfDemoLoading] = useState(true);
   const [gameOfDemoUpdateTime, setGameOfDemoUpdateTime] = useState<string>("");
 
+  // 날짜 필터링 헬퍼 함수
+  const isDateInRange = (date: Date) => {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+    
+    return date >= sevenDaysAgo;
+  };
+
+  // 캘린더 관련 함수들
+  const getCalendarDays = (year: number, month: number): CalendarDay[] => {
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    const calendarDays: CalendarDay[] = [];
+    
+    // 이전 달의 날짜들
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+      const date = new Date(year, month, -i);
+      calendarDays.push({
+        date,
+        isCurrentMonth: false,
+        events: []
+      });
+    }
+    
+    // 현재 달의 날짜들
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(year, month, i);
+      calendarDays.push({
+        date,
+        isCurrentMonth: true,
+        events: []
+      });
+    }
+    
+    // 다음 달의 날짜들 (6주 채우기)
+    const remainingDays = 42 - calendarDays.length;
+    for (let i = 1; i <= remainingDays; i++) {
+      const date = new Date(year, month + 1, i);
+      calendarDays.push({
+        date,
+        isCurrentMonth: false,
+        events: []
+      });
+    }
+    
+    return calendarDays;
+  };
+
+  // 모든 이벤트를 캘린더용 데이터로 변환
+  const getAllEventsForCalendar = (): CalendarEvent[] => {
+    const allEvents: CalendarEvent[] = [];
+    
+    // 러브버디즈 이벤트
+    loveBuddiesData.forEach(schedule => {
+      const dateMatch = schedule.date.match(/(\d+)\/(\d+)/);
+      if (dateMatch) {
+        const month = parseInt(dateMatch[1]) - 1;
+        const day = parseInt(dateMatch[2]);
+        allEvents.push({
+          date: new Date(schedule.year, month, day),
+          type: 'loveBuddies',
+          title: schedule.title,
+          applicants: schedule.applicants,
+          maxCapacity: schedule.maxCapacity,
+          color: '#FF69B4'
+        });
+      }
+    });
+    
+    // 나우서울 이벤트
+    nowSeoulData.forEach(schedule => {
+      // 나우서울은 제목에서 날짜를 파싱해야 함
+      const dateMatch = schedule.title.match(/(\d+)월\s*(\d+)일/);
+      if (dateMatch) {
+        const month = parseInt(dateMatch[1]) - 1;
+        const day = parseInt(dateMatch[2]);
+        const total = Object.values(schedule.applicants).reduce((sum, count) => sum + count, 0);
+        allEvents.push({
+          date: new Date(schedule.year, month, day),
+          type: 'nowSeoul',
+          title: schedule.title,
+          applicants: { total },
+          maxCapacity: schedule.maxCapacity,
+          color: '#FFAC3A'
+        });
+      }
+    });
+    
+    // 리얼지니어스 이벤트
+    realGeniusData.forEach(schedule => {
+      const dateMatch = schedule.date.match(/(\d+)\/(\d+)/);
+      if (dateMatch) {
+        const month = parseInt(dateMatch[1]) - 1;
+        const day = parseInt(dateMatch[2]);
+        allEvents.push({
+          date: new Date(schedule.year, month, day),
+          type: 'realGenius',
+          title: schedule.title,
+          applicants: schedule.applicants,
+          maxCapacity: schedule.maxCapacity,
+          color: '#9E4BED'
+        });
+      }
+    });
+    
+    // 게임오브데모데이 이벤트
+    gameOfDemoData.forEach(schedule => {
+      const dateMatch = schedule.date.match(/(\d+)월\s*(\d+)일/);
+      if (dateMatch) {
+        const month = parseInt(dateMatch[1]) - 1;
+        const day = parseInt(dateMatch[2]);
+        allEvents.push({
+          date: new Date(schedule.year, month, day),
+          type: 'gameOfDemo',
+          title: schedule.title,
+          applicants: schedule.applicants,
+          maxCapacity: schedule.maxCapacity,
+          color: '#8B5CF6'
+        });
+      }
+    });
+    
+    return allEvents;
+  };
+
+  // 현재 표시할 년월
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+
   // 러브버디즈 데이터 가져오기
   useEffect(() => {
     const fetchLoveBuddiesData = async () => {
@@ -95,44 +265,61 @@ export default function RealDataPage() {
         const rows = csvText.split("\n").slice(1);
         const updatedSchedule: LoveBuddiesScheduleItem[] = [];
 
+        let currentYear = 2025;
+        let lastMonth = 0;
+
         rows.forEach((row) => {
           if (row.trim()) {
             const cols = row.split(",");
             const title = cols[1]?.replace(/"/g, "").trim();
-            const cColumnValue = cols[2]?.replace(/"/g, "").trim();
-            const isChecked = cColumnValue === "TRUE";
             const maxCapacity = parseInt(cols[3]) || 40;
             const total = parseInt(cols[4]) || 0;
             const female = parseInt(cols[5]) || 0;
             const male = parseInt(cols[6]) || 0;
 
             if (
-              isChecked &&
               title &&
               title.includes("일일남매") &&
               title.length > 0
             ) {
-              const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
-              const dateStr = dateMatch ? dateMatch[1] : "";
-              const timeMatch = title.match(/\d+:\d+/);
-              const timeStr = timeMatch ? timeMatch[0] : "";
-              const gameTitle = title
-                .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
-                .trim();
-              const cleanTitle = timeStr
-                ? `${timeStr} ${gameTitle}`
-                : gameTitle;
+              const dateMatch = title.match(/(\d+)\/(\d+)\s*\([^)]+\)/);
+              if (dateMatch) {
+                const month = parseInt(dateMatch[1]);
+                const day = parseInt(dateMatch[2]);
+                
+                // 월이 이전보다 작아지면 연도가 바뀐 것으로 판단
+                if (lastMonth > 0 && month < lastMonth) {
+                  currentYear++;
+                }
+                lastMonth = month;
+                
+                const fullDate = new Date(currentYear, month - 1, day);
+                
+                // 날짜 필터링 적용
+                if (isDateInRange(fullDate)) {
+                  const dateStr = dateMatch[0];
+                  const timeMatch = title.match(/\d+:\d+/);
+                  const timeStr = timeMatch ? timeMatch[0] : "";
+                  const gameTitle = title
+                    .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
+                    .trim();
+                  const cleanTitle = timeStr
+                    ? `${timeStr} ${gameTitle}`
+                    : gameTitle;
 
-              updatedSchedule.push({
-                date: dateStr,
-                title: cleanTitle,
-                applicants: {
-                  total,
-                  female,
-                  male,
-                },
-                maxCapacity,
-              });
+                  updatedSchedule.push({
+                    date: dateStr,
+                    year: currentYear,
+                    title: cleanTitle,
+                    applicants: {
+                      total,
+                      female,
+                      male,
+                    },
+                    maxCapacity,
+                  });
+                }
+              }
             }
           }
         });
@@ -173,11 +360,13 @@ export default function RealDataPage() {
         const rows = csvText.split("\n").slice(1);
         const updatedSchedule: NowSeoulScheduleItem[] = [];
 
+        let currentYear = 2025;
+        let lastMonth = 0;
+
         rows.forEach((row) => {
           if (row.trim()) {
             const cols = row.split(",");
             const title = cols[1]?.replace(/"/g, "").trim();
-            const isChecked = cols[2]?.replace(/"/g, "").trim() === "TRUE";
             const maxCapacity = parseInt(cols[3]) || 20;
 
             const planner = parseInt(cols[5]) || 0;
@@ -186,25 +375,42 @@ export default function RealDataPage() {
             const designer = parseInt(cols[8]) || 0;
             const other = parseInt(cols[9]) || 0;
 
-            const isVisible = isChecked && title && title !== "선택 항목";
+            if (title && title !== "선택 항목") {
+              // 나우서울은 날짜 정보가 제한적이므로 제목에서 날짜 추출 시도
+              const dateMatch = title.match(/(\d+)월\s*(\d+)일/);
+              if (dateMatch) {
+                const month = parseInt(dateMatch[1]);
+                const day = parseInt(dateMatch[2]);
+                
+                // 월이 이전보다 작아지면 연도가 바뀐 것으로 판단
+                if (lastMonth > 0 && month < lastMonth) {
+                  currentYear++;
+                }
+                lastMonth = month;
+                
+                const fullDate = new Date(currentYear, month - 1, day);
+                
+                // 날짜 필터링 적용
+                if (isDateInRange(fullDate)) {
+                  const dayOfWeekMatch = title.match(/\(([^)]+)\)/);
+                  const dateStr = dayOfWeekMatch ? dayOfWeekMatch[1] : "";
 
-            if (isVisible) {
-              const dateMatch = title.match(/\(([^)]+)\)/);
-              const dateStr = dateMatch ? dateMatch[1] : "";
-
-              updatedSchedule.push({
-                date: dateStr,
-                title: title.replace(/\([^)]*\)/, "").trim(),
-                hasEarlyBird: true,
-                applicants: {
-                  planner,
-                  marketer,
-                  developer,
-                  designer,
-                  other,
-                },
-                maxCapacity,
-              });
+                  updatedSchedule.push({
+                    date: dateStr,
+                    year: currentYear,
+                    title: title.replace(/\([^)]*\)/, "").trim(),
+                    hasEarlyBird: true,
+                    applicants: {
+                      planner,
+                      marketer,
+                      developer,
+                      designer,
+                      other,
+                    },
+                    maxCapacity,
+                  });
+                }
+              }
             }
           }
         });
@@ -247,51 +453,68 @@ export default function RealDataPage() {
         const rows = csvText.split("\n").slice(1);
         const updatedSchedule: RealGeniusScheduleItem[] = [];
 
+        let currentYear = 2025;
+        let lastMonth = 0;
+
         rows.forEach((row) => {
           if (row.trim()) {
             const cols = row.split(",");
             const title = cols[1]?.replace(/"/g, "").trim();
-            const cColumnValue = cols[2]?.replace(/"/g, "").trim();
-            const isChecked = cColumnValue === "TRUE";
             const maxCapacity = parseInt(cols[3]) || 20;
             const total = parseInt(cols[4]) || 0;
             const female = parseInt(cols[5]) || 0;
             const male = parseInt(cols[6]) || 0;
 
             if (
-              isChecked &&
               title &&
               title !== "선택 항목" &&
               title.length > 0
             ) {
-              const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
-              const dateStr = dateMatch ? dateMatch[1] : "";
+              const dateMatch = title.match(/(\d+)\/(\d+)\s*\([^)]+\)/);
+              if (dateMatch) {
+                const month = parseInt(dateMatch[1]);
+                const day = parseInt(dateMatch[2]);
+                
+                // 월이 이전보다 작아지면 연도가 바뀐 것으로 판단
+                if (lastMonth > 0 && month < lastMonth) {
+                  currentYear++;
+                }
+                lastMonth = month;
+                
+                const fullDate = new Date(currentYear, month - 1, day);
+                
+                // 날짜 필터링 적용
+                if (isDateInRange(fullDate)) {
+                  const dateStr = dateMatch[0];
 
-              const gameName = title
-                .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
-                .trim();
+                  const gameName = title
+                    .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
+                    .trim();
 
-              let difficulty = "EASY";
-              if (
-                gameName.includes("바이너리") ||
-                gameName.includes("이중스파이")
-              ) {
-                difficulty = "MID";
-              } else if (gameName.includes("??????")) {
-                difficulty = "HARD";
+                  let difficulty = "EASY";
+                  if (
+                    gameName.includes("바이너리") ||
+                    gameName.includes("이중스파이")
+                  ) {
+                    difficulty = "MID";
+                  } else if (gameName.includes("??????")) {
+                    difficulty = "HARD";
+                  }
+
+                  updatedSchedule.push({
+                    date: dateStr,
+                    year: currentYear,
+                    title: gameName,
+                    difficulty,
+                    applicants: {
+                      total,
+                      female,
+                      male,
+                    },
+                    maxCapacity,
+                  });
+                }
               }
-
-              updatedSchedule.push({
-                date: dateStr,
-                title: gameName,
-                difficulty,
-                applicants: {
-                  total,
-                  female,
-                  male,
-                },
-                maxCapacity,
-              });
             }
           }
         });
@@ -332,37 +555,55 @@ export default function RealDataPage() {
         const rows = csvText.split("\n").slice(1);
         const updatedSchedule: GameOfDemoScheduleItem[] = [];
 
+        let currentYear = 2025;
+        let lastMonth = 0;
+
         rows.forEach((row) => {
           if (row.trim()) {
             const cols = row.split(",");
             const title = cols[1]?.replace(/"/g, "").trim();
-            const cColumnValue = cols[2]?.replace(/"/g, "").trim();
-            const isChecked = cColumnValue === "TRUE";
             const maxCapacity = parseInt(cols[3]) || 50;
             const total = parseInt(cols[4]) || 0;
             const participants = parseInt(cols[5]) || 0;
             const creators = parseInt(cols[6]) || 0;
 
             if (
-              isChecked &&
               title &&
               title !== "선택 항목" &&
               title.length > 0
             ) {
               // 제목에서 날짜 추출 (예: [12회] 6월 28일 토요일 13시~18시)
-              const dateMatch = title.match(/(\d+월\s*\d+일\s*[^0-9]*)/);
-              const dateStr = dateMatch ? dateMatch[1].trim() : "";
+              const dateMatch = title.match(/(\d+)월\s*(\d+)일/);
+              if (dateMatch) {
+                const month = parseInt(dateMatch[1]);
+                const day = parseInt(dateMatch[2]);
+                
+                // 월이 이전보다 작아지면 연도가 바뀐 것으로 판단
+                if (lastMonth > 0 && month < lastMonth) {
+                  currentYear++;
+                }
+                lastMonth = month;
+                
+                const fullDate = new Date(currentYear, month - 1, day);
+                
+                // 날짜 필터링 적용
+                if (isDateInRange(fullDate)) {
+                  const dateMatchFull = title.match(/(\d+월\s*\d+일\s*[^0-9]*)/);
+                  const dateStr = dateMatchFull ? dateMatchFull[1].trim() : "";
 
-              updatedSchedule.push({
-                date: dateStr,
-                title: title,
-                applicants: {
-                  total,
-                  participants,
-                  creators,
-                },
-                maxCapacity,
-              });
+                  updatedSchedule.push({
+                    date: dateStr,
+                    year: currentYear,
+                    title: title,
+                    applicants: {
+                      total,
+                      participants,
+                      creators,
+                    },
+                    maxCapacity,
+                  });
+                }
+              }
             }
           }
         });
@@ -617,14 +858,224 @@ export default function RealDataPage() {
           <h1 className="text-4xl font-bold text-white mb-4">
             📊 내부 스케줄 데이터
           </h1>
-          <p className="text-white/80 text-lg">
+          <p className="text-white/80 text-lg mb-6">
             전체 브랜드 스케줄 현황 (내부용)
           </p>
+          
+          {/* 뷰 모드 토글 */}
+          <div className="flex justify-center">
+            <div className="bg-white/10 rounded-full p-1 flex gap-1">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-full transition-all ${
+                  viewMode === 'list'
+                    ? 'bg-white text-black font-semibold'
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                📋 리스트 뷰
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={`px-4 py-2 rounded-full transition-all ${
+                  viewMode === 'calendar'
+                    ? 'bg-white text-black font-semibold'
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                📅 캘린더 뷰
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-8 max-w-4xl mx-auto">
-          {/* 러브버디즈 스케줄 박스 */}
-          <div className="w-full">
+        {viewMode === 'calendar' ? (
+          // 캘린더 뷰
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-white/5 rounded-xl p-6 shadow-lg">
+              {/* 필터 체크박스 */}
+              <div className="flex flex-wrap gap-4 justify-center mb-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.loveBuddies}
+                    onChange={(e) => setFilters({...filters, loveBuddies: e.target.checked})}
+                    className="w-4 h-4 rounded"
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FF69B4' }}></div>
+                    <span className="text-white">러브버디즈</span>
+                  </div>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.nowSeoul}
+                    onChange={(e) => setFilters({...filters, nowSeoul: e.target.checked})}
+                    className="w-4 h-4 rounded"
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FFAC3A' }}></div>
+                    <span className="text-white">나우서울</span>
+                  </div>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.realGenius}
+                    onChange={(e) => setFilters({...filters, realGenius: e.target.checked})}
+                    className="w-4 h-4 rounded"
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#9E4BED' }}></div>
+                    <span className="text-white">소셜지니어스</span>
+                  </div>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.gameOfDemo}
+                    onChange={(e) => setFilters({...filters, gameOfDemo: e.target.checked})}
+                    className="w-4 h-4 rounded"
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#8B5CF6' }}></div>
+                    <span className="text-white">게임오브데모데이</span>
+                  </div>
+                </label>
+              </div>
+
+              {/* 캘린더 헤더 */}
+              <div className="flex justify-between items-center mb-6">
+                <button
+                  onClick={() => {
+                    if (currentMonth === 0) {
+                      setCurrentMonth(11);
+                      setCurrentYear(currentYear - 1);
+                    } else {
+                      setCurrentMonth(currentMonth - 1);
+                    }
+                  }}
+                  className="text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
+                >
+                  ◀
+                </button>
+                <h2 className="text-2xl font-bold text-white">
+                  {currentYear}년 {currentMonth + 1}월
+                </h2>
+                <button
+                  onClick={() => {
+                    if (currentMonth === 11) {
+                      setCurrentMonth(0);
+                      setCurrentYear(currentYear + 1);
+                    } else {
+                      setCurrentMonth(currentMonth + 1);
+                    }
+                  }}
+                  className="text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
+                >
+                  ▶
+                </button>
+              </div>
+
+              {/* 요일 헤더 */}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {['일', '월', '화', '수', '목', '금', '토'].map(day => (
+                  <div key={day} className="text-center text-white/60 text-sm font-semibold py-2">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* 캘린더 그리드 */}
+              <div className="grid grid-cols-7 gap-2">
+                {(() => {
+                  const calendarDays = getCalendarDays(currentYear, currentMonth);
+                  const allEvents = getAllEventsForCalendar();
+                  
+                  // 필터링된 이벤트만 표시
+                  const filteredEvents = allEvents.filter(event => {
+                    if (event.type === 'loveBuddies' && !filters.loveBuddies) return false;
+                    if (event.type === 'nowSeoul' && !filters.nowSeoul) return false;
+                    if (event.type === 'realGenius' && !filters.realGenius) return false;
+                    if (event.type === 'gameOfDemo' && !filters.gameOfDemo) return false;
+                    return true;
+                  });
+                  
+                  // 각 날짜에 이벤트 매핑
+                  calendarDays.forEach(day => {
+                    day.events = filteredEvents.filter(event => 
+                      event.date.getFullYear() === day.date.getFullYear() &&
+                      event.date.getMonth() === day.date.getMonth() &&
+                      event.date.getDate() === day.date.getDate()
+                    );
+                  });
+                  
+                  return calendarDays.map((day, index) => {
+                    const isToday = 
+                      day.date.toDateString() === new Date().toDateString();
+                    const isInRange = isDateInRange(day.date);
+                    
+                    return (
+                      <div
+                        key={index}
+                        className={`min-h-[150px] p-2 rounded-lg border transition-all ${
+                          day.isCurrentMonth
+                            ? isToday
+                              ? 'bg-white/20 border-white'
+                              : 'bg-black/30 border-white/10 hover:bg-black/50'
+                            : 'bg-black/10 border-white/5'
+                        } ${!isInRange && 'opacity-30'}`}
+                      >
+                        <div className={`text-sm font-semibold mb-2 ${
+                          day.isCurrentMonth ? 'text-white' : 'text-white/40'
+                        } ${isToday && 'text-yellow-400'}`}>
+                          {day.date.getDate()}
+                        </div>
+                        
+                        {/* 이벤트 표시 */}
+                        <div className="space-y-1.5">
+                          {day.events.map((event, eventIndex) => {
+                            const getApplicantInfo = () => {
+                              if (event.applicants.female !== undefined && event.applicants.male !== undefined) {
+                                return `여${event.applicants.female} 남${event.applicants.male}`;
+                              } else if (event.applicants.participants !== undefined && event.applicants.creators !== undefined) {
+                                return `참${event.applicants.participants} 제${event.applicants.creators}`;
+                              } else if (event.applicants.total !== undefined) {
+                                return `총${event.applicants.total}명`;
+                              }
+                              return '';
+                            };
+                            
+                            return (
+                              <div
+                                key={eventIndex}
+                                className="text-xs p-1.5 rounded"
+                                style={{ backgroundColor: event.color + '30', borderLeft: `3px solid ${event.color}` }}
+                              >
+                                <div className="font-medium text-white leading-relaxed">
+                                  {event.title}
+                                </div>
+                                <div className="text-white/70 text-[10px] mt-0.5">
+                                  {getApplicantInfo()} / {event.maxCapacity}명
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+
+            </div>
+          </div>
+        ) : (
+          // 리스트 뷰
+          <div className="space-y-8 max-w-4xl mx-auto">
+            {/* 러브버디즈 스케줄 박스 */}
+            <div className="w-full">
             <div className="bg-white/5 p-4 shadow-lg">
               <h2 className="text-xl font-bold text-center text-white mb-3">
                 💕 러브버디즈 스케줄
@@ -678,8 +1129,8 @@ export default function RealDataPage() {
                     >
                       <div className="flex items-center justify-between px-3 py-2">
                         <div className="flex items-center space-x-3">
-                          <span className="font-medium text-[#F4F4F4] min-w-[70px] text-sm">
-                            {schedule.date}
+                          <span className="font-medium text-[#F4F4F4] min-w-[100px] text-sm">
+                            {schedule.year} {schedule.date}
                           </span>
                           <span className="text-white font-bold flex-grow text-sm">
                             {schedule.title}
@@ -795,8 +1246,8 @@ export default function RealDataPage() {
                       >
                         <div className="flex items-center justify-between px-3 pt-3 pb-1">
                           <div className="flex items-center space-x-4">
-                            <span className="font-medium text-[#F4F4F4] min-w-[80px]">
-                              {schedule.date} (목)
+                            <span className="font-medium text-[#F4F4F4] min-w-[110px]">
+                              {schedule.year} {schedule.date} (목)
                             </span>
                             <span className="text-white font-bold">
                               {schedule.title}
@@ -909,8 +1360,8 @@ export default function RealDataPage() {
                       >
                         <div className="flex items-center justify-between p-3">
                           <div className="flex items-center space-x-4">
-                            <span className="font-medium text-[#F4F4F4] min-w-[80px]">
-                              {schedule.date}
+                            <span className="font-medium text-[#F4F4F4] min-w-[100px]">
+                              {schedule.year} {schedule.date}
                             </span>
                             <span className="text-white font-bold flex-grow">
                               {schedule.title}{" "}
@@ -1016,8 +1467,8 @@ export default function RealDataPage() {
                     >
                       <div className="flex items-center justify-between p-3">
                         <div className="flex items-center space-x-4">
-                          <span className="font-medium text-[#F4F4F4] min-w-[80px]">
-                            {schedule.date}
+                          <span className="font-medium text-[#F4F4F4] min-w-[120px]">
+                            {schedule.year}년 {schedule.date}
                           </span>
                           <span className="text-white font-bold flex-grow">
                             {schedule.title}
@@ -1047,22 +1498,23 @@ export default function RealDataPage() {
             </div>
           </div>
 
-          {/* 내부용 정보 */}
-          <div className="w-full mt-12">
-            <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-600">
-              <h3 className="text-lg font-bold text-white mb-2">
-                📋 내부 참고사항
-              </h3>
-              <ul className="text-white/80 text-sm space-y-1">
-                <li>• 이 페이지는 내부 관리용입니다</li>
-                <li>• 실시간 스케줄 현황을 확인할 수 있습니다</li>
-                <li>
-                  • 각 브랜드별 가격정책과 시간대를 한눈에 비교할 수 있습니다
-                </li>
-              </ul>
+            {/* 내부용 정보 */}
+            <div className="w-full mt-12">
+              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-600">
+                <h3 className="text-lg font-bold text-white mb-2">
+                  📋 내부 참고사항
+                </h3>
+                <ul className="text-white/80 text-sm space-y-1">
+                  <li>• 이 페이지는 내부 관리용입니다</li>
+                  <li>• 실시간 스케줄 현황을 확인할 수 있습니다</li>
+                  <li>
+                    • 각 브랜드별 가격정책과 시간대를 한눈에 비교할 수 있습니다
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
