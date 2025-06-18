@@ -345,7 +345,7 @@ export default function LoveBuddiesDetailPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/상세_1.png"
+                src="/ssobig_assets/일일남매 상세1.jpg"
                 alt="일일남매 상세 1"
                 width={620}
                 height={1200}
@@ -360,7 +360,7 @@ export default function LoveBuddiesDetailPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/상세_2.png"
+                src="/ssobig_assets/일일남매 상세2.jpg"
                 alt="일일남매 상세 2"
                 width={620}
                 height={1200}
