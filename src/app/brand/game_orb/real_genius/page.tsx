@@ -841,11 +841,33 @@ export default function RealGeniusPage() {
                     {/* 3:4 비율 포스터 이미지 영역 */}
                     <div className="w-full aspect-[3/4] relative">
                       <Image
-                        src="/ssobig_assets/바이너리.png"
+                        src="/ssobig_assets/바이너리_compressed.png"
                         alt="바이너리"
                         fill
                         style={{ objectFit: "cover" }}
+                        priority={false}
+                        loading="lazy"
+                        sizes="220px"
+                        onError={(e) => {
+                          console.error("바이너리 이미지 로드 실패:", e);
+                          // 이미지 로드 실패 시 fallback 처리
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                          const fallback = target.parentElement?.querySelector(
+                            ".image-fallback"
+                          ) as HTMLElement;
+                          if (fallback) {
+                            fallback.style.display = "flex";
+                          }
+                        }}
                       />
+                      {/* Fallback 텍스트 */}
+                      <div
+                        className="image-fallback absolute inset-0 bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-lg"
+                        style={{ display: "none" }}
+                      >
+                        바이너리
+                      </div>
                     </div>
                     {/* 카드 내용 영역 */}
                     <div className="p-4 pt-5 flex flex-col h-[155px]">
@@ -1040,71 +1062,6 @@ export default function RealGeniusPage() {
                 </div>
               </div>
             </div>
-
-            {/* 마무리 섹션 */}
-            <div className="text-center my-20">
-              <h2 className="text-2xl font-bold mb-5">
-                머리는 짜릿하게, 마음은 즐겁게!
-                <br />
-                게임으로 만나 찐친되는 마법!
-              </h2>
-              <p className="text-lg mb-8">
-                이제 더 이상 화면 밖에서 구경만 하지 마세요!
-              </p>
-              <p className="text-xl text-[#95BE62] font-bold">
-                흥미로운 게임과 새로운 찐친을 만들어 줄<br />
-                &lt;게임예능현실판&gt;이 당신을 기다립니다.
-              </p>
-            </div>
-
-            {/* 연합어때 이미지 */}
-            <div className="w-full my-24"></div>
-
-            {/* 신청 전 최종 확인 내용 */}
-            <div className="mb-16">
-              <div className="bg-white/10 backdrop-blur-[30px] p-4 md:p-6 rounded-xl">
-                <h2 className="text-2xl font-bold text-center mb-8">
-                  신청 전 최종 확인 내용
-                </h2>
-
-                <div className="space-y-4">
-                  <div className="flex flex-col md:flex-row md:items-center py-3 border-b border-white/10">
-                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
-                      오시는 길
-                    </span>
-                    <span className="text-white">쏘빅스튜디오</span>
-                  </div>
-
-                  <div className="flex flex-col md:flex-row md:items-center py-3 border-b border-white/10">
-                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
-                      소요시간
-                    </span>
-                    <span className="text-white">3시간</span>
-                  </div>
-
-                  <div className="flex flex-col md:flex-row md:items-start py-3 border-b border-white/10">
-                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
-                      제공사항
-                    </span>
-                    <span className="text-white">
-                      어디에서도 해볼 수 없는 콘텐츠⭐, 간단한 다과 및 음료{" "}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col md:flex-row md:items-start py-3">
-                    <span className="font-bold text-[#9E4BED] md:w-[120px] mb-2 md:mb-0">
-                      준비물품
-                    </span>
-                    <span className="text-white">
-                      풀충전한 폰 (폰 사용 많음!)
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* FAQ 섹션 */}
-            <FAQSection questions={faqQuestions} />
           </div>
         </div>
 
