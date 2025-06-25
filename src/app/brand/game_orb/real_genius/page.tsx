@@ -759,6 +759,178 @@ export default function RealGeniusPage() {
                     </LinkWithUtm>
                   </div>
 
+                  {/* 이중 스파이 카드 */}
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-purple-500/50">
+                    {/* 3:4 비율 포스터 이미지 영역 */}
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/이중스파이 포스터.png"
+                        alt="이중 스파이"
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                    {/* 카드 내용 영역 */}
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <span className="font-bold text-white">
+                            이중 스파이
+                          </span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            MID
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
+                        다양한 능력을 쓸 수 있는 심도 있는 팀전 세력전! 흑막으로
+                        상대 조직의 보스가 지목 되다면!
+                      </p>
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-purple-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 5 ? "bg-purple-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>12~40명</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
+                    <LinkWithUtm
+                      href="https://www.instagram.com/p/DLTwW3FP3pB/?igsh=MTRpOW5vYnFvOGJw"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-purple-400 text-center text-sm font-medium transition-colors"
+                    >
+                      자세히 보기
+                    </LinkWithUtm>
+                  </div>
+
+                  {/* 바이너리 카드 */}
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-purple-500/50">
+                    {/* 3:4 비율 포스터 이미지 영역 */}
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/바이너리_compressed.png"
+                        alt="바이너리"
+                        fill
+                        style={{ objectFit: "cover" }}
+                        priority={false}
+                        loading="lazy"
+                        sizes="220px"
+                        onError={(e) => {
+                          console.error("바이너리 이미지 로드 실패:", e);
+                          // 이미지 로드 실패 시 fallback 처리
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                          const fallback = target.parentElement?.querySelector(
+                            ".image-fallback"
+                          ) as HTMLElement;
+                          if (fallback) {
+                            fallback.style.display = "flex";
+                          }
+                        }}
+                      />
+                      {/* Fallback 텍스트 */}
+                      <div
+                        className="image-fallback absolute inset-0 bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-lg"
+                        style={{ display: "none" }}
+                      >
+                        바이너리
+                      </div>
+                    </div>
+                    {/* 카드 내용 영역 */}
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <span className="font-bold text-white">바이너리</span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            MID
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
+                        이진법을 결합한 단체 심리전 투표게임?! 시드 숫자를
+                        랜덤으로 받아, 동맹이 시시각각 바뀐다!
+                      </p>
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-purple-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-purple-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>20~100명</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
+                    <LinkWithUtm
+                      href="https://www.instagram.com/p/DKl3Ev6PqzK"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-purple-400 text-center text-sm font-medium transition-colors"
+                    >
+                      자세히 보기
+                    </LinkWithUtm>
+                  </div>
+
                   {/* 슈가빌리지 카드 */}
                   <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
                     {/* 3:4 비율 포스터 이미지 영역 */}
@@ -835,234 +1007,15 @@ export default function RealGeniusPage() {
                       자세히 보기
                     </LinkWithUtm>
                   </div>
-
-                  {/* 바이너리 카드 */}
-                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
-                    {/* 3:4 비율 포스터 이미지 영역 */}
-                    <div className="w-full aspect-[3/4] relative">
-                      <Image
-                        src="/ssobig_assets/바이너리_compressed.png"
-                        alt="바이너리"
-                        fill
-                        style={{ objectFit: "cover" }}
-                        priority={false}
-                        loading="lazy"
-                        sizes="220px"
-                        onError={(e) => {
-                          console.error("바이너리 이미지 로드 실패:", e);
-                          // 이미지 로드 실패 시 fallback 처리
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = "none";
-                          const fallback = target.parentElement?.querySelector(
-                            ".image-fallback"
-                          ) as HTMLElement;
-                          if (fallback) {
-                            fallback.style.display = "flex";
-                          }
-                        }}
-                      />
-                      {/* Fallback 텍스트 */}
-                      <div
-                        className="image-fallback absolute inset-0 bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold text-lg"
-                        style={{ display: "none" }}
-                      >
-                        바이너리
-                      </div>
-                    </div>
-                    {/* 카드 내용 영역 */}
-                    <div className="p-4 pt-5 flex flex-col h-[155px]">
-                      <div className="flex justify-between items-center mb-2">
-                        <div>
-                          <span className="font-bold text-white">바이너리</span>
-                        </div>
-                        <div className="flex gap-1 justify-end">
-                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                            MID
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
-                        이진법을 결합한 단체 심리전 투표게임?! 시드 숫자를
-                        랜덤으로 받아, 동맹이 시시각각 바뀐다!
-                      </p>
-                      <div className="mt-auto">
-                        <div className="flex justify-between items-center text-xs">
-                          <div className="flex gap-4">
-                            <div>
-                              <span>복잡성</span>
-                              <div className="flex items-center space-x-0.5 mt-1">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                  <div
-                                    key={i}
-                                    className={`w-2 h-2 rounded-full ${
-                                      i === 3 ? "bg-yellow-500" : "bg-white/20"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <div>
-                              <span>전략성</span>
-                              <div className="flex items-center space-x-0.5 mt-1">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                  <div
-                                    key={i}
-                                    className={`w-2 h-2 rounded-full ${
-                                      i === 3 ? "bg-yellow-500" : "bg-white/20"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-xs text-gray-300 text-right">
-                            <span>20~100명</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
-                    <LinkWithUtm
-                      href="https://www.instagram.com/p/DKl3Ev6PqzK"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
-                    >
-                      자세히 보기
-                    </LinkWithUtm>
-                  </div>
-
-                  {/* 이중 스파이 카드 */}
-                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-purple-500/50">
-                    {/* 3:4 비율 포스터 이미지 영역 */}
-                    <div className="w-full aspect-[3/4] relative">
-                      <Image
-                        src="/ssobig_assets/이중 스파이.png"
-                        alt="??????"
-                        fill
-                        style={{ objectFit: "cover" }}
-                      />
-                    </div>
-                    {/* 카드 내용 영역 */}
-                    <div className="p-4 pt-5 flex flex-col h-[155px]">
-                      <div className="flex justify-between items-center mb-2">
-                        <div>
-                          <span className="font-bold text-white">
-                            이중 스파이
-                          </span>
-                        </div>
-                        <div className="flex gap-1 justify-end">
-                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                            MID
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
-                        다양한 능력을 쓸 수 있는 심도 있는 팀전 세력전! 흑막으로
-                        상대 조직의 보스가 지목 되다면!
-                      </p>
-                      <div className="mt-auto">
-                        <div className="flex justify-between items-center text-xs">
-                          <div className="flex gap-4">
-                            <div>
-                              <span>복잡성</span>
-                              <div className="flex items-center space-x-0.5 mt-1">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                  <div
-                                    key={i}
-                                    className={`w-2 h-2 rounded-full ${
-                                      i === 3 ? "bg-purple-500" : "bg-white/20"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <div>
-                              <span>전략성</span>
-                              <div className="flex items-center space-x-0.5 mt-1">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                  <div
-                                    key={i}
-                                    className={`w-2 h-2 rounded-full ${
-                                      i === 5 ? "bg-purple-500" : "bg-white/20"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-xs text-gray-300 text-right">
-                            <span>12~40명</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 미스터리 카드 (추가된 카드) */}
-                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-orange-500/50">
-                    {/* 3:4 비율 포스터 이미지 영역 */}
-                    <div className="w-full aspect-[3/4] relative">
-                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-4xl font-bold text-orange-500">
-                        ?????
-                      </div>
-                    </div>
-                    {/* 카드 내용 영역 */}
-                    <div className="p-4 pt-5 flex flex-col h-[155px]">
-                      <div className="flex justify-between items-center mb-2">
-                        <div>
-                          <span className="font-bold text-white">??????</span>
-                        </div>
-                        <div className="flex gap-1 justify-end">
-                          <span className="bg-orange-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                            HARD
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
-                        ??????
-                      </p>
-                      <div className="mt-auto">
-                        <div className="flex justify-between items-center text-xs">
-                          <div className="flex gap-4">
-                            <div>
-                              <span>복잡성</span>
-                              <div className="flex items-center space-x-0.5 mt-1">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                  <div
-                                    key={i}
-                                    className={`w-2 h-2 rounded-full ${
-                                      i === 4 ? "bg-orange-500" : "bg-white/20"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <div>
-                              <span>전략성</span>
-                              <div className="flex items-center space-x-0.5 mt-1">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                  <div
-                                    key={i}
-                                    className={`w-2 h-2 rounded-full ${
-                                      i === 5 ? "bg-orange-500" : "bg-white/20"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-xs text-gray-300 text-right">
-                            <span>??????</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* FAQ 섹션 */}
+        <div className="w-full max-w-[620px] mx-auto px-5 py-1 pb-10">
+          <FAQSection questions={faqQuestions} />
         </div>
 
         {/* 하단 고정 CTA 버튼 */}
