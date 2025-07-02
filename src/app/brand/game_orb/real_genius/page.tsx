@@ -706,6 +706,9 @@ export default function RealGeniusPage() {
                           <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
                             EASY
                           </span>
+                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            MID
+                          </span>
                         </div>
                       </div>
                       <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
@@ -781,6 +784,9 @@ export default function RealGeniusPage() {
                         <div className="flex gap-1 justify-end">
                           <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
                             MID
+                          </span>
+                          <span className="bg-red-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            HARD
                           </span>
                         </div>
                       </div>
