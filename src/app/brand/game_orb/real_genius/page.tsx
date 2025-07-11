@@ -683,6 +683,86 @@ export default function RealGeniusPage() {
               {/* 가로 스크롤 카드 레이아웃 */}
               <div className="relative w-full pb-6 overflow-x-auto hide-scrollbar">
                 <div className="inline-flex space-x-6 px-2 py-6">
+                  {/* 죄수의 딜레마 카드 */}
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-purple-500/50">
+                    {/* 3:4 비율 포스터 이미지 영역 */}
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/죄수의 딜레마.png"
+                        alt="죄수의 딜레마"
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                    {/* 카드 내용 영역 */}
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <span className="font-bold text-white">
+                            죄수의 딜레마
+                          </span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            EASY
+                          </span>
+                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            MID
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
+                        여러분은 같은 사건에 연루된 공범들입니다. 지금부터 침묵,
+                        고발, 자백 중 하나의 행동을 선택하세요. 형량을 가장 많이
+                        감형받은 자만이 자유를 되찾을 수 있습니다.
+                      </p>
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-purple-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 4 ? "bg-purple-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>10~30명</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
+                    <LinkWithUtm
+                      href="https://www.instagram.com/p/DL9nk0SPVu6/?igsh=cGR5dmxoYXc0YmJq"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-purple-400 text-center text-sm font-medium transition-colors"
+                    >
+                      자세히 보기
+                    </LinkWithUtm>
+                  </div>
+
                   {/* 불면증 마피아 카드 */}
                   <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
                     {/* 3:4 비율 포스터 이미지 영역 */}
