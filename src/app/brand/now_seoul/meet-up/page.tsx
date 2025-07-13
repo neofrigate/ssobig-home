@@ -5,21 +5,6 @@ import Script from "next/script";
 import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
 import { FAQSection } from "../../../../components/FAQ";
-import { useState, useEffect } from "react";
-
-interface ScheduleItem {
-  date: string;
-  title: string;
-  hasEarlyBird: boolean;
-  applicants: {
-    planner: number;
-    marketer: number;
-    developer: number;
-    designer: number;
-    other: number;
-  };
-  maxCapacity: number;
-}
 
 // FAQ 질문 데이터
 const faqQuestions = [
@@ -71,237 +56,6 @@ const faqQuestions = [
 ];
 
 export default function RealGeniusPage() {
-  const [scheduleData, setScheduleData] = useState([
-    {
-      date: "5/29 (목)",
-      title: "AI & 업무 자동화",
-      hasEarlyBird: true,
-      applicants: {
-        planner: 4,
-        marketer: 2,
-        developer: 2,
-        designer: 2,
-        other: 1,
-      },
-      maxCapacity: 20,
-    },
-    {
-      date: "6/5 (목)",
-      title: "생성형 AI와 콘텐츠 제작",
-      hasEarlyBird: true,
-      applicants: {
-        planner: 2,
-        marketer: 2,
-        developer: 1,
-        designer: 1,
-        other: 1,
-      },
-      maxCapacity: 20,
-    },
-    {
-      date: "6/12 (목)",
-      title: "AI를 활용한 협업 프로세스 구축",
-      hasEarlyBird: true,
-      applicants: {
-        planner: 1,
-        marketer: 1,
-        developer: 1,
-        designer: 1,
-        other: 1,
-      },
-      maxCapacity: 20,
-    },
-  ]);
-
-  const [lastUpdateTime, setLastUpdateTime] = useState<string>(() => {
-    const now = new Date();
-    return `UPDATE : ${now.getFullYear()}.${String(now.getMonth() + 1).padStart(
-      2,
-      "0"
-    )}.${String(now.getDate()).padStart(2, "0")} ${String(
-      now.getHours()
-    ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-  });
-
-  // Google Sheets에서 데이터 가져오기
-  useEffect(() => {
-    const fetchSheetData = async () => {
-      console.log("🔄 Google Sheets 데이터 가져오기 시작...");
-      try {
-        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
-        console.log("📡 요청 URL:", url);
-
-        const response = await fetch(url);
-        console.log("📥 응답 상태:", response.status, response.statusText);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const csvText = await response.text();
-        console.log("📄 CSV 데이터 길이:", csvText.length);
-        console.log("📄 CSV 데이터 미리보기:", csvText.substring(0, 500));
-
-        // CSV 파싱
-        const rows = csvText.split("\n").slice(1); // 헤더 제외
-        console.log("📊 총 데이터 행 수:", rows.length);
-        const updatedSchedule: ScheduleItem[] = [];
-
-        rows.forEach((row) => {
-          if (row.trim()) {
-            const cols = row.split(",");
-            const title = cols[1]?.replace(/"/g, "").trim(); // B열: 제목
-            const isChecked = cols[2]?.replace(/"/g, "").trim() === "TRUE"; // C열: 노출 체크박스
-            const maxCapacity = parseInt(cols[3]) || 20; // D열: 최대인원
-
-            const planner = parseInt(cols[5]) || 0; // F열: 기획자
-            const marketer = parseInt(cols[6]) || 0; // G열: 마케터
-            const developer = parseInt(cols[7]) || 0; // H열: 개발자
-            const designer = parseInt(cols[8]) || 0; // I열: 디자이너
-            const other = parseInt(cols[9]) || 0; // J열: 기타
-
-            console.log(
-              `📋 행 파싱 - 제목: "${title}", 체크: ${isChecked}, 최대인원: ${maxCapacity}, 기획자: ${planner}, 마케터: ${marketer}, 개발자: ${developer}, 디자이너: ${designer}, 기타: ${other}`
-            );
-
-            // 체크박스가 체크되고 제목이 유효한 경우에만 표시
-            const isVisible = isChecked && title && title !== "선택 항목";
-            console.log(
-              `✅ 표시 여부: ${isVisible} (체크: ${isChecked}, 제목 유효: ${
-                title && title !== "선택 항목"
-              })`
-            );
-
-            if (isVisible) {
-              // 날짜 추출 (괄호 안의 날짜)
-              const dateMatch = title.match(/\(([^)]+)\)/);
-              const dateStr = dateMatch ? dateMatch[1] : "";
-
-              updatedSchedule.push({
-                date: dateStr,
-                title: title.replace(/\([^)]*\)/, "").trim(),
-                hasEarlyBird: true,
-                applicants: {
-                  planner,
-                  marketer,
-                  developer,
-                  designer,
-                  other,
-                },
-                maxCapacity,
-              });
-            }
-          }
-        });
-
-        console.log(`📝 파싱 완료 - 총 ${updatedSchedule.length}개 일정 발견`);
-
-        if (updatedSchedule.length > 0) {
-          console.log("✨ 업데이트된 스케줄 데이터:", updatedSchedule);
-          console.log("🔄 React state 업데이트 중...");
-          setScheduleData(updatedSchedule);
-          console.log("✅ 데이터 업데이트 완료!");
-        } else {
-          console.log(
-            "⚠️ 표시할 데이터가 없습니다. 체크박스가 체크된 항목이 있는지 확인하세요."
-          );
-        }
-
-        // 업데이트 시간 설정
-        const now = new Date();
-        const updateTimeString = `UPDATE : ${now.getFullYear()}.${String(
-          now.getMonth() + 1
-        ).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} ${String(
-          now.getHours()
-        ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-        setLastUpdateTime(updateTimeString);
-      } catch (error) {
-        console.error("❌ Google Sheets 데이터 가져오기 실패:", error);
-        console.error("🔍 에러 상세:", {
-          message: error instanceof Error ? error.message : "알 수 없는 오류",
-          timestamp: new Date().toISOString(),
-        });
-      }
-    };
-
-    fetchSheetData();
-  }, []);
-
-  const jobColors = {
-    planner: "#8851FF", // 기획자
-    marketer: "#95BCF3", // 마케터
-    developer: "#F3EB82", // 개발자
-    designer: "#F09127", // 디자이너
-    other: "#FFB4C3", // 기타
-  };
-
-  const jobLabels = {
-    planner: "기획자",
-    marketer: "마케터",
-    developer: "개발자",
-    designer: "디자이너",
-    other: "기타",
-  };
-
-  type ApplicantData = {
-    planner: number;
-    marketer: number;
-    developer: number;
-    designer: number;
-    other: number;
-  };
-
-  const ApplicantChart = ({
-    applicants,
-    maxCapacity,
-  }: {
-    applicants: ApplicantData;
-    maxCapacity: number;
-  }) => {
-    // 누적 바 차트를 위한 데이터 준비
-    const chartData = Object.entries(applicants).map(
-      ([job, count]: [string, number]) => {
-        const percentage = maxCapacity > 0 ? (count / maxCapacity) * 100 : 0;
-        return {
-          job,
-          count,
-          percentage,
-          color: jobColors[job as keyof typeof jobColors],
-          label: jobLabels[job as keyof typeof jobLabels],
-        };
-      }
-    );
-
-    return (
-      <div className="px-3 py-2 bg-black/30 rounded-none">
-        {/* 누적 바 차트 */}
-        <div className="flex h-2 bg-white/10 rounded-full overflow-hidden">
-          {chartData.map((item) => (
-            <div
-              key={item.job}
-              className="transition-all duration-700 ease-out"
-              style={{
-                width: `${item.percentage}%`,
-                backgroundColor: item.color,
-              }}
-            />
-          ))}
-          {/* 빈 공간 표시 */}
-          <div
-            className="bg-white/5"
-            style={{
-              width: `${Math.max(
-                0,
-                100 - chartData.reduce((sum, item) => sum + item.percentage, 0)
-              )}%`,
-            }}
-          />
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
       <Head>
@@ -375,153 +129,36 @@ export default function RealGeniusPage() {
             </div>
           </div>
 
-          {/* 나우서울 밋업 스케줄 박스 */}
+          {/* 나우서울 9월 재개 안내 */}
           <div className="w-full mb-12 px-0">
             <div className="bg-black rounded-none p-0 shadow-lg">
-              <h2 className="text-2xl font-bold text-center text-white mb-3 px-3 pt-8">
-                나우서울 밋업 스케줄
-              </h2>
+              <div className="bg-gradient-to-br from-[#FFAC3A]/15 via-[#101F50]/10 to-black/60 backdrop-blur-[30px] p-8 rounded-xl border border-[#FFAC3A]/30 mx-3 my-8">
+                <h2 className="text-2xl font-bold text-center text-white mb-6">
+                  나우서울 9월에 다시 만나요
+                </h2>
 
-              {/* 가격 및 시간 정보 */}
-              <div className="bg-black/70 rounded-none p-3 mb-3 mx-3">
-                <div className="flex flex-col space-y-4">
-                  <div>
-                    <div className="flex items-center flex-wrap">
-                      <span className="text-white font-bold text-lg mr-2">
-                        가격:
-                      </span>
-                      <span className="line-through text-gray-400 text-lg mr-2">
-                        35,000원
-                      </span>
-                      <span className="text-[#FFAC3A] font-bold text-xl">
-                        25,000원
-                      </span>
-                      <span className="bg-[#FFAC3A] text-black px-2 py-0.5 rounded-full text-xs font-bold ml-2">
-                        할인
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-white font-bold text-lg">
-                    매주 목요일 19:30~22:00
-                    <span className="text-white"> (2.5시간)</span>
-                  </div>
-                </div>
-
-                {/* 태그 형태 범례 */}
-                <div className="flex flex-wrap gap-2 justify-end mt-6 mb-3">
-                  {Object.entries(jobLabels).map(([job, label]) => (
-                    <div
-                      key={job}
-                      className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs border border-white/20"
-                      style={{
-                        backgroundColor: `${
-                          jobColors[job as keyof typeof jobColors]
-                        }20`,
-                      }}
-                    >
-                      <div
-                        className="w-2 h-2 rounded-full"
-                        style={{
-                          backgroundColor:
-                            jobColors[job as keyof typeof jobColors],
-                        }}
-                      />
-                      <span className="text-white/90">{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 일정 목록 */}
-              <div className="space-y-6 px-3">
-                {scheduleData.map((schedule, index) => {
-                  const total = Object.values(schedule.applicants).reduce(
-                    (sum: number, count: number) => sum + count,
-                    0
-                  );
-                  return (
-                    <div
-                      key={index}
-                      className="rounded-none bg-black/50 hover:bg-black/80 transition-colors"
-                    >
-                      <div className="flex items-center justify-between px-3 pt-3 pb-1">
-                        <div className="flex items-center space-x-4">
-                          <span className="font-medium text-[#F4F4F4] min-w-[80px]">
-                            {schedule.date} (목)
-                          </span>
-                          <span className="text-white font-bold">
-                            {schedule.title}
-                          </span>
-                        </div>
-                        <span className="text-[#FFAC3A] font-bold text-sm">
-                          {total}/{schedule.maxCapacity}명
-                        </span>
-                      </div>
-                      <ApplicantChart
-                        applicants={schedule.applicants}
-                        maxCapacity={schedule.maxCapacity}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* 참여 조건 */}
-              <div className="mt-10 -mx-3">
-                <div className="mx-9 px-3 py-2 bg-[#FFAC3A]/20 rounded-lg border border-[#FFAC3A]/50">
-                  <p className="text-[#FFAC3A] font-bold text-sm mb-1">
-                    📋 참여 조건
+                <div className="text-center space-y-4">
+                  <p className="text-lg text-white/90">
+                    더욱 알찬 콘텐츠와 시스템으로 준비하여
                   </p>
-                  <p className="text-white text-sm">
-                    3년차 이상의 경력을 가지신 분들만 참여 가능합니다
+                  <p className="text-xl font-bold text-[#FFAC3A]">
+                    9월에 다시 돌아오겠습니다!
                   </p>
-                </div>
-              </div>
 
-              {/* 주제별 모집 이유 설명 */}
-              <div className="mt-4 -mx-3">
-                <div className="mx-9 px-3 py-2 bg-white/5 rounded-lg border border-white/10">
-                  <h5 className="text-[#FFAC3A] font-bold text-sm mb-3 flex items-center">
-                    💡 왜 매회 다른 주제로 진행할까요?
-                  </h5>
-                  <div className="space-y-2 text-white/90 text-sm">
-                    <p className="flex items-start">
-                      <span className="text-[#FFAC3A] mr-2">•</span>
-                      <span>
-                        <strong>관심사가 비슷한 사람들과 더 깊은 대화</strong>가
-                        가능해요
-                      </span>
-                    </p>
-                    <p className="flex items-start">
-                      <span className="text-[#FFAC3A] mr-2">•</span>
-                      <span>
-                        <strong>나와 잘 맞는 사람을 찾기</strong> 훨씬
-                        쉬워집니다
-                      </span>
-                    </p>
-                    <p className="flex items-start">
-                      <span className="text-[#FFAC3A] mr-2">•</span>
-                      <span>
-                        <strong>요즘 가장 핫한 주제만 엄선</strong>해서 진행해요
-                      </span>
+                  <div className="bg-black/30 p-4 rounded-xl mt-6">
+                    <p className="text-white/80 text-sm">
+                      잠시 재정비 시간을 가지며,
+                      <br />더 나은 네트워킹 경험을 위해 준비하고 있습니다.
                     </p>
                   </div>
-                  <div className="mt-3 text-center">
-                    <span className="text-[#FFAC3A] text-xs font-medium bg-[#FFAC3A]/10 px-3 py-1 rounded-full">
-                      관심 있는 주제 회차에 참여하세요! 🎯
+
+                  <div className="text-center mt-6">
+                    <span className="text-[#FFAC3A] text-sm font-medium bg-[#FFAC3A]/10 px-4 py-2 rounded-full">
+                      9월 재개 소식을 가장 먼저 받고 싶다면? 👇
                     </span>
                   </div>
                 </div>
               </div>
-
-              {/* 업데이트 시간 표시 */}
-              {lastUpdateTime && (
-                <div className="text-right mt-3 pr-6 pb-3">
-                  <span className="text-white/60 text-xs">
-                    {lastUpdateTime}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 
@@ -1054,7 +691,7 @@ export default function RealGeniusPage() {
               buttonType="meetup_main_cta"
               destination="smore_form"
             >
-              🔥 지금 기회 잡기 (선착순 마감)
+              📢 알림 신청하기
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"
