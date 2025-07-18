@@ -11,7 +11,7 @@ interface ScheduleItem {
   date: string;
   time: string;
   title: string;
-  difficulty: string;
+  difficulty: string[];
   applicants: {
     total: number;
     female: number;
@@ -133,14 +133,19 @@ export default function RealGeniusPage() {
               .trim();
 
             // 난이도 추정 (게임명에 따라)
-            let difficulty = "EASY";
-            if (
-              gameName.includes("바이너리") ||
-              gameName.includes("이중스파이")
-            ) {
-              difficulty = "MID";
+            let difficulty: string[] = ["EASY"];
+            if (gameName.includes("바이너리")) {
+              difficulty = ["MID"];
+            } else if (gameName.includes("이중스파이")) {
+              difficulty = ["HARD"];
+            } else if (gameName.includes("캠퍼스")) {
+              difficulty = ["EASY", "MID"];
+            } else if (gameName.includes("죄수의 딜레마")) {
+              difficulty = ["EASY", "MID"];
+            } else if (gameName.includes("마피아")) {
+              difficulty = ["EASY", "MID"];
             } else if (gameName.includes("??????")) {
-              difficulty = "HARD";
+              difficulty = ["HARD"];
             }
 
             if (
@@ -388,10 +393,15 @@ export default function RealGeniusPage() {
                       if (
                         title.includes("마피아") ||
                         title.includes("바이너리") ||
-                        title.includes("스파이")
+                        title.includes("스파이") ||
+                        title.includes("설령전") ||
+                        title.includes("죄수의 딜레마")
                       ) {
                         return "Mind";
-                      } else if (title.includes("슈가빌리지")) {
+                      } else if (
+                        title.includes("슈가빌리지") ||
+                        title.includes("캠퍼스")
+                      ) {
                         return "Story";
                       }
                       return "";
@@ -418,13 +428,18 @@ export default function RealGeniusPage() {
                                 </span>
                               )}
                             </span>
-                            <span
-                              className={`${getDifficultyColor(
-                                schedule.difficulty
-                              )} text-white px-2 py-0.5 rounded-full text-xs font-bold`}
-                            >
-                              {schedule.difficulty}
-                            </span>
+                            <div className="flex gap-1">
+                              {schedule.difficulty.map((diff, idx) => (
+                                <span
+                                  key={idx}
+                                  className={`${getDifficultyColor(
+                                    diff
+                                  )} text-white px-2 py-0.5 rounded-full text-xs font-bold`}
+                                >
+                                  {diff}
+                                </span>
+                              ))}
+                            </div>
                           </div>
                           <span className="text-[#9E4BED] font-bold text-sm">
                             {schedule.applicants.total}/{schedule.maxCapacity}명
@@ -683,6 +698,162 @@ export default function RealGeniusPage() {
               {/* 가로 스크롤 카드 레이아웃 */}
               <div className="relative w-full pb-6 overflow-x-auto hide-scrollbar">
                 <div className="inline-flex space-x-6 px-2 py-6">
+                  {/* 설령전 카드 */}
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
+                    {/* 3:4 비율 포스터 이미지 영역 */}
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/설령전 포스터.png"
+                        alt="설령전"
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                    {/* 카드 내용 영역 */}
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <span className="font-bold text-white">설령전</span>
+                          <span
+                            className="font-serif italic text-sm text-yellow-500 transform -rotate-2 font-thin ml-1"
+                            style={{ fontFamily: "cursive" }}
+                          >
+                            Mind
+                          </span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            EASY
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
+                        천년동안 구미호의 지배 아래 음기로 가득 찬 나라. 신수
+                        &apos;해태&apos;의 부름을 받아 구미호와 그 세력을
+                        물리치고 양의 기운으로 세상의 균형을 되찾아야 합니다.
+                      </p>
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 2 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 2 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>12~30명</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* 자세히 보기 버튼 - 비활성화 */}
+                    <div className="block w-full py-3 bg-[#3d2f26]/50 text-yellow-400/50 text-center text-sm font-medium cursor-not-allowed">
+                      준비중
+                    </div>
+                  </div>
+
+                  {/* 캠퍼스 라이프 카드 */}
+                  <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-yellow-500/50">
+                    {/* 3:4 비율 포스터 이미지 영역 */}
+                    <div className="w-full aspect-[3/4] relative">
+                      <Image
+                        src="/ssobig_assets/캠퍼스 라이프.png"
+                        alt="캠퍼스 라이프"
+                        fill
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                    {/* 카드 내용 영역 */}
+                    <div className="p-4 pt-5 flex flex-col h-[155px]">
+                      <div className="flex justify-between items-center mb-2">
+                        <div>
+                          <span className="font-bold text-white">
+                            캠퍼스 라이프
+                          </span>
+                        </div>
+                        <div className="flex gap-1 justify-end">
+                          <span className="bg-yellow-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            EASY
+                          </span>
+                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                            MID
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-[#F4F4F4] mb-2 line-clamp-3">
+                        2025년 8월, 캠퍼스에서 벌어지는 흥미진진한 이야기! 학교
+                        생활 포인트 시스템과 함께 펼쳐지는 대학생활 시뮬레이션
+                        게임입니다.
+                      </p>
+                      <div className="mt-auto">
+                        <div className="flex justify-between items-center text-xs">
+                          <div className="flex gap-4">
+                            <div>
+                              <span>복잡성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 2 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <span>전략성</span>
+                              <div className="flex items-center space-x-0.5 mt-1">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-2 h-2 rounded-full ${
+                                      i === 3 ? "bg-yellow-500" : "bg-white/20"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-300 text-right">
+                            <span>12~30명</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* 자세히 보기 버튼 - 카드 외부에 배치 */}
+                    <LinkWithUtm
+                      href="https://www.instagram.com/p/DMMqr8aPuYb/?igsh=MW82MW50NDk4NjB0bg=="
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
+                    >
+                      자세히 보기
+                    </LinkWithUtm>
+                  </div>
+
                   {/* 죄수의 딜레마 카드 */}
                   <div className="w-[220px] flex-shrink-0 bg-white/5 rounded-xl overflow-hidden border border-purple-500/50">
                     {/* 3:4 비율 포스터 이미지 영역 */}
@@ -769,7 +940,7 @@ export default function RealGeniusPage() {
                     <div className="w-full aspect-[3/4] relative">
                       <Image
                         src="/ssobig_assets/불면증 마피아.png"
-                        alt="??????"
+                        alt="불면증 마피아"
                         fill
                         style={{ objectFit: "cover" }}
                       />
@@ -862,9 +1033,6 @@ export default function RealGeniusPage() {
                           </span>
                         </div>
                         <div className="flex gap-1 justify-end">
-                          <span className="bg-purple-500/80 text-white px-2 py-0.5 rounded-full text-xs">
-                            MID
-                          </span>
                           <span className="bg-red-500/80 text-white px-2 py-0.5 rounded-full text-xs">
                             HARD
                           </span>
