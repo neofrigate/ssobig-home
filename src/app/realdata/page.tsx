@@ -83,7 +83,7 @@ interface CalendarDay {
 
 export default function RealDataPage() {
   // 뷰 모드 상태 ('list' | 'calendar')
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
 
   // 필터 상태
   const [filters, setFilters] = useState({
@@ -1164,7 +1164,9 @@ export default function RealDataPage() {
                 ).map((day) => (
                   <div
                     key={day}
-                    className="text-center text-white/60 text-xs md:text-sm font-semibold py-1 md:py-2"
+                    className={`text-center text-xs md:text-sm font-semibold py-1 md:py-2 ${
+                      day === "일" ? "text-red-400" : "text-white/60"
+                    }`}
                   >
                     {day}
                   </div>
@@ -1222,15 +1224,21 @@ export default function RealDataPage() {
                         } ${
                           day.isCurrentMonth
                             ? isToday
-                              ? "bg-white/20 border-white"
+                              ? "bg-white/1 border-white"
                               : "bg-black/30 border-white/10 hover:bg-black/50"
                             : "bg-black/10 border-white/5"
                         } ${!isInRange && "opacity-30"}`}
                       >
                         <div
                           className={`text-xs md:text-sm font-semibold mb-1 md:mb-2 ${
-                            day.isCurrentMonth ? "text-white" : "text-white/40"
-                          } ${isToday && "text-yellow-400"}`}
+                            isToday
+                              ? "text-yellow-400"
+                              : day.date.getDay() === 0
+                              ? "text-red-400"
+                              : day.isCurrentMonth
+                              ? "text-white"
+                              : "text-white/40"
+                          }`}
                         >
                           {day.date.getDate()}
                         </div>
