@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Card, { CardProps } from "../../../components/Card";
 import Script from "next/script";
-import { trackLinkClick } from "../../../utils/gtag";
 
 export default function GameOrbPage() {
   const gameOrbCards: CardProps[] = [
@@ -26,24 +25,43 @@ export default function GameOrbPage() {
       buttonType: "social_genius_cta",
       destination: "internal_page",
     },
+    // {
+    //   title: "게임오브 정모 : 신작게임 데모데이",
+    //   description: "커뮤니티 멤버들과 함께하는 정모에 참여하세요.",
+    //   linkText: "demoday",
+    //   linkHref: "/brand/game_orb/demoday",
+    //   linkIconType: "link",
+    //   hasImageArea: true,
+    //   imagePlaceholderText: "게임오브 정모",
+    //   imageAreaStyle: {
+    //     backgroundImage: "url('/ssobig_assets/게임 정모 포스.png')",
+    //     backgroundSize: "cover",
+    //     backgroundPosition: "center",
+    //   },
+    //   fullImageCard: true,
+    //   // 추적 정보 추가
+    //   brandPage: "game_orb",
+    //   buttonType: "meetup_cta",
+    //   destination: "internal_page",
+    // },
     {
-      title: "게임오브 정모 : 신작게임 데모데이",
-      description: "커뮤니티 멤버들과 함께하는 정모에 참여하세요.",
-      linkText: "demoday",
-      linkHref: "/brand/game_orb/demoday",
+      title: "게임오브 비밀 카톡방 🎮",
+      description: "게임 애호가들과 함께하는 비밀 카톡방에 참여하세요.",
+      linkText: "kakao_chat",
+      linkHref: "https://open.kakao.com/o/g9LIA56f",
       linkIconType: "link",
       hasImageArea: true,
-      imagePlaceholderText: "게임오브 정모",
+      imagePlaceholderText: "게임오브 카톡방",
       imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/게임 정모 포스.png')",
+        backgroundImage: "url('/ssobig_assets/게임오브.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       },
       fullImageCard: true,
       // 추적 정보 추가
       brandPage: "game_orb",
-      buttonType: "meetup_cta",
-      destination: "internal_page",
+      buttonType: "kakao_chat_cta",
+      destination: "external_chat",
     },
   ];
 
@@ -141,27 +159,6 @@ export default function GameOrbPage() {
               {gameOrbCards.map((item) => (
                 <Card key={item.title} {...item} />
               ))}
-
-              {/* 추가 참여 버튼 */}
-              <div className="mt-8">
-                <a
-                  href="https://open.kakao.com/o/g9LIA56f"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex p-4 justify-center items-center gap-4 w-full max-w-[580px] rounded-full bg-[#8631EC] hover:bg-[#7128d1] text-white font-bold text-[16px] shadow-[0px_0px_20px_0px_rgba(255,255,255,0.50)] transform transition-all hover:scale-105 duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 aspect-[145/14] mx-auto"
-                  onClick={() =>
-                    trackLinkClick({
-                      linkUrl: "https://open.kakao.com/o/g9LIA56f",
-                      linkText: "게임오브 비밀 카톡방",
-                      brandPage: "game_orb",
-                      buttonType: "kakao_chat_cta",
-                      destination: "external_chat",
-                    })
-                  }
-                >
-                  게임오브 비밀 카톡방 🎮
-                </a>
-              </div>
             </div>
           </section>
         </main>
