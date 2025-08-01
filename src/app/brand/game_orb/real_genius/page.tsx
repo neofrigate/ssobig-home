@@ -768,10 +768,18 @@ export default function RealGeniusPage() {
                         </div>
                       </div>
                     </div>
-                    {/* 자세히 보기 버튼 - 비활성화 */}
-                    <div className="block w-full py-3 bg-[#3d2f26]/50 text-yellow-400/50 text-center text-sm font-medium cursor-not-allowed">
-                      준비중
-                    </div>
+                    {/* 자세히 보기 버튼 */}
+                    <LinkWithUtm
+                      href="https://www.instagram.com/p/DMSNNtivJyV/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full py-3 bg-[#3d2f26] hover:bg-[#4a3a31] text-yellow-400 text-center text-sm font-medium transition-colors"
+                      brandPage="game_orb"
+                      buttonType="seolryeong_cta"
+                      destination="instagram"
+                    >
+                      자세히 보기
+                    </LinkWithUtm>
                   </div>
 
                   {/* 캠퍼스 라이프 카드 */}
