@@ -53,7 +53,7 @@ export default function GameOrbPage() {
       hasImageArea: true,
       imagePlaceholderText: "게임오브 카톡방",
       imageAreaStyle: {
-        backgroundImage: "url('/ssobig_assets/게임오브.png')",
+        backgroundImage: "url('/ssobig_assets/게임오브 단톡방.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       },
