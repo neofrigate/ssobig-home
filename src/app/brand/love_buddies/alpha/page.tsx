@@ -107,7 +107,7 @@ export default function LoveBuddiesAlphaPage() {
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="w-full max-w-[620px] mx-auto">
             <LinkWithUtm
-              href="https://smore.im/form/J1P3y5d52F"
+              href="https://smore.im/form/Mo8BwTVq8o"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full h-[56px] bg-[#FF6B9F] hover:bg-[#e45a8b] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-lg"
@@ -115,7 +115,7 @@ export default function LoveBuddiesAlphaPage() {
               buttonType="alpha_main_cta"
               destination="smore_form"
             >
-              온라인 마니또 사전신청하기
+              온라인마니또 신청하기
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"
