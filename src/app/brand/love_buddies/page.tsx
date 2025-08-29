@@ -119,7 +119,7 @@ const LoveBuddiesPage = () => {
             buttonType="alpha_cta"
             destination="internal_page"
           >
-            💌Top3 알파남매 사전신청하기
+            💌Top3 알파남매 신청하기
           </ActionButton>
 
           {/* 참가후기 섹션 위의 여백 */}
