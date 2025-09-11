@@ -273,7 +273,7 @@ export default function LoveBuddiesAlphaPage() {
               <div className="bg-black/70 rounded-lg p-3 mb-4">
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-2">
                   <p className="text-white font-bold text-base mb-1 sm:mb-0">
-                    가격: <span className="text-white">25,000원</span>
+                    가격: <span className="text-white">30,000원</span>
                     <span className="text-[#FF6B9F]">(온라인)</span>
                   </p>
                   <p className="text-white font-bold text-base">
