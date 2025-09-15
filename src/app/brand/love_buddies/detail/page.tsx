@@ -153,9 +153,11 @@ export default function LoveBuddiesDetailPage() {
   const ApplicantChart = ({
     applicants,
     maxCapacity,
+    isCompleted = false,
   }: {
     applicants: { total: number; female: number; male: number };
     maxCapacity: number;
+    isCompleted?: boolean;
   }) => {
     const femalePercentage =
       maxCapacity > 0 ? (applicants.female / maxCapacity) * 100 : 0;
@@ -171,11 +173,15 @@ export default function LoveBuddiesDetailPage() {
         {/* 누적 바 차트 */}
         <div className="flex h-2 bg-white/10 rounded-full overflow-hidden">
           <div
-            className="transition-all duration-700 ease-out bg-[#FF69B4]"
+            className={`transition-all duration-700 ease-out ${
+              isCompleted ? "bg-[#FF69B4]/30" : "bg-[#FF69B4]"
+            }`}
             style={{ width: `${femalePercentage}%` }}
           />
           <div
-            className="transition-all duration-700 ease-out bg-[#4A90E2]"
+            className={`transition-all duration-700 ease-out ${
+              isCompleted ? "bg-[#4A90E2]/30" : "bg-[#4A90E2]"
+            }`}
             style={{ width: `${malePercentage}%` }}
           />
           <div
@@ -324,32 +330,52 @@ export default function LoveBuddiesDetailPage() {
                     </div>
                   </div>
                 ) : (
-                  scheduleData.map((schedule, index) => (
-                    <div
-                      key={index}
-                      className="rounded-lg bg-black/50 hover:bg-black/80 transition-colors"
-                    >
-                      <div className="flex items-center justify-between px-3 py-2">
-                        <div className="flex items-center space-x-3">
-                          <span className="font-medium text-[#F4F4F4] min-w-[70px] text-sm">
-                            {schedule.date}
-                          </span>
-                          <span className="text-white font-bold flex-grow text-sm">
-                            {schedule.title}
+                  scheduleData.map((schedule, index) => {
+                    const isCompleted = schedule.title.includes("전체마감");
+                    return (
+                      <div
+                        key={index}
+                        className="rounded-lg bg-black/50 hover:bg-black/80 transition-colors"
+                      >
+                        <div className="flex items-center justify-between px-3 py-2">
+                          <div className="flex items-center space-x-3">
+                            <span
+                              className={`font-medium min-w-[70px] text-sm ${
+                                isCompleted
+                                  ? "text-[#F4F4F4]/30"
+                                  : "text-[#F4F4F4]"
+                              }`}
+                            >
+                              {schedule.date}
+                            </span>
+                            <span
+                              className={`font-bold flex-grow text-sm ${
+                                isCompleted ? "text-white/30" : "text-white"
+                              }`}
+                            >
+                              {schedule.title}
+                            </span>
+                          </div>
+                          <span
+                            className={`font-bold text-xs ${
+                              isCompleted
+                                ? "text-[#FF6B9F]/30"
+                                : "text-[#FF6B9F]"
+                            }`}
+                          >
+                            {schedule.applicants.total}/{schedule.maxCapacity}명
                           </span>
                         </div>
-                        <span className="text-[#FF6B9F] font-bold text-xs">
-                          {schedule.applicants.total}/{schedule.maxCapacity}명
-                        </span>
+                        <div className="px-3 pb-2">
+                          <ApplicantChart
+                            applicants={schedule.applicants}
+                            maxCapacity={schedule.maxCapacity}
+                            isCompleted={isCompleted}
+                          />
+                        </div>
                       </div>
-                      <div className="px-3 pb-2">
-                        <ApplicantChart
-                          applicants={schedule.applicants}
-                          maxCapacity={schedule.maxCapacity}
-                        />
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 

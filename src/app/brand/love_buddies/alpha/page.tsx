@@ -163,9 +163,11 @@ export default function LoveBuddiesAlphaPage() {
   const ApplicantChart = ({
     applicants,
     maxCapacity,
+    isInProgress = false,
   }: {
     applicants: { total: number; female: number; male: number };
     maxCapacity: number;
+    isInProgress?: boolean;
   }) => {
     const femalePercentage =
       maxCapacity > 0 ? (applicants.female / maxCapacity) * 100 : 0;
@@ -181,11 +183,15 @@ export default function LoveBuddiesAlphaPage() {
         {/* 누적 바 차트 */}
         <div className="flex h-2 bg-white/10 rounded-full overflow-hidden">
           <div
-            className="transition-all duration-700 ease-out bg-[#FF69B4]"
+            className={`transition-all duration-700 ease-out ${
+              isInProgress ? "bg-[#FF69B4]/30" : "bg-[#FF69B4]"
+            }`}
             style={{ width: `${femalePercentage}%` }}
           />
           <div
-            className="transition-all duration-700 ease-out bg-[#4A90E2]"
+            className={`transition-all duration-700 ease-out ${
+              isInProgress ? "bg-[#4A90E2]/30" : "bg-[#4A90E2]"
+            }`}
             style={{ width: `${malePercentage}%` }}
           />
           <div
@@ -309,29 +315,67 @@ export default function LoveBuddiesAlphaPage() {
                     </div>
                   </div>
                 ) : (
-                  scheduleData.map((schedule, index) => (
-                    <div
-                      key={index}
-                      className="rounded-lg bg-black/50 hover:bg-black/80 transition-colors"
-                    >
-                      <div className="flex items-center justify-between px-3 py-2">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-white font-bold flex-grow text-sm">
-                            {schedule.title}
+                  scheduleData.map((schedule, index) => {
+                    // 시작 날짜 추출 및 진행 중 여부 확인
+                    const getManittoStatus = (title: string) => {
+                      // "9/15~9/19 온라인 마니또" 형태에서 시작 날짜(9/15) 추출
+                      const dateMatch = title.match(/^(\d{1,2})\/(\d{1,2})~/);
+                      if (dateMatch) {
+                        const startMonth = parseInt(dateMatch[1]);
+                        const startDay = parseInt(dateMatch[2]);
+                        const currentDate = new Date();
+                        const currentYear = currentDate.getFullYear();
+
+                        // 시작 날짜 객체 생성
+                        const startDate = new Date(
+                          currentYear,
+                          startMonth - 1,
+                          startDay
+                        );
+
+                        // 현재 날짜와 비교 (시작 날짜가 지났으면 진행중)
+                        return currentDate >= startDate;
+                      }
+                      return false;
+                    };
+
+                    const isInProgress = getManittoStatus(schedule.title);
+
+                    return (
+                      <div
+                        key={index}
+                        className="rounded-lg bg-black/50 hover:bg-black/80 transition-colors"
+                      >
+                        <div className="flex items-center justify-between px-3 py-2">
+                          <div className="flex items-center space-x-3">
+                            <span
+                              className={`font-bold flex-grow text-sm ${
+                                isInProgress ? "text-white/30" : "text-white"
+                              }`}
+                            >
+                              {schedule.title}
+                            </span>
+                          </div>
+                          <span
+                            className={`font-bold text-xs ${
+                              isInProgress ? "text-[#FF6B9F]" : "text-[#FF6B9F]"
+                            }`}
+                          >
+                            {isInProgress
+                              ? "마니또 진행중"
+                              : `${schedule.applicants.total}/${schedule.maxCapacity}명`}
                           </span>
                         </div>
-                        <span className="text-[#FF6B9F] font-bold text-xs">
-                          {schedule.applicants.total}/{schedule.maxCapacity}명
-                        </span>
+                        <div className="px-3 pb-2">
+                          <ApplicantChart
+                            applicants={schedule.applicants}
+                            maxCapacity={schedule.maxCapacity}
+                            isInProgress={isInProgress}
+                          />
+                        </div>
                       </div>
-                      <div className="px-3 pb-2">
-                        <ApplicantChart
-                          applicants={schedule.applicants}
-                          maxCapacity={schedule.maxCapacity}
-                        />
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
