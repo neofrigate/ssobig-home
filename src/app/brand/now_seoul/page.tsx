@@ -161,12 +161,12 @@ export default function NowSeoulPage() {
 
         {/* Content Area */}
         <main className="w-full max-w-[620px] mx-auto z-10 relative px-5 mt-[30px]">
-          <section className="pb-12">
-            {/* 신청 링크 섹션 */}
+          {/* 신청 링크 섹션 - 숨김 처리 */}
+          {/* <section className="pb-12">
             <div className="w-full space-y-5 sm:space-y-6 max-w-[580px] mx-auto">
               <Card {...nowSeoulCard} />
             </div>
-          </section>
+          </section> */}
 
           {/* 참여자 프로필 섹션 */}
           <section className="pb-12">

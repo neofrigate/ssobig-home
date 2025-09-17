@@ -31,15 +31,16 @@ export default function Home() {
       imageUrl: "/ssobig_assets/러브버디즈.png",
       imageAreaStyle: { backgroundColor: "#000000" },
     },
-    {
-      title: "N.O.W.seoul 나우서울",
-      description: "퇴근 후 만나는 전문직 비즈니스 네트워킹 모임",
-      linkText: "now_seoul",
-      linkHref: "/brand/now_seoul",
-      linkIconType: "link",
-      imageUrl: "/ssobig_assets/나우서울.png",
-      imageAreaStyle: {},
-    },
+    // N.O.W.seoul 카드 숨김 처리
+    // {
+    //   title: "N.O.W.seoul 나우서울",
+    //   description: "퇴근 후 만나는 전문직 비즈니스 네트워킹 모임",
+    //   linkText: "now_seoul",
+    //   linkHref: "/brand/now_seoul",
+    //   linkIconType: "link",
+    //   imageUrl: "/ssobig_assets/나우서울.png",
+    //   imageAreaStyle: {},
+    // },
     {
       title: "게임오브",
       description: "TV속 게임을 만들고 플레이하는 커뮤니티",
