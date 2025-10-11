@@ -52,10 +52,10 @@ const Sidebar: React.FC = () => {
                   src="/ssobig_assets/Logo/logo=ssobig, color=white.png"
                   alt="쏘빅"
                   width={80}
-                  height={28}
+                  height={29}
                   priority
                   unoptimized
-                  style={{ width: 80, height: "auto" }}
+                  className="h-auto"
                 />
               </LinkWithUtm>
             </div>
@@ -102,9 +102,9 @@ const Sidebar: React.FC = () => {
                     src="/ssobig_assets/Logo/logo=playroom, color=white.png"
                     alt="PLAYROOm"
                     width={125}
-                    height={30}
+                    height={40}
                     unoptimized
-                    style={{ width: 125, height: "auto" }}
+                    className="h-auto"
                   />
                 </div>
               </LinkWithUtm>

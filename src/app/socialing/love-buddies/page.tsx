@@ -1,7 +1,6 @@
 import Image from "next/image";
-import ActionButton from "../../../components/ActionButton";
+import Link from "next/link";
 import Script from "next/script";
-import ImageSlider from "../../../components/ImageSlider";
 
 export const metadata = {
   title: "Ssobig-Love Buddies",
@@ -31,32 +30,33 @@ const LoveBuddiesPage = () => {
       />
       {/* End Meta Pixel Code */}
 
-      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start pb-4 px-0 selection:bg-pink-500 selection:text-white pt-[88px] md:pt-[60px]">
+      <div className="text-white font-sans relative flex flex-col items-center justify-start pb-[100px] px-0 selection:bg-pink-500 selection:text-white pt-[88px] md:pt-[60px]">
         {/* 배경 이미지 next/image 적용 */}
         <div className="fixed inset-0 -z-10">
           <Image
-            src="/ssobig_assets/러브버디즈 배경.jpg"
+            src="/ssobig_assets/lovebuddies/hero-main.jpg"
             alt="러브버디즈 배경"
             fill
             style={{ objectFit: "cover", objectPosition: "center" }}
             priority
             sizes="100vw"
           />
-          {/* 배경 이미지 위에 그라데이션 오버레이 적용 */}
-          <div className="fixed inset-0 bg-gradient-to-b from-black to-transparent"></div>
+          {/* 배경 이미지 위에 블랙 50% 투명도 오버레이 적용 */}
+          <div className="fixed inset-0 bg-black/50"></div>
         </div>
 
         {/* 이미지 및 컨텐츠 영역 */}
-        <div className="w-full max-w-[620px] mx-auto z-10 relative text-center px-5 pt-5 flex flex-col items-center gap-[30px]">
+        <div className="w-full md:max-w-[720px] mx-auto z-10 relative text-center px-5 pt-5 flex flex-col items-center gap-[30px]">
           {/* 로고 이미지 */}
           <div className="w-full max-w-[400px] h-[96px] sm:h-[150px] relative flex justify-center items-center mx-auto">
             <Image
-              src="/ssobig_assets/brand logo=러브버디즈.png"
+              src="/ssobig_assets/lovebuddies/brand-logo.png"
               alt="러브버디즈 로고"
               fill
               style={{ objectFit: "contain" }}
               className="mx-auto"
               priority
+              sizes="(max-width: 768px) 80vw, 400px"
             />
           </div>
 
@@ -70,7 +70,7 @@ const LoveBuddiesPage = () => {
           >
             <div className="w-[24px] h-[24px]">
               <Image
-                src="/ssobig_assets/instaBigIcon.png"
+                src="/ssobig_assets/home/icon-instagram-circle.png"
                 alt="인스타그램 아이콘"
                 width={24}
                 height={24}
@@ -95,71 +95,85 @@ const LoveBuddiesPage = () => {
         </div>
 
         {/* Content Area */}
-        <main className="z-10 flex flex-col items-center text-center max-w-[620px] w-full p-5 mt-[30px]">
-          {/* 상세 페이지 버튼 */}
-          <ActionButton
-            href="/socialing/love-buddies/detail"
-            className="mb-6"
-            target="_self"
-            rel=""
-            brandPage="love_buddies"
-            buttonType="main_cta"
-            destination="internal_page"
+        <div className="z-10 flex flex-col items-center md:max-w-[720px] w-full px-5 pb-0 mt-[30px]">
+          {/* 일일남매 섹션 */}
+          <Link
+            href="/socialing/love-buddies/11namme"
+            className="group flex flex-row gap-3 sm:gap-4 w-full items-center mb-6 sm:mb-8"
           >
-            🙋🏻‍♀️[일일남매] 콘텐츠 참여하기!
-          </ActionButton>
+            {/* 포스터 */}
+            <div className="relative w-[120px] sm:w-[190px] md:w-[228px] aspect-[3/4] rounded-lg overflow-hidden shadow-lg transition-transform group-hover:scale-105 group-hover:shadow-2xl flex-shrink-0">
+              <Image
+                src="/ssobig_assets/socialing/poster_일일남매.png"
+                alt="일일남매 포스터"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 120px, (max-width: 768px) 190px, 228px"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+            </div>
 
-          {/* 알파남매 온라인 마니또 바로가기 버튼 */}
-          <ActionButton
+            {/* 설명 */}
+            <div className="flex-1 text-left">
+              <h3 className="text-lg sm:text-2xl font-bold text-white mb-1 sm:mb-2 group-hover:text-pink-300 transition-colors">
+                🙋🏻‍♀️ 일일남매
+              </h3>
+              <p className="text-xs sm:text-base text-neutral-300 leading-relaxed">
+                매력적인 남녀들이 모여 흥미진진하게 서로를 알아가는 콘텐츠
+              </p>
+              <div className="mt-2 sm:mt-3 inline-flex items-center text-white/80 group-hover:text-white transition-colors">
+                <span className="text-xs sm:text-base">자세히 보기 →</span>
+              </div>
+            </div>
+          </Link>
+
+          {/* 알파남매 섹션 */}
+          <Link
             href="/socialing/love-buddies/alpha"
-            className="mb-6"
-            target="_self"
-            rel=""
-            brandPage="love_buddies"
-            buttonType="alpha_cta"
-            destination="internal_page"
+            className="group flex flex-row gap-3 sm:gap-4 w-full items-center mb-6"
           >
-            💌Top3 알파남매 신청하기
-          </ActionButton>
+            {/* 포스터 */}
+            <div className="relative w-[120px] sm:w-[190px] md:w-[228px] aspect-[3/4] rounded-lg overflow-hidden shadow-lg transition-transform group-hover:scale-105 group-hover:shadow-2xl flex-shrink-0">
+              <Image
+                src="/ssobig_assets/socialing/poster_마니또.png"
+                alt="알파남매 포스터"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 120px, (max-width: 768px) 190px, 228px"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+            </div>
 
-          {/* 참가후기 섹션 위의 여백 */}
-          <div className="h-[50px]"></div>
+            {/* 설명 */}
+            <div className="flex-1 text-left">
+              <h3 className="text-lg sm:text-2xl font-bold text-white mb-1 sm:mb-2 group-hover:text-pink-300 transition-colors">
+                💌 알파남매
+              </h3>
+              <p className="text-xs sm:text-base text-neutral-300 leading-relaxed">
+                Top3를 선정하는 특별한 온라인 마니또 콘텐츠
+              </p>
+              <div className="mt-2 sm:mt-3 inline-flex items-center text-white/80 group-hover:text-white transition-colors">
+                <span className="text-xs sm:text-base">자세히 보기 →</span>
+              </div>
+            </div>
+          </Link>
 
           {/* Reviews Section Title */}
-          <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 text-center w-full">
             일일남매 둘러보기
           </h3>
 
-          {/* 이미지 슬라이더 추가 */}
-          <div className="w-full mt-2 mb-10">
-            <ImageSlider
-              images={[
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_14.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_15.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_17.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_18.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_19.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_20.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_22.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_23.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_24.png",
-                "/ssobig_assets/러브버디즈 둘러보기/일일남매_25.png",
-              ]}
-              altTexts={[
-                "일일남매 활동 사진 1",
-                "일일남매 활동 사진 2",
-                "일일남매 활동 사진 3",
-                "일일남매 활동 사진 4",
-                "일일남매 활동 사진 5",
-                "일일남매 활동 사진 6",
-                "일일남매 활동 사진 7",
-                "일일남매 활동 사진 8",
-                "일일남매 활동 사진 9",
-                "일일남매 활동 사진 10",
-              ]}
+          {/* YouTube 영상 */}
+          <div className="w-full aspect-video rounded-lg overflow-hidden shadow-lg">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/qC0arXdNOlI"
+              title="일일남매 영상"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
             />
           </div>
-        </main>
+        </div>
       </div>
     </>
   );

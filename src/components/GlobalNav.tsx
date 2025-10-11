@@ -291,13 +291,11 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               src="/ssobig_assets/Logo/logo=ssobig, color=white.png"
               alt="쏘빅"
               width={80}
-              height={28}
-              className="transition-opacity duration-700"
+              height={29}
+              className="transition-opacity duration-700 h-auto"
               unoptimized
               style={{
                 opacity: useWhiteText ? 1 : 0,
-                height: "auto",
-                width: "auto",
               }}
               suppressHydrationWarning
             />
@@ -306,13 +304,11 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               src="/ssobig_assets/Logo/logo=ssobig, color=black.png"
               alt="쏘빅"
               width={80}
-              height={28}
-              className="transition-opacity duration-700 absolute top-0 left-0"
+              height={29}
+              className="transition-opacity duration-700 absolute top-0 left-0 h-auto"
               unoptimized
               style={{
                 opacity: useBlackText ? 1 : 0,
-                height: "auto",
-                width: "auto",
               }}
               suppressHydrationWarning
             />
@@ -339,8 +335,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 src="/ssobig_assets/Logo/logo=playroom, color=white.png"
                 alt="PLAYROOm"
                 width={82}
-                height={20}
-                className="transition-opacity duration-700"
+                height={26}
+                className="transition-opacity duration-700 h-auto"
                 unoptimized
                 style={{
                   opacity: useWhiteText
@@ -348,8 +344,6 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                       ? 1
                       : 0.4
                     : 0,
-                  height: "auto",
-                  width: "auto",
                 }}
                 suppressHydrationWarning
               />
@@ -358,8 +352,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 src="/ssobig_assets/Logo/logo=playroom, color=black.png"
                 alt="PLAYROOm"
                 width={82}
-                height={20}
-                className="transition-opacity duration-700 absolute top-0 left-0"
+                height={26}
+                className="transition-opacity duration-700 absolute top-0 left-0 h-auto"
                 unoptimized
                 style={{
                   opacity: useBlackText
@@ -367,8 +361,6 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                       ? 1
                       : 0.4
                     : 0,
-                  height: "auto",
-                  width: "auto",
                 }}
                 suppressHydrationWarning
               />
@@ -420,14 +412,14 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
           <Image
             src={
               useBlackText
-                ? "/ssobig_assets/home/logo-ssobig-text-black.png"
-                : "/ssobig_assets/home/logo-ssobig-text-white.png"
+                ? "/ssobig_assets/Logo/logo=ssobig, color=black.png"
+                : "/ssobig_assets/Logo/logo=ssobig, color=white.png"
             }
             alt="쏘빅"
             width={120}
-            height={36}
+            height={44}
             unoptimized
-            style={{ height: "auto", width: "auto" }}
+            className="h-auto"
             suppressHydrationWarning
           />
         </Link>
@@ -445,13 +437,12 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                   : "/ssobig_assets/Logo/logo=playroom, color=white.png"
               }
               alt="PLAYROOm"
-              width={118}
-              height={28}
+              width={122}
+              height={39}
               unoptimized
+              className="h-auto"
               style={{
                 opacity: pathname === "/playroom" ? 1 : 0.6,
-                height: "auto",
-                width: "auto",
               }}
               suppressHydrationWarning
             />

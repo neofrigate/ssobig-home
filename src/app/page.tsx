@@ -13,7 +13,7 @@ export default function Home() {
         {/* 배경 이미지 */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/ssobig_assets/러브버디즈 배경.jpg"
+            src="/ssobig_assets/lovebuddies/hero-main.jpg"
             alt="쏘빅 배경"
             fill
             style={{
@@ -30,8 +30,8 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/40 z-[1]"></div>
 
         {/* 중앙 컨텐츠 */}
-        <div className="relative z-10 text-center px-5 max-w-4xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
+        <div className="relative z-10 text-center px-4 md:px-6 max-w-4xl">
+          <h1 className="text-[32px] sm:text-[40px] md:text-[48px] lg:text-[56px] font-bold text-white mb-4 sm:mb-6 leading-tight">
             2명의 소중한 시간부터
             <br />
             100명의 특별한 순간까지
@@ -44,13 +44,13 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Link
               href="/playroom"
-              className="bg-white text-black px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold hover:bg-gray-100 transition-colors rounded-full"
+              className="bg-white text-black px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base md:text-lg font-semibold hover:bg-gray-100 transition-colors rounded-full"
             >
               친구들과 즐기기
             </Link>
             <Link
               href="/socialing"
-              className="bg-black text-white px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold hover:bg-black/80 transition-colors rounded-full"
+              className="bg-black text-white px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base md:text-lg font-semibold hover:bg-black/80 transition-colors rounded-full"
             >
               새로운 사람과 알아가기
             </Link>
@@ -78,20 +78,19 @@ export default function Home() {
       {/* 나머지 섹션들 - 좌측 정렬 */}
       <div className="bg-white relative">
         {/* 2. 쏘빅툴 소개 - 좌측 정렬 */}
-        <section className="py-20 md:py-32 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-5 md:px-10">
+        <section className="py-12 md:py-16 lg:py-20 border-b border-gray-200">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
             {/* 타이틀 영역 - 좌측 정렬 */}
-            <div className="mb-20">
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-4xl">📱</span>
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-                  쏘빅툴
+            <div className="mb-12 md:mb-16">
+              <div className="mb-6">
+                <h2 className="text-[28px] sm:text-[32px] md:text-[36px] lg:text-[40px] font-bold text-gray-900 leading-tight">
+                  SSOBIG TOOL
                 </h2>
               </div>
-              <h3 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] font-bold text-gray-900 mb-4 leading-tight">
                 핸드폰만 있으면, 언제 어디서나 바로 시작
               </h3>
-              <p className="text-lg text-gray-600 max-w-3xl">
+              <p className="text-base sm:text-lg text-gray-600 max-w-3xl leading-relaxed">
                 친구들과 카페에서? 연인과 집에서? 동아리 MT에서?
                 <br />
                 어떤 상황이든 모바일 하나로 함께 즐길 수 있는 검증된 템플릿을
@@ -100,113 +99,45 @@ export default function Home() {
             </div>
 
             {/* 4가지 강점 - 좌측 정렬 그리드 */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-12 md:mb-16">
               <div>
-                <div className="text-5xl mb-4">📱</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">📱</div>
+                <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                   언제 어디서나
                 </h4>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm md:text-base">
                   모바일 플랫폼으로 즉시 접근 가능
                 </p>
               </div>
 
               <div>
-                <div className="text-5xl mb-4">👥</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">👥</div>
+                <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                   함께하는 재미
                 </h4>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm md:text-base">
                   80% 이상이 멀티플레이 긍정평가
                 </p>
               </div>
 
               <div>
-                <div className="text-5xl mb-4">⚡</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">⚡</div>
+                <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                   검증된 콘텐츠
                 </h4>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm md:text-base">
                   오프라인 검증된 97% 만족도
                 </p>
               </div>
 
               <div>
-                <div className="text-5xl mb-4">🎯</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">🎯</div>
+                <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                   다양한 상황
                 </h4>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm md:text-base">
                   2명부터 100명까지 모든 상황 대응
                 </p>
-              </div>
-            </div>
-
-            {/* 인원별 템플릿 - 리스트형 */}
-            <div className="mb-20">
-              <h3 className="text-2xl font-bold text-gray-900 mb-8">
-                인원별 추천 템플릿
-              </h3>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4 pb-6 border-b border-gray-200">
-                  <span className="text-3xl">💕</span>
-                  <div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">
-                      연인과 함께 (2명)
-                    </h4>
-                    <p className="text-gray-600">
-                      데이트 게임 | 기념일 콘텐츠 | 소통 게임
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 pb-6 border-b border-gray-200">
-                  <span className="text-3xl">👥</span>
-                  <div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">
-                      친구들과 함께 (4-8명)
-                    </h4>
-                    <p className="text-gray-600">
-                      아이스브레이킹 | 파티 게임 | 밸런스 게임
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 pb-6 border-b border-gray-200">
-                  <span className="text-3xl">🎯</span>
-                  <div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">
-                      동아리/모임 (8-100명)
-                    </h4>
-                    <p className="text-gray-600">
-                      팀 빌딩 | 워크숍 | 네트워킹 이벤트
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 통계 - 좌측 정렬 */}
-            <div className="flex flex-wrap gap-8 py-8 border-t border-b border-gray-200 mb-12">
-              <div>
-                <div className="text-4xl font-bold text-gray-900 mb-1">97%</div>
-                <div className="text-gray-600 text-sm">참가자 만족도</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-gray-900 mb-1">
-                  80%+
-                </div>
-                <div className="text-gray-600 text-sm">멀티플레이 긍정</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-gray-900 mb-1">5분</div>
-                <div className="text-gray-600 text-sm">평균 시작 시간</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-gray-900 mb-1">
-                  100+
-                </div>
-                <div className="text-gray-600 text-sm">다양한 템플릿</div>
               </div>
             </div>
 
@@ -216,15 +147,7 @@ export default function Home() {
                 href="https://about.ssobig.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-black text-white px-8 py-3 font-semibold hover:bg-black/80 transition-colors"
-              >
-                지금 시작하기
-              </a>
-              <a
-                href="https://about.ssobig.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border-2 border-black text-black px-8 py-3 font-semibold hover:bg-black hover:text-white transition-colors"
+                className="border border-black text-black px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base md:text-lg font-semibold hover:bg-black hover:text-white transition-colors rounded-full"
               >
                 템플릿 둘러보기
               </a>
@@ -233,14 +156,14 @@ export default function Home() {
         </section>
 
         {/* 3. 소셜링 소개 - 좌측 정렬 */}
-        <section className="py-20 md:py-32 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-5 md:px-10">
+        <section className="py-12 md:py-16 lg:py-20 border-b border-gray-200">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
             {/* 타이틀 */}
-            <div className="mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <div className="mb-12 md:mb-16">
+              <h2 className="text-[28px] sm:text-[32px] md:text-[36px] lg:text-[40px] font-bold text-gray-900 mb-4 leading-tight">
                 같이 즐길 사람이 없다고? 걱정 마세요
               </h2>
-              <p className="text-lg text-gray-600 max-w-3xl">
+              <p className="text-base sm:text-lg text-gray-600 max-w-3xl leading-relaxed">
                 혼자 오셔도 괜찮아요. 새로운 사람들과 대규모로 함께 즐길 수 있는
                 특별한 소셜링도 운영 중입니다
               </p>
@@ -253,17 +176,18 @@ export default function Home() {
                 <div className="grid md:grid-cols-2 gap-8 items-center pb-12 border-b border-gray-200">
                   <div className="relative h-64 md:h-80">
                     <Image
-                      src="/ssobig_assets/러브버디즈.png"
+                      src="/ssobig_assets/lovebuddies/thumb-main.png"
                       alt="러브버디즈"
                       fill
                       style={{ objectFit: "contain", objectPosition: "left" }}
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>
                   <div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                    <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 md:mb-3">
                       💕 러브버디즈
                     </h3>
-                    <p className="text-lg text-gray-600 mb-4">
+                    <p className="text-base md:text-lg text-gray-600 mb-3 md:mb-4">
                       술 없이도 친해지는 소셜 개더링
                     </p>
                     <ul className="space-y-2 mb-6 text-gray-600">
@@ -283,17 +207,18 @@ export default function Home() {
                 <div className="grid md:grid-cols-2 gap-8 items-center pb-12 border-b border-gray-200">
                   <div className="relative h-64 md:h-80">
                     <Image
-                      src="/ssobig_assets/게임오브.png"
+                      src="/ssobig_assets/gameorb/thumb-main.png"
                       alt="게임오브"
                       fill
                       style={{ objectFit: "contain", objectPosition: "left" }}
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>
                   <div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                    <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 md:mb-3">
                       🎲 게임오브
                     </h3>
-                    <p className="text-lg text-gray-600 mb-4">
+                    <p className="text-base md:text-lg text-gray-600 mb-3 md:mb-4">
                       당신이 주인공인 게임 예능 현실판
                     </p>
                     <ul className="space-y-2 mb-6 text-gray-600">
@@ -312,7 +237,7 @@ export default function Home() {
             <div className="mt-12">
               <Link
                 href="/socialing"
-                className="inline-block border-2 border-black text-black px-8 py-3 font-semibold hover:bg-black hover:text-white transition-colors"
+                className="inline-block border border-black text-black px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base md:text-lg font-semibold hover:bg-black hover:text-white transition-colors rounded-full"
               >
                 소셜링 자세히 보기
               </Link>
@@ -321,14 +246,14 @@ export default function Home() {
         </section>
 
         {/* 4. 협업 실적 - 좌측 정렬 */}
-        <section className="py-20 md:py-32 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-5 md:px-10">
+        <section className="py-12 md:py-16 lg:py-20 border-b border-gray-200">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
             {/* 타이틀 */}
-            <div className="mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <div className="mb-12 md:mb-16">
+              <h2 className="text-[28px] sm:text-[32px] md:text-[36px] lg:text-[40px] font-bold text-gray-900 mb-4 leading-tight">
                 다양한 파트너들과 함께하고 있습니다
               </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mb-2">
+              <p className="text-base sm:text-lg text-gray-600 max-w-3xl mb-2 leading-relaxed">
                 맞춤형 오프라인 콘텐츠 설계부터 제작, 대규모 행사 운영까지
               </p>
               <p className="text-base text-gray-900 font-semibold">
@@ -337,13 +262,13 @@ export default function Home() {
             </div>
 
             {/* 협업 타입 - 그리드 */}
-            <div className="grid sm:grid-cols-3 gap-12 mb-20">
+            <div className="grid sm:grid-cols-3 gap-8 md:gap-12 mb-12 md:mb-16">
               <div>
-                <div className="text-5xl mb-4">🎥</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">🎥</div>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
                   유튜브 협업
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm md:text-base text-gray-600 leading-relaxed">
                   대형 크리에이터와 콘텐츠 협업
                   <br />
                   기획부터 제작까지 원스톱
@@ -351,11 +276,11 @@ export default function Home() {
               </div>
 
               <div>
-                <div className="text-5xl mb-4">🏢</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">🏢</div>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
                   B2B/B2G 행사
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm md:text-base text-gray-600 leading-relaxed">
                   정부·지자체 & 기업 행사 전문
                   <br />
                   맞춤형 워크숍 & 팀 빌딩
@@ -363,115 +288,28 @@ export default function Home() {
               </div>
 
               <div>
-                <div className="text-5xl mb-4">🎪</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                <div className="text-4xl md:text-5xl mb-3 md:mb-4">🎪</div>
+                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
                   축제/이벤트
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-sm md:text-base text-gray-600 leading-relaxed">
                   대학 축제부터 지역 축제까지
                   <br />
                   특별 프로그램 제공
                 </p>
               </div>
             </div>
-
-            {/* 4대 역량 - 리스트형 */}
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-8">
-                SSOBIG만의 검증된 역량
-              </h3>
-              <div className="space-y-6">
-                <div className="flex gap-4 pb-6 border-b border-gray-200">
-                  <span className="text-xl font-bold text-gray-900 flex-shrink-0">
-                    1.
-                  </span>
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-2">
-                      맞춤형 오프라인 콘텐츠 설계 & 제작
-                    </h4>
-                    <p className="text-gray-600">
-                      상황과 니즈에 맞는 완벽한 커스터마이징
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 pb-6 border-b border-gray-200">
-                  <span className="text-xl font-bold text-gray-900 flex-shrink-0">
-                    2.
-                  </span>
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-2">
-                      대규모 행사 운영 경험
-                    </h4>
-                    <p className="text-gray-600">
-                      10명 소모임부터 100명+ 대형 행사까지
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 pb-6 border-b border-gray-200">
-                  <span className="text-xl font-bold text-gray-900 flex-shrink-0">
-                    3.
-                  </span>
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-2">
-                      게임 디자인 전문 팀
-                    </h4>
-                    <p className="text-gray-600">
-                      오프라인 검증된 자체 제작 콘텐츠
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 pb-6 border-b border-gray-200">
-                  <span className="text-xl font-bold text-gray-900 flex-shrink-0">
-                    4.
-                  </span>
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-2">
-                      다양한 협업 경험
-                    </h4>
-                    <p className="text-gray-600">
-                      유튜버/B2B/B2G/축제 전방위 협업
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 수치 */}
-            <div className="flex flex-wrap gap-8 py-8 border-t border-b border-gray-200 mb-6">
-              <div>
-                <div className="text-4xl font-bold text-gray-900 mb-1">97%</div>
-                <p className="text-gray-600 text-sm">참가자 만족도</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-gray-900 mb-1">
-                  500+
-                </div>
-                <p className="text-gray-600 text-sm">진행 실적</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-gray-900 mb-1">
-                  10K+
-                </div>
-                <p className="text-gray-600 text-sm">누적 참가자</p>
-              </div>
-            </div>
-            <p className="text-gray-500 text-sm">
-              서울대, 연세대, 고려대, 카카오, 네이버, 서울시 등과 함께했습니다
-            </p>
           </div>
         </section>
 
         {/* 5. 최종 CTA - 좌측 정렬 */}
-        <section className="py-20 md:py-32">
-          <div className="max-w-7xl mx-auto px-5 md:px-10">
-            <div className="mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <section className="py-12 md:py-16 lg:py-20">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
+            <div className="mb-10 md:mb-12">
+              <h2 className="text-[28px] sm:text-[32px] md:text-[36px] lg:text-[40px] font-bold text-gray-900 mb-4 leading-tight">
                 함께 시작할 준비 되셨나요?
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
                 쏘빅과 함께 특별한 경험을 만들어보세요
               </p>
             </div>
@@ -483,37 +321,45 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="group"
               >
-                <div className="pb-8 border-b-2 border-gray-200 group-hover:border-black transition-colors">
-                  <div className="text-5xl mb-4">🎯</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <div className="pb-6 md:pb-8 border-b border-gray-200 group-hover:border-black transition-colors">
+                  <div className="text-4xl md:text-5xl mb-3 md:mb-4">🎯</div>
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                     템플릿 사용하기
                   </h3>
-                  <p className="text-gray-600 mb-4">쏘빅툴로 바로 시작</p>
-                  <span className="text-black font-semibold group-hover:underline">
+                  <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4">
+                    쏘빅툴로 바로 시작
+                  </p>
+                  <span className="text-sm md:text-base text-black font-semibold group-hover:underline">
                     시작하기 →
                   </span>
                 </div>
               </a>
 
               <Link href="/socialing" className="group">
-                <div className="pb-8 border-b-2 border-gray-200 group-hover:border-black transition-colors">
-                  <div className="text-5xl mb-4">💝</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <div className="pb-6 md:pb-8 border-b border-gray-200 group-hover:border-black transition-colors">
+                  <div className="text-4xl md:text-5xl mb-3 md:mb-4">💝</div>
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                     소셜링 참여하기
                   </h3>
-                  <p className="text-gray-600 mb-4">러브버디즈, 게임오브</p>
-                  <span className="text-black font-semibold group-hover:underline">
+                  <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4">
+                    러브버디즈, 게임오브
+                  </p>
+                  <span className="text-sm md:text-base text-black font-semibold group-hover:underline">
                     신청하기 →
                   </span>
                 </div>
               </Link>
 
               <Link href="/contact" className="group">
-                <div className="pb-8 border-b-2 border-black bg-black text-white px-6 py-8">
-                  <div className="text-5xl mb-4">🤝</div>
-                  <h3 className="text-xl font-bold mb-2">협업 문의하기</h3>
-                  <p className="text-gray-300 mb-4">B2B/B2G 파트너십</p>
-                  <span className="font-semibold group-hover:underline">
+                <div className="pb-6 md:pb-8 border-b border-black bg-black text-white px-4 md:px-6 py-6 md:py-8">
+                  <div className="text-4xl md:text-5xl mb-3 md:mb-4">🤝</div>
+                  <h3 className="text-lg md:text-xl font-bold mb-2">
+                    협업 문의하기
+                  </h3>
+                  <p className="text-sm md:text-base text-gray-300 mb-3 md:mb-4">
+                    B2B/B2G 파트너십
+                  </p>
+                  <span className="text-sm md:text-base font-semibold group-hover:underline">
                     문의하기 →
                   </span>
                 </div>

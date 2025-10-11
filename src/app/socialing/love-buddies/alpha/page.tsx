@@ -238,7 +238,7 @@ export default function LoveBuddiesAlphaPage() {
         {/* 배경 이미지 - 스크롤에도 고정됨 */}
         <div className="fixed inset-0 -z-10 bg-black">
           <Image
-            src="/ssobig_assets/러브버디즈 배경.jpg"
+            src="/ssobig_assets/lovebuddies/hero-main.jpg"
             alt="러브버디즈 배경"
             fill
             style={{
@@ -257,7 +257,7 @@ export default function LoveBuddiesAlphaPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/알파남매 포스터.jpg"
+                src="/ssobig_assets/lovebuddies/alpha/poster.jpg"
                 alt="알파남매 포스터"
                 width={620}
                 height={0}
@@ -394,7 +394,7 @@ export default function LoveBuddiesAlphaPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/알파남매 1.jpg"
+                src="/ssobig_assets/lovebuddies/alpha/gallery-01.jpg"
                 alt="일일남매 상세 1"
                 width={620}
                 height={1200}
@@ -409,7 +409,7 @@ export default function LoveBuddiesAlphaPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/알파남매 2.jpg"
+                src="/ssobig_assets/lovebuddies/alpha/gallery-02.jpg"
                 alt="일일남매 상세 2"
                 width={620}
                 height={1200}

@@ -54,7 +54,6 @@ main {
   min-height: 100svh;
 }
 
-/* GNB 숨김 애니메이션 */
 .global-nav {
   position: sticky;
   top: 0;
@@ -93,6 +92,16 @@ body.gnb-hidden .global-nav {
 .hide-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+/* 스크롤 스냅 컨테이너 설정 */
+.snap-container {
+  scroll-behavior: smooth;
+}
+
+/* 각 섹션 스냅 설정 */
+.snap-container section {
+  scroll-snap-align: start;
 }
 
 /* 가로 스크롤 애니메이션 */
