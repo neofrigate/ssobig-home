@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Card, { CardProps } from "../../../components/Card";
 import Script from "next/script";
@@ -10,7 +11,7 @@ export default function GameOrbPage() {
       title: "SOCIAL GENIUS : 게임 예능 현실판 참여하기",
       description: "흥미진진한 게임 예능에 지금 바로 참여하세요.",
       linkText: "real_genius",
-      linkHref: "/brand/game_orb/real_genius",
+      linkHref: "/brand/game-orb/real_genius",
       linkIconType: "link",
       hasImageArea: true,
       imagePlaceholderText: "데블스플랜 참여",
@@ -29,7 +30,7 @@ export default function GameOrbPage() {
     //   title: "게임오브 정모 : 신작게임 데모데이",
     //   description: "커뮤니티 멤버들과 함께하는 정모에 참여하세요.",
     //   linkText: "demoday",
-    //   linkHref: "/brand/game_orb/demoday",
+    //   linkHref: "/brand/game-orb/demoday",
     //   linkIconType: "link",
     //   hasImageArea: true,
     //   imagePlaceholderText: "게임오브 정모",
@@ -88,7 +89,7 @@ export default function GameOrbPage() {
       />
       {/* End Meta Pixel Code */}
 
-      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start pb-4 px-0 selection:bg-purple-500 selection:text-white pt-[72px]">
+      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start pb-4 px-0 selection:bg-purple-500 selection:text-white pt-[88px] md:pt-[60px]">
         {/* 배경 이미지 next/image 적용 */}
         <div className="fixed inset-0 -z-10">
           <Image

@@ -29,14 +29,11 @@ export default function ChannelTalk() {
     scriptElement.innerHTML = script;
     document.head.appendChild(scriptElement);
 
-    // 채널톡 버튼 위치 설정
+    // 채널톡 버튼 숨김 (플로팅 버튼 비활성화)
     const style = document.createElement("style");
     style.innerHTML = `
       #ch-plugin {
-        position: fixed !important;
-        bottom: 138px !important;
-        right: 16px !important;
-        z-index: 9999 !important;
+        display: none !important;
       }
     `;
     document.head.appendChild(style);

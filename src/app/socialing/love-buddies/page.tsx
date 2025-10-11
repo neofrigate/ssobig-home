@@ -31,7 +31,7 @@ const LoveBuddiesPage = () => {
       />
       {/* End Meta Pixel Code */}
 
-      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start pb-4 px-0 selection:bg-pink-500 selection:text-white pt-[72px]">
+      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start pb-4 px-0 selection:bg-pink-500 selection:text-white pt-[88px] md:pt-[60px]">
         {/* 배경 이미지 next/image 적용 */}
         <div className="fixed inset-0 -z-10">
           <Image
@@ -98,7 +98,7 @@ const LoveBuddiesPage = () => {
         <main className="z-10 flex flex-col items-center text-center max-w-[620px] w-full p-5 mt-[30px]">
           {/* 상세 페이지 버튼 */}
           <ActionButton
-            href="/brand/love_buddies/detail"
+            href="/socialing/love-buddies/detail"
             className="mb-6"
             target="_self"
             rel=""
@@ -111,7 +111,7 @@ const LoveBuddiesPage = () => {
 
           {/* 알파남매 온라인 마니또 바로가기 버튼 */}
           <ActionButton
-            href="/brand/love_buddies/alpha"
+            href="/socialing/love-buddies/alpha"
             className="mb-6"
             target="_self"
             rel=""

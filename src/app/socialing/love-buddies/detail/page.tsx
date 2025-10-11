@@ -252,7 +252,7 @@ export default function LoveBuddiesDetailPage() {
         {/* 배경 이미지 - 스크롤에도 고정됨 */}
         <div className="fixed inset-0 -z-10 bg-black">
           <Image
-            src="/ssobig_assets/러브버디즈 배경.jpg"
+            src="/ssobig_assets/lovebuddies/hero-main.jpg"
             alt="러브버디즈 배경"
             fill
             style={{
@@ -271,7 +271,7 @@ export default function LoveBuddiesDetailPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/상세 상단 공통 디자인_일일남매.png"
+                src="/ssobig_assets/lovebuddies/header-dailynammae.png"
                 alt="일일남매 상단 디자인"
                 width={620}
                 height={0}
@@ -394,7 +394,7 @@ export default function LoveBuddiesDetailPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/일일남매 상세1.jpg"
+                src="/ssobig_assets/lovebuddies/detail-dailynammae-01.jpg"
                 alt="일일남매 상세 1"
                 width={620}
                 height={1200}
@@ -409,7 +409,7 @@ export default function LoveBuddiesDetailPage() {
           <div className="w-full h-auto">
             <div className="relative w-full">
               <Image
-                src="/ssobig_assets/일일남매 상세2.jpg"
+                src="/ssobig_assets/lovebuddies/detail-dailynammae-02.jpg"
                 alt="일일남매 상세 2"
                 width={620}
                 height={1200}

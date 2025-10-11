@@ -74,7 +74,7 @@ export default function DayNammaePage() {
       </noscript>
       {/* End Meta Pixel Code */}
 
-      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start px-0 selection:bg-pink-500 selection:text-white pt-[72px]">
+      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start px-0 selection:bg-pink-500 selection:text-white pt-[88px] md:pt-[60px]">
         {/* 배경 이미지 next/image 적용 */}
         <div className="absolute inset-0 -z-10 bg-black">
           <Image

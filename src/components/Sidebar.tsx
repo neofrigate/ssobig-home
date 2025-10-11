@@ -49,12 +49,13 @@ const Sidebar: React.FC = () => {
                 onClick={toggleSidebar}
               >
                 <Image
-                  src="/ssobig_assets/쏘빅 로고-흑백.png"
-                  alt="쏘빅 로고"
-                  width={51}
-                  height={32}
-                  className="w-[51px] h-[32px]"
+                  src="/ssobig_assets/Logo/logo=ssobig, color=white.png"
+                  alt="쏘빅"
+                  width={80}
+                  height={28}
                   priority
+                  unoptimized
+                  style={{ width: 80, height: "auto" }}
                 />
               </LinkWithUtm>
             </div>
@@ -82,14 +83,14 @@ const Sidebar: React.FC = () => {
           </div>
 
           <nav className="text-white flex-grow overflow-y-auto">
-            <div className="mb-6">
-              <div className="mb-2 text-sm text-gray-400 px-5">
-                Social Brands
-              </div>
+            {/* PLAYROOM */}
+            <div className="mb-2">
               <LinkWithUtm
-                href="/brand/love_buddies"
-                className={`block hover:opacity-80 transition-all ${
-                  isActive("/brand/love_buddies") ? "bg-white/10" : ""
+                href="/playroom"
+                className={`block transition-all ${
+                  isActive("/playroom")
+                    ? "bg-white/10 opacity-100"
+                    : "opacity-50 hover:opacity-80"
                 }`}
                 onClick={toggleSidebar}
                 brandPage="sidebar"
@@ -98,149 +99,85 @@ const Sidebar: React.FC = () => {
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <Image
-                    src="/ssobig_assets/brand logo 2=러브버디즈.png"
-                    alt="Love Buddies"
-                    width={120}
+                    src="/ssobig_assets/Logo/logo=playroom, color=white.png"
+                    alt="PLAYROOm"
+                    width={125}
                     height={30}
-                    className="object-contain"
-                  />
-                </div>
-              </LinkWithUtm>
-              <LinkWithUtm
-                href="/brand/now_seoul"
-                className={`block hover:opacity-80 transition-all ${
-                  isActive("/brand/now_seoul") ? "bg-white/10" : ""
-                }`}
-                onClick={toggleSidebar}
-                brandPage="sidebar"
-                buttonType="navigation"
-                destination="internal_page"
-              >
-                <div className="h-[60px] relative flex items-center px-5">
-                  <Image
-                    src="/ssobig_assets/brand logo 2=나우서울.png"
-                    alt="N.O.W.seoul"
-                    width={120}
-                    height={30}
-                    className="object-contain"
-                  />
-                </div>
-              </LinkWithUtm>
-              <LinkWithUtm
-                href="/brand/game_orb"
-                className={`block hover:opacity-80 transition-all ${
-                  isActive("/brand/game_orb") ? "bg-white/10" : ""
-                }`}
-                onClick={toggleSidebar}
-                brandPage="sidebar"
-                buttonType="navigation"
-                destination="internal_page"
-              >
-                <div className="h-[60px] relative flex items-center px-5">
-                  <Image
-                    src="/ssobig_assets/brand logo 2=게임오브.png"
-                    alt="GAME ORB"
-                    width={120}
-                    height={30}
-                    className="object-contain"
+                    unoptimized
+                    style={{ width: 125, height: "auto" }}
                   />
                 </div>
               </LinkWithUtm>
             </div>
 
-            <div className="mb-6">
-              <div className="mb-2 text-sm text-gray-400 px-5">Solutions</div>
+            {/* SOCIALING */}
+            <div className="mb-2">
               <LinkWithUtm
-                href="https://about.ssobig.com"
-                className={`block hover:opacity-80 transition-all ${
-                  isActive("https://about.ssobig.com") ? "bg-white/10" : ""
+                href="/socialing"
+                className={`block transition-all ${
+                  isActive("/socialing") && pathname === "/socialing"
+                    ? "bg-white/10 opacity-100"
+                    : "opacity-50 hover:opacity-80"
                 }`}
-                onClick={toggleSidebar}
+                onClick={() => {
+                  if (pathname.startsWith("/socialing")) {
+                    const container = document.querySelector(".snap-container");
+                    if (container) {
+                      container.scrollTop = 0;
+                    }
+                  }
+                  toggleSidebar();
+                }}
                 brandPage="sidebar"
                 buttonType="navigation"
-                destination="external"
+                destination="internal_page"
               >
                 <div className="h-[60px] relative flex items-center px-5">
-                  <Image
-                    src="/ssobig_assets/brand logo 2=ssobigtool.png"
-                    alt="ssobig tool"
-                    width={120}
-                    height={30}
-                    className="object-contain"
-                  />
+                  <span className="text-white font-bold text-xl tracking-wide">
+                    SOCIALING
+                  </span>
                 </div>
               </LinkWithUtm>
-            </div>
 
-            <div className="mb-6">
-              <div className="mb-2 text-sm text-gray-400 px-5">Community</div>
+              {/* 서브 메뉴 */}
               <LinkWithUtm
-                href="https://dis.qa/hKclNB"
-                className={`block hover:opacity-80 transition-all ${
-                  isActive("https://dis.qa/hKclNB") ? "bg-white/10" : ""
+                href="/socialing/love-buddies"
+                className={`block transition-all ${
+                  isActive("/socialing/love-buddies")
+                    ? "bg-white/10 opacity-100"
+                    : "opacity-50 hover:opacity-80"
                 }`}
-                target="_blank"
-                rel="noopener noreferrer"
                 onClick={toggleSidebar}
                 brandPage="sidebar"
                 buttonType="navigation"
-                destination="external"
+                destination="internal_page"
               >
-                <div className="h-[60px] relative flex items-center px-5">
-                  <Image
-                    src="/ssobig_assets/brand logo 2=ssobigs.png"
-                    alt="SSOBIGS"
-                    width={120}
-                    height={30}
-                    className="object-contain"
-                  />
+                <div className="h-[50px] relative flex items-center px-5 pl-10">
+                  <span className="text-white font-medium text-base">
+                    러브버디즈
+                  </span>
+                </div>
+              </LinkWithUtm>
+              <LinkWithUtm
+                href="/socialing/game-orb"
+                className={`block transition-all ${
+                  isActive("/socialing/game-orb")
+                    ? "bg-white/10 opacity-100"
+                    : "opacity-50 hover:opacity-80"
+                }`}
+                onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="navigation"
+                destination="internal_page"
+              >
+                <div className="h-[50px] relative flex items-center px-5 pl-10">
+                  <span className="text-white font-medium text-base">
+                    게임오브
+                  </span>
                 </div>
               </LinkWithUtm>
             </div>
           </nav>
-
-          {/* 푸터 추가 */}
-          <footer className="text-left text-neutral-400 text-xs px-5 py-6 mt-auto border-t border-neutral-700/50">
-            <p className="footer_p">주식회사 쏘빅</p>
-            <p className="footer_p mb-2">대표자 : 안민우, 조원철</p>
-            <p className="footer_p">사업자등록번호 : 140-87-03096</p>
-            <p className="footer_p">전화번호 : 02-2635-7942</p>
-            <p className="footer_e-mail">E-mail : ssobigstudio@gmail.com</p>
-            <p className="footer_p">
-              통신판매업신고번호 : 제2024-서울영등포-0816호
-            </p>
-            <p className="footer_p mb-3">
-              주소 : 서울특별시 서초구 사평대로55길 37, (실란트로타워)지하2층
-              (반포동)
-            </p>
-            <p className="footer_p">
-              <LinkWithUtm
-                href="https://about.ssobig.com/privacy_policy"
-                style={{ color: "inherit", textDecoration: "underline" }}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={toggleSidebar}
-                brandPage="sidebar"
-                buttonType="footer_link"
-                destination="external"
-              >
-                개인정보 처리방침
-              </LinkWithUtm>
-              <span style={{ margin: "0 5px" }}>|</span>
-              <LinkWithUtm
-                href="https://about.ssobig.com/terms_of_service"
-                style={{ color: "inherit", textDecoration: "underline" }}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={toggleSidebar}
-                brandPage="sidebar"
-                buttonType="footer_link"
-                destination="external"
-              >
-                이용약관
-              </LinkWithUtm>
-            </p>
-          </footer>
         </div>
       </div>
     </>

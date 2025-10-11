@@ -30,7 +30,7 @@ export default function DevilsPlanPage() {
       />
       {/* End Meta Pixel Code */}
 
-      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start px-0 selection:bg-purple-500 selection:text-white pt-[72px]">
+      <div className="min-h-screen text-white font-sans relative flex flex-col items-center justify-start px-0 selection:bg-purple-500 selection:text-white pt-[88px] md:pt-[60px]">
         {/* Content goes here */}
         <h1>Devil&apos;s Plan Page</h1>
         <p>Coming soon...</p>
