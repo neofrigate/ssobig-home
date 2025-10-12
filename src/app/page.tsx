@@ -350,20 +350,25 @@ export default function Home() {
                 </div>
               </Link>
 
-              <Link href="/contact" className="group">
-                <div className="pb-6 md:pb-8 border-b border-black bg-black text-white px-4 md:px-6 py-6 md:py-8">
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLScgHycMgGfhps6DjY_TvZPoYu-kgAeD0crK9n_sFoDeDMgX8g/viewform"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group"
+              >
+                <div className="pb-6 md:pb-8 border-b border-gray-200 group-hover:border-black transition-colors">
                   <div className="text-4xl md:text-5xl mb-3 md:mb-4">🤝</div>
-                  <h3 className="text-lg md:text-xl font-bold mb-2">
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                     협업 문의하기
                   </h3>
-                  <p className="text-sm md:text-base text-gray-300 mb-3 md:mb-4">
+                  <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4">
                     B2B/B2G 파트너십
                   </p>
-                  <span className="text-sm md:text-base font-semibold group-hover:underline">
+                  <span className="text-sm md:text-base text-black font-semibold group-hover:underline">
                     문의하기 →
                   </span>
                 </div>
-              </Link>
+              </a>
             </div>
           </div>
         </section>
