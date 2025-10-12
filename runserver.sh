@@ -1,5 +1,69 @@
 #!/bin/bash
 
+# 사용법 출력
+show_usage() {
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "📋 사용법"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  echo "  ./runserver.sh          # 개발 서버 + ngrok 실행"
+  echo "  ./runserver.sh check    # 배포 전 체크 (lint + build)"
+  echo "  ./runserver.sh lint     # ESLint만 실행"
+  echo "  ./runserver.sh build    # 프로덕션 빌드만 실행"
+  echo ""
+  exit 0
+}
+
+# 배포 전 체크 함수
+check_for_deploy() {
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "🔍 배포 전 체크 시작"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  
+  # Step 1: ESLint 체크
+  echo "📝 [1/2] ESLint 체크 중..."
+  echo ""
+  if yarn lint; then
+    echo ""
+    echo "✅ ESLint 통과"
+  else
+    echo ""
+    echo "❌ ESLint 에러 발생"
+    echo "💡 에러를 수정한 후 다시 시도하세요"
+    exit 1
+  fi
+  
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  
+  # Step 2: 프로덕션 빌드
+  echo "🏗️  [2/2] 프로덕션 빌드 테스트 중..."
+  echo ""
+  if yarn build; then
+    echo ""
+    echo "✅ 빌드 성공"
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🎉 모든 체크 통과! Vercel 배포 가능합니다"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    echo "💡 로컬에서 프로덕션 빌드 결과를 확인하려면:"
+    echo "   yarn start"
+    echo ""
+  else
+    echo ""
+    echo "❌ 빌드 실패"
+    echo "💡 위의 에러를 수정한 후 다시 시도하세요"
+    exit 1
+  fi
+  
+  exit 0
+}
+
 # Cleanup 함수 (Ctrl+C 시 모든 프로세스 종료)
 cleanup() {
   echo ""
@@ -21,6 +85,41 @@ cleanup() {
   echo "✅ 모든 프로세스 종료 완료"
   exit 0
 }
+
+# 명령어 처리
+case "$1" in
+  help|--help|-h)
+    show_usage
+    ;;
+  check)
+    check_for_deploy
+    ;;
+  lint)
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📝 ESLint 실행 중..."
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    yarn lint
+    exit $?
+    ;;
+  build)
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🏗️  프로덕션 빌드 실행 중..."
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    yarn build
+    exit $?
+    ;;
+  "")
+    # 인자 없으면 기본 개발 서버 실행
+    ;;
+  *)
+    echo "❌ 알 수 없는 명령어: $1"
+    show_usage
+    ;;
+esac
 
 # Ctrl+C 시 cleanup 함수 실행
 trap cleanup SIGINT SIGTERM
