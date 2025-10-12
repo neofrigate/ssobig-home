@@ -143,14 +143,12 @@ export default function Home() {
 
             {/* CTA */}
             <div className="flex flex-wrap gap-4">
-              <a
-                href="https://about.ssobig.com"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/playroom"
                 className="border border-black text-black px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base md:text-lg font-semibold hover:bg-black hover:text-white transition-colors rounded-full"
               >
                 템플릿 둘러보기
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -315,12 +313,7 @@ export default function Home() {
             </div>
 
             <div className="grid sm:grid-cols-3 gap-8">
-              <a
-                href="https://about.ssobig.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-              >
+              <Link href="/playroom" className="group">
                 <div className="pb-6 md:pb-8 border-b border-gray-200 group-hover:border-black transition-colors">
                   <div className="text-4xl md:text-5xl mb-3 md:mb-4">🎯</div>
                   <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
@@ -333,7 +326,7 @@ export default function Home() {
                     시작하기 →
                   </span>
                 </div>
-              </a>
+              </Link>
 
               <Link href="/socialing" className="group">
                 <div className="pb-6 md:pb-8 border-b border-gray-200 group-hover:border-black transition-colors">
