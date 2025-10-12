@@ -5,7 +5,7 @@ import Image from "next/image";
 export const LinkIcon = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
     <Image
-      src="/ssobig_assets/linkIcon.png"
+      src="/ssobig_assets/home/icon-link.png"
       alt="링크 아이콘"
       width={16}
       height={16}
@@ -20,7 +20,7 @@ export const CssInstagramIcon = (
 ) => (
   <div className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${props.className}`}>
     <Image
-      src="/ssobig_assets/instaIcon.png"
+      src="/ssobig_assets/home/icon-instagram.png"
       alt="인스타그램 아이콘"
       width={16}
       height={16}

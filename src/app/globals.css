@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* GNB 높이 변수 */
+  --gnb-height-mobile: 88px;
+  --gnb-height-desktop: 60px;
+  /* Safe area */
+  --safe-area-top: env(safe-area-inset-top, 0px);
 }
 
 @theme inline {
@@ -19,16 +24,63 @@
   }
 }
 
+html {
+  height: 100%;
+  /* iOS Safari 오버스크롤 대응 */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+  overscroll-behavior: none;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   touch-action: manipulation;
   -webkit-text-size-adjust: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
-html {
-  touch-action: pan-x pan-y;
+/* 메인 컨테이너 */
+main {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.global-nav {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+  height: var(--gnb-height-mobile);
+  /* 배경색은 React 컴포넌트에서 제어 */
+}
+
+@media (min-width: 768px) {
+  .global-nav {
+    height: var(--gnb-height-desktop);
+  }
+}
+
+/* 스크롤 다운 시 GNB 위로 숨김 */
+body.gnb-hidden .global-nav {
+  transform: translateY(calc(-1 * var(--gnb-height-mobile)));
+}
+
+@media (min-width: 768px) {
+  body.gnb-hidden .global-nav {
+    transform: translateY(calc(-1 * var(--gnb-height-desktop)));
+  }
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -40,4 +92,32 @@ html {
 .hide-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+/* 스크롤 스냅 컨테이너 설정 */
+.snap-container {
+  scroll-behavior: smooth;
+}
+
+/* 각 섹션 스냅 설정 */
+.snap-container section {
+  scroll-snap-align: start;
+}
+
+/* 가로 스크롤 애니메이션 */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused;
 }
