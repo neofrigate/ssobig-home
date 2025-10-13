@@ -309,15 +309,20 @@ const SocialGeniusPage = () => {
                   🎮 소셜지니어스 스케줄
                 </h2>
 
-                {/* 범례 */}
-                <div className="flex gap-2 md:gap-3 justify-end mb-4 md:mb-6">
-                  <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-white/10 bg-[#FF69B4]/20">
-                    <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#FF69B4]" />
-                    <span className="text-white/80">여자</span>
+                {/* 참가비 및 범례 */}
+                <div className="flex gap-2 md:gap-3 justify-between items-center mb-4 md:mb-6 px-3 md:px-4">
+                  <div className="text-sm md:text-base font-semibold text-white">
+                    참가비 : 28,000원 (오픈할인중)
                   </div>
-                  <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-white/10 bg-[#4A90E2]/20">
-                    <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#4A90E2]" />
-                    <span className="text-white/80">남자</span>
+                  <div className="flex gap-2 md:gap-3">
+                    <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-white/10 bg-[#FF69B4]/20">
+                      <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#FF69B4]" />
+                      <span className="text-white/80">여자</span>
+                    </div>
+                    <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-white/10 bg-[#4A90E2]/20">
+                      <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#4A90E2]" />
+                      <span className="text-white/80">남자</span>
+                    </div>
                   </div>
                 </div>
 
@@ -468,77 +473,6 @@ const SocialGeniusPage = () => {
                   <br />
                   &ldquo;게임으로 즐겁게 친해진다!&rdquo;가 우리의 모토! 🙌
                 </p>
-              </div>
-            </div>
-
-            {/* 진행방식 섹션 */}
-            <div className="bg-[#E9E5F6] px-6 py-10 md:px-9 md:py-14">
-              <div className="bg-white/60 p-5 md:p-6 rounded-xl">
-                <h4 className="text-xl md:text-2xl font-bold text-black mb-6 text-center">
-                  게임을 가장 잘 즐길 수 있는 진행방식
-                </h4>
-
-                <div className="space-y-2 text-sm md:text-base text-black/80">
-                  <p className="flex justify-between">
-                    <span>자유 탐색전 + 대화</span>
-                    <span className="text-[#9E4BED] font-medium">[15분]</span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span>안내 + 튜토리얼</span>
-                    <span className="text-[#9E4BED] font-medium">[20분]</span>
-                  </p>
-
-                  <div className="bg-[#9E4BED]/10 p-4 rounded-xl border border-[#9E4BED] my-4">
-                    <p className="flex justify-between items-center mb-2">
-                      <span className="text-base md:text-lg font-extrabold text-[#9E4BED]">
-                        메인 매치
-                      </span>
-                      <span className="text-base md:text-lg font-bold text-black">
-                        [2시간]
-                      </span>
-                    </p>
-
-                    <div className="pl-3 border-l-2 border-[#9E4BED]/50 ml-2 space-y-2 mt-3">
-                      <p className="flex justify-between text-sm">
-                        <span className="font-medium text-black">전반전</span>
-                        <span className="text-[#9E4BED] font-medium">
-                          [50분]
-                        </span>
-                      </p>
-                      <p className="text-xs text-black/70 ml-3">
-                        승리 플레이어에게 후반전 베네핏 제공
-                      </p>
-
-                      <p className="flex justify-between text-sm">
-                        <span className="font-medium text-black">
-                          비밀 규칙 공개 + 전략회의
-                        </span>
-                        <span className="text-[#9E4BED] font-medium">
-                          [20분]
-                        </span>
-                      </p>
-                      <p className="text-xs text-black/70 ml-3">
-                        새로운 전략과 새로운 연합 등장
-                      </p>
-
-                      <p className="flex justify-between text-sm">
-                        <span className="font-medium text-black">후반전</span>
-                        <span className="text-[#9E4BED] font-medium">
-                          [50분]
-                        </span>
-                      </p>
-                      <p className="text-xs text-black/70 ml-3">
-                        후반전에서 &lsquo;생존&rsquo;해야 최종 승리
-                      </p>
-                    </div>
-                  </div>
-
-                  <p className="flex justify-between">
-                    <span>후일담 나누기</span>
-                    <span className="text-[#9E4BED] font-medium">[25분]</span>
-                  </p>
-                  <p className="text-black/80">+ 인근 찐맛집 오픈런 2차</p>
-                </div>
               </div>
             </div>
 
