@@ -454,11 +454,6 @@ const ElevenNammePage = () => {
             </LinkWithUtm>
           </div>
         </div>
-
-        {/* 채널톡 상담 버튼 - 고정 위치 */}
-        <div className="fixed bottom-24 right-8 z-50">
-          <ChannelTalkButton />
-        </div>
       </div>
     </>
   );
