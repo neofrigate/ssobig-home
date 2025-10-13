@@ -44,6 +44,9 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   // 메인 홈 페이지
   const isHomePage = pathname === "/";
 
+  // 드롭다운 상태 관리
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   // 초기 상태를 false로 설정하여 서버/클라이언트 hydration 일치
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -452,36 +455,79 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               />
             )}
           </Link>
-          <Link
-            href="/socialing"
-            className="relative flex items-center h-full transition-opacity hover:opacity-80"
-            onClick={(e) => {
-              if (pathname === "/socialing") {
-                e.preventDefault();
-                const container = document.querySelector(".snap-container");
-                if (container) {
-                  container.scrollTop = 0;
-                }
-              }
-            }}
+          <div
+            className="relative flex items-center h-full"
+            onMouseEnter={() => setIsDropdownOpen(true)}
+            onMouseLeave={() => setIsDropdownOpen(false)}
           >
-            <span
-              className={`font-medium text-base transition-colors duration-700 ${
-                useBlackText ? "text-gray-900" : "text-white"
-              }`}
-              style={{
-                opacity: pathname.startsWith("/socialing") ? 1 : 0.6,
+            <Link
+              href="/socialing"
+              className="relative flex items-center h-full transition-opacity hover:opacity-80"
+              onClick={(e) => {
+                if (pathname === "/socialing") {
+                  e.preventDefault();
+                  const container = document.querySelector(".snap-container");
+                  if (container) {
+                    container.scrollTop = 0;
+                  }
+                }
               }}
-              suppressHydrationWarning
             >
-              SOCIALING
-            </span>
-            {pathname.startsWith("/socialing") && (
+              <span
+                className={`font-medium text-base transition-colors duration-700 ${
+                  useBlackText ? "text-gray-900" : "text-white"
+                }`}
+                style={{
+                  opacity: pathname.startsWith("/socialing") ? 1 : 0.6,
+                }}
+                suppressHydrationWarning
+              >
+                SOCIALING
+              </span>
+              {pathname.startsWith("/socialing") && (
+                <div
+                  className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
+                />
+              )}
+            </Link>
+
+            {/* 드롭다운 메뉴 */}
+            {isDropdownOpen && (
               <div
-                className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
-              />
+                className={`absolute top-full left-0 mt-0 w-36 z-50 transition-colors duration-700 rounded-xl overflow-hidden ${
+                  useBlackText ? "bg-white/40" : "bg-black/40"
+                }`}
+                style={{
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  boxShadow: useBlackText
+                    ? "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
+                    : "0 10px 25px -5px rgba(255, 255, 255, 0.4), 0 8px 10px -6px rgba(255, 255, 255, 0.3)",
+                }}
+              >
+                <Link
+                  href="/socialing/love-buddies"
+                  className={`block px-4 py-3 text-sm transition-colors duration-700 ${
+                    useBlackText
+                      ? "text-gray-900 hover:bg-black/10"
+                      : "text-white hover:bg-white/20"
+                  }`}
+                >
+                  러브버디즈
+                </Link>
+                <Link
+                  href="/socialing/game-orb"
+                  className={`block px-4 py-3 text-sm transition-colors duration-700 ${
+                    useBlackText
+                      ? "text-gray-900 hover:bg-black/10"
+                      : "text-white hover:bg-white/20"
+                  }`}
+                >
+                  게임오브
+                </Link>
+              </div>
             )}
-          </Link>
+          </div>
           <a
             href="https://tool.ssobig.com"
             target="_blank"

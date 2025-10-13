@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# ngrok 도메인 설정
+NGROK_DOMAIN="undepressive-makenzie-supernaturally.ngrok-free.dev"
+
 # 사용법 출력
 show_usage() {
   echo ""
@@ -7,10 +10,13 @@ show_usage() {
   echo "📋 사용법"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
-  echo "  ./runserver.sh          # 개발 서버 + ngrok 실행"
-  echo "  ./runserver.sh check    # 배포 전 체크 (lint + build)"
-  echo "  ./runserver.sh lint     # ESLint만 실행"
-  echo "  ./runserver.sh build    # 프로덕션 빌드만 실행"
+  echo "  ./runserver.sh                  # 개발 서버 + ngrok 실행 (고정 도메인)"
+  echo "  ./runserver.sh random           # 개발 서버 + ngrok 실행 (랜덤 도메인)"
+  echo "  ./runserver.sh check            # 배포 전 체크 (lint + build)"
+  echo "  ./runserver.sh lint             # ESLint만 실행"
+  echo "  ./runserver.sh build            # 프로덕션 빌드만 실행"
+  echo ""
+  echo "  현재 고정 도메인: $NGROK_DOMAIN"
   echo ""
   exit 0
 }
@@ -87,6 +93,8 @@ cleanup() {
 }
 
 # 명령어 처리
+USE_RANDOM_DOMAIN=false
+
 case "$1" in
   help|--help|-h)
     show_usage
@@ -112,8 +120,12 @@ case "$1" in
     yarn build
     exit $?
     ;;
+  random)
+    # 랜덤 도메인으로 실행
+    USE_RANDOM_DOMAIN=true
+    ;;
   "")
-    # 인자 없으면 기본 개발 서버 실행
+    # 인자 없으면 기본 개발 서버 실행 (고정 도메인)
     ;;
   *)
     echo "❌ 알 수 없는 명령어: $1"
@@ -123,6 +135,20 @@ esac
 
 # Ctrl+C 시 cleanup 함수 실행
 trap cleanup SIGINT SIGTERM
+
+# 기존 ngrok 프로세스 확인 및 종료
+echo "🔍 기존 ngrok 프로세스 확인 중..."
+NGROK_PIDS=$(pgrep -f "ngrok")
+if [ ! -z "$NGROK_PIDS" ]; then
+  echo "⚠️  기존 ngrok 프로세스 종료 중..."
+  echo "$NGROK_PIDS" | xargs kill -9 2>/dev/null
+  sleep 2
+  echo "✅ ngrok 프로세스 정리 완료"
+else
+  echo "✅ 실행 중인 ngrok 프로세스 없음"
+fi
+
+echo ""
 
 # 3000번 포트 확인 및 정리
 echo "🔍 3000번 포트 확인 중..."
@@ -162,7 +188,13 @@ echo "🌍 ngrok 터널 시작 중..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "💻 로컬 주소:  http://localhost:3000"
-echo "📱 외부 주소:  아래 ngrok URL 확인"
+
+if [ "$USE_RANDOM_DOMAIN" = true ]; then
+  echo "📱 외부 주소:  아래 ngrok URL 확인 (랜덤 도메인)"
+else
+  echo "📱 외부 주소:  https://$NGROK_DOMAIN"
+fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
@@ -178,5 +210,9 @@ if ! command -v ngrok &> /dev/null; then
   exit 1
 fi
 
-# ngrok 실행
-ngrok http 3000
+# ngrok 실행 (도메인 지정 여부에 따라 분기)
+if [ "$USE_RANDOM_DOMAIN" = true ]; then
+  ngrok http 3000
+else
+  ngrok http --domain=$NGROK_DOMAIN 3000
+fi

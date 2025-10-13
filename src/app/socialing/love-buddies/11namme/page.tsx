@@ -307,15 +307,20 @@ const ElevenNammePage = () => {
                   💕 러브버디즈 스케줄
                 </h2>
 
-                {/* 범례 */}
-                <div className="flex gap-2 md:gap-3 justify-end mb-4 md:mb-6">
-                  <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-black/10 bg-[#FF69B4]/15">
-                    <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#FF69B4]" />
-                    <span className="text-black/80">여자</span>
+                {/* 가격 및 범례 */}
+                <div className="flex gap-2 md:gap-3 justify-between items-center mb-4 md:mb-6 px-3 md:px-4">
+                  <div className="text-sm md:text-base font-semibold text-black">
+                    참가비 : 35,000원
                   </div>
-                  <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-black/10 bg-[#4A90E2]/15">
-                    <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#4A90E2]" />
-                    <span className="text-black/80">남자</span>
+                  <div className="flex gap-2 md:gap-3">
+                    <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-black/10 bg-[#FF69B4]/15">
+                      <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#FF69B4]" />
+                      <span className="text-black/80">여자</span>
+                    </div>
+                    <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-black/10 bg-[#4A90E2]/15">
+                      <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#4A90E2]" />
+                      <span className="text-black/80">남자</span>
+                    </div>
                   </div>
                 </div>
 
@@ -448,6 +453,11 @@ const ElevenNammePage = () => {
               </svg>
             </LinkWithUtm>
           </div>
+        </div>
+
+        {/* 채널톡 상담 버튼 - 고정 위치 */}
+        <div className="fixed bottom-24 right-8 z-50">
+          <ChannelTalkButton />
         </div>
       </div>
     </>

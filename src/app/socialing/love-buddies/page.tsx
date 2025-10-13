@@ -1,10 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-
-export const metadata = {
-  title: "Ssobig-Love Buddies",
-};
 
 const LoveBuddiesPage = () => {
   return (
