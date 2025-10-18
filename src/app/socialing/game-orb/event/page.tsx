@@ -241,102 +241,22 @@ export default function GameOrbPage() {
             </div>
           </a>
 
-          {/* 모집중인 게임 라인업 섹션 */}
+          {/* 구글 폼 임베드 섹션 */}
           <div className="w-full mt-16 sm:mt-20">
             <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 sm:mb-8 text-center w-full">
-              모집중인 게임 라인업
+              이벤트 신청하기
             </h3>
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-6 w-full">
-              {/* 불면증마피아 */}
-              <div className="flex flex-col">
-                <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-lg mb-2 sm:mb-3">
-                  <Image
-                    src="/ssobig_assets/socialing/poster_불면증마피아.png"
-                    alt="불면증마피아"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 33vw, (max-width: 768px) 200px, 220px"
-                  />
-                </div>
-                <h4 className="text-xs sm:text-sm md:text-base font-semibold text-white mb-1">
-                  불면증마피아
-                </h4>
-                {gameSchedules.불면증마피아.length > 0 ? (
-                  gameSchedules.불면증마피아
-                    .slice(0, 2)
-                    .map((schedule, idx) => (
-                      <p
-                        key={idx}
-                        className="text-xs sm:text-sm text-neutral-300"
-                      >
-                        - {schedule.date} {schedule.time}
-                      </p>
-                    ))
-                ) : (
-                  <p className="text-xs sm:text-sm text-neutral-300">
-                    - 일정 준비중
-                  </p>
-                )}
-              </div>
-              {/* 캠퍼스라이프 */}
-              <div className="flex flex-col">
-                <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-lg mb-2 sm:mb-3">
-                  <Image
-                    src="/ssobig_assets/socialing/poster_캠퍼스라이프.jpg"
-                    alt="캠퍼스라이프"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 33vw, (max-width: 768px) 200px, 220px"
-                  />
-                </div>
-                <h4 className="text-xs sm:text-sm md:text-base font-semibold text-white mb-1">
-                  캠퍼스라이프
-                </h4>
-                {gameSchedules.캠퍼스라이프.length > 0 ? (
-                  gameSchedules.캠퍼스라이프
-                    .slice(0, 2)
-                    .map((schedule, idx) => (
-                      <p
-                        key={idx}
-                        className="text-xs sm:text-sm text-neutral-300"
-                      >
-                        - {schedule.date} {schedule.time}
-                      </p>
-                    ))
-                ) : (
-                  <p className="text-xs sm:text-sm text-neutral-300">
-                    - 일정 준비중
-                  </p>
-                )}
-              </div>
-              {/* 이중스파이 */}
-              <div className="flex flex-col">
-                <div className="relative aspect-[3/4] rounded-lg overflow-hidden shadow-lg mb-2 sm:mb-3">
-                  <Image
-                    src="/ssobig_assets/socialing/poster_이중스파이.png"
-                    alt="이중스파이"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 33vw, (max-width: 768px) 200px, 220px"
-                  />
-                </div>
-                <h4 className="text-xs sm:text-sm md:text-base font-semibold text-white mb-1">
-                  이중스파이
-                </h4>
-                {gameSchedules.이중스파이.length > 0 ? (
-                  gameSchedules.이중스파이.slice(0, 2).map((schedule, idx) => (
-                    <p
-                      key={idx}
-                      className="text-xs sm:text-sm text-neutral-300"
-                    >
-                      - {schedule.date} {schedule.time}
-                    </p>
-                  ))
-                ) : (
-                  <p className="text-xs sm:text-sm text-neutral-300">
-                    - 일정 준비중
-                  </p>
-                )}
+            
+            {/* 구글 폼 컨테이너 */}
+            <div className="w-full bg-white/5 rounded-lg overflow-hidden shadow-lg backdrop-blur-sm">
+              <div className="relative w-full" style={{ paddingBottom: '247%', minHeight: '600px' }}>
+                <iframe 
+                  src="https://docs.google.com/forms/d/e/1FAIpQLSe92HxZjpWjHwLAz9R1OSJ2qrXph2RQ2gwwgiW__9x8g8hnIA/viewform?embedded=true" 
+                  className="absolute top-0 left-0 w-full h-full border-0"
+                  style={{ minHeight: '600px' }}
+                >
+                  로드 중…
+                </iframe>
               </div>
             </div>
           </div>
