@@ -1,97 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import Script from "next/script";
 
-interface GameSchedule {
-  [gameName: string]: { date: string; time: string }[];
-}
-
-export default function GameOrbPage() {
-  const [gameSchedules, setGameSchedules] = useState<GameSchedule>({
-    불면증마피아: [],
-    캠퍼스라이프: [],
-    이중스파이: [],
-  });
-
-  // Google Sheets에서 데이터 가져오기
-  useEffect(() => {
-    const fetchSheetData = async () => {
-      try {
-        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1562356640`;
-
-        const response = await fetch(url);
-        if (!response.ok) return;
-
-        const csvText = await response.text();
-        const rows = csvText.split("\n").slice(1);
-
-        const schedules: GameSchedule = {
-          불면증마피아: [],
-          캠퍼스라이프: [],
-          이중스파이: [],
-        };
-
-        rows.forEach((row) => {
-          if (row.trim()) {
-            const cols = row.split(",");
-            const title = cols[1]?.replace(/"/g, "").trim();
-            const isChecked = cols[2]?.replace(/"/g, "").trim() === "TRUE";
-
-            if (
-              isChecked &&
-              title &&
-              title !== "선택 항목" &&
-              title.length > 0
-            ) {
-              console.log("Processing title:", title);
-
-              const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
-              const dateStr = dateMatch ? dateMatch[1] : "";
-
-              const timeMatch = title.match(/(\d+:\d+)/);
-              const timeStr = timeMatch ? timeMatch[1] : "";
-
-              if (dateStr) {
-                const scheduleItem = { date: dateStr, time: timeStr };
-
-                if (title.includes("불면증") || title.includes("마피아")) {
-                  console.log("Added to 불면증마피아:", scheduleItem);
-                  schedules.불면증마피아.push(scheduleItem);
-                } else if (
-                  title.includes("캠퍼스") ||
-                  title.includes("라이프")
-                ) {
-                  console.log("Added to 캠퍼스라이프:", scheduleItem);
-                  schedules.캠퍼스라이프.push(scheduleItem);
-                } else if (title.includes("이중") || title.includes("스파이")) {
-                  console.log("Added to 이중스파이:", scheduleItem);
-                  schedules.이중스파이.push(scheduleItem);
-                }
-              }
-            }
-          }
-        });
-
-        console.log("Final schedules:", schedules);
-
-        setGameSchedules(schedules);
-      } catch (error) {
-        console.error("Failed to fetch schedule data:", error);
-      }
-    };
-
-    fetchSheetData();
-  }, []);
-
+const SocialGeniusPage = () => {
+  const FORM_URL =
+    "https://docs.google.com/forms/d/e/1FAIpQLSefYgNol9q9mYGzCcUs1SxoHaO3ECDb9LCAhMAv8oskvUuixw/viewform?usp=header";
   return (
     <>
       {/* Meta Pixel Code */}
       <Script
-        id="facebook-pixel"
+        id="facebook-pixel-game-orb"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
@@ -110,158 +29,69 @@ export default function GameOrbPage() {
       />
       {/* End Meta Pixel Code */}
 
-      <div className="text-white font-sans relative flex flex-col items-center justify-start pb-[100px] px-0 selection:bg-purple-500 selection:text-white pt-[88px] md:pt-[60px]">
+      <div className="min-h-screen text-white font-sans relative">
         {/* 배경 이미지 next/image 적용 */}
         <div className="fixed inset-0 -z-10">
           <Image
             src="/ssobig_assets/gameorb/hero-main.jpg"
-            alt="게임오브 배경"
+            alt="소셜지니어스 배경"
             fill
             style={{ objectFit: "cover", objectPosition: "center" }}
             priority
             sizes="100vw"
           />
           {/* 배경 이미지 위에 그라데이션 오버레이 적용 */}
-          <div className="fixed inset-0 bg-gradient-to-b from-black/50 via-black/80 to-black/85"></div>
-        </div>
-
-        {/* 이미지 및 컨텐츠 영역 */}
-        <div className="w-full md:max-w-[720px] mx-auto z-10 relative text-center px-5 pt-5 flex flex-col items-center gap-[30px]">
-          {/* 로고 이미지 */}
-          <div className="w-full max-w-[400px] h-[96px] sm:h-[150px] relative flex justify-center items-center mx-auto">
-            <Image
-              src="/ssobig_assets/gameorb/brand-logo.png"
-              alt="게임오브 로고"
-              fill
-              style={{ objectFit: "contain" }}
-              className="mx-auto"
-              priority
-              sizes="(max-width: 768px) 80vw, 400px"
-            />
-          </div>
-
-          {/* 인스타그램 아이콘 */}
-          <a
-            href="https://www.instagram.com/game_orb/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center text-neutral-300 hover:text-white transition-colors group"
-            aria-label="인스타그램으로 이동"
-          >
-            <div className="w-[24px] h-[24px]">
-              <Image
-                src="/ssobig_assets/home/icon-instagram-circle.png"
-                alt="인스타그램 아이콘"
-                width={24}
-                height={24}
-                className="w-full h-full filter brightness-0 invert"
-              />
-            </div>
-          </a>
-
-          {/* 텍스트 섹션 */}
-          <div className="text-left w-full">
-            <h2 className="text-[24px] sm:text-[28px] font-bold text-white mb-[12.26px]">
-              Game Orb 게임오브
-            </h2>
-            <p className="text-[14px] sm:text-[16px] text-neutral-300 w-full leading-relaxed">
-              TV 게임 예능 프로그램의 짜릿하고 지적인 게임들을 현실에서 더
-              재밌게 구현해내는 곳!
-              <br />
-              &lt;더 지니어스&gt;, &lt;크라임씬&gt;, &lt;피의 게임&gt;,
-              &lt;데블스 플랜&gt;을 보며 느꼈던 두근거림과 감동을 일상의 만남
-              속에 불러와, 참가자들이 주인공이 되어보는 장을 만들고자 합니다.
-            </p>
-          </div>
+          <div className="fixed inset-0 bg-gradient-to-b from-black/85 via-black/70 to-black/55"></div>
+          {/* 모바일 상단 GNB 영역 블랙 배경 */}
+          <div className="fixed top-0 left-0 right-0 h-[88px] bg-black md:hidden z-0"></div>
         </div>
 
         {/* Content Area */}
-        <div className="z-10 flex flex-col items-center md:max-w-[720px] w-full px-5 pb-0 mt-[30px]">
-          {/* 소셜지니어스 섹션 */}
-          <Link
-            href="/socialing/game-orb/social_genius"
-            className="group flex flex-row gap-3 sm:gap-4 w-full items-center mb-6 sm:mb-8"
-          >
-            {/* 포스터 */}
-            <div className="relative w-[120px] sm:w-[190px] md:w-[228px] aspect-[3/4] rounded-lg overflow-hidden shadow-lg transition-transform group-hover:scale-105 group-hover:shadow-2xl flex-shrink-0">
-              <Image
-                src="/ssobig_assets/socialing/poster_소셜지니어스.png"
-                alt="소셜지니어스 포스터"
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 120px, (max-width: 768px) 190px, 228px"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-            </div>
+        <main className="w-full md:max-w-[720px] flex flex-col items-center mx-auto pt-0 md:pt-6 pb-24 bg-black md:bg-transparent">
+          {/* 포스터 이미지 */}
+          <div className="w-full md:rounded-3xl overflow-hidden md:shadow-lg">
+            <Image
+              src="/ssobig_assets/gameorb/빠니와 불마.png"
+              alt="빠니보틀과 함께하는 불면증 마피아"
+              width={1080}
+              height={1920}
+              className="w-full h-auto block leading-[0]"
+              priority
+              style={{ display: "block", margin: 0, padding: 0 }}
+            />
+          </div>
+        </main>
 
-            {/* 설명 */}
-            <div className="flex-1 text-left">
-              <h3 className="text-lg sm:text-2xl font-bold text-white mb-1 sm:mb-2 group-hover:text-purple-300 transition-colors">
-                🎮 소셜지니어스
-              </h3>
-              <p className="text-xs sm:text-base text-neutral-300 leading-relaxed">
-                흥미진진한 게임 예능에 지금 바로 참여하세요
-              </p>
-              <div className="mt-2 sm:mt-3 inline-flex items-center text-white/80 group-hover:text-white transition-colors">
-                <span className="text-xs sm:text-base">자세히 보기 →</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* 카카오톡 오픈채팅 섹션 */}
-          <a
-            href="https://open.kakao.com/o/g9LIA56f"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex flex-row gap-3 sm:gap-4 w-full items-center mb-0"
-          >
-            {/* 포스터 */}
-            <div className="relative w-[120px] sm:w-[190px] md:w-[228px] aspect-[3/4] rounded-lg overflow-hidden shadow-lg transition-transform group-hover:scale-105 group-hover:shadow-2xl flex-shrink-0">
-              <Image
-                src="/ssobig_assets/socialing/poster_오픈카톡방.png"
-                alt="게임오브 카톡방 포스터"
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 120px, (max-width: 768px) 190px, 228px"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-            </div>
-
-            {/* 설명 */}
-            <div className="flex-1 text-left">
-              <h3 className="text-lg sm:text-2xl font-bold text-white mb-1 sm:mb-2 group-hover:text-purple-300 transition-colors">
-                💬 게임오브 비밀 카톡방
-              </h3>
-              <p className="text-xs sm:text-base text-neutral-300 leading-relaxed">
-                게임 애호가들과 함께하는 비밀 카톡방에 참여하세요
-              </p>
-              <div className="mt-2 sm:mt-3 inline-flex items-center text-white/80 group-hover:text-white transition-colors">
-                <span className="text-xs sm:text-base">참여하기 →</span>
-              </div>
-            </div>
-          </a>
-
-          {/* 구글 폼 임베드 섹션 */}
-          <div className="w-full mt-16 sm:mt-20">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 sm:mb-8 text-center w-full">
-              이벤트 신청하기
-            </h3>
-            
-            {/* 구글 폼 컨테이너 */}
-            <div className="w-full bg-white/5 rounded-lg overflow-hidden shadow-lg backdrop-blur-sm">
-              <div className="relative w-full" style={{ paddingBottom: '247%', minHeight: '600px' }}>
-                <iframe 
-                  src="https://docs.google.com/forms/d/e/1FAIpQLSe92HxZjpWjHwLAz9R1OSJ2qrXph2RQ2gwwgiW__9x8g8hnIA/viewform?embedded=true" 
-                  className="absolute top-0 left-0 w-full h-full border-0"
-                  style={{ minHeight: '600px' }}
-                >
-                  로드 중…
-                </iframe>
-              </div>
-            </div>
+        {/* 하단 고정 CTA 버튼 */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 z-30 bg-gradient-to-t from-black via-black to-transparent md:bg-none">
+          <div className="w-full max-w-[720px] md:max-w-[600px] mx-auto">
+            <a
+              href={FORM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full h-[56px] bg-[#9E4BED] hover:bg-[#8341c9] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-all duration-300 text-base md:text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              신청하기 🎮
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 ml-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </a>
           </div>
         </div>
       </div>
     </>
   );
-}
+};
+
+export default SocialGeniusPage;
