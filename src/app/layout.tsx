@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/next";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import PageViewTracker from "../components/PageViewTracker";
 import ChannelTalk from "../components/ChannelTalk";
+import EventPopup from "../components/EventPopup";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <PageViewTracker />
         <Sidebar />
+        <EventPopup />
         <main>{children}</main>
         <ChannelTalk />
         <SpeedInsights />

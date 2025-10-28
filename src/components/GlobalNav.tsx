@@ -393,15 +393,49 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 useBlackText ? "text-gray-900" : "text-white"
               }`}
               style={{
-                opacity: pathname.startsWith("/socialing") ? 1 : 0.4,
+                opacity:
+                  isMounted &&
+                  pathname.startsWith("/socialing") &&
+                  pathname !== "/socialing/game-orb/event"
+                    ? 1
+                    : 0.4,
               }}
               suppressHydrationWarning
             >
               SOCIALING
             </span>
-            {pathname.startsWith("/socialing") && (
+            {isMounted &&
+              pathname.startsWith("/socialing") &&
+              pathname !== "/socialing/game-orb/event" && (
+                <div
+                  className={`absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-700 ${underlineColorClass}`}
+                  suppressHydrationWarning
+                />
+              )}
+          </Link>
+
+          <Link
+            href="/socialing/game-orb/event"
+            className="relative h-full flex items-center font-medium text-sm"
+          >
+            <span
+              className={`transition-all duration-700 ${
+                useBlackText ? "text-gray-900" : "text-white"
+              }`}
+              style={{
+                opacity:
+                  isMounted && pathname === "/socialing/game-orb/event"
+                    ? 1
+                    : 0.4,
+              }}
+              suppressHydrationWarning
+            >
+              EVENT
+            </span>
+            {isMounted && pathname === "/socialing/game-orb/event" && (
               <div
                 className={`absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-700 ${underlineColorClass}`}
+                suppressHydrationWarning
               />
             )}
           </Link>
@@ -478,17 +512,25 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                   useBlackText ? "text-gray-900" : "text-white"
                 }`}
                 style={{
-                  opacity: pathname.startsWith("/socialing") ? 1 : 0.6,
+                  opacity:
+                    isMounted &&
+                    pathname.startsWith("/socialing") &&
+                    pathname !== "/socialing/game-orb/event"
+                      ? 1
+                      : 0.6,
                 }}
                 suppressHydrationWarning
               >
                 SOCIALING
               </span>
-              {pathname.startsWith("/socialing") && (
-                <div
-                  className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
-                />
-              )}
+              {isMounted &&
+                pathname.startsWith("/socialing") &&
+                pathname !== "/socialing/game-orb/event" && (
+                  <div
+                    className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
+                    suppressHydrationWarning
+                  />
+                )}
             </Link>
 
             {/* 드롭다운 메뉴 */}
@@ -528,6 +570,31 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               </div>
             )}
           </div>
+          <Link
+            href="/socialing/game-orb/event"
+            className="relative flex items-center h-full transition-opacity hover:opacity-80"
+          >
+            <span
+              className={`font-medium text-base transition-colors duration-700 ${
+                useBlackText ? "text-gray-900" : "text-white"
+              }`}
+              style={{
+                opacity:
+                  isMounted && pathname === "/socialing/game-orb/event"
+                    ? 1
+                    : 0.6,
+              }}
+              suppressHydrationWarning
+            >
+              EVENT
+            </span>
+            {isMounted && pathname === "/socialing/game-orb/event" && (
+              <div
+                className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
+                suppressHydrationWarning
+              />
+            )}
+          </Link>
           <a
             href="https://tool.ssobig.com"
             target="_blank"
