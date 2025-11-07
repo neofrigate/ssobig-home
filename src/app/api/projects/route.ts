@@ -3,6 +3,33 @@ import axios from "axios";
 
 export const dynamic = 'force-dynamic';
 
+// Notion API 타입 정의
+interface RichText {
+  plain_text: string;
+  [key: string]: unknown;
+}
+
+interface NotionProperty {
+  type: string;
+  title?: RichText[];
+  rich_text?: RichText[];
+  select?: { name: string };
+  multi_select?: Array<{ name: string }>;
+  files?: Array<{
+    type: string;
+    external?: { url: string };
+    file?: { url: string };
+  }>;
+  url?: string;
+  [key: string]: unknown;
+}
+
+interface NotionPage {
+  id: string;
+  properties: Record<string, NotionProperty>;
+  [key: string]: unknown;
+}
+
 export async function GET() {
   try {
     // 환경 변수 확인
@@ -55,38 +82,38 @@ export async function GET() {
     console.log("데이터 받음, 결과 개수:", data.results?.length || 0);
 
     // 프로젝트 데이터 변환
-    const projects = data.results.map((page: any) => {
+    const projects = data.results.map((page: NotionPage) => {
       const props = page.properties || {};
 
-      const getTitle = (prop: any) => {
+      const getTitle = (prop: NotionProperty) => {
         if (prop?.type === "title" && prop.title?.[0]) {
           return prop.title[0].plain_text || "";
         }
         return "";
       };
 
-      const getRichText = (prop: any) => {
+      const getRichText = (prop: NotionProperty) => {
         if (prop?.type === "rich_text" && prop.rich_text?.[0]) {
           return prop.rich_text[0].plain_text || "";
         }
         return "";
       };
 
-      const getSelect = (prop: any) => {
+      const getSelect = (prop: NotionProperty) => {
         if (prop?.type === "select" && prop.select) {
           return prop.select.name || "";
         }
         return "";
       };
 
-      const getMultiSelect = (prop: any) => {
+      const getMultiSelect = (prop: NotionProperty) => {
         if (prop?.type === "multi_select" && prop.multi_select) {
-          return prop.multi_select.map((item: any) => item.name);
+          return prop.multi_select.map((item) => item.name);
         }
         return [];
       };
 
-      const getFiles = (prop: any) => {
+      const getFiles = (prop: NotionProperty) => {
         if (prop?.type === "files" && prop.files?.[0]) {
           const file = prop.files[0];
           if (file.type === "external") return file.external?.url || "";
@@ -95,7 +122,7 @@ export async function GET() {
         return "";
       };
 
-      const getUrl = (prop: any) => {
+      const getUrl = (prop: NotionProperty) => {
         if (prop?.type === "url" && prop.url) {
           return prop.url;
         }
@@ -124,16 +151,19 @@ export async function GET() {
     console.log("총 프로젝트 수:", projects.length);
 
     return NextResponse.json({ projects });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류";
+    const responseData = axios.isAxiosError(error) ? error.response?.data : undefined;
+    
     console.error("API 오류:", error);
-    console.error("오류 메시지:", error.message);
-    console.error("응답 데이터:", error.response?.data);
+    console.error("오류 메시지:", errorMessage);
+    console.error("응답 데이터:", responseData);
     
     return NextResponse.json(
       {
         error: "프로젝트를 가져오는 중 오류가 발생했습니다.",
-        details: error.message || "알 수 없는 오류",
-        notionError: error.response?.data,
+        details: errorMessage,
+        notionError: responseData,
       },
       { status: 500 }
     );
