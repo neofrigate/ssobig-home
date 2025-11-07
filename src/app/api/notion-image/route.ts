@@ -83,12 +83,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
-  } catch (error: any) {
-    console.error('Notion image fetch error:', error.message);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Notion image fetch error:', errorMessage);
     return NextResponse.json(
       { 
         error: 'Failed to fetch image',
-        details: error.message 
+        details: errorMessage 
       },
       { status: 500 }
     );

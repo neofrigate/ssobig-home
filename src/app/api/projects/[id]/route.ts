@@ -3,6 +3,44 @@ import axios from "axios";
 
 export const dynamic = 'force-dynamic';
 
+// Notion API 타입 정의
+interface RichText {
+  plain_text: string;
+  [key: string]: unknown;
+}
+
+interface NotionBlock {
+  type: string;
+  paragraph?: { rich_text: RichText[] };
+  heading_1?: { rich_text: RichText[] };
+  heading_2?: { rich_text: RichText[] };
+  heading_3?: { rich_text: RichText[] };
+  bulleted_list_item?: { rich_text: RichText[] };
+  numbered_list_item?: { rich_text: RichText[] };
+  quote?: { rich_text: RichText[] };
+  code?: { rich_text: RichText[] };
+  video?: { type: string; external?: { url: string } };
+  embed?: { url: string };
+  bookmark?: { url: string };
+  [key: string]: unknown;
+}
+
+interface NotionProperty {
+  type: string;
+  title?: RichText[];
+  rich_text?: RichText[];
+  select?: { name: string };
+  multi_select?: Array<{ name: string }>;
+  files?: Array<{
+    type: string;
+    external?: { url: string };
+    file?: { url: string };
+  }>;
+  url?: string;
+  date?: { start: string };
+  [key: string]: unknown;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
@@ -61,15 +99,15 @@ export async function GET(
     console.log("블록 개수:", blocks.length);
 
     // 블록을 텍스트로 변환
-    const getBlockText = (block: any): string => {
+    const getBlockText = (block: NotionBlock): string => {
       if (!block) return "";
       
       const type = block.type;
       
       // 텍스트 추출 헬퍼
-      const getRichText = (richTexts: any[]) => {
+      const getRichText = (richTexts: RichText[]) => {
         if (!richTexts || richTexts.length === 0) return "";
-        return richTexts.map((rt: any) => rt.plain_text || "").join("");
+        return richTexts.map((rt) => rt.plain_text || "").join("");
       };
 
       switch (type) {
@@ -111,44 +149,44 @@ export async function GET(
 
     // 모든 블록을 텍스트로 변환
     const contentText = blocks
-      .map((block: any) => getBlockText(block))
+      .map((block: NotionBlock) => getBlockText(block))
       .filter((text: string) => text.length > 0)
       .join("\n\n");
 
     console.log("변환된 본문 길이:", contentText.length);
 
     // 프로젝트 데이터 변환
-    const getTitle = (prop: any) => {
+    const getTitle = (prop: NotionProperty) => {
       if (prop?.type === "title" && prop.title?.[0]) {
         return prop.title[0].plain_text || "";
       }
       return "";
     };
 
-    const getRichText = (prop: any) => {
+    const getRichText = (prop: NotionProperty) => {
       if (prop?.type === "rich_text" && prop.rich_text?.[0]) {
         return prop.rich_text[0].plain_text || "";
       }
       return "";
     };
 
-    const getSelect = (prop: any) => {
+    const getSelect = (prop: NotionProperty) => {
       if (prop?.type === "select" && prop.select) {
         return prop.select.name || "";
       }
       return "";
     };
 
-    const getMultiSelect = (prop: any) => {
+    const getMultiSelect = (prop: NotionProperty) => {
       if (prop?.type === "multi_select" && prop.multi_select) {
-        return prop.multi_select.map((item: any) => item.name);
+        return prop.multi_select.map((item) => item.name);
       }
       return [];
     };
 
-    const getFiles = (prop: any) => {
+    const getFiles = (prop: NotionProperty) => {
       if (prop?.type === "files" && prop.files) {
-        return prop.files.map((file: any) => {
+        return prop.files.map((file) => {
           if (file.type === "external") return file.external?.url || "";
           if (file.type === "file") return file.file?.url || "";
           return "";
@@ -157,14 +195,14 @@ export async function GET(
       return [];
     };
 
-    const getUrl = (prop: any) => {
+    const getUrl = (prop: NotionProperty) => {
       if (prop?.type === "url" && prop.url) {
         return prop.url;
       }
       return "";
     };
 
-    const getDate = (prop: any) => {
+    const getDate = (prop: NotionProperty) => {
       if (prop?.type === "date" && prop.date) {
         return prop.date.start || "";
       }
@@ -194,16 +232,19 @@ export async function GET(
     console.log("변환된 프로젝트:", project.title);
 
     return NextResponse.json({ project });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류";
+    const responseData = axios.isAxiosError(error) ? error.response?.data : undefined;
+    
     console.error("API 오류:", error);
-    console.error("오류 메시지:", error.message);
-    console.error("응답 데이터:", error.response?.data);
+    console.error("오류 메시지:", errorMessage);
+    console.error("응답 데이터:", responseData);
     
     return NextResponse.json(
       {
         error: "프로젝트를 가져오는 중 오류가 발생했습니다.",
-        details: error.message || "알 수 없는 오류",
-        notionError: error.response?.data,
+        details: errorMessage,
+        notionError: responseData,
       },
       { status: 500 }
     );
