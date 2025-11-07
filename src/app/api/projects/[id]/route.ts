@@ -43,12 +43,15 @@ interface NotionProperty {
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // params를 await로 unwrap
+    const resolvedParams = await params;
+    const pageId = resolvedParams.id;
+    
     // 환경 변수 확인
     const apiKey = process.env.NOTION_API_KEY;
-    const pageId = params.id;
 
     if (!apiKey) {
       return NextResponse.json(
