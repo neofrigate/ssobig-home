@@ -1,0 +1,212 @@
+import { NextResponse } from "next/server";
+import axios from "axios";
+
+export const dynamic = 'force-dynamic';
+
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // 환경 변수 확인
+    const apiKey = process.env.NOTION_API_KEY;
+    const pageId = params.id;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "NOTION_API_KEY가 설정되지 않았습니다." },
+        { status: 500 }
+      );
+    }
+
+    if (!pageId) {
+      return NextResponse.json(
+        { error: "프로젝트 ID가 필요합니다." },
+        { status: 400 }
+      );
+    }
+
+    console.log("프로젝트 ID:", pageId);
+
+    // Notion 페이지 가져오기
+    const url = `https://api.notion.com/v1/pages/${pageId}`;
+    
+    const https = await import('https');
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    });
+    
+    const response = await axios.get(url, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Notion-Version': '2022-06-28',
+      },
+      httpsAgent,
+    });
+
+    const page = response.data;
+    const props = page.properties || {};
+
+    // 페이지 본문(Blocks) 가져오기
+    const blocksUrl = `https://api.notion.com/v1/blocks/${pageId}/children`;
+    const blocksResponse = await axios.get(blocksUrl, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Notion-Version': '2022-06-28',
+      },
+      httpsAgent,
+    });
+
+    const blocks = blocksResponse.data.results || [];
+    console.log("블록 개수:", blocks.length);
+
+    // 블록을 텍스트로 변환
+    const getBlockText = (block: any): string => {
+      if (!block) return "";
+      
+      const type = block.type;
+      
+      // 텍스트 추출 헬퍼
+      const getRichText = (richTexts: any[]) => {
+        if (!richTexts || richTexts.length === 0) return "";
+        return richTexts.map((rt: any) => rt.plain_text || "").join("");
+      };
+
+      switch (type) {
+        case "paragraph":
+          return getRichText(block.paragraph?.rich_text);
+        case "heading_1":
+          return "# " + getRichText(block.heading_1?.rich_text);
+        case "heading_2":
+          return "## " + getRichText(block.heading_2?.rich_text);
+        case "heading_3":
+          return "### " + getRichText(block.heading_3?.rich_text);
+        case "bulleted_list_item":
+          return "• " + getRichText(block.bulleted_list_item?.rich_text);
+        case "numbered_list_item":
+          return "1. " + getRichText(block.numbered_list_item?.rich_text);
+        case "quote":
+          return "> " + getRichText(block.quote?.rich_text);
+        case "code":
+          return "```\n" + getRichText(block.code?.rich_text) + "\n```";
+        case "divider":
+          return "---";
+        case "video":
+          // 비디오 블록 (유튜브 등)
+          if (block.video?.type === "external") {
+            return "[VIDEO]" + block.video.external.url;
+          }
+          return "";
+        case "embed":
+          // Embed 블록 (유튜브, 기타 embed)
+          return "[EMBED]" + block.embed?.url || "";
+        case "bookmark":
+          // 북마크 블록
+          return "[LINK]" + block.bookmark?.url || "";
+        default:
+          console.log("처리되지 않은 블록 타입:", type);
+          return "";
+      }
+    };
+
+    // 모든 블록을 텍스트로 변환
+    const contentText = blocks
+      .map((block: any) => getBlockText(block))
+      .filter((text: string) => text.length > 0)
+      .join("\n\n");
+
+    console.log("변환된 본문 길이:", contentText.length);
+
+    // 프로젝트 데이터 변환
+    const getTitle = (prop: any) => {
+      if (prop?.type === "title" && prop.title?.[0]) {
+        return prop.title[0].plain_text || "";
+      }
+      return "";
+    };
+
+    const getRichText = (prop: any) => {
+      if (prop?.type === "rich_text" && prop.rich_text?.[0]) {
+        return prop.rich_text[0].plain_text || "";
+      }
+      return "";
+    };
+
+    const getSelect = (prop: any) => {
+      if (prop?.type === "select" && prop.select) {
+        return prop.select.name || "";
+      }
+      return "";
+    };
+
+    const getMultiSelect = (prop: any) => {
+      if (prop?.type === "multi_select" && prop.multi_select) {
+        return prop.multi_select.map((item: any) => item.name);
+      }
+      return [];
+    };
+
+    const getFiles = (prop: any) => {
+      if (prop?.type === "files" && prop.files) {
+        return prop.files.map((file: any) => {
+          if (file.type === "external") return file.external?.url || "";
+          if (file.type === "file") return file.file?.url || "";
+          return "";
+        }).filter((url: string) => url);
+      }
+      return [];
+    };
+
+    const getUrl = (prop: any) => {
+      if (prop?.type === "url" && prop.url) {
+        return prop.url;
+      }
+      return "";
+    };
+
+    const getDate = (prop: any) => {
+      if (prop?.type === "date" && prop.date) {
+        return prop.date.start || "";
+      }
+      return "";
+    };
+
+    // 모든 이미지 파일 가져오기 (썸네일 + 이미지 필드)
+    const thumbnailFiles = getFiles(props["썸네일"] || props["Thumbnail"]);
+    const imageFiles = getFiles(props["이미지"] || props["Image"]);
+    const allImages = [...thumbnailFiles, ...imageFiles].filter(url => url && url !== "#");
+
+    const project = {
+      id: page.id,
+      title: getTitle(props["제목"] || props["이름"] || props["Title"] || props["Name"]),
+      description: getRichText(props["설명"] || props["Description"] || props["부제"]),
+      category: getSelect(props["카테고리"] || props["Category"]),
+      tags: getMultiSelect(props["태그"] || props["Tags"]),
+      images: allImages.length > 0 ? allImages : [],
+      link: getUrl(props["링크"] || props["Link"]),
+      year: getRichText(props["연도"] || props["Year"]),
+      partner: getRichText(props["파트너"] || props["Partner"]),
+      date: getDate(props["날짜"] || props["Date"]),
+      selection: getMultiSelect(props["선택"] || props["Selection"]),
+      content: contentText, // 페이지 본문 추가
+    };
+
+    console.log("변환된 프로젝트:", project.title);
+
+    return NextResponse.json({ project });
+  } catch (error: any) {
+    console.error("API 오류:", error);
+    console.error("오류 메시지:", error.message);
+    console.error("응답 데이터:", error.response?.data);
+    
+    return NextResponse.json(
+      {
+        error: "프로젝트를 가져오는 중 오류가 발생했습니다.",
+        details: error.message || "알 수 없는 오류",
+        notionError: error.response?.data,
+      },
+      { status: 500 }
+    );
+  }
+}
+
