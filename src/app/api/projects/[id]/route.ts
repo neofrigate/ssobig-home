@@ -135,7 +135,8 @@ export async function GET(
         case "video":
           // 비디오 블록 (유튜브 등)
           if (block.video?.type === "external") {
-            return "[VIDEO]" + block.video.external.url;
+            const videoUrl = block.video.external?.url;
+            return videoUrl ? "[VIDEO]" + videoUrl : "";
           }
           return "";
         case "embed":
