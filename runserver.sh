@@ -2,6 +2,23 @@
 
 # ngrok 도메인 설정
 NGROK_DOMAIN="undepressive-makenzie-supernaturally.ngrok-free.dev"
+NGROK_DOMAIN_FILE="local.ngrok-domain"
+USING_CUSTOM_NGROK_DOMAIN=false
+USE_RANDOM_DOMAIN=false
+
+if [ -f "$NGROK_DOMAIN_FILE" ]; then
+  CUSTOM_NGROK_DOMAIN=$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' "$NGROK_DOMAIN_FILE")
+  if [ ! -z "$CUSTOM_NGROK_DOMAIN" ]; then
+    CUSTOM_NGROK_DOMAIN_LOWER=$(echo "$CUSTOM_NGROK_DOMAIN" | tr '[:upper:]' '[:lower:]')
+    if [[ "$CUSTOM_NGROK_DOMAIN_LOWER" == "random" || "$CUSTOM_NGROK_DOMAIN_LOWER" == "none" ]]; then
+      USE_RANDOM_DOMAIN=true
+      USING_CUSTOM_NGROK_DOMAIN=true
+    else
+      NGROK_DOMAIN="$CUSTOM_NGROK_DOMAIN"
+      USING_CUSTOM_NGROK_DOMAIN=true
+    fi
+  fi
+fi
 
 # 사용법 출력
 show_usage() {
@@ -17,6 +34,8 @@ show_usage() {
   echo "  ./runserver.sh build            # 프로덕션 빌드만 실행"
   echo ""
   echo "  현재 고정 도메인: $NGROK_DOMAIN"
+  echo "  (개인 도메인은 local.ngrok-domain 파일에 저장"
+  echo "   파일에 random 또는 none을 입력하면 랜덤 도메인 사용)"
   echo ""
   exit 0
 }
@@ -93,7 +112,6 @@ cleanup() {
 }
 
 # 명령어 처리
-USE_RANDOM_DOMAIN=false
 
 case "$1" in
   help|--help|-h)
@@ -167,6 +185,16 @@ echo "🚀 개발 서버 시작 중..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
+echo "🧪 TypeScript 타입 체크 중..."
+if yarn tsc --noEmit; then
+  echo "✅ 타입 체크 통과"
+else
+  echo "❌ 타입 오류가 발생했습니다. 위의 에러를 수정한 뒤 다시 실행하세요."
+  exit 1
+fi
+
+echo ""
+
 # 개발 서버를 백그라운드로 실행
 yarn dev > /dev/null 2>&1 &
 DEV_PID=$!
@@ -188,6 +216,14 @@ echo "🌍 ngrok 터널 시작 중..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "💻 로컬 주소:  http://localhost:3000"
+
+if [ "$USE_RANDOM_DOMAIN" = false ]; then
+  if [ "$USING_CUSTOM_NGROK_DOMAIN" = true ]; then
+    echo "ℹ️  local.ngrok-domain 파일에서 사용자 정의 도메인을 불러왔습니다."
+  else
+    echo "ℹ️  local.ngrok-domain 파일을 찾지 못해 기본 도메인을 사용합니다."
+  fi
+fi
 
 if [ "$USE_RANDOM_DOMAIN" = true ]; then
   echo "📱 외부 주소:  아래 ngrok URL 확인 (랜덤 도메인)"
