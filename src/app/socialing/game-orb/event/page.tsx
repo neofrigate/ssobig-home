@@ -4,8 +4,8 @@ import Image from "next/image";
 import Script from "next/script";
 
 const SocialGeniusPage = () => {
-  const FORM_URL =
-    "https://docs.google.com/forms/d/e/1FAIpQLSefYgNol9q9mYGzCcUs1SxoHaO3ECDb9LCAhMAv8oskvUuixw/viewform?usp=header";
+  // const FORM_URL =
+  //   "https://docs.google.com/forms/d/e/1FAIpQLSefYgNol9q9mYGzCcUs1SxoHaO3ECDb9LCAhMAv8oskvUuixw/viewform?usp=header";
   return (
     <>
       {/* Meta Pixel Code */}
@@ -65,28 +65,12 @@ const SocialGeniusPage = () => {
         {/* 하단 고정 CTA 버튼 */}
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30 bg-gradient-to-t from-black via-black to-transparent md:bg-none">
           <div className="w-full max-w-[720px] md:max-w-[600px] mx-auto">
-            <a
-              href={FORM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full h-[56px] bg-[#9E4BED] hover:bg-[#8341c9] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-all duration-300 text-base md:text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+            <button
+              disabled
+              className="w-full h-[56px] bg-gray-500 text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-all duration-300 text-base md:text-lg shadow-lg cursor-not-allowed opacity-70"
             >
-              신청하기 🎮
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 ml-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </a>
+              신청 마감
+            </button>
           </div>
         </div>
       </div>
