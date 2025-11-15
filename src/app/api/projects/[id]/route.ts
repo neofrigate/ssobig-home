@@ -108,7 +108,7 @@ export async function GET(
       const type = block.type;
       
       // 텍스트 추출 헬퍼
-      const getRichText = (richTexts: RichText[]) => {
+      const getRichText = (richTexts?: RichText[]) => {
         if (!richTexts || richTexts.length === 0) return "";
         return richTexts.map((rt) => rt.plain_text || "").join("");
       };
@@ -253,4 +253,3 @@ export async function GET(
     );
   }
 }
-
