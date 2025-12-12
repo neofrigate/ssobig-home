@@ -18,5 +18,6 @@
   ],
   "editor.quickSuggestions": {
     "strings": true
-  }
+  },
+  "css.lint.unknownAtRules": "ignore"
 }

@@ -43,6 +43,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const isSocialingMainPage = pathname === "/socialing";
   // 메인 홈 페이지
   const isHomePage = pathname === "/";
+  // 프로젝트 페이지 (화이트 배경 고정)
+  const isProjectPage = pathname.startsWith("/project");
 
   // 드롭다운 상태 관리
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -72,6 +74,12 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     // 소셜링 메인 페이지 진입 시 초기 상태를 1섹션(흰 배경)으로 설정
     if (isSocialingMainPage) {
       setIsScrolled(true);
+    } else if (isHomePage) {
+      // 홈페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
+      setIsScrolled(true);
+    } else if (isProjectPage) {
+      // 프로젝트 페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
+      setIsScrolled(true);
     } else if (!isPlayroomPage && !isSocialingPage) {
       // 다른 페이지는 초기 상태를 false로
       setIsScrolled(false);
@@ -86,6 +94,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     isSocialingMainPage,
     isPlayroomPage,
     isSocialingPage,
+    isHomePage,
+    isProjectPage,
     isMounted,
   ]);
 
@@ -116,14 +126,9 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 setIsScrolled(false);
               }
             }
-          } else if (isHomePage) {
-            // 메인 홈 페이지: 히어로 섹션이 거의 끝날 때 흰색으로 전환
-            const viewportHeight = initialViewportHeight || window.innerHeight;
-            if (currentScrollY > viewportHeight * 0.85) {
-              setIsScrolled(true);
-            } else {
-              setIsScrolled(false);
-            }
+          } else if (isHomePage || isProjectPage) {
+            // 메인 홈 페이지 & 프로젝트 페이지: 항상 light 모드 (흰 배경, 검정 텍스트)
+            setIsScrolled(true);
           } else {
             // 배경 변경 감지
             if (currentScrollY > 50) {
@@ -179,6 +184,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     lastScrollY,
     isSocialingMainPage,
     isHomePage,
+    isProjectPage,
     initialViewportHeight,
     isMounted,
   ]);
@@ -216,11 +222,26 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [isSocialingMainPage, isMounted]);
 
+  // 쏘빅 오프라인 페이지 체크 (항상 다크 모드)
+  const isOfflinePage = pathname?.startsWith("/offline");
+
   // 페이지 유형에 따른 네비게이션 모드 결정
   const navMode: "overlay" | "light" | "dark" = (() => {
     // 클라이언트가 마운트되기 전에는 안전한 기본 상태 사용
     if (!isMounted) {
-      return "overlay";
+      // 오프라인, 플레이룸, 소셜링 상세 페이지는 어두운 배경이므로 overlay로 시작
+      if (isOfflinePage || isPlayroomPage || isSocialingPage) {
+        return "overlay";
+      }
+      return "light";
+    }
+    // 홈페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
+    if (isHomePage) {
+      return "light";
+    }
+    // 오프라인 페이지는 항상 dark 모드 또는 overlay (스크롤 시 dark)
+    if (isOfflinePage) {
+      return isScrolled ? "dark" : "overlay";
     }
     if (isSocialingPage || isPlayroomPage) {
       return "overlay";
@@ -234,7 +255,12 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     return "overlay";
   })();
 
-  const navBgClass = navMode === "light" ? "bg-white" : "";
+  const navBgClass =
+    navMode === "light"
+      ? "bg-white"
+      : navMode === "dark"
+      ? "bg-black backdrop-blur-md"
+      : "";
 
   const useBlackText = navMode === "light";
   const useWhiteText = !useBlackText;
@@ -279,7 +305,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             className="absolute inset-0 pointer-events-none md:hidden"
             style={{
               background:
-                "linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%)",
+                "linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 100%)",
             }}
           />
         </>
@@ -329,93 +355,53 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
         {/* 2단: 메뉴 (36px) */}
         <div className="h-[36px] relative flex items-center justify-start gap-4 px-5">
           <Link
-            href="/playroom"
+            href="/"
             className="relative h-full flex items-center font-medium text-sm"
           >
-            <div className="relative">
-              {/* 흰색 로고 */}
-              <Image
-                src="/ssobig_assets/Logo/logo=playroom, color=white.png"
-                alt="PLAYROOm"
-                width={82}
-                height={26}
-                className="transition-opacity duration-700 h-auto"
-                unoptimized
-                style={{
-                  opacity: useWhiteText
-                    ? pathname === "/playroom"
-                      ? 1
-                      : 0.4
-                    : 0,
-                }}
-                suppressHydrationWarning
-              />
-              {/* 검은색 로고 */}
-              <Image
-                src="/ssobig_assets/Logo/logo=playroom, color=black.png"
-                alt="PLAYROOm"
-                width={82}
-                height={26}
-                className="transition-opacity duration-700 absolute top-0 left-0 h-auto"
-                unoptimized
-                style={{
-                  opacity: useBlackText
-                    ? pathname === "/playroom"
-                      ? 1
-                      : 0.4
-                    : 0,
-                }}
-                suppressHydrationWarning
-              />
-            </div>
-            {pathname === "/playroom" && (
+            <span
+              className={`transition-all duration-700 ${
+                useBlackText ? "text-gray-900" : "text-white"
+              }`}
+              style={{
+                opacity: isMounted && pathname === "/" ? 1 : 0.6,
+              }}
+              suppressHydrationWarning
+            >
+              HOME
+            </span>
+            {isMounted && pathname === "/" && (
               <div
                 className={`absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-700 ${underlineColorClass}`}
+                suppressHydrationWarning
               />
             )}
           </Link>
 
           <Link
-            href="/socialing"
+            href="/playroom"
             className="relative h-full flex items-center font-medium text-sm"
-            onClick={(e) => {
-              if (pathname === "/socialing") {
-                e.preventDefault();
-                const container = document.querySelector(".snap-container");
-                if (container) {
-                  container.scrollTop = 0;
-                }
-              }
-            }}
           >
             <span
               className={`transition-all duration-700 ${
                 useBlackText ? "text-gray-900" : "text-white"
               }`}
               style={{
-                opacity:
-                  isMounted &&
-                  pathname.startsWith("/socialing") &&
-                  pathname !== "/socialing/game-orb/event"
-                    ? 1
-                    : 0.4,
+                opacity: isMounted && pathname === "/playroom" ? 1 : 0.6,
               }}
               suppressHydrationWarning
             >
-              SOCIALING
+              PLAYROOM
             </span>
-            {isMounted &&
-              pathname.startsWith("/socialing") &&
-              pathname !== "/socialing/game-orb/event" && (
-                <div
-                  className={`absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-700 ${underlineColorClass}`}
-                  suppressHydrationWarning
-                />
-              )}
+            {isMounted && pathname === "/playroom" && (
+              <div
+                className={`absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-700 ${underlineColorClass}`}
+                suppressHydrationWarning
+              />
+            )}
           </Link>
 
           <Link
-            href="/socialing/game-orb/event"
+            href="/offline"
             className="relative h-full flex items-center font-medium text-sm"
           >
             <span
@@ -423,16 +409,36 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 useBlackText ? "text-gray-900" : "text-white"
               }`}
               style={{
-                opacity:
-                  isMounted && pathname === "/socialing/game-orb/event"
-                    ? 1
-                    : 0.4,
+                opacity: isMounted && pathname === "/offline" ? 1 : 0.6,
               }}
               suppressHydrationWarning
             >
-              EVENT
+              OFFLINE
             </span>
-            {isMounted && pathname === "/socialing/game-orb/event" && (
+            {isMounted && pathname === "/offline" && (
+              <div
+                className={`absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-700 ${underlineColorClass}`}
+                suppressHydrationWarning
+              />
+            )}
+          </Link>
+
+          <Link
+            href="/project"
+            className="relative h-full flex items-center font-medium text-sm"
+          >
+            <span
+              className={`transition-all duration-700 ${
+                useBlackText ? "text-gray-900" : "text-white"
+              }`}
+              style={{
+                opacity: isMounted && pathname === "/project" ? 1 : 0.6,
+              }}
+              suppressHydrationWarning
+            >
+              PROJECT
+            </span>
+            {isMounted && pathname === "/project" && (
               <div
                 className={`absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-700 ${underlineColorClass}`}
                 suppressHydrationWarning
@@ -443,7 +449,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
       </div>
 
       {/* 웹 버전 (md 이상) - 스크롤에 따라 변경 */}
-      <div className="hidden md:flex items-center justify-between px-8 max-w-[1400px] mx-auto h-full relative z-10">
+      <div className="hidden md:flex items-center justify-between px-8 max-w-[1200px] mx-auto h-full relative z-10">
         {/* 로고 */}
         <Link href="/" className="flex items-center h-full">
           <Image
@@ -464,114 +470,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
         {/* 메뉴 */}
         <div className="flex items-center gap-6 h-full">
           <Link
-            href="/playroom"
-            className="relative flex items-center h-full transition-opacity hover:opacity-80"
-          >
-            <Image
-              src={
-                useBlackText
-                  ? "/ssobig_assets/Logo/logo=playroom, color=black.png"
-                  : "/ssobig_assets/Logo/logo=playroom, color=white.png"
-              }
-              alt="PLAYROOm"
-              width={122}
-              height={39}
-              unoptimized
-              className="h-auto"
-              style={{
-                opacity: pathname === "/playroom" ? 1 : 0.6,
-              }}
-              suppressHydrationWarning
-            />
-            {pathname === "/playroom" && (
-              <div
-                className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
-              />
-            )}
-          </Link>
-          <div
-            className="relative flex items-center h-full"
-            onMouseEnter={() => setIsDropdownOpen(true)}
-            onMouseLeave={() => setIsDropdownOpen(false)}
-          >
-            <Link
-              href="/socialing"
-              className="relative flex items-center h-full transition-opacity hover:opacity-80"
-              onClick={(e) => {
-                if (pathname === "/socialing") {
-                  e.preventDefault();
-                  const container = document.querySelector(".snap-container");
-                  if (container) {
-                    container.scrollTop = 0;
-                  }
-                }
-              }}
-            >
-              <span
-                className={`font-medium text-base transition-colors duration-700 ${
-                  useBlackText ? "text-gray-900" : "text-white"
-                }`}
-                style={{
-                  opacity:
-                    isMounted &&
-                    pathname.startsWith("/socialing") &&
-                    pathname !== "/socialing/game-orb/event"
-                      ? 1
-                      : 0.6,
-                }}
-                suppressHydrationWarning
-              >
-                SOCIALING
-              </span>
-              {isMounted &&
-                pathname.startsWith("/socialing") &&
-                pathname !== "/socialing/game-orb/event" && (
-                  <div
-                    className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
-                    suppressHydrationWarning
-                  />
-                )}
-            </Link>
-
-            {/* 드롭다운 메뉴 */}
-            {isDropdownOpen && (
-              <div
-                className={`absolute top-full left-0 mt-0 w-36 z-50 transition-colors duration-700 rounded-xl overflow-hidden ${
-                  useBlackText ? "bg-white/40" : "bg-black/40"
-                }`}
-                style={{
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                  boxShadow: useBlackText
-                    ? "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
-                    : "0 10px 25px -5px rgba(255, 255, 255, 0.4), 0 8px 10px -6px rgba(255, 255, 255, 0.3)",
-                }}
-              >
-                <Link
-                  href="/socialing/love-buddies"
-                  className={`block px-4 py-3 text-sm transition-colors duration-700 ${
-                    useBlackText
-                      ? "text-gray-900 hover:bg-black/10"
-                      : "text-white hover:bg-white/20"
-                  }`}
-                >
-                  러브버디즈
-                </Link>
-                <Link
-                  href="/socialing/game-orb"
-                  className={`block px-4 py-3 text-sm transition-colors duration-700 ${
-                    useBlackText
-                      ? "text-gray-900 hover:bg-black/10"
-                      : "text-white hover:bg-white/20"
-                  }`}
-                >
-                  게임오브
-                </Link>
-              </div>
-            )}
-          </div>
-          <Link
-            href="/socialing/game-orb/event"
+            href="/"
             className="relative flex items-center h-full transition-opacity hover:opacity-80"
           >
             <span
@@ -579,30 +478,85 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 useBlackText ? "text-gray-900" : "text-white"
               }`}
               style={{
-                opacity:
-                  isMounted && pathname === "/socialing/game-orb/event"
-                    ? 1
-                    : 0.6,
+                opacity: isMounted && pathname === "/" ? 1 : 0.6,
               }}
               suppressHydrationWarning
             >
-              EVENT
+              HOME
             </span>
-            {isMounted && pathname === "/socialing/game-orb/event" && (
+            {isMounted && pathname === "/" && (
               <div
                 className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
                 suppressHydrationWarning
               />
             )}
           </Link>
-          <a
-            href="https://tool.ssobig.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`px-6 py-2 rounded-full font-medium transition-all ${ctaStyleClass}`}
+          <Link
+            href="/playroom"
+            className="relative flex items-center h-full transition-opacity hover:opacity-80"
           >
-            시작하기
-          </a>
+            <span
+              className={`font-medium text-base transition-colors duration-700 ${
+                useBlackText ? "text-gray-900" : "text-white"
+              }`}
+              style={{
+                opacity: isMounted && pathname === "/playroom" ? 1 : 0.6,
+              }}
+              suppressHydrationWarning
+            >
+              PLAYROOM
+            </span>
+            {isMounted && pathname === "/playroom" && (
+              <div
+                className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
+                suppressHydrationWarning
+              />
+            )}
+          </Link>
+          <Link
+            href="/offline"
+            className="relative flex items-center h-full transition-opacity hover:opacity-80"
+          >
+            <span
+              className={`font-medium text-base transition-colors duration-700 ${
+                useBlackText ? "text-gray-900" : "text-white"
+              }`}
+              style={{
+                opacity: isMounted && pathname === "/offline" ? 1 : 0.6,
+              }}
+              suppressHydrationWarning
+            >
+              OFFLINE
+            </span>
+            {isMounted && pathname === "/offline" && (
+              <div
+                className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
+                suppressHydrationWarning
+              />
+            )}
+          </Link>
+          <Link
+            href="/project"
+            className="relative flex items-center h-full transition-opacity hover:opacity-80"
+          >
+            <span
+              className={`font-medium text-base transition-colors duration-700 ${
+                useBlackText ? "text-gray-900" : "text-white"
+              }`}
+              style={{
+                opacity: isMounted && pathname === "/project" ? 1 : 0.6,
+              }}
+              suppressHydrationWarning
+            >
+              PROJECT
+            </span>
+            {isMounted && pathname === "/project" && (
+              <div
+                className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
+                suppressHydrationWarning
+              />
+            )}
+          </Link>
         </div>
       </div>
     </nav>

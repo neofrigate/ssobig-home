@@ -42,12 +42,17 @@ const nextConfig = {
       },
       {
         source: "/brand/love_buddies/detail",
-        destination: "/socialing/love-buddies/11namme",
+        destination: "/offline/11namme",
         permanent: true,
       },
       {
         source: "/brand/love_buddies/alpha",
-        destination: "/socialing/love-buddies/alpha",
+        destination: "/offline/manito",
+        permanent: true,
+      },
+      {
+        source: "/offline/alpha",
+        destination: "/offline/manito",
         permanent: true,
       },
       {
@@ -57,7 +62,27 @@ const nextConfig = {
       },
       {
         source: "/brand/game_orb/real_genius",
-        destination: "/socialing/game-orb/social_genius",
+        destination: "/offline/mafia",
+        permanent: true,
+      },
+      {
+        source: "/offline/social_genius",
+        destination: "/offline/mafia",
+        permanent: true,
+      },
+      {
+        source: "/socialing/love-buddies/11namme",
+        destination: "/offline/11namme",
+        permanent: true,
+      },
+      {
+        source: "/socialing/love-buddies/alpha",
+        destination: "/offline/manito",
+        permanent: true,
+      },
+      {
+        source: "/socialing/game-orb/social_genius",
+        destination: "/offline/mafia",
         permanent: true,
       },
     ];
