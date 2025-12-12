@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Tailwind CSS v4 @theme directive - valid but not recognized by some linters */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -104,20 +112,9 @@ body.gnb-hidden .global-nav {
   scroll-snap-align: start;
 }
 
-/* 가로 스크롤 애니메이션 */
-@keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
+/* 가로 스크롤 애니메이션은 JavaScript로 제어 */
 
-.animate-scroll {
-  animation: scroll 30s linear infinite;
-}
-
-.animate-scroll:hover {
-  animation-play-state: paused;
+/* Next.js Portal 위치 조정 */
+nextjs-portal {
+  left: 0px !important;
 }

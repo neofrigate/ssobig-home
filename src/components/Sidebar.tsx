@@ -83,6 +83,28 @@ const Sidebar: React.FC = () => {
           </div>
 
           <nav className="text-white flex-grow overflow-y-auto">
+            {/* HOME */}
+            <div className="mb-2">
+              <LinkWithUtm
+                href="/"
+                className={`block transition-all ${
+                  isActive("/")
+                    ? "bg-white/10 opacity-100"
+                    : "opacity-50 hover:opacity-80"
+                }`}
+                onClick={toggleSidebar}
+                brandPage="sidebar"
+                buttonType="navigation"
+                destination="internal_page"
+              >
+                <div className="h-[60px] relative flex items-center px-5">
+                  <span className="text-white font-bold text-xl tracking-wide">
+                    HOME
+                  </span>
+                </div>
+              </LinkWithUtm>
+            </div>
+
             {/* PLAYROOM */}
             <div className="mb-2">
               <LinkWithUtm
@@ -98,52 +120,41 @@ const Sidebar: React.FC = () => {
                 destination="internal_page"
               >
                 <div className="h-[60px] relative flex items-center px-5">
-                  <Image
-                    src="/ssobig_assets/Logo/logo=playroom, color=white.png"
-                    alt="PLAYROOm"
-                    width={125}
-                    height={40}
-                    unoptimized
-                    className="h-auto"
-                  />
+                  <span className="text-white font-bold text-xl tracking-wide">
+                    PLAYROOM
+                  </span>
                 </div>
               </LinkWithUtm>
             </div>
 
-            {/* SOCIALING */}
+            {/* OFFLINE */}
             <div className="mb-2">
               <LinkWithUtm
-                href="/socialing"
+                href="/offline"
                 className={`block transition-all ${
-                  isActive("/socialing") && pathname === "/socialing"
+                  isActive("/offline")
                     ? "bg-white/10 opacity-100"
                     : "opacity-50 hover:opacity-80"
                 }`}
-                onClick={() => {
-                  if (pathname.startsWith("/socialing")) {
-                    const container = document.querySelector(".snap-container");
-                    if (container) {
-                      container.scrollTop = 0;
-                    }
-                  }
-                  toggleSidebar();
-                }}
+                onClick={toggleSidebar}
                 brandPage="sidebar"
                 buttonType="navigation"
                 destination="internal_page"
               >
                 <div className="h-[60px] relative flex items-center px-5">
                   <span className="text-white font-bold text-xl tracking-wide">
-                    SOCIALING
+                    OFFLINE
                   </span>
                 </div>
               </LinkWithUtm>
+            </div>
 
-              {/* 서브 메뉴 */}
+            {/* PROJECT */}
+            <div className="mb-2">
               <LinkWithUtm
-                href="/socialing/love-buddies"
+                href="/project"
                 className={`block transition-all ${
-                  isActive("/socialing/love-buddies")
+                  isActive("/project")
                     ? "bg-white/10 opacity-100"
                     : "opacity-50 hover:opacity-80"
                 }`}
@@ -152,27 +163,9 @@ const Sidebar: React.FC = () => {
                 buttonType="navigation"
                 destination="internal_page"
               >
-                <div className="h-[50px] relative flex items-center px-5 pl-10">
-                  <span className="text-white font-medium text-base">
-                    러브버디즈
-                  </span>
-                </div>
-              </LinkWithUtm>
-              <LinkWithUtm
-                href="/socialing/game-orb"
-                className={`block transition-all ${
-                  isActive("/socialing/game-orb")
-                    ? "bg-white/10 opacity-100"
-                    : "opacity-50 hover:opacity-80"
-                }`}
-                onClick={toggleSidebar}
-                brandPage="sidebar"
-                buttonType="navigation"
-                destination="internal_page"
-              >
-                <div className="h-[50px] relative flex items-center px-5 pl-10">
-                  <span className="text-white font-medium text-base">
-                    게임오브
+                <div className="h-[60px] relative flex items-center px-5">
+                  <span className="text-white font-bold text-xl tracking-wide">
+                    PROJECT
                   </span>
                 </div>
               </LinkWithUtm>
