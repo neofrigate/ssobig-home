@@ -33,8 +33,10 @@ type GlobalNavProps = {
 const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const pathname = usePathname();
 
-  // 플레이룸 페이지 체크
+  // 플레이룸 페이지 체크 (실제 컨텐츠 페이지 - 화이트 배경 고정)
   const isPlayroomPage = pathname === "/playroom";
+  // 플레이룸 하이드 페이지 (커밍순 페이지 - 투명 배경)
+  const isPlayroomHidePage = pathname === "/playroom_hide";
   // 소셜링 페이지들 (투명 배경 유지)
   const isSocialingPage =
     pathname.startsWith("/socialing/love-buddies") ||
@@ -80,7 +82,10 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     } else if (isProjectPage) {
       // 프로젝트 페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
       setIsScrolled(true);
-    } else if (!isPlayroomPage && !isSocialingPage) {
+    } else if (isPlayroomPage) {
+      // 플레이룸 페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
+      setIsScrolled(true);
+    } else if (!isPlayroomHidePage && !isSocialingPage) {
       // 다른 페이지는 초기 상태를 false로
       setIsScrolled(false);
     }
@@ -93,6 +98,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     pathname,
     isSocialingMainPage,
     isPlayroomPage,
+    isPlayroomHidePage,
     isSocialingPage,
     isHomePage,
     isProjectPage,
@@ -126,8 +132,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 setIsScrolled(false);
               }
             }
-          } else if (isHomePage || isProjectPage) {
-            // 메인 홈 페이지 & 프로젝트 페이지: 항상 light 모드 (흰 배경, 검정 텍스트)
+          } else if (isHomePage || isProjectPage || isPlayroomPage) {
+            // 메인 홈 페이지 & 프로젝트 페이지 & 플레이룸 페이지: 항상 light 모드 (흰 배경, 검정 텍스트)
             setIsScrolled(true);
           } else {
             // 배경 변경 감지
@@ -185,6 +191,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     isSocialingMainPage,
     isHomePage,
     isProjectPage,
+    isPlayroomPage,
     initialViewportHeight,
     isMounted,
   ]);
@@ -229,9 +236,13 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const navMode: "overlay" | "light" | "dark" = (() => {
     // 클라이언트가 마운트되기 전에는 안전한 기본 상태 사용
     if (!isMounted) {
-      // 오프라인, 플레이룸, 소셜링 상세 페이지는 어두운 배경이므로 overlay로 시작
-      if (isOfflinePage || isPlayroomPage || isSocialingPage) {
+      // 오프라인, 플레이룸 하이드, 소셜링 상세 페이지는 어두운 배경이므로 overlay로 시작
+      if (isOfflinePage || isPlayroomHidePage || isSocialingPage) {
         return "overlay";
+      }
+      // 플레이룸 페이지는 항상 light 모드
+      if (isPlayroomPage) {
+        return "light";
       }
       return "light";
     }
@@ -239,11 +250,15 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     if (isHomePage) {
       return "light";
     }
+    // 플레이룸 페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
+    if (isPlayroomPage) {
+      return "light";
+    }
     // 오프라인 페이지는 항상 dark 모드 또는 overlay (스크롤 시 dark)
     if (isOfflinePage) {
       return isScrolled ? "dark" : "overlay";
     }
-    if (isSocialingPage || isPlayroomPage) {
+    if (isSocialingPage || isPlayroomHidePage) {
       return "overlay";
     }
     if (isSocialingMainPage) {
@@ -275,8 +290,14 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
       style={{
         // iOS Safari 오버스크롤 대응
         WebkitOverflowScrolling: "touch",
+        // 모바일에서 light 모드일 때 배경색 확실히 적용
+        backgroundColor: navMode === "light" ? "#ffffff" : undefined,
       }}
     >
+      {/* Light mode background - 모바일에서도 확실히 보이도록 */}
+      {navMode === "light" && (
+        <div className="absolute inset-0 bg-white pointer-events-none z-0" />
+      )}
       {/* Overlay mode background layers - 모바일만 */}
       {navMode === "overlay" && (
         <>
@@ -311,7 +332,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
         </>
       )}
       {/* 모바일 버전 (md 미만) */}
-      <div className="md:hidden relative z-10">
+      <div className="md:hidden relative z-20">
         {/* 1단: 로고 (52px) */}
         <div className="h-[52px] flex items-center justify-between px-5">
           <Link href="/" className="flex items-center relative">
@@ -364,6 +385,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               }`}
               style={{
                 opacity: isMounted && pathname === "/" ? 1 : 0.6,
+                color: navMode === "light" ? "#111827" : undefined,
               }}
               suppressHydrationWarning
             >
@@ -387,6 +409,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               }`}
               style={{
                 opacity: isMounted && pathname === "/playroom" ? 1 : 0.6,
+                color: navMode === "light" ? "#111827" : undefined,
               }}
               suppressHydrationWarning
             >
@@ -410,6 +433,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               }`}
               style={{
                 opacity: isMounted && pathname === "/offline" ? 1 : 0.6,
+                color: navMode === "light" ? "#111827" : undefined,
               }}
               suppressHydrationWarning
             >
@@ -433,6 +457,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               }`}
               style={{
                 opacity: isMounted && pathname === "/project" ? 1 : 0.6,
+                color: navMode === "light" ? "#111827" : undefined,
               }}
               suppressHydrationWarning
             >
