@@ -194,6 +194,15 @@ else
 fi
 
 echo ""
+echo "📝 ESLint 체크 중..."
+if yarn lint; then
+  echo "✅ ESLint 체크 통과"
+else
+  echo "❌ ESLint 오류가 발생했습니다. 위의 에러를 수정한 뒤 다시 실행하세요."
+  exit 1
+fi
+
+echo ""
 
 # 개발 서버를 백그라운드로 실행
 yarn dev > /dev/null 2>&1 &

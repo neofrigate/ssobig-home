@@ -48,9 +48,6 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   // 프로젝트 페이지 (화이트 배경 고정)
   const isProjectPage = pathname.startsWith("/project");
 
-  // 드롭다운 상태 관리
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   // 초기 상태를 false로 설정하여 서버/클라이언트 hydration 일치
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -280,9 +277,6 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const useBlackText = navMode === "light";
   const useWhiteText = !useBlackText;
   const underlineColorClass = useBlackText ? "bg-gray-900" : "bg-white";
-  const ctaStyleClass = useBlackText
-    ? "bg-black text-white hover:bg-black/80"
-    : "bg-white text-black hover:bg-gray-100";
 
   return (
     <nav
