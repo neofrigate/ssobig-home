@@ -85,7 +85,6 @@ export default function ProjectDetailPage() {
     }
 
     fetchProject();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]); // params는 Next.js 15에서 비동기이므로 dependency에 포함하지 않습니다.
 
   if (loading) {

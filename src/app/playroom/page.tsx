@@ -13,6 +13,7 @@ interface ContentCardProps {
   price?: string;
   link: string;
   cardSize?: "large" | "small";
+  imageFit?: "cover" | "contain";
 }
 
 function ContentCard({
@@ -23,6 +24,7 @@ function ContentCard({
   price,
   link,
   cardSize = "large",
+  imageFit = "cover",
 }: ContentCardProps) {
   // 모바일/태블릿 너비 계산 (< md)
   // Large: 2.5개 (gap 16px 기준) -> 모바일: calc(40vw - 22px), 태블릿: calc(32vw - 14px)
@@ -54,7 +56,7 @@ function ContentCard({
             src={image}
             alt={title}
             fill
-            style={{ objectFit: "cover" }}
+            style={{ objectFit: imageFit }}
             sizes="(max-width: 640px) 40vw, 30vw"
             className="rounded-lg"
           />
@@ -100,7 +102,8 @@ function ContentCard({
             src={image}
             alt={title}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-110"
+            style={{ objectFit: imageFit }}
+            className="transition-transform duration-300 group-hover:scale-110"
             sizes={
               cardSize === "large"
                 ? "(min-width: 1024px) 25vw, 33vw"
@@ -150,6 +153,7 @@ interface ContentRowProps {
   items: ContentCardProps[];
   cardSize?: "large" | "small";
   mobileGap?: number; // 모바일 gap (px)
+  imageFit?: "cover" | "contain";
 }
 
 function ContentRow({
@@ -158,6 +162,7 @@ function ContentRow({
   items,
   cardSize = "large",
   mobileGap = 16,
+  imageFit = "cover",
 }: ContentRowProps) {
   return (
     <section className="py-6 md:py-8">
@@ -183,6 +188,7 @@ function ContentRow({
                 price={item.price}
                 link={item.link}
                 cardSize={cardSize}
+                imageFit={imageFit}
               />
             ))}
           </div>
@@ -206,6 +212,7 @@ function ContentRow({
                 price={item.price}
                 link={item.link}
                 cardSize={cardSize}
+                imageFit={imageFit}
               />
             ))}
           </div>
@@ -405,7 +412,7 @@ export default function PlayroomPage() {
             image: "/ssobig_assets/playroom/도플갱어.png",
             title: "도플갱어",
             description:
-              "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야",
+              "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야?",
             players: "4인, 120분",
             price: "펀딩 진행중",
             link: "https://tumblbug.com/ssobig002",
@@ -418,6 +425,7 @@ export default function PlayroomPage() {
         title="친구들과 함께 즐기기"
         cardSize="small"
         mobileGap={12}
+        imageFit="contain"
         items={[
           {
             image: "/ssobig_assets/playroom/퀴즈메이커.png",
@@ -459,6 +467,7 @@ export default function PlayroomPage() {
         title="쏘빅툴 체험해보기"
         cardSize="small"
         mobileGap={12}
+        imageFit="contain"
         items={[
           {
             image: "/ssobig_assets/playroom/생산성_자리배치.png",
