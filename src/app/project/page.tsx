@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import type { NotionProject } from "@/types/notion";
+import Footer from "../../components/Footer";
 
 export default function ProjectPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("전체");
@@ -17,13 +18,13 @@ export default function ProjectPage() {
       try {
         setLoading(true);
         const response = await fetch("/api/projects");
-        
+
         if (!response.ok) {
           throw new Error("프로젝트를 불러오는데 실패했습니다.");
         }
 
         const data = await response.json();
-        
+
         if (data.error) {
           throw new Error(data.error);
         }
@@ -32,7 +33,9 @@ export default function ProjectPage() {
         setError(null);
       } catch (err) {
         console.error("프로젝트 로딩 오류:", err);
-        setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
+        setError(
+          err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+        );
       } finally {
         setLoading(false);
       }
@@ -42,7 +45,10 @@ export default function ProjectPage() {
   }, []);
 
   // 카테고리 목록 생성
-  const categories = ["전체", ...Array.from(new Set(projects.map((p) => p.category)))];
+  const categories = [
+    "전체",
+    ...Array.from(new Set(projects.map((p) => p.category))),
+  ];
 
   // 필터링된 프로젝트
   const filteredProjects =
@@ -52,67 +58,67 @@ export default function ProjectPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* 히어로 섹션 */}
-      <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-purple-900 via-purple-800 to-black pt-[88px] md:pt-[60px]">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 text-center px-4 md:px-6 max-w-4xl">
-          <h1 className="text-[40px] sm:text-[48px] md:text-[56px] lg:text-[64px] font-bold text-white mb-4 sm:mb-6 leading-tight">
-            프로젝트 포트폴리오
-          </h1>
-          <p className="text-lg sm:text-xl md:text-2xl text-white/90 mb-8 sm:mb-10 leading-relaxed">
-            쏘빅이 만들어온 다양한 프로젝트와 성과를 소개합니다
-          </p>
-        </div>
-      </section>
-
-      {/* 소개 섹션 */}
-      <section className="py-12 md:py-16 lg:py-20 border-b border-gray-200">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
-            <div className="text-center md:text-left">
-              <div className="text-4xl md:text-5xl font-bold text-purple-600 mb-2">
-                50+
-              </div>
-              <p className="text-base md:text-lg text-gray-600">진행한 프로젝트</p>
-            </div>
-            <div className="text-center md:text-left">
-              <div className="text-4xl md:text-5xl font-bold text-purple-600 mb-2">
-                10,000+
-              </div>
-              <p className="text-base md:text-lg text-gray-600">참여한 사람들</p>
-            </div>
-            <div className="text-center md:text-left">
-              <div className="text-4xl md:text-5xl font-bold text-purple-600 mb-2">
-                97%
-              </div>
-              <p className="text-base md:text-lg text-gray-600">평균 만족도</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 프로젝트 리스트 섹션 */}
-      <section className="py-16 md:py-20 lg:py-24">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
-          {/* 타이틀 및 필터 */}
-          <div className="mb-12 md:mb-16">
-            <h2 className="text-[32px] sm:text-[36px] md:text-[40px] lg:text-[48px] font-bold text-gray-900 mb-4 leading-tight">
-              우리의 프로젝트
-            </h2>
-            <p className="text-base sm:text-lg text-gray-600 mb-8 max-w-3xl leading-relaxed">
-              쏘빅이 만들어가는 특별한 경험들을 소개합니다
+      {/* 메인 섹션 */}
+      <section className="pt-[100px] sm:pt-[110px] md:pt-[100px] pb-16 md:pb-20">
+        <div className="max-w-[1200px] mx-auto px-5 md:px-8">
+          {/* 타이틀 */}
+          <div className="mb-16 md:mb-20">
+            <h1 className="text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] xl:text-[40px] font-bold text-gray-900 mb-4 sm:mb-5 md:mb-6 leading-tight max-w-4xl">
+              <span className="md:hidden">
+                쏘빅 SSOBIG은
+                <br />
+                {`'`}인터랙티브한 경험(IX){`'`}을 설계하고
+                <br />
+                실행하는 솔루션 기업입니다.
+              </span>
+              <span className="hidden md:inline">
+                쏘빅 SSOBIG은 {`'`}인터랙티브한 경험(IX){`'`}을
+                <br /> 설계하고 실행하는 솔루션 기업입니다.
+              </span>
+            </h1>
+            <p className="text-[14px] sm:text-[15px] md:text-base lg:text-lg text-gray-600 leading-relaxed max-w-3xl">
+              <span className="md:hidden">
+                모임, 커뮤니티, 교육, 워크샵,
+                <br />
+                단체 행사, 영상 콘텐츠 등 포맷에 관계없이,
+                <br />
+                쏘빅은 클라이언트의 기획 의도를
+                <br />
+                {`'`}체계적인 게이미피케이션 시스템{`'`}과
+                <br />
+                {`'`}안정적인 기술 (쏘빅툴){`'`}, {`'`}빈틈없는 현장 운영{`'`}
+                으로 구현합니다.
+              </span>
+              <span className="hidden md:inline">
+                모임, 커뮤니티, 교육, 워크샵, 단체 행사, 영상 콘텐츠 등 포맷에
+                관계없이,
+                <br />
+                쏘빅은 클라이언트의 기획 의도를 {`'`}체계적인 게이미피케이션
+                시스템
+                {`'`}과
+                <br />
+                {`'`}안정적인 기술 (쏘빅툴){`'`}, {`'`}빈틈없는 현장 운영{`'`}
+                으로 구현합니다.
+              </span>
             </p>
+          </div>
+
+          {/* 카테고리 필터 */}
+          <div className="mb-12 md:mb-16">
+            <h2 className="text-[18px] sm:text-[22px] md:text-[26px] lg:text-[28px] font-bold text-gray-900 mb-4 sm:mb-5 md:mb-6">
+              진행한 프로젝트
+            </h2>
 
             {/* 카테고리 필터 */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
               {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm md:text-base font-semibold transition-all ${
+                  className={`px-4 sm:px-5 py-2 text-[13px] sm:text-sm md:text-base font-medium transition-all rounded-full ${
                     selectedCategory === category
                       ? "bg-black text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
                   }`}
                 >
                   {category}
@@ -125,95 +131,81 @@ export default function ProjectPage() {
           {loading && (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-              <p className="mt-4 text-gray-600">프로젝트를 불러오는 중...</p>
+              <p className="mt-4 text-sm sm:text-base text-gray-600">
+                프로젝트를 불러오는 중...
+              </p>
             </div>
           )}
 
           {/* 에러 상태 */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-              <p className="text-red-600 font-semibold mb-2">오류가 발생했습니다</p>
+              <p className="text-red-600 font-semibold mb-2">
+                오류가 발생했습니다
+              </p>
               <p className="text-red-500 text-sm">{error}</p>
               <p className="text-gray-600 text-sm mt-4">
-                .env.local 파일에 NOTION_API_KEY와 NOTION_DATABASE_ID가 설정되어 있는지 확인해주세요.
+                프로젝트 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.
               </p>
             </div>
           )}
 
           {/* 프로젝트 그리드 */}
           {!loading && !error && (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
               {filteredProjects.length === 0 ? (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-gray-600 text-lg">
+                  <p className="text-sm sm:text-base md:text-lg text-gray-600">
                     해당 카테고리에 프로젝트가 없습니다.
                   </p>
                 </div>
               ) : (
                 filteredProjects.map((project) => (
-              <Link
-                key={project.id}
-                href={`/project/${project.id}`}
-                className="group block"
-              >
-                <div className="relative h-64 md:h-72 mb-6 rounded-lg overflow-hidden bg-gray-100">
-                  {project.id ? (
-                    <Image
-                      src={`/api/notion-image?pageId=${project.id}&property=썸네일`}
-                      alt={project.title}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="group-hover:scale-105 transition-transform duration-300"
-                      unoptimized
-                      onError={(e) => {
-                        // Fallback to placeholder on error
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-200">
-                      <span className="text-gray-400 text-lg font-semibold">No Image</span>
+                  <Link
+                    key={project.id}
+                    href={`/project/${project.id}`}
+                    className="group block"
+                  >
+                    <div className="relative aspect-video mb-4 rounded-lg overflow-hidden bg-gray-200 transition-all duration-300 group-hover:bg-gray-300">
+                      {project.image ? (
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          style={{ objectFit: "cover" }}
+                          sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                          className="w-full h-full object-cover"
+                          unoptimized
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = "none";
+                          }}
+                        />
+                      ) : null}
                     </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
-                  {/* 연도 배지 */}
-                  {project.year && (
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-700">
-                      {project.year}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        {project.category && <span>{project.category}</span>}
+                        {project.year && (
+                          <>
+                            <span>•</span>
+                            <span>{project.year}</span>
+                          </>
+                        )}
+                      </div>
+                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 group-hover:underline">
+                        {project.title}
+                      </h3>
+                      <p className="text-[13px] sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                        {project.description}
+                      </p>
+                      <div className="text-right">
+                        <span className="text-[10px] sm:text-xs text-gray-400">
+                          자세히 보기 →
+                        </span>
+                      </div>
                     </div>
-                  )}
-                </div>
-                {project.category && (
-                  <div className="mb-3">
-                    <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 text-xs md:text-sm rounded-full font-medium">
-                      {project.category}
-                    </span>
-                  </div>
-                )}
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
-                  {project.title}
-                </h3>
-                <p className="text-base text-gray-600 mb-4 leading-relaxed line-clamp-3">
-                  {project.description}
-                </p>
-                {project.tags && project.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <span className="inline-flex items-center text-black font-semibold group-hover:underline">
-                  자세히 보기 →
-                </span>
-              </Link>
+                  </Link>
                 ))
               )}
             </div>
@@ -222,24 +214,26 @@ export default function ProjectPage() {
       </section>
 
       {/* CTA 섹션 */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      <section className="py-20 md:py-24 border-t border-gray-200 bg-gray-50">
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 text-center">
-          <h2 className="text-[28px] sm:text-[32px] md:text-[36px] font-bold text-gray-900 mb-4">
+          <h2 className="text-[20px] sm:text-[28px] md:text-[32px] lg:text-[36px] font-bold text-gray-900 mb-4 sm:mb-5 md:mb-6">
             함께 프로젝트를 만들어가고 싶으신가요?
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 mb-8">
+          <p className="text-[14px] sm:text-base md:text-lg text-gray-600 mb-8 sm:mb-9 md:mb-10">
             쏘빅과 협업하거나 새로운 프로젝트를 시작해보세요
           </p>
           <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLScgHycMgGfhps6DjY_TvZPoYu-kgAeD0crK9n_sFoDeDMgX8g/viewform"
+            href="https://forms.gle/BjQMEKSvEruWxEuNA"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-black text-white px-8 py-4 text-lg font-semibold hover:bg-gray-800 transition-colors rounded-full"
+            className="inline-block bg-black text-white px-8 sm:px-9 md:px-10 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base font-semibold hover:bg-gray-800 transition-colors"
           >
             협업 문의하기
           </a>
         </div>
       </section>
+
+      <Footer mode="light" />
     </div>
   );
 }

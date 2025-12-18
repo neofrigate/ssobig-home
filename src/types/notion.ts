@@ -1,4 +1,4 @@
-// Notion 프로젝트 타입 정의
+// 프로젝트 타입 정의 (MD 파일 기반)
 export interface NotionProject {
   id: string;
   title: string;
@@ -8,6 +8,22 @@ export interface NotionProject {
   image: string;
   link: string;
   year: string;
+}
+
+// MD 파일 프로젝트 상세 타입
+export interface ProjectDetail {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  images: string[];
+  link: string;
+  year: string;
+  partner: string;
+  date: string;
+  selection: string[];
+  content: string;
 }
 
 // Notion API 응답 타입
@@ -47,5 +63,3 @@ export interface NotionFile {
     url: string;
   };
 }
-
-

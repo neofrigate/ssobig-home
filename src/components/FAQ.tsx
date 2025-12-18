@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface FAQItemProps {
   question: string;
-  answer: string;
+  answer: string | string[];
 }
 
 export const FAQItem = ({ question, answer }: FAQItemProps) => {
@@ -37,10 +37,26 @@ export const FAQItem = ({ question, answer }: FAQItemProps) => {
       </button>
       {isOpen && (
         <div className="pb-4">
-          <p
-            className="text-sm md:text-base text-[#F4F4F4] font-normal leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: answer }}
-          />
+          {Array.isArray(answer) ? (
+            <div className="space-y-2">
+              {answer.map((paragraph, index) =>
+                paragraph ? (
+                  <p
+                    key={index}
+                    className="text-sm md:text-base text-[#F4F4F4] font-normal leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: paragraph }}
+                  />
+                ) : (
+                  <div key={index} className="h-2" />
+                )
+              )}
+            </div>
+          ) : (
+            <p
+              className="text-sm md:text-base text-[#F4F4F4] font-normal leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: answer }}
+            />
+          )}
         </div>
       )}
     </div>
@@ -51,7 +67,7 @@ interface FAQSectionProps {
   title?: string;
   questions: Array<{
     question: string;
-    answer: string;
+    answer: string | string[];
   }>;
 }
 
