@@ -470,7 +470,7 @@ export default function PlayroomPage() {
         imageFit="contain"
         items={[
           {
-            image: "/ssobig_assets/playroom/생산성_자리배치.png",
+            image: "/ssobig_assets/playroom/자리배치.jpg",
             title: "자리배치",
             description: "공정하고 효율적인\n팀 나누기 도구",
             players: "2~100인",
@@ -478,7 +478,7 @@ export default function PlayroomPage() {
             link: "https://tool.ssobig.com/templates/af3a987f",
           },
           {
-            image: "/ssobig_assets/playroom/생산성_투표-1.png",
+            image: "/ssobig_assets/playroom/생산성_투표.png",
             title: "즉석 투표하기",
             description: "빠르고 간편한\n실시간 투표 도구",
             players: "무제한",
@@ -486,7 +486,7 @@ export default function PlayroomPage() {
             link: "https://tool.ssobig.com/templates/248df6bf",
           },
           {
-            image: "/ssobig_assets/playroom/생산성_투표.png",
+            image: "/ssobig_assets/playroom/생산성_투표-1.png",
             title: "가중치 투표",
             description: "중요도를 반영한\n스마트 투표 시스템",
             players: "무제한",
