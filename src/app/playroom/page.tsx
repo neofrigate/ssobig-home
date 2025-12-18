@@ -401,7 +401,7 @@ export default function PlayroomPage() {
           //   link: "https://tool.ssobig.com/templates/c2439b65",
           // },
           {
-            image: "/ssobig_assets/playroom/기억 속의 너.png",
+            image: "/ssobig_assets/playroom/기억 속의 너.jpg",
             title: "기억 속의 너",
             description: "커플 전용 선택형 스토리 게임",
             players: "2인, 90분",
@@ -409,7 +409,7 @@ export default function PlayroomPage() {
             link: "https://tumblbug.com/ssobig001",
           },
           {
-            image: "/ssobig_assets/playroom/도플갱어.png",
+            image: "/ssobig_assets/playroom/도플갱어.jpg",
             title: "도플갱어",
             description:
               "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야?",
@@ -428,7 +428,7 @@ export default function PlayroomPage() {
         imageFit="contain"
         items={[
           {
-            image: "/ssobig_assets/playroom/퀴즈메이커.png",
+            image: "/ssobig_assets/playroom/퀴즈메이커.jpg",
             title: "퀴즈메이커",
             description: "나만의 퀴즈를 만들어\n친구들과 함께 즐기기",
             players: "2~100인",

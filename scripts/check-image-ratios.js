@@ -10,7 +10,7 @@ const playroomDir = path.join(__dirname, "../public/ssobig_assets/playroom");
 
 // 확인할 이미지 파일들
 const targetImages = [
-  "퀴즈메이커.png",
+  "퀴즈메이커.jpg",
   "나몰라퀴즈.jpg",
   "사랑의 징검다리.jpg",
   "우정의 징검다리.jpg",
