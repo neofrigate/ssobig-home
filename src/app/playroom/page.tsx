@@ -478,7 +478,7 @@ export default function PlayroomPage() {
             link: "https://tool.ssobig.com/templates/af3a987f",
           },
           {
-            image: "/ssobig_assets/playroom/생산성_투표.png",
+            image: "/ssobig_assets/playroom/즉석 투표하기.jpg",
             title: "즉석 투표하기",
             description: "빠르고 간편한\n실시간 투표 도구",
             players: "무제한",
@@ -486,7 +486,7 @@ export default function PlayroomPage() {
             link: "https://tool.ssobig.com/templates/248df6bf",
           },
           {
-            image: "/ssobig_assets/playroom/생산성_투표-1.png",
+            image: "/ssobig_assets/playroom/가중치 투표.jpg",
             title: "가중치 투표",
             description: "중요도를 반영한\n스마트 투표 시스템",
             players: "무제한",
