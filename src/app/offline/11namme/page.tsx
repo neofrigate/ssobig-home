@@ -352,7 +352,7 @@ const ElevenNammePage = () => {
 
             {/* Product Detail 2 */}
             <Image
-              src="/ssobig_assets/lovebuddies/product-detail 2.jpg"
+              src="/ssobig_assets/lovebuddies/product-detail2.webp"
               alt="상세 이미지 2"
               width={1920}
               height={1080}
@@ -361,7 +361,7 @@ const ElevenNammePage = () => {
 
             {/* Product Detail 3 */}
             <Image
-              src="/ssobig_assets/lovebuddies/product-detail 3.png"
+              src="/ssobig_assets/lovebuddies/product-detail3.webp"
               alt="상세 이미지 3"
               width={1920}
               height={1080}
@@ -460,5 +460,3 @@ const ElevenNammePage = () => {
 };
 
 export default ElevenNammePage;
-
-

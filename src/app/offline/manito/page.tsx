@@ -341,7 +341,7 @@ const ManitoPage = () => {
 
             {/* Product Detail 2 */}
             <Image
-              src="/ssobig_assets/lovebuddies/alpha/gallery-01.jpg"
+              src="/ssobig_assets/lovebuddies/alpha/gallery-01.webp"
               alt="알파 마니또 상세 이미지 2"
               width={1920}
               height={1080}
@@ -351,7 +351,7 @@ const ManitoPage = () => {
 
             {/* Product Detail 3 */}
             <Image
-              src="/ssobig_assets/lovebuddies/alpha/gallery-02.jpg"
+              src="/ssobig_assets/lovebuddies/alpha/gallery-02.webp"
               alt="알파 마니또 상세 이미지 3"
               width={1920}
               height={1080}

@@ -46,86 +46,14 @@ export default function ProjectDetailPage() {
   };
 
   useEffect(() => {
-    // #region agent log
-    fetch("http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "project/[id]/page.tsx:31",
-        message: "useEffect entry",
-        data: {
-          id,
-          paramsType: typeof params,
-        },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        runId: "run1",
-        hypothesisId: "A",
-      }),
-    }).catch(() => {});
-    // #endregion
     async function fetchProject() {
-      // #region agent log
-      fetch(
-        "http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "project/[id]/page.tsx:34",
-            message: "fetchProject entry",
-            data: { id, idType: typeof id, idUndefined: id === undefined },
-            timestamp: Date.now(),
-            sessionId: "debug-session",
-            runId: "run1",
-            hypothesisId: "A",
-          }),
-        }
-      ).catch(() => {});
-      // #endregion
       if (!id) {
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "project/[id]/page.tsx:37",
-              message: "id is undefined, skipping fetch",
-              data: { id },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              runId: "run1",
-              hypothesisId: "A",
-            }),
-          }
-        ).catch(() => {});
-        // #endregion
         setError("프로젝트 ID가 필요합니다.");
         setLoading(false);
         return;
       }
       try {
         setLoading(true);
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "project/[id]/page.tsx:45",
-              message: "Before API call",
-              data: { id, url: `/api/projects/${id}` },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              runId: "run1",
-              hypothesisId: "B",
-            }),
-          }
-        ).catch(() => {});
-        // #endregion
 
         const response = await fetch(`/api/projects/${id}?t=${Date.now()}`, {
           cache: "no-store",
@@ -138,49 +66,7 @@ export default function ProjectDetailPage() {
           throw new Error("프로젝트를 불러오는데 실패했습니다.");
         }
 
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "project/[id]/page.tsx:50",
-              message: "After API call",
-              data: { status: response.status, ok: response.ok },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              runId: "run1",
-              hypothesisId: "B",
-            }),
-          }
-        ).catch(() => {});
-        // #endregion
-
         const data = await response.json();
-
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "project/[id]/page.tsx:55",
-              message: "After parsing response",
-              data: {
-                hasError: !!data.error,
-                hasProject: !!data.project,
-                projectTitle: data.project?.title,
-              },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              runId: "run1",
-              hypothesisId: "B",
-            }),
-          }
-        ).catch(() => {});
-        // #endregion
 
         if (data.error) {
           throw new Error(data.error);
@@ -188,70 +74,13 @@ export default function ProjectDetailPage() {
 
         setProject(data.project);
         setError(null);
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "project/[id]/page.tsx:63",
-              message: "Project set successfully",
-              data: { projectTitle: data.project?.title },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              runId: "run1",
-              hypothesisId: "B",
-            }),
-          }
-        ).catch(() => {});
-        // #endregion
       } catch (err) {
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "project/[id]/page.tsx:66",
-              message: "Error caught",
-              data: {
-                errorMessage: err instanceof Error ? err.message : "unknown",
-                errorType: err?.constructor?.name,
-              },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              runId: "run1",
-              hypothesisId: "C",
-            }),
-          }
-        ).catch(() => {});
-        // #endregion
         console.error("프로젝트 로딩 오류:", err);
         setError(
           err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
         );
       } finally {
         setLoading(false);
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7242/ingest/8b9a2258-15fb-4f1b-8e59-15efbb4757d6",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "project/[id]/page.tsx:73",
-              message: "fetchProject exit",
-              data: { loading: false },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              runId: "run1",
-              hypothesisId: "A",
-            }),
-          }
-        ).catch(() => {});
-        // #endregion
       }
     }
 

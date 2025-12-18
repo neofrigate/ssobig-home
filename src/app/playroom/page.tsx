@@ -27,15 +27,15 @@ function ContentCard({
   // 모바일/태블릿 너비 계산 (< md)
   // Large: 2.5개 (gap 16px 기준) -> 모바일: calc(40vw - 22px), 태블릿: calc(32vw - 14px)
   // Small: 3.2개 (gap 12px 기준) -> 모바일: calc(31.25vw - 18px), 태블릿: calc(24vw - 10px)
-  const mobileClass = 
-    cardSize === "large" 
-      ? "w-[calc(40vw-22px)] sm:w-[calc(32vw-14px)]" 
+  const mobileClass =
+    cardSize === "large"
+      ? "w-[calc(40vw-22px)] sm:w-[calc(32vw-14px)]"
       : "w-[calc(31.25vw-18px)] sm:w-[calc(24vw-10px)]";
 
   // 데스크톱 너비 계산 (>= md)
   // Large: 4개 (gap 20px/24px) -> MD: calc(25% - 15px), LG: calc(25% - 18px)
   // Small: 5개 (gap 18px/22px) -> MD: calc(20% - 14px), LG: calc(20% - 17px)
-  const desktopClass = 
+  const desktopClass =
     cardSize === "large"
       ? "md:w-[calc(25%-15px)] lg:w-[calc(25%-18px)]"
       : "md:w-[calc(20%-14px)] lg:w-[calc(20%-17px)]";
@@ -62,12 +62,21 @@ function ContentCard({
         {price && players && (
           <div className="mb-2 w-full text-left flex flex-wrap gap-1">
             {players.split(", ").map((player, index) => (
-              <span key={index} className="inline-block px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] sm:text-xs font-medium">
+              <span
+                key={index}
+                className="inline-block px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] sm:text-xs font-medium"
+              >
                 {player}
               </span>
             ))}
             <span className="inline-block px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] sm:text-xs font-medium">
-              {price === "무료" ? "무료" : price === "문의" ? "문의" : price === "펀딩 진행중" ? "펀딩 진행중" : price.replace("토큰", "") + "토큰"}
+              {price === "무료"
+                ? "무료"
+                : price === "문의"
+                ? "문의"
+                : price === "펀딩 진행중"
+                ? "펀딩 진행중"
+                : price.replace("토큰", "") + "토큰"}
             </span>
           </div>
         )}
@@ -92,19 +101,32 @@ function ContentCard({
             alt={title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-110"
-            sizes={cardSize === "large" ? "(min-width: 1024px) 25vw, 33vw" : "(min-width: 1024px) 20vw, 25vw"}
+            sizes={
+              cardSize === "large"
+                ? "(min-width: 1024px) 25vw, 33vw"
+                : "(min-width: 1024px) 20vw, 25vw"
+            }
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
         </div>
         {price && players && (
           <div className="mb-2 flex flex-wrap gap-1">
             {players.split(", ").map((player, index) => (
-              <span key={index} className="inline-block px-2 md:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] md:text-xs font-medium">
+              <span
+                key={index}
+                className="inline-block px-2 md:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] md:text-xs font-medium"
+              >
                 {player}
               </span>
             ))}
             <span className="inline-block px-2 md:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] md:text-xs font-medium">
-              {price === "무료" ? "무료" : price === "문의" ? "문의" : price === "펀딩 진행중" ? "펀딩 진행중" : price.replace("토큰", "") + "토큰"}
+              {price === "무료"
+                ? "무료"
+                : price === "문의"
+                ? "문의"
+                : price === "펀딩 진행중"
+                ? "펀딩 진행중"
+                : price.replace("토큰", "") + "토큰"}
             </span>
           </div>
         )}
@@ -112,7 +134,9 @@ function ContentCard({
           {title}
         </h3>
         <div className="text-xs md:text-sm lg:text-base">
-          <p className="text-gray-600 line-clamp-2 whitespace-pre-wrap">{description}</p>
+          <p className="text-gray-600 line-clamp-2 whitespace-pre-wrap">
+            {description}
+          </p>
         </div>
       </a>
     </>
@@ -128,7 +152,13 @@ interface ContentRowProps {
   mobileGap?: number; // 모바일 gap (px)
 }
 
-function ContentRow({ title, description, items, cardSize = "large", mobileGap = 16 }: ContentRowProps) {
+function ContentRow({
+  title,
+  description,
+  items,
+  cardSize = "large",
+  mobileGap = 16,
+}: ContentRowProps) {
   return (
     <section className="py-6 md:py-8">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8">
@@ -144,7 +174,7 @@ function ContentRow({ title, description, items, cardSize = "large", mobileGap =
         <div className="md:hidden overflow-x-auto -mx-4 px-4 hide-scrollbar pb-4">
           <div className="flex w-max" style={{ gap: `${mobileGap}px` }}>
             {items.map((item, index) => (
-              <ContentCard 
+              <ContentCard
                 key={index}
                 image={item.image}
                 title={item.title}
@@ -159,9 +189,15 @@ function ContentRow({ title, description, items, cardSize = "large", mobileGap =
         </div>
         {/* 태블릿/데스크톱: 기존 스타일 - 스크롤 가능 표시 */}
         <div className="hidden md:block overflow-x-auto -mx-5 md:-mx-8 px-5 md:px-8 pb-4 hide-scrollbar">
-          <div className={`flex w-full ${cardSize === "small" ? "gap-[18px] lg:gap-[22px]" : "gap-5 lg:gap-6"}`}>
+          <div
+            className={`flex w-full ${
+              cardSize === "small"
+                ? "gap-[18px] lg:gap-[22px]"
+                : "gap-5 lg:gap-6"
+            }`}
+          >
             {items.map((item, index) => (
-              <ContentCard 
+              <ContentCard
                 key={index}
                 image={item.image}
                 title={item.title}
@@ -291,7 +327,9 @@ export default function PlayroomPage() {
                       src={banner.bgImage}
                       alt={banner.title1}
                       fill
-                      className={`object-cover ${banner.mobileImage ? 'hidden sm:block' : ''}`}
+                      className={`object-cover ${
+                        banner.mobileImage ? "hidden sm:block" : ""
+                      }`}
                       priority={index === 0}
                       sizes="100vw"
                     />
@@ -347,14 +385,14 @@ export default function PlayroomPage() {
       <ContentRow
         title="스토리 추리게임"
         items={[
-          {
-            image: "/ssobig_assets/playroom/백설공주와 독사과.png",
-            title: "백설공주와 독사과",
-            description: "백설공주에게 독사과를 건넨자는?\n동화 다시 읽기",
-            players: "2인, 60분",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/c2439b65",
-          },
+          // {
+          //   image: "/ssobig_assets/playroom/백설공주와 독사과.png",
+          //   title: "백설공주와 독사과",
+          //   description: "백설공주에게 독사과를 건넨자는?\n동화 다시 읽기",
+          //   players: "2인, 60분",
+          //   price: "무료",
+          //   link: "https://tool.ssobig.com/templates/c2439b65",
+          // },
           {
             image: "/ssobig_assets/playroom/기억 속의 너.png",
             title: "기억 속의 너",
@@ -366,7 +404,8 @@ export default function PlayroomPage() {
           {
             image: "/ssobig_assets/playroom/도플갱어.png",
             title: "도플갱어",
-            description: "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야",
+            description:
+              "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야",
             players: "4인, 120분",
             price: "펀딩 진행중",
             link: "https://tumblbug.com/ssobig002",

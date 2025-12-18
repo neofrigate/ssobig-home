@@ -354,7 +354,7 @@ const SocialGeniusPage = () => {
 
             {/* Product Detail 2 이미지 */}
             <Image
-              src="/ssobig_assets/offline/mafia/불면증마피아 2.png"
+              src="/ssobig_assets/offline/mafia/불면증마피아2.webp"
               alt="상세 이미지 2"
               width={1920}
               height={1080}
