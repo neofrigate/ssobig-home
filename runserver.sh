@@ -250,5 +250,48 @@ fi
 if [ "$USE_RANDOM_DOMAIN" = true ]; then
   ngrok http 3000
 else
-  ngrok http --domain=$NGROK_DOMAIN 3000
+  # 도메인 예약 오류 시 자동으로 랜덤 도메인으로 fallback
+  echo "🔐 ngrok 인증 확인 중..."
+  
+  # ngrok 실행 시도 (출력을 임시 파일로 저장)
+  NGROK_LOG_FILE="/tmp/ngrok_output_$$.log"
+  ngrok http --domain=$NGROK_DOMAIN 3000 > "$NGROK_LOG_FILE" 2>&1 &
+  NGROK_PID=$!
+  
+  # 3초 대기 후 에러 확인 (ngrok이 에러를 출력하는데 시간이 걸릴 수 있음)
+  sleep 3
+  
+  # 로그 파일에서 에러 확인
+  if [ -f "$NGROK_LOG_FILE" ]; then
+    if grep -qi "ERR_NGROK_320\|reserved for another account\|failed to start tunnel" "$NGROK_LOG_FILE" 2>/dev/null; then
+      # 도메인 예약 오류 발견 - 프로세스 종료 후 랜덤 도메인으로 전환
+      kill $NGROK_PID 2>/dev/null
+      wait $NGROK_PID 2>/dev/null
+      echo "✅ ngrok 인증 확인 완료"
+      echo ""
+      echo "⚠️  도메인 '$NGROK_DOMAIN'이 다른 계정에 예약되어 있습니다."
+      echo "🔄 랜덤 도메인으로 자동 전환합니다..."
+      echo ""
+      rm -f "$NGROK_LOG_FILE"
+      ngrok http 3000
+      exit 0
+    fi
+  fi
+  
+  # 프로세스가 여전히 실행 중인지 확인
+  if kill -0 $NGROK_PID 2>/dev/null; then
+    # 정상 실행 중 - 로그 파일 삭제하고 ngrok 출력을 화면에 표시
+    echo "✅ ngrok 인증 완료"
+    rm -f "$NGROK_LOG_FILE"
+    # ngrok 출력을 화면에 표시하면서 실행
+    wait $NGROK_PID
+  else
+    # 프로세스가 종료되었는데 에러가 감지되지 않았으면 로그 출력
+    if [ -f "$NGROK_LOG_FILE" ]; then
+      echo "❌ ngrok 실행 실패:"
+      cat "$NGROK_LOG_FILE"
+      rm -f "$NGROK_LOG_FILE"
+    fi
+    exit 1
+  fi
 fi

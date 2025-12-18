@@ -39,16 +39,16 @@ export function getProjectFiles(): string[] {
   const files = fs.readdirSync(projectsDirectory);
   const yamlFiles = files.filter((file) => file.endsWith(".yml"));
   const mdFiles = files.filter((file) => file.endsWith(".md"));
-  
+
   // YAML 파일이 있으면 YAML 파일 ID 반환, 없으면 MD 파일 반환
   const projectIds = new Set<string>();
-  
+
   // YAML 파일에서 ID 추출
   yamlFiles.forEach((file) => {
     const id = file.replace(/\.yml$/, "");
     projectIds.add(id);
   });
-  
+
   // YAML 파일이 없는 MD 파일만 추가 (하위 호환성)
   mdFiles.forEach((file) => {
     const id = file.replace(/\.md$/, "");
@@ -56,7 +56,7 @@ export function getProjectFiles(): string[] {
       projectIds.add(id);
     }
   });
-  
+
   return Array.from(projectIds);
 }
 
@@ -69,14 +69,14 @@ export function getProjectById(id: string): ProjectData | null {
   try {
     // ID 정규화 (.md, .yml 확장자 제거)
     const normalizedId = id.replace(/\.(md|yml)$/, "");
-    
+
     // 먼저 YAML 파일 확인
     const yamlPath = path.join(projectsDirectory, `${normalizedId}.yml`);
     const mdPath = path.join(projectsDirectory, `${normalizedId}.md`);
-    
+
     let metadata: ProjectMetadata;
     let content: string;
-    
+
     if (fs.existsSync(yamlPath)) {
       // YAML 파일이 있는 경우: YAML에서 메타데이터 로드, contentPath로 MD 파일 로드
       if (process.env.NODE_ENV === "development") {
@@ -85,10 +85,10 @@ export function getProjectById(id: string): ProjectData | null {
           `[DEV] Loading project from YAML: ${normalizedId}.yml (modified: ${stats.mtime})`
         );
       }
-      
+
       const yamlContent = fs.readFileSync(yamlPath, "utf8");
-      const yamlData = yaml.load(yamlContent) as any;
-      
+      const yamlData = yaml.load(yamlContent) as Partial<ProjectMetadata>;
+
       // 메타데이터 검증 및 기본값 설정
       metadata = {
         id: yamlData.id || normalizedId,
@@ -106,9 +106,12 @@ export function getProjectById(id: string): ProjectData | null {
         status: yamlData.status || "draft",
         contentPath: yamlData.contentPath || `${normalizedId}.md`,
       };
-      
+
       // contentPath로 지정된 MD 파일 로드
-      const contentFilePath = path.join(projectsDirectory, metadata.contentPath!);
+      const contentFilePath = path.join(
+        projectsDirectory,
+        metadata.contentPath!
+      );
       if (fs.existsSync(contentFilePath)) {
         content = fs.readFileSync(contentFilePath, "utf8").trim();
       } else {
@@ -123,30 +126,35 @@ export function getProjectById(id: string): ProjectData | null {
           `[DEV] Loading project file (legacy): ${normalizedId}.md (modified: ${stats.mtime})`
         );
       }
-      
+
       const fileContents = fs.readFileSync(mdPath, "utf8");
-      const { data, content: mdContent } = matter(fileContents);
-      
+      const { data, content: mdContent } =
+        matter<ProjectMetadata>(fileContents);
+
       // 메타데이터 검증 및 기본값 설정
       metadata = {
-        id: data.id || normalizedId,
-        title: data.title || "Untitled",
-        description: data.description || "",
-        category: data.category || "기타",
+        id: (data.id as string | undefined) || normalizedId,
+        title: (data.title as string | undefined) || "Untitled",
+        description: (data.description as string | undefined) || "",
+        category: (data.category as string | undefined) || "기타",
         tags: Array.isArray(data.tags) ? data.tags : [],
-        year: data.year || new Date().getFullYear().toString(),
-        date: data.date || "",
-        partner: data.partner || "",
-        thumbnail: data.thumbnail || "",
+        year:
+          (data.year as string | undefined) ||
+          new Date().getFullYear().toString(),
+        date: (data.date as string | undefined) || "",
+        partner: (data.partner as string | undefined) || "",
+        thumbnail: (data.thumbnail as string | undefined) || "",
         images: Array.isArray(data.images) ? data.images : [],
-        link: data.link || "#",
+        link: (data.link as string | undefined) || "#",
         selection: Array.isArray(data.selection) ? data.selection : [],
-        status: data.status || "draft",
+        status: (data.status as string | undefined) || "draft",
       };
-      
+
       content = mdContent.trim();
     } else {
-      console.warn(`Project file not found: ${normalizedId} (checked .yml and .md)`);
+      console.warn(
+        `Project file not found: ${normalizedId} (checked .yml and .md)`
+      );
       return null;
     }
 
@@ -173,6 +181,7 @@ export function getAllProjects(): ProjectMetadata[] {
       if (!project) return null;
 
       // 본문 제외하고 메타데이터만 반환
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { content, ...metadata } = project;
       return metadata;
     })
@@ -204,4 +213,3 @@ export function getAllCategories(): string[] {
   const categories = new Set(projects.map((project) => project.category));
   return Array.from(categories).sort();
 }
-
