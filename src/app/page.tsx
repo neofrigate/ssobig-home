@@ -109,28 +109,49 @@ export default function Home() {
 
     // 터치 이벤트 처리 (모바일)
     let touchStartX = 0;
+    let touchStartY = 0;
     let touchStartOffset = 0;
+    let isHorizontalScroll = false;
+    let isFirstMove = true;
 
     const handleTouchStart = (e: TouchEvent) => {
       touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
       touchStartOffset = baseOffset;
       isUserScrollingRef.current = true;
+      isHorizontalScroll = false;
+      isFirstMove = true;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       const touchX = e.touches[0].clientX;
-      const diff = touchStartX - touchX;
-      baseOffset = touchStartOffset + diff;
+      const touchY = e.touches[0].clientY;
+      const diffX = touchStartX - touchX;
+      const diffY = touchStartY - touchY;
 
-      // 한 세트 너비를 넘어가면 리셋
-      if (setWidth > 0) {
-        while (baseOffset >= setWidth) {
-          baseOffset -= setWidth;
-          touchStartOffset -= setWidth;
+      if (isFirstMove) {
+        // 첫 이동 시 수평 스크롤인지 수직 스크롤인지 판단
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+          isHorizontalScroll = true;
         }
-        while (baseOffset < 0) {
-          baseOffset += setWidth;
-          touchStartOffset += setWidth;
+        isFirstMove = false;
+      }
+
+      if (isHorizontalScroll) {
+        // 수평 스크롤일 때만 슬라이더 이동 및 기본 동작(수직 스크롤) 방지
+        e.preventDefault();
+        baseOffset = touchStartOffset + diffX;
+
+        // 한 세트 너비를 넘어가면 리셋
+        if (setWidth > 0) {
+          while (baseOffset >= setWidth) {
+            baseOffset -= setWidth;
+            touchStartOffset -= setWidth;
+          }
+          while (baseOffset < 0) {
+            baseOffset += setWidth;
+            touchStartOffset += setWidth;
+          }
         }
       }
     };
@@ -142,9 +163,13 @@ export default function Home() {
     };
 
     container.addEventListener("wheel", handleWheel, { passive: false });
-    container.addEventListener("touchstart", handleTouchStart);
-    container.addEventListener("touchmove", handleTouchMove);
-    container.addEventListener("touchend", handleTouchEnd);
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    container.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+    container.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -166,9 +191,9 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="h-screen bg-white -mt-[88px] md:-mt-[60px] overflow-hidden">
+    <div className="min-h-screen bg-white -mt-[88px] md:-mt-[60px] overflow-x-hidden">
       {/* 1. 히어로 섹션 - 전체 화면 (중앙 정렬 유지) - GNB와 겹침 */}
-      <section className="relative h-[100svh] flex flex-col overflow-hidden pt-[88px] md:pt-[60px]">
+      <section className="relative h-[100svh] flex flex-col pt-[88px] md:pt-[60px]">
         {/* 중앙 컨텐츠 */}
         <div className="flex-1 flex items-center justify-center py-2 sm:py-3 md:py-4 lg:py-6 xl:py-8">
           <div className="relative z-10 text-center px-4 md:px-6 max-w-4xl">

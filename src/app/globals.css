@@ -36,8 +36,8 @@ html {
   height: 100%;
   /* iOS Safari 오버스크롤 대응 */
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none;
-  overscroll-behavior: none;
+  overscroll-behavior-y: auto;
+  overscroll-behavior: auto;
 }
 
 body {
