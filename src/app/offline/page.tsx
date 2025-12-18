@@ -99,7 +99,9 @@ function OfflineCard({
 }
 
 export default function OfflinePage() {
-  const [totalParticipants, setTotalParticipants] = useState<number>(12000);
+  const [totalParticipants, setTotalParticipants] = useState<number | null>(
+    null
+  );
 
   // Google Sheets에서 총 신청자 수 가져오기
   useEffect(() => {
@@ -136,7 +138,10 @@ export default function OfflinePage() {
   }, []);
 
   // 숫자 포맷팅 (천 단위 콤마)
-  const formattedCount = totalParticipants.toLocaleString("ko-KR");
+  const formattedCount =
+    totalParticipants !== null
+      ? totalParticipants.toLocaleString("ko-KR")
+      : "...";
 
   return (
     <div className="min-h-screen bg-black -mt-[88px] md:-mt-[60px]">
