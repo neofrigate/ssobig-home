@@ -166,7 +166,7 @@ export default function ProjectPage() {
                     href={`/project/${project.id}`}
                     className="group block"
                   >
-                    <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden bg-gray-200 transition-all duration-300 group-hover:bg-gray-300">
+                    <div className="relative aspect-video mb-4 rounded-lg overflow-hidden bg-gray-200 transition-all duration-300 group-hover:bg-gray-300">
                       {project.image ? (
                         <Image
                           src={project.image}
@@ -223,7 +223,7 @@ export default function ProjectPage() {
             쏘빅과 협업하거나 새로운 프로젝트를 시작해보세요
           </p>
           <a
-            href="https://ssobig.channel.io"
+            href="https://forms.gle/BjQMEKSvEruWxEuNA"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-black text-white px-8 sm:px-9 md:px-10 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base font-semibold hover:bg-gray-800 transition-colors"

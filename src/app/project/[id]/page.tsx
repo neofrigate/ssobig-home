@@ -27,6 +27,23 @@ export default function ProjectDetailPage() {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+
+  // 유튜브 비디오 ID 추출 함수
+  const extractYouTubeId = (url: string): string | null => {
+    if (!url) return null;
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|img\.youtube\.com\/vi\/)([^&\n?#]+)/,
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1].split("/")[0];
+      }
+    }
+    return null;
+  };
 
   useEffect(() => {
     // #region agent log
@@ -431,25 +448,69 @@ export default function ProjectDetailPage() {
             <div className="mb-12 -mx-5 lg:mx-0">
               {/* 모바일/태블릿: 가로 스크롤, 데스크톱: 그리드 */}
               <div className="flex lg:grid lg:grid-cols-2 gap-3 lg:gap-6 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 hide-scrollbar pl-5 pr-5 lg:pl-0 lg:pr-0">
-                {project.images.map((imageSrc, index) => (
-                  <div
-                    key={index}
-                    className="relative flex-shrink-0 w-[85vw] sm:w-[85vw] md:w-[90vw] lg:w-auto h-64 sm:h-80 md:h-[600px] lg:h-80 rounded-lg overflow-hidden bg-gray-100"
-                  >
-                    <Image
-                      src={imageSrc}
-                      alt={`${project.title} 이미지 ${index + 1}`}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      sizes="(max-width: 768px) 85vw, (max-width: 1024px) 90vw, 50vw"
-                      unoptimized
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = "none";
-                      }}
-                    />
-                  </div>
-                ))}
+                {project.images.map((imageSrc, index) => {
+                  const videoId = extractYouTubeId(imageSrc);
+                  const isPlaying = playingIndex === index;
+
+                  return (
+                    <div
+                      key={index}
+                      className="relative flex-shrink-0 w-[85vw] sm:w-[85vw] md:w-[90vw] lg:w-full aspect-video rounded-lg overflow-hidden bg-gray-100 group"
+                    >
+                      {videoId && isPlaying ? (
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                          title={`${project.title} 영상 ${index + 1}`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          className="w-full h-full"
+                        />
+                      ) : (
+                        <>
+                          <Image
+                            src={imageSrc}
+                            alt={`${project.title} 이미지 ${index + 1}`}
+                            fill
+                            style={{ objectFit: "cover" }}
+                            sizes="(max-width: 768px) 85vw, (max-width: 1024px) 90vw, 50vw"
+                            unoptimized
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                            }}
+                          />
+                          {videoId && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors pointer-events-none">
+                              <button
+                                onClick={() => setPlayingIndex(index)}
+                                className="w-16 h-16 flex items-center justify-center bg-white/90 rounded-full shadow-xl transform transition-transform group-hover:scale-110 pointer-events-auto"
+                              >
+                                <svg
+                                  className="w-8 h-8 text-black ml-1"
+                                  fill="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path d="M8 5v14l11-7z" />
+                                </svg>
+                              </button>
+                              <a
+                                href={`https://www.youtube.com/watch?v=${videoId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-4 px-4 py-1.5 bg-black/60 text-white text-xs rounded-full hover:bg-black/80 transition-colors pointer-events-auto"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                유튜브에서 보기 ↗
+                              </a>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -483,6 +544,28 @@ export default function ProjectDetailPage() {
                     // 포맷팅 헬퍼 함수
                     const formatLineNumber = (num: number) =>
                       String(num).padStart(3, " ");
+
+                    // 이미지 그룹 찾기: 연속된 이미지들을 그룹화 (빈 줄 무시)
+                    const imageRegex = /^!\[([^\]]*)\]\(([^)]+)\)$/;
+                    const imageGroups: Array<Array<number>> = [];
+                    let currentGroup: number[] = [];
+
+                    lines.forEach((line, index) => {
+                      const trimmed = line.trim();
+                      if (trimmed.match(imageRegex)) {
+                        currentGroup.push(index);
+                      } else if (trimmed !== "") {
+                        // 빈 줄이 아닌 다른 내용이 나오면 그룹 종료
+                        if (currentGroup.length > 0) {
+                          imageGroups.push([...currentGroup]);
+                          currentGroup = [];
+                        }
+                      }
+                      // 빈 줄은 무시하고 계속 그룹에 포함
+                    });
+                    if (currentGroup.length > 0) {
+                      imageGroups.push(currentGroup);
+                    }
 
                     const parsedLines = lines.map((line, index) => {
                       const trimmed = line.trim();
@@ -529,9 +612,16 @@ export default function ProjectDetailPage() {
                       }
 
                       // 이미지 처리: ![alt](src)
-                      const imageRegex = /^!\[([^\]]*)\]\(([^)]+)\)$/;
                       const imageMatch = trimmed.match(imageRegex);
                       if (imageMatch) {
+                        // 이 이미지가 속한 그룹 찾기
+                        const groupIndex = imageGroups.findIndex((group) =>
+                          group.includes(index)
+                        );
+                        const group =
+                          groupIndex !== -1 ? imageGroups[groupIndex] : null;
+                        const isGroupStart = group && group[0] === index;
+
                         lineType.push("IMAGE");
                         console.log(
                           `Line ${formatLineNumber(
@@ -543,16 +633,60 @@ export default function ProjectDetailPage() {
                             60
                           )}`
                         );
+
+                        // 그룹이 있고 2개 이상의 이미지가 연속된 경우
+                        if (group && group.length >= 2 && isGroupStart) {
+                          return (
+                            <div
+                              key={index}
+                              className="grid grid-cols-2 gap-2 sm:gap-3 my-6"
+                            >
+                              {group.map((imgIndex) => {
+                                const imgLine = lines[imgIndex].trim();
+                                const imgMatch = imgLine.match(imageRegex);
+                                if (!imgMatch) return null;
+                                return (
+                                  <div
+                                    key={imgIndex}
+                                    className="relative w-full aspect-[4/3] rounded-lg overflow-hidden"
+                                  >
+                                    <Image
+                                      src={imgMatch[2]}
+                                      alt={imgMatch[1]}
+                                      fill
+                                      style={{ objectFit: "cover" }}
+                                      className="rounded-lg"
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        }
+
+                        // 그룹의 첫 번째가 아니면 렌더링하지 않음 (그룹의 첫 번째에서 이미 렌더링됨)
+                        if (group && group.length >= 2 && !isGroupStart) {
+                          return null;
+                        }
+
+                        // 단일 이미지 또는 그룹이 1개인 경우
+                        // 실란트로 보고서 이미지만 contain으로 처리
+                        const isSilantroReport =
+                          imageMatch[2]?.includes("실란트로 보고서");
                         return (
                           <div
                             key={index}
-                            className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden my-4"
+                            className="relative w-full aspect-video rounded-lg overflow-hidden my-8"
                           >
                             <Image
                               src={imageMatch[2]}
                               alt={imageMatch[1]}
                               fill
-                              style={{ objectFit: "contain" }}
+                              style={{
+                                objectFit: isSilantroReport
+                                  ? "contain"
+                                  : "cover",
+                              }}
                               className="rounded-lg"
                             />
                           </div>
@@ -860,7 +994,7 @@ export default function ProjectDetailPage() {
                     });
                     console.log("=".repeat(80));
 
-                    return parsedLines;
+                    return parsedLines.filter((line) => line !== null);
                   })()}
                 </div>
               )}
@@ -902,6 +1036,24 @@ export default function ProjectDetailPage() {
                       <span className="text-gray-500">카테고리</span>
                       <p className="text-gray-900 font-medium">
                         {project.category}
+                      </p>
+                    </div>
+                  )}
+                  {project.link && project.link !== "#" && (
+                    <div>
+                      <span className="text-gray-500">관련 링크</span>
+                      <p className="text-gray-900 font-medium">
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-600 hover:text-purple-800 underline break-all"
+                        >
+                          {project.link.includes("youtube.com") ||
+                          project.link.includes("youtu.be")
+                            ? "유튜브 영상 보기 ↗"
+                            : "프로젝트 링크 보기 ↗"}
+                        </a>
                       </p>
                     </div>
                   )}

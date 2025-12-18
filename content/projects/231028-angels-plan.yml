@@ -1,0 +1,16 @@
+id: angels-plan
+title: "엔젤스플랜"
+description: "99명이 펼치는 초대형 심리게임 서바이벌"
+category: "B2C 행사"
+tags: ["단체게임", "대형행사", "데블스플랜", "게임파티", "소셜링"]
+year: "2023"
+date: "2023-10-28"
+partner: ""
+thumbnail: "/ssobig_assets/project/231028-angels-plan/포스터.jpeg"
+images:
+  - "/ssobig_assets/project/231028-angels-plan/포스터.jpeg"
+  - "/ssobig_assets/project/231028-angels-plan/엔젤스플랜.png"
+link: ""
+selection: ["B2C 행사"]
+status: "published"
+contentPath: "231028-angels-plan.md"

@@ -91,7 +91,7 @@ export function getProjectById(id: string): ProjectData | null {
 
       // 메타데이터 검증 및 기본값 설정
       metadata = {
-        id: yamlData.id || normalizedId,
+        id: normalizedId, // ID는 항상 파일명을 따르도록 수정
         title: yamlData.title || "Untitled",
         description: yamlData.description || "",
         category: yamlData.category || "기타",
@@ -108,14 +108,18 @@ export function getProjectById(id: string): ProjectData | null {
       };
 
       // contentPath로 지정된 MD 파일 로드
-      const contentFilePath = path.join(
-        projectsDirectory,
-        metadata.contentPath!
-      );
+      const contentPath = metadata.contentPath!;
+      // contentPath가 절대 경로가 아닌 경우 projectsDirectory 기준으로 처리
+      const contentFilePath = contentPath.startsWith("/")
+        ? path.join(process.cwd(), "public", contentPath)
+        : path.join(projectsDirectory, contentPath);
+
       if (fs.existsSync(contentFilePath)) {
         content = fs.readFileSync(contentFilePath, "utf8").trim();
       } else {
-        console.warn(`Content file not found: ${metadata.contentPath}`);
+        console.warn(
+          `Content file not found: ${contentPath} (checked: ${contentFilePath})`
+        );
         content = "";
       }
     } else if (fs.existsSync(mdPath)) {
@@ -133,7 +137,7 @@ export function getProjectById(id: string): ProjectData | null {
 
       // 메타데이터 검증 및 기본값 설정
       metadata = {
-        id: (data.id as string | undefined) || normalizedId,
+        id: normalizedId, // ID는 항상 파일명을 따르도록 수정
         title: (data.title as string | undefined) || "Untitled",
         description: (data.description as string | undefined) || "",
         category: (data.category as string | undefined) || "기타",
@@ -172,29 +176,39 @@ export function getProjectById(id: string): ProjectData | null {
  * 모든 프로젝트 메타데이터 가져오기 (published 상태만)
  */
 export function getAllProjects(): ProjectMetadata[] {
-  const projectIds = getProjectFiles();
+  try {
+    const projectIds = getProjectFiles();
 
-  const projects = projectIds
-    .map((id) => {
-      const project = getProjectById(id);
+    const projects = projectIds
+      .map((id) => {
+        try {
+          const project = getProjectById(id);
 
-      if (!project) return null;
+          if (!project) return null;
 
-      // 본문 제외하고 메타데이터만 반환
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { content, ...metadata } = project;
-      return metadata;
-    })
-    .filter((project): project is ProjectMetadata => project !== null)
-    .filter((project) => project.status === "published") // published 상태만
-    .sort((a, b) => {
-      // 날짜 기준 내림차순 정렬 (최신순)
-      const dateA = a.date ? new Date(a.date).getTime() : 0;
-      const dateB = b.date ? new Date(b.date).getTime() : 0;
-      return dateB - dateA;
-    });
+          // 본문 제외하고 메타데이터만 반환
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { content, ...metadata } = project;
+          return metadata;
+        } catch (error) {
+          console.error(`Error loading project ${id}:`, error);
+          return null;
+        }
+      })
+      .filter((project): project is ProjectMetadata => project !== null)
+      .filter((project) => project.status === "published") // published 상태만
+      .sort((a, b) => {
+        // 날짜 기준 내림차순 정렬 (최신순)
+        const dateA = a.date ? new Date(a.date).getTime() : 0;
+        const dateB = b.date ? new Date(b.date).getTime() : 0;
+        return dateB - dateA;
+      });
 
-  return projects;
+    return projects;
+  } catch (error) {
+    console.error("Error in getAllProjects:", error);
+    return [];
+  }
 }
 
 /**

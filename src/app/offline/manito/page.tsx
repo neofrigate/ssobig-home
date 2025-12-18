@@ -262,7 +262,7 @@ const ManitoPage = () => {
         <div className="fixed inset-0 -z-10">
           <Image
             src="/ssobig_assets/lovebuddies/hero-main.jpg"
-            alt="온라인 마니또 배경"
+            alt="알파 마니또 배경"
             fill
             style={{ objectFit: "cover", objectPosition: "center" }}
             priority
@@ -281,7 +281,7 @@ const ManitoPage = () => {
             {/* Product Detail 1 */}
             <Image
               src="/ssobig_assets/lovebuddies/alpha/poster.jpg"
-              alt="온라인 마니또 상세 이미지 1"
+              alt="알파 마니또 상세 이미지 1"
               width={1920}
               height={1080}
               className="w-full h-auto block leading-[0]"
@@ -289,11 +289,11 @@ const ManitoPage = () => {
               style={{ display: "block", margin: 0, padding: 0 }}
             />
 
-            {/* 온라인 마니또 스케줄 박스 */}
+            {/* 알파 마니또 스케줄 박스 */}
             <div className="w-full">
               <div className="bg-[#F2F2F2] p-4 md:px-6 md:py-7">
                 <h2 className="text-xl md:text-2xl font-bold text-center text-black mb-3 md:mb-4">
-                  💌 온라인 마니또 스케줄
+                  💌 알파 마니또 스케줄
                 </h2>
 
                 {/* 가격 및 범례 */}
@@ -342,7 +342,7 @@ const ManitoPage = () => {
             {/* Product Detail 2 */}
             <Image
               src="/ssobig_assets/lovebuddies/alpha/gallery-01.jpg"
-              alt="온라인 마니또 상세 이미지 2"
+              alt="알파 마니또 상세 이미지 2"
               width={1920}
               height={1080}
               className="w-full h-auto block leading-[0]"
@@ -352,7 +352,7 @@ const ManitoPage = () => {
             {/* Product Detail 3 */}
             <Image
               src="/ssobig_assets/lovebuddies/alpha/gallery-02.jpg"
-              alt="온라인 마니또 상세 이미지 3"
+              alt="알파 마니또 상세 이미지 3"
               width={1920}
               height={1080}
               className="w-full h-auto block leading-[0]"
@@ -368,29 +368,29 @@ const ManitoPage = () => {
               <div className="space-y-0">
                 {[
                   {
-                    question: "[온라인 마니또]는 어떻게 신청하나요?",
+                    question: "[알파 마니또]는 어떻게 신청하나요?",
                     answer:
-                      "페이지 하단의 <온라인마니또 신청하기> 버튼을 클릭하고<br/>양식에 맞춰 답변을 제출해주시면 됩니다!<br/>신청 후 발송되는 안내 문자에 따라 결제까지 마쳐주셔야 최종 신청 완료이니,<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>꼭 안내 문자 확인 후 결제 부탁드립니다!</strong>",
+                      "페이지 하단의 <알파마니또 신청하기> 버튼을 클릭하고<br/>양식에 맞춰 답변을 제출해주시면 됩니다!<br/>신청 후 발송되는 안내 문자에 따라 결제까지 마쳐주셔야 최종 신청 완료이니,<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>꼭 안내 문자 확인 후 결제 부탁드립니다!</strong>",
                   },
                   {
-                    question: "[온라인 마니또]는 무엇인가요?",
+                    question: "[알파 마니또]는 무엇인가요?",
                     answer:
-                      "온라인 마니또는 일일남매 상위 TOP3만 참여 가능한 특별한 이벤트입니다.<br/>5일간 온라인으로 진행되며, 내 마니또와 설레이는 첫만남을 가질 수 있어요!<br/>일일남매에서 좋은 성과를 거둔 분들만 참여할 수 있는 프리미엄 이벤트입니다.",
+                      "알파 마니또는 일일남매 상위 TOP3만 참여 가능한 특별한 이벤트입니다.<br/>5일간 온라인으로 진행되며, 내 마니또와 설레이는 첫만남을 가질 수 있어요!<br/>일일남매에서 좋은 성과를 거둔 분들만 참여할 수 있는 프리미엄 이벤트입니다.",
                   },
                   {
-                    question: "[온라인 마니또] 참가 자격은 어떻게 되나요?",
+                    question: "[알파 마니또] 참가 자격은 어떻게 되나요?",
                     answer:
                       "일일남매 상위 TOP3에 랭크된 분들만 참여 가능합니다.<br/>일일남매에서 좋은 성과를 거두신 분들께 제공되는 특별한 기회예요!",
                   },
                   {
-                    question: "[온라인 마니또] 지각시 참여가 어렵나요?",
+                    question: "[알파 마니또] 지각시 참여가 어렵나요?",
                     answer:
-                      "온라인 마니또는 5일간 진행되는 프로그램입니다.<br/>시작일 이후에는 참여가 어려울 수 있으니<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>시작일에 맞춰 참여 부탁드립니다!</strong>",
+                      "알파 마니또는 5일간 진행되는 프로그램입니다.<br/>시작일 이후에는 참여가 어려울 수 있으니<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>시작일에 맞춰 참여 부탁드립니다!</strong>",
                   },
                   {
                     question: "모임 공지와 진행 방식은 어떻게 확인하나요?",
                     answer:
-                      "온라인 마니또는 전용 웹앱을 통해 진행됩니다.<br/>모임 전용 웹앱 링크에 접속하시면 공지 및 진행 방식을 확인하실 수 있으니<br/>꼭 접속 후 확인 부탁드립니다!<br/>모임 링크는 시작일 전날 일괄 전송드리고 있습니다 :)",
+                      "알파 마니또는 전용 웹앱을 통해 진행됩니다.<br/>모임 전용 웹앱 링크에 접속하시면 공지 및 진행 방식을 확인하실 수 있으니<br/>꼭 접속 후 확인 부탁드립니다!<br/>모임 링크는 시작일 전날 일괄 전송드리고 있습니다 :)",
                   },
                 ].map((faq, index) => (
                   <FAQItem
@@ -416,7 +416,7 @@ const ManitoPage = () => {
               buttonType="alpha_main_cta"
               destination="smore_form"
             >
-              온라인마니또 신청하기 💌
+              알파마니또 신청하기 💌
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"

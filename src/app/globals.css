@@ -118,3 +118,18 @@ body.gnb-hidden .global-nav {
 nextjs-portal {
   left: 0px !important;
 }
+
+/* 깜빡이는 애니메이션 */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-blink {
+  animation: blink 1.5s ease-in-out infinite;
+}

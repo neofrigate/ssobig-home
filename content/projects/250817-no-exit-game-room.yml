@@ -1,0 +1,16 @@
+id: no-exit-game-room
+title: "노엑싯 게임룸"
+description: "유튜브 게임 콘텐츠 첫 쏘빅툴 적용"
+category: "크리에이터 협업"
+tags: ["영상 콘텐츠", "미디어 협업", "유튜브", "실시간 게임 시스템"]
+year: "2025"
+date: "2025-08-17"
+partner: "빠니보틀"
+thumbnail: "https://img.youtube.com/vi/yetVRFrCX0I/maxresdefault.jpg"
+images:
+  - "https://img.youtube.com/vi/yetVRFrCX0I/maxresdefault.jpg"
+  - "https://img.youtube.com/vi/UA2HtZs3ZLg/maxresdefault.jpg"
+link: "https://www.youtube.com/watch?v=yetVRFrCX0I"
+selection: ["크리에이터 협업"]
+status: "published"
+contentPath: "250817-no-exit-game-room.md"

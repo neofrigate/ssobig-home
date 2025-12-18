@@ -293,7 +293,7 @@ const SocialGeniusPage = () => {
           <div className="w-full md:rounded-3xl overflow-hidden md:shadow-lg">
             {/* Product Detail 1 */}
             <Image
-              src="/ssobig_assets/gameorb/product-detail 1.png"
+              src="/ssobig_assets/offline/mafia/불면증마피아 1.jpg"
               alt="상세 이미지 1"
               width={1920}
               height={1080}
@@ -304,15 +304,15 @@ const SocialGeniusPage = () => {
 
             {/* 소셜지니어스 스케줄 박스 */}
             <div className="w-full -mt-1">
-              <div className="bg-[#141414] p-4 md:px-6 md:py-7">
+              <div className="bg-black p-4 md:px-6 md:py-7">
                 <h2 className="text-xl md:text-2xl font-bold text-center text-white mb-3 md:mb-4">
-                  🎮 소셜지니어스 스케줄
+                  불면증마피아 스케줄
                 </h2>
 
                 {/* 참가비 및 범례 */}
                 <div className="flex gap-2 md:gap-3 justify-between items-center mb-4 md:mb-6 px-3 md:px-4">
                   <div className="text-sm md:text-base font-semibold text-white">
-                    참가비 : 28,000원 (오픈할인중)
+                    참가비 : 30,000원 (오픈할인중)
                   </div>
                   <div className="flex gap-2 md:gap-3">
                     <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-white/10 bg-[#FF69B4]/20">
@@ -354,7 +354,7 @@ const SocialGeniusPage = () => {
 
             {/* Product Detail 2 이미지 */}
             <Image
-              src="/ssobig_assets/gameorb/product-detail 2.png"
+              src="/ssobig_assets/offline/mafia/불면증마피아 2.png"
               alt="상세 이미지 2"
               width={1920}
               height={1080}
@@ -362,285 +362,15 @@ const SocialGeniusPage = () => {
               style={{ display: "block", margin: 0, padding: 0 }}
             />
 
-            {/* Product Detail 2 - 소개 섹션 */}
-            <div className="bg-[#E9E5F6] px-6 py-10 md:px-9 md:py-14">
-              <div className="space-y-6 text-center">
-                <p className="text-base md:text-lg text-black leading-relaxed">
-                  <span className="text-[#9E4BED] font-semibold">
-                    &ldquo;데블스 플랜&rdquo;, &ldquo;더 지니어스&rdquo;,
-                    <br />
-                    &ldquo;피의 게임&rdquo;...
-                  </span>
-                  <br />
-                  게임 예능 속 숨 막히는 전략과 반전에 열광하셨나요?
-                </p>
-
-                <p className="text-base md:text-lg text-black leading-relaxed">
-                  혹시{" "}
-                  <span className="text-[#9E4BED] font-semibold">
-                    &ldquo;나라면 저기서 저렇게 했을 텐데!&rdquo;
-                  </span>
-                  <br />
-                  혹은{" "}
-                  <span className="text-[#9E4BED] font-semibold">
-                    &ldquo;저 게임, 내가 하면 더 잘할 수 있을 것 같은데?&rdquo;
-                  </span>
-                  <br />
-                  라고 외치신 적 있으신가요?
-                </p>
-
-                <p className="text-base md:text-lg text-black leading-relaxed">
-                  아니면,{" "}
-                  <span className="text-[#9E4BED] font-semibold">
-                    &ldquo;주말에 뭐하지?
-                    <br />
-                    새로운 사람들과 재밌게 놀고 싶은데!&rdquo;
-                  </span>
-                  <br />
-                  하고 생각하셨나요?
-                </p>
-              </div>
-
-              {/* 걱정 해소 */}
-              <div className="mt-10 bg-white/60 p-5 md:p-6 rounded-xl">
-                <div className="text-center">
-                  <p className="text-sm md:text-base text-[#9E4BED] mb-1">
-                    🤯 &ldquo;게임예능이라니, 너무 어렵진 않을까?&rdquo;
-                  </p>
-                  <p className="text-sm md:text-base text-[#9E4BED] mb-2">
-                    🥳 &ldquo;처음인데... 혼자인데... 잘 어울릴 수
-                    있을까?&rdquo;
-                  </p>
-                  <p className="text-base md:text-lg font-bold text-black">
-                    걱정 마세요! 🙌
-                  </p>
-                </div>
-              </div>
-
-              {/* 후기 섹션 */}
-              <div className="mt-10">
-                <h3 className="text-lg md:text-xl font-bold text-center text-black mb-5">
-                  참가자분들이 남겨주신
-                  <br />
-                  생생한 찐 후기모음🤩
-                </h3>
-
-                <div className="space-y-3">
-                  <div className="bg-white/60 p-4 rounded-xl">
-                    <p className="text-sm md:text-base text-black mb-2">
-                      &ldquo;드라마틱한 전개의 연속이라 시간 가는 줄 몰랐어요!
-                      이렇게 흥미진진할 줄 몰랐네요!&rdquo;
-                    </p>
-                    <p className="text-xs text-[#9E4BED] text-right">
-                      - 30대 직장인 K님
-                    </p>
-                  </div>
-                  <div className="bg-white/60 p-4 rounded-xl">
-                    <p className="text-sm md:text-base text-black mb-2">
-                      &ldquo;전략 게임이라 어려울까봐 걱정했는데, 생각보다 쉽고
-                      엄청 재미있었어요!&rdquo;
-                    </p>
-                    <p className="text-xs text-[#9E4BED] text-right">
-                      - 20대 대학생 P님
-                    </p>
-                  </div>
-                  <div className="bg-white/60 p-4 rounded-xl">
-                    <p className="text-sm md:text-base text-black mb-2">
-                      &ldquo;처음 본 사람들이랑 이렇게 빨리 친해질 수 있다니
-                      놀라웠어요. 꼭 다시 참가하고 싶어요!&rdquo;
-                    </p>
-                    <p className="text-xs text-[#9E4BED] text-right">
-                      - 30대 직장인 J님
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* 술없이도 이미지 */}
-              <div className="mt-10">
-                <Image
-                  src="/ssobig_assets/gameorb/no-alcohol-02.png"
-                  alt="술없이도 이미지"
-                  width={1920}
-                  height={1080}
-                  className="w-full rounded-xl"
-                />
-                <p className="text-sm md:text-base font-bold text-black text-center mt-6">
-                  😎 &ldquo;술 없이도 이렇게 재밌게 친해질 수 있다고?&rdquo;
-                  <br />
-                  네, 신기할걸요? 🙌
-                  <br />
-                  <br />
-                  &ldquo;게임으로 즐겁게 친해진다!&rdquo;가 우리의 모토! 🙌
-                </p>
-              </div>
-            </div>
-
-            {/* 게임 라인업 섹션 */}
-            <div className="w-full bg-[#141414] px-6 py-10 md:px-9 md:py-14">
-              <h2 className="text-2xl md:text-3xl font-bold text-center text-white mb-8 md:mb-12">
-                🎯 게임 라인업
-              </h2>
-
-              {/* 1. 불면증 마피아 */}
-              <div className="mb-12 md:mb-16">
-                <h3 className="text-xl md:text-2xl font-bold text-[#9E4BED] mb-3">
-                  불면증 마피아
-                </h3>
-                <p className="text-sm md:text-base text-white/80 mb-6 leading-relaxed">
-                  밤이 되면 마피아가 깨어나 시민을 제거합니다. 낮에는 시민들이
-                  투표로 마피아를 찾아내야 해요. 심리전과 추리가 결합된 클래식
-                  마피아 게임의 진수를 경험하세요!
-                </p>
-                {/* 이미지 슬라이더 */}
-                <div className="relative overflow-hidden">
-                  <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4">
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/불마_1.jpg"
-                        alt="불면증 마피아 1"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/불마_2.png"
-                        alt="불면증 마피아 2"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/불마_3.png"
-                        alt="불면증 마피아 3"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/불마_4.png"
-                        alt="불면증 마피아 4"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 2. 캠퍼스 라이프 */}
-              <div className="mb-12 md:mb-16">
-                <h3 className="text-xl md:text-2xl font-bold text-[#9E4BED] mb-3">
-                  캠퍼스 라이프
-                </h3>
-                <p className="text-sm md:text-base text-white/80 mb-6 leading-relaxed">
-                  대학 생활을 테마로 한 소셜 추리 게임! 각자의 역할과 목표를
-                  달성하며 다른 플레이어들과 협력하거나 경쟁해야 합니다. 전략적
-                  선택이 승패를 가릅니다!
-                </p>
-                {/* 이미지 슬라이더 */}
-                <div className="relative overflow-hidden">
-                  <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4">
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/캠라_1.jpg"
-                        alt="캠퍼스 라이프 1"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/캠라_2.png"
-                        alt="캠퍼스 라이프 2"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/캠라_3.png"
-                        alt="캠퍼스 라이프 3"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/캠라_4.png"
-                        alt="캠퍼스 라이프 4"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. 죄수의 딜레마 */}
-              <div className="mb-0">
-                <h3 className="text-xl md:text-2xl font-bold text-[#9E4BED] mb-3">
-                  죄수의 딜레마
-                </h3>
-                <p className="text-sm md:text-base text-white/80 mb-6 leading-relaxed">
-                  협력할 것인가, 배신할 것인가? 유명한 게임 이론을 실제로
-                  경험해보세요. 신뢰와 배신 사이에서 최선의 선택을 고민하며
-                  심리전을 펼치는 전략 게임입니다!
-                </p>
-                {/* 이미지 슬라이더 */}
-                <div className="relative overflow-hidden">
-                  <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4">
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/죄수의딜레마_1.jpg"
-                        alt="죄수의 딜레마 1"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/죄수의딜레마_2.png"
-                        alt="죄수의 딜레마 2"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/죄수의딜레마_3.png"
-                        alt="죄수의 딜레마 3"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                    <div className="flex-shrink-0 w-[70%] snap-center">
-                      <Image
-                        src="/ssobig_assets/gameorb/line-up/죄수의딜레마_4.png"
-                        alt="죄수의 딜레마 4"
-                        width={800}
-                        height={600}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Product Detail 3 이미지 */}
+            <Image
+              src="/ssobig_assets/offline/mafia/불면증마피아 3.png"
+              alt="상세 이미지 3"
+              width={1920}
+              height={1080}
+              className="w-full h-auto block leading-[0]"
+              style={{ display: "block", margin: 0, padding: 0 }}
+            />
 
             {/* FAQ 섹션 */}
             <div className="w-full bg-[#141414] px-6 py-4 md:px-9 md:py-7 pb-24 md:pb-28">
@@ -743,5 +473,3 @@ const SocialGeniusPage = () => {
 };
 
 export default SocialGeniusPage;
-
-

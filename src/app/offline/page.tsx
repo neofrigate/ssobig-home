@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Footer from "../../components/Footer";
@@ -98,6 +99,45 @@ function OfflineCard({
 }
 
 export default function OfflinePage() {
+  const [totalParticipants, setTotalParticipants] = useState<number>(12000);
+
+  // Google Sheets에서 총 신청자 수 가져오기
+  useEffect(() => {
+    const fetchTotalParticipants = async () => {
+      try {
+        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
+        const GID = "1757320005";
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const csvText = await response.text();
+        const rows = csvText.split("\n");
+
+        // A2 셀은 두 번째 행(인덱스 1)의 첫 번째 열
+        if (rows.length > 1) {
+          const secondRow = rows[1].split(",");
+          const a2Value = secondRow[0]?.trim();
+
+          if (a2Value && !isNaN(Number(a2Value))) {
+            setTotalParticipants(Number(a2Value));
+          }
+        }
+      } catch (error) {
+        console.error("총 신청자 수를 가져오는 중 오류 발생:", error);
+        // 에러 발생 시 기본값 유지
+      }
+    };
+
+    fetchTotalParticipants();
+  }, []);
+
+  // 숫자 포맷팅 (천 단위 콤마)
+  const formattedCount = totalParticipants.toLocaleString("ko-KR");
+
   return (
     <div className="min-h-screen bg-black -mt-[88px] md:-mt-[60px]">
       {/* 히어로 섹션 */}
@@ -144,7 +184,11 @@ export default function OfflinePage() {
             어디서도 경험하지 못한 특별한 콘텐츠로 가까워지는 곳
           </h1>
           <p className="text-base md:text-lg text-gray-300 font-medium break-keep">
-            매주 200명이 신청하고 있어요!
+            지금까지{" "}
+            <span className="animate-blink inline-block font-bold">
+              {formattedCount}명
+            </span>
+            이 함께했어요
           </p>
         </div>
 
@@ -156,7 +200,7 @@ export default function OfflinePage() {
               <OfflineCard
                 title="일일남매"
                 schedule="매주 금~일요일"
-                description={`매력쟁이들 사이에 사실 내 남매가?!\n'일일'남매와 혈육 케미 찐친 되기`}
+                description={`매력쟁이들 사이에 내 남매가?!\n'일일'남매와 혈육 케미 찐친 되기`}
                 imageSrc="/ssobig_assets/socialing/poster_일일남매.png"
                 imageAlt="일일남매 포스터"
                 sizes="(max-width: 640px) 32vw, 40vw"
@@ -174,11 +218,11 @@ export default function OfflinePage() {
                 href="/offline/mafia"
               />
               <OfflineCard
-                title="온라인마니또"
+                title="알파마니또"
                 schedule="매달 둘째주"
-                description={`일일남매 상위 TOP3만 잠여 가능!\n내 마니또와 설레이는 첫만남!`}
+                description={`일일남매 상위 TOP3만 참여 가능!\n내 마니또와 설레이는 첫만남!`}
                 imageSrc="/ssobig_assets/socialing/poster_마니또.png"
-                imageAlt="온라인마니또 포스터"
+                imageAlt="알파마니또 포스터"
                 sizes="(max-width: 640px) 32vw, 40vw"
                 isMobile={true}
                 href="/offline/manito"
@@ -191,7 +235,7 @@ export default function OfflinePage() {
             <OfflineCard
               title="일일남매"
               schedule="매주 금~일요일"
-              description={`매력쟁이들 사이에 사실 내 남매가?!\n'일일'남매와 혈육 케미 찐친 되기`}
+              description={`매력쟁이들 사이에 내 남매가?!\n'일일'남매와 혈육 케미 찐친 되기`}
               imageSrc="/ssobig_assets/socialing/poster_일일남매.png"
               imageAlt="일일남매 포스터"
               sizes="33vw"
@@ -207,11 +251,11 @@ export default function OfflinePage() {
               href="/offline/social_genius"
             />
             <OfflineCard
-              title="온라인마니또"
+              title="알파마니또"
               schedule="매달 둘째주"
-              description={`일일남매 상위 TOP3만 잠여 가능!\n내 마니또와 설레이는 첫만남!`}
+              description={`일일남매 상위 TOP3만 참여 가능!\n내 마니또와 설레이는 첫만남!`}
               imageSrc="/ssobig_assets/socialing/poster_마니또.png"
-              imageAlt="온라인마니또 포스터"
+              imageAlt="알파마니또 포스터"
               sizes="33vw"
               href="/offline/manito"
             />

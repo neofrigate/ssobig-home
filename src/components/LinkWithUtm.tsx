@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { appendUtmParams } from "../utils/utm";
 import { trackLinkClick } from "../utils/gtag";
 
-interface LinkWithUtmProps extends LinkProps {
+interface LinkWithUtmProps extends Omit<LinkProps, "href"> {
+  href: string | object;
   children: React.ReactNode;
   className?: string;
   target?: string;
@@ -57,6 +58,30 @@ const LinkWithUtm: React.FC<LinkWithUtmProps> = ({
     }
   };
 
+  // 외부 링크인 경우 일반 <a> 태그 사용
+  const isExternalLink =
+    typeof href === "string" &&
+    (href.startsWith("http") || href.startsWith("//"));
+
+  if (isExternalLink) {
+    const externalUrl =
+      typeof urlWithUtm === "string" ? urlWithUtm : (href as string);
+    return (
+      <a
+        href={externalUrl}
+        className={className}
+        target={target || "_blank"}
+        rel={rel || "noopener noreferrer"}
+        style={style}
+        onClick={handleClick}
+        {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  // 내부 링크인 경우 Next.js Link 사용
   return (
     <Link
       href={urlWithUtm}

@@ -213,7 +213,7 @@ export default function Home() {
             {bestcutImages.map((image, index) => (
               <div
                 key={`first-${index}`}
-                className="flex-shrink-0 h-full aspect-[4/3] mx-1 sm:mx-1.5 md:mx-2 rounded-lg overflow-hidden"
+                className="flex-shrink-0 h-full aspect-video mx-1 sm:mx-1.5 md:mx-2 rounded-lg overflow-hidden"
               >
                 <Image
                   src={`/ssobig_assets/bestcut/optimized/${image}`}
@@ -229,7 +229,7 @@ export default function Home() {
             {bestcutImages.map((image, index) => (
               <div
                 key={`second-${index}`}
-                className="flex-shrink-0 h-full aspect-[4/3] mx-1 sm:mx-1.5 md:mx-2 rounded-lg overflow-hidden"
+                className="flex-shrink-0 h-full aspect-video mx-1 sm:mx-1.5 md:mx-2 rounded-lg overflow-hidden"
               >
                 <Image
                   src={`/ssobig_assets/bestcut/optimized/${image}`}
