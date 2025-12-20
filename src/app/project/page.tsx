@@ -72,7 +72,7 @@ export default function ProjectPage() {
                 실행하는 솔루션 기업입니다.
               </span>
               <span className="hidden md:inline">
-                쏘빅 SSOBIG은 {`'`}인터랙티브한 경험(IX){`'`}을
+                쏘빅 SSOBIG은 {`'`}인터랙티브한 경험{`'`}을
                 <br /> 설계하고 실행하는 솔루션 기업입니다.
               </span>
             </h1>
