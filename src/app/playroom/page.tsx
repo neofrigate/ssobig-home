@@ -78,6 +78,10 @@ function ContentCard({
                 ? "문의"
                 : price === "펀딩 진행중"
                 ? "펀딩 진행중"
+                : price === "펀딩 종료"
+                ? "펀딩 종료"
+                : price === "사전예약 진행중"
+                ? "사전예약 진행중"
                 : price.replace("토큰", "") + "토큰"}
             </span>
           </div>
@@ -129,6 +133,10 @@ function ContentCard({
                 ? "문의"
                 : price === "펀딩 진행중"
                 ? "펀딩 진행중"
+                : price === "펀딩 종료"
+                ? "펀딩 종료"
+                : price === "사전예약 진행중"
+                ? "사전예약 진행중"
                 : price.replace("토큰", "") + "토큰"}
             </span>
           </div>
@@ -241,6 +249,16 @@ export default function PlayroomPage() {
 
   // 배너 데이터
   const banners: BannerData[] = [
+    {
+      title1: "황후마마의 죽음,",
+      title2: "그 원인은 궁 안에 있다.",
+      subtitle:
+        "사전예약 얼리버드 매진! 7인용 머더 미스터리 [황후마마 살인사건]",
+      bgImage: "/ssobig_assets/playroom/히어로_황후마마_데스크톱.jpg",
+      mobileImage: "/ssobig_assets/playroom/히어로_황후마마_모바일.jpg",
+      bgGradient: "from-red-600 to-pink-600",
+      link: "https://tumblbug.com/ssobig003",
+    },
     {
       title1: "당신의 선택으로 완성되는",
       title2: "커플 전용 미스터리 게임",
@@ -392,20 +410,28 @@ export default function PlayroomPage() {
       <ContentRow
         title="스토리 추리게임"
         items={[
-          // {
-          //   image: "/ssobig_assets/playroom/백설공주와 독사과.png",
-          //   title: "백설공주와 독사과",
-          //   description: "백설공주에게 독사과를 건넨자는?\n동화 다시 읽기",
-          //   players: "2인, 60분",
-          //   price: "무료",
-          //   link: "https://tool.ssobig.com/templates/c2439b65",
-          // },
+          {
+            image: "/ssobig_assets/playroom/황후마마살인사건.png",
+            title: "황후마마 살인사건",
+            description: "황후마마의 죽음,\n그 원인은 궁 안에 있다.",
+            players: "7인, 120분",
+            price: "사전예약 진행중",
+            link: "https://tumblbug.com/ssobig003",
+          },
+          {
+            image: "/ssobig_assets/playroom/백설공주와독사과.jpg",
+            title: "백설공주와 독사과",
+            description: "백설공주에게 독사과를 건넨자는?\n동화 다시 읽기",
+            players: "2인, 60분",
+            price: "무료",
+            link: "https://tool.ssobig.com/templates/c2439b65",
+          },
           {
             image: "/ssobig_assets/playroom/기억 속의 너.jpg",
             title: "기억 속의 너",
             description: "커플 전용 선택형 스토리 게임",
             players: "2인, 90분",
-            price: "펀딩 진행중",
+            price: "펀딩 종료",
             link: "https://tumblbug.com/ssobig001",
           },
           {
@@ -414,7 +440,7 @@ export default function PlayroomPage() {
             description:
               "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야?",
             players: "4인, 120분",
-            price: "펀딩 진행중",
+            price: "펀딩 종료",
             link: "https://tumblbug.com/ssobig002",
           },
         ]}
