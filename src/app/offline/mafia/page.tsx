@@ -526,7 +526,7 @@ const SocialGeniusPage = () => {
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="w-full max-w-[720px] md:max-w-[600px] mx-auto">
             <LinkWithUtm
-              href="https://form.ssobig.com/realgenius"
+              href="https://tool.ssobig.com/games/ee200ae0"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full h-[56px] bg-[#9E4BED] hover:bg-[#8341c9] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-base md:text-lg"
