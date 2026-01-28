@@ -85,6 +85,21 @@ const nextConfig = {
         destination: "/offline/mafia",
         permanent: true,
       },
+      {
+        source: "/lovebuddies",
+        destination: "https://www.ssobig.com/offline/11namme",
+        permanent: true,
+      },
+      {
+        source: "/realgenius",
+        destination: "https://www.ssobig.com/offline/mafia",
+        permanent: true,
+      },
+      {
+        source: "/manito",
+        destination: "https://www.ssobig.com/offline/manito",
+        permanent: true,
+      },
     ];
   },
 };
