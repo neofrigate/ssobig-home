@@ -212,13 +212,13 @@ export default function Home() {
                 href="/playroom"
                 className="bg-black text-white px-5 sm:px-6 md:px-5 lg:px-6 xl:px-7 py-2 sm:py-2.5 md:py-2.5 lg:py-3 xl:py-3.5 text-[13px] sm:text-[15px] md:text-[15px] lg:text-base xl:text-lg font-semibold hover:bg-gray-800 transition-colors rounded-full"
               >
-                친구들과 즐기기
+                추리게임 콘텐츠 구경하기
               </Link>
               <Link
                 href="/offline"
                 className="border border-black text-black px-5 sm:px-6 md:px-5 lg:px-6 xl:px-7 py-2 sm:py-2.5 md:py-2.5 lg:py-3 xl:py-3.5 text-[13px] sm:text-[15px] md:text-[15px] lg:text-base xl:text-lg font-semibold hover:bg-black hover:text-white transition-colors rounded-full"
               >
-                새로운 사람과 알아가기
+                대규모 콘텐츠로 새친구 사귀기
               </Link>
             </div>
           </div>
