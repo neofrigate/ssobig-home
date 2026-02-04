@@ -431,8 +431,8 @@ export default function PlayroomPage() {
             title: "기억 속의 너",
             description: "커플 전용 선택형 스토리 게임",
             players: "2인, 90분",
-            price: "펀딩 종료",
-            link: "https://tumblbug.com/ssobig001",
+            price: "240토큰",
+            link: "https://relay.ssobig.com/ssobig-b44",
           },
           {
             image: "/ssobig_assets/playroom/도플갱어.jpg",
@@ -440,8 +440,8 @@ export default function PlayroomPage() {
             description:
               "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야?",
             players: "4인, 120분",
-            price: "펀딩 종료",
-            link: "https://tumblbug.com/ssobig002",
+            price: "300토큰",
+            link: "https://relay.ssobig.com/ssobig-qju",
           },
         ]}
       />
