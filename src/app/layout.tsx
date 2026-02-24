@@ -68,6 +68,11 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    other: {
+      "naver-site-verification": ["c2b418891f7b9669ea94269cbf6002783babe3f9"],
+    },
+  },
   alternates: {
     canonical: "https://www.ssobig.com",
   },
