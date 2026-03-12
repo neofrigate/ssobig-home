@@ -80,12 +80,70 @@ const ElevenNammePage = () => {
     setLastUpdateTime(updateTimeString);
   }, []);
 
+  // API 응답 파싱 함수
+  const parseScheduleData = (
+    data: {
+      schedule: string;
+      maxCapacity: number;
+      exposedTotal: number;
+      exposedFemale: number;
+      exposedMale: number;
+      status: string;
+    }[]
+  ): ScheduleItem[] => {
+    return data
+      .map((item) => {
+        const title = item.schedule?.trim();
+        if (!title) return null;
+
+        const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
+        const dateStr = dateMatch ? dateMatch[1] : "";
+
+        const timeMatch = title.match(/\d+:\d+/);
+        const timeStr = timeMatch ? timeMatch[0] : "";
+
+        const gameTitle = title
+          .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
+          .trim();
+
+        const cleanTitle = timeStr ? `${timeStr} ${gameTitle}` : gameTitle;
+
+        return {
+          date: dateStr,
+          title: cleanTitle,
+          applicants: {
+            total: item.exposedTotal || 0,
+            female: item.exposedFemale || 0,
+            male: item.exposedMale || 0,
+          },
+          maxCapacity: item.maxCapacity || 40,
+          status: item.status || "",
+        };
+      })
+      .filter((item): item is ScheduleItem => item !== null);
+  };
+
+  // 폴백 데이터 (API 실패 시 사용)
+  const FALLBACK_DATA = [
+    { schedule: "3/13 (금) 19:30 일일남매", maxCapacity: 48, exposedTotal: 48, exposedFemale: 24, exposedMale: 24, status: "전체마감" },
+    { schedule: "3/14 (토) 15:00 일일남매", maxCapacity: 48, exposedTotal: 47, exposedFemale: 21, exposedMale: 26, status: "남자마감" },
+    { schedule: "3/14 (토) 19:00 일일남매", maxCapacity: 48, exposedTotal: 44, exposedFemale: 22, exposedMale: 22, status: "임박" },
+    { schedule: "3/20 (금) 19:30 일일남매", maxCapacity: 48, exposedTotal: 48, exposedFemale: 24, exposedMale: 24, status: "전체마감" },
+    { schedule: "3/21 (토) 15:00 일일남매", maxCapacity: 48, exposedTotal: 41, exposedFemale: 21, exposedMale: 20, status: "여자마감" },
+    { schedule: "3/21 (토) 19:00 일일남매", maxCapacity: 48, exposedTotal: 39, exposedFemale: 20, exposedMale: 19, status: "임박" },
+    { schedule: "3/27 (금) 19:30 일일남매", maxCapacity: 48, exposedTotal: 32, exposedFemale: 20, exposedMale: 12, status: "임박" },
+    { schedule: "3/28 (토) 15:00 일일남매", maxCapacity: 48, exposedTotal: 35, exposedFemale: 19, exposedMale: 16, status: "여유" },
+    { schedule: "3/28 (토) 19:00 일일남매", maxCapacity: 48, exposedTotal: 32, exposedFemale: 18, exposedMale: 14, status: "여유" },
+  ];
+
   // Supabase RPC에서 스케줄 데이터 가져오기
   useEffect(() => {
     const fetchScheduleData = async () => {
       try {
         const SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
-        const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        const SUPABASE_ANON_KEY =
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcmh3d2p6dHNlb2VnYWl6c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU4MjY0OTIsImV4cCI6MjA2MTQwMjQ5Mn0.Q7qfAO6ZatGqb84uQt74f5SSxmrvzx_qTooblg20gTg";
 
         const response = await fetch(
           `${SUPABASE_URL}/rest/v1/rpc/get_exposure_status`,
@@ -93,7 +151,7 @@ const ElevenNammePage = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              apikey: SUPABASE_ANON_KEY || "",
+              apikey: SUPABASE_ANON_KEY,
             },
             body: JSON.stringify({ p_request_table: "day-nammae-request" }),
           }
@@ -104,47 +162,11 @@ const ElevenNammePage = () => {
         }
 
         const data = await response.json();
-        const updatedSchedule: ScheduleItem[] = [];
+        const updatedSchedule = parseScheduleData(data);
 
-        data.forEach(
-          (item: {
-            schedule: string;
-            maxCapacity: number;
-            exposedTotal: number;
-            exposedFemale: number;
-            exposedMale: number;
-            status: string;
-          }) => {
-            const title = item.schedule?.trim();
-            if (!title) return;
-
-            const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
-            const dateStr = dateMatch ? dateMatch[1] : "";
-
-            const timeMatch = title.match(/\d+:\d+/);
-            const timeStr = timeMatch ? timeMatch[0] : "";
-
-            const gameTitle = title
-              .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
-              .trim();
-
-            const cleanTitle = timeStr
-              ? `${timeStr} ${gameTitle}`
-              : gameTitle;
-
-            updatedSchedule.push({
-              date: dateStr,
-              title: cleanTitle,
-              applicants: {
-                total: item.exposedTotal || 0,
-                female: item.exposedFemale || 0,
-                male: item.exposedMale || 0,
-              },
-              maxCapacity: item.maxCapacity || 40,
-              status: item.status || "",
-            });
-          }
-        );
+        if (updatedSchedule.length === 0) {
+          throw new Error("빈 데이터");
+        }
 
         setScheduleData(updatedSchedule);
         setIsLoading(false);
@@ -157,7 +179,8 @@ const ElevenNammePage = () => {
         ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
         setLastUpdateTime(updateTimeString);
       } catch (error) {
-        console.error("스케줄 데이터 가져오기 실패:", error);
+        console.error("스케줄 데이터 가져오기 실패, 폴백 사용:", error);
+        setScheduleData(parseScheduleData(FALLBACK_DATA));
         setIsLoading(false);
       }
     };
@@ -357,7 +380,7 @@ const ElevenNammePage = () => {
                     </div>
                   ) : scheduleData.length === 0 ? (
                     <div className="flex items-center justify-center py-6 text-black/60 text-sm md:text-base">
-                      📅 현재 예정된 스케줄이 없습니다
+                      📅 참여하기 버튼을 눌러주세요
                     </div>
                   ) : (
                     scheduleData.map((schedule, index) => (
