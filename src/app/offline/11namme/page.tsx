@@ -14,6 +14,7 @@ interface ScheduleItem {
     male: number;
   };
   maxCapacity: number;
+  status: string;
 }
 
 // FAQ 아이템 컴포넌트
@@ -79,66 +80,71 @@ const ElevenNammePage = () => {
     setLastUpdateTime(updateTimeString);
   }, []);
 
-  // Google Sheets에서 데이터 가져오기
+  // Supabase RPC에서 스케줄 데이터 가져오기
   useEffect(() => {
-    const fetchSheetData = async () => {
+    const fetchScheduleData = async () => {
       try {
-        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1294659426`;
+        const SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
+        const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-        const response = await fetch(url);
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/rpc/get_exposure_status`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: SUPABASE_ANON_KEY || "",
+            },
+            body: JSON.stringify({ p_request_table: "day-nammae-request" }),
+          }
+        );
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const csvText = await response.text();
-        const rows = csvText.split("\n").slice(1); // 헤더 제외
+        const data = await response.json();
         const updatedSchedule: ScheduleItem[] = [];
 
-        rows.forEach((row) => {
-          if (row.trim()) {
-            const cols = row.split(",");
-            const title = cols[1]?.replace(/"/g, "").trim();
-            const cColumnValue = cols[2]?.replace(/"/g, "").trim();
-            const isChecked = cColumnValue === "TRUE";
-            const maxCapacity = parseInt(cols[3]) || 40;
-            const total = parseInt(cols[4]) || 0;
-            const female = parseInt(cols[5]) || 0;
-            const male = parseInt(cols[6]) || 0;
+        data.forEach(
+          (item: {
+            schedule: string;
+            maxCapacity: number;
+            exposedTotal: number;
+            exposedFemale: number;
+            exposedMale: number;
+            status: string;
+          }) => {
+            const title = item.schedule?.trim();
+            if (!title) return;
 
-            if (
-              isChecked &&
-              title &&
-              title.includes("일일남매") &&
-              title.length > 0
-            ) {
-              const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
-              const dateStr = dateMatch ? dateMatch[1] : "";
+            const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
+            const dateStr = dateMatch ? dateMatch[1] : "";
 
-              const timeMatch = title.match(/\d+:\d+/);
-              const timeStr = timeMatch ? timeMatch[0] : "";
+            const timeMatch = title.match(/\d+:\d+/);
+            const timeStr = timeMatch ? timeMatch[0] : "";
 
-              const gameTitle = title
-                .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
-                .trim();
+            const gameTitle = title
+              .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
+              .trim();
 
-              const cleanTitle = timeStr
-                ? `${timeStr} ${gameTitle}`
-                : gameTitle;
+            const cleanTitle = timeStr
+              ? `${timeStr} ${gameTitle}`
+              : gameTitle;
 
-              updatedSchedule.push({
-                date: dateStr,
-                title: cleanTitle,
-                applicants: {
-                  total,
-                  female,
-                  male,
-                },
-                maxCapacity,
-              });
-            }
+            updatedSchedule.push({
+              date: dateStr,
+              title: cleanTitle,
+              applicants: {
+                total: item.exposedTotal || 0,
+                female: item.exposedFemale || 0,
+                male: item.exposedMale || 0,
+              },
+              maxCapacity: item.maxCapacity || 40,
+              status: item.status || "",
+            });
           }
-        });
+        );
 
         setScheduleData(updatedSchedule);
         setIsLoading(false);
@@ -151,23 +157,23 @@ const ElevenNammePage = () => {
         ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
         setLastUpdateTime(updateTimeString);
       } catch (error) {
-        console.error("❌ Google Sheets 데이터 가져오기 실패:", error);
+        console.error("스케줄 데이터 가져오기 실패:", error);
         setIsLoading(false);
       }
     };
 
-    fetchSheetData();
+    fetchScheduleData();
   }, []);
 
   // 참가자 차트 컴포넌트 - 중앙 기준
   const ApplicantChart = ({
     applicants,
     maxCapacity,
-    isCompleted = false,
+    status = "",
   }: {
     applicants: { total: number; female: number; male: number };
     maxCapacity: number;
-    isCompleted?: boolean;
+    status?: string;
   }) => {
     const halfCapacity = maxCapacity / 2;
     const femalePercentage =
@@ -177,13 +183,16 @@ const ElevenNammePage = () => {
     const femaleEmpty = Math.max(0, 100 - femalePercentage);
     const maleEmpty = Math.max(0, 100 - malePercentage);
 
+    const femaleFaded = status === "전체마감" || status === "여자마감";
+    const maleFaded = status === "전체마감" || status === "남자마감";
+
     return (
       <div className="flex h-2 md:h-3 bg-black/10 rounded-full overflow-hidden">
         {/* 왼쪽 절반 - 여자 */}
         <div className="flex w-1/2 flex-row-reverse">
           <div
             className={`transition-all duration-700 ease-out rounded-l-full ${
-              isCompleted ? "bg-[#FF69B4]/30" : "bg-[#FF69B4]"
+              femaleFaded ? "bg-[#FF69B4]/30" : "bg-[#FF69B4]"
             }`}
             style={{ width: `${femalePercentage}%` }}
           />
@@ -196,7 +205,7 @@ const ElevenNammePage = () => {
         <div className="flex w-1/2">
           <div
             className={`transition-all duration-700 ease-out rounded-r-full ${
-              isCompleted ? "bg-[#4A90E2]/30" : "bg-[#4A90E2]"
+              maleFaded ? "bg-[#4A90E2]/30" : "bg-[#4A90E2]"
             }`}
             style={{ width: `${malePercentage}%` }}
           />
@@ -208,17 +217,26 @@ const ElevenNammePage = () => {
 
   // 스케줄 아이템 컴포넌트
   const ScheduleItem = ({ schedule }: { schedule: ScheduleItem }) => {
-    const isCompleted = schedule.title.includes("전체마감");
+    const isCompleted = schedule.status === "전체마감";
     const timeMatch = schedule.title.match(/^(\d+:\d+)\s+(.+)$/);
     const time = timeMatch ? timeMatch[1] : "";
     const gameName = timeMatch ? timeMatch[2] : schedule.title;
 
     const textOpacity = isCompleted ? "opacity-30" : "";
 
+    const statusConfig: Record<string, { bg: string; text: string }> = {
+      전체마감: { bg: "bg-black/10", text: "text-black/40" },
+      여자마감: { bg: "bg-[#FF69B4]/15", text: "text-[#FF69B4]" },
+      남자마감: { bg: "bg-[#4A90E2]/15", text: "text-[#4A90E2]" },
+      임박: { bg: "bg-orange-100", text: "text-orange-500" },
+      여유: { bg: "bg-green-100", text: "text-green-600" },
+    };
+    const statusStyle = statusConfig[schedule.status];
+
     return (
       <div className="mb-4 md:mb-6">
         <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-4">
-          <div className="flex items-center space-x-3 md:space-x-4 flex-grow">
+          <div className="flex items-center space-x-2 md:space-x-3 flex-grow flex-wrap">
             <span
               className={`font-medium md:font-semibold text-sm md:text-base text-black whitespace-nowrap ${textOpacity}`}
             >
@@ -229,6 +247,13 @@ const ElevenNammePage = () => {
             >
               {gameName}
             </span>
+            {statusStyle && schedule.status !== "여유" && schedule.status !== "임박" && (
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
+              >
+                {schedule.status === "전체마감" ? `🔒 ${schedule.status}` : schedule.status}
+              </span>
+            )}
           </div>
           <span
             className={`font-light text-xs md:text-sm text-black/70 ml-3 whitespace-nowrap ${textOpacity}`}
@@ -240,7 +265,7 @@ const ElevenNammePage = () => {
           <ApplicantChart
             applicants={schedule.applicants}
             maxCapacity={schedule.maxCapacity}
-            isCompleted={isCompleted}
+            status={schedule.status}
           />
         </div>
       </div>
