@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface FooterProps {
   mode?: "dark" | "light";
@@ -9,6 +9,16 @@ interface FooterProps {
 
 const Footer = ({ mode = "dark" }: FooterProps) => {
   const [isFooterOpen, setIsFooterOpen] = useState(false);
+  const [platform, setPlatform] = useState<"ios" | "android" | "other">("other");
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+      setPlatform("ios");
+    } else if (/Android/i.test(ua)) {
+      setPlatform("android");
+    }
+  }, []);
 
   const isLight = mode === "light";
 
@@ -136,34 +146,61 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
             </div>
           </div>
 
-          {/* 약관 링크 */}
-          <p className={`${isLight ? "text-gray-400" : "text-white/40"} pt-3`}>
-            <Link
-              href="https://about.ssobig.com/privacy_policy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`underline ${
+          {/* 약관 링크 + 앱 다운로드 */}
+          <div className={`${isLight ? "text-gray-400" : "text-white/40"} pt-3 flex items-center justify-between`}>
+            <p>
+              <Link
+                href="https://about.ssobig.com/privacy_policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`underline ${
+                  isLight
+                    ? "hover:text-gray-600"
+                    : "hover:text-white/60"
+                }`}
+              >
+                개인정보 처리방침
+              </Link>
+              <span className="mx-2">|</span>
+              <Link
+                href="https://about.ssobig.com/terms_of_service"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`underline ${
+                  isLight
+                    ? "hover:text-gray-600"
+                    : "hover:text-white/60"
+                }`}
+              >
+                이용약관
+              </Link>
+            </p>
+            <button
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isLight
-                  ? "hover:text-gray-600"
-                  : "hover:text-white/60"
+                  ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  : "bg-white/10 text-white/60 hover:bg-white/20"
               }`}
+              onClick={() => {
+                if (platform === "android") {
+                  window.open("https://play.google.com/store/apps/details?id=com.ssobig.ssobigtool&hl=ko", "_blank");
+                } else {
+                  window.open("https://apps.apple.com/kr/app/ssobig-tool/id6745536878", "_blank");
+                }
+              }}
             >
-              개인정보 처리방침
-            </Link>
-            <span className="mx-2">|</span>
-            <Link
-              href="https://about.ssobig.com/terms_of_service"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`underline ${
-                isLight
-                  ? "hover:text-gray-600"
-                  : "hover:text-white/60"
-              }`}
-            >
-              이용약관
-            </Link>
-          </p>
+              {platform === "android" ? (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.523 2.293l1.478 2.553c.289.5.117 1.14-.383 1.429a1.044 1.044 0 01-1.429-.383L15.71 3.34C14.573 2.793 13.32 2.483 12 2.483c-1.32 0-2.573.31-3.71.856L6.812 5.892a1.044 1.044 0 01-1.429.383 1.044 1.044 0 01-.383-1.429L6.477 2.293C3.81 3.95 2 6.794 2 10.073h20c0-3.28-1.81-6.123-4.477-7.78zM7 7.5a1 1 0 110-2 1 1 0 010 2zm10 0a1 1 0 110-2 1 1 0 010 2zM3.5 11h.5v9c0 1.105.895 2 2 2h1V15h10v7h1c1.105 0 2-.895 2-2v-9h.5c.553 0 1-.447 1-1s-.447-1-1-1h-17c-.553 0-1 .447-1 1s.447 1 1 1zM1 11c-.553 0-1 .447-1 1v7c0 .553.447 1 1 1s1-.447 1-1v-7c0-.553-.447-1-1-1zm22 0c-.553 0-1 .447-1 1v7c0 .553.447 1 1 1s1-.447 1-1v-7c0-.553-.447-1-1-1z"/>
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                </svg>
+              )}
+              {platform === "android" ? "Google Play" : platform === "ios" ? "App Store" : "앱 다운로드"}
+            </button>
+          </div>
         </div>
       </div>
     </footer>
