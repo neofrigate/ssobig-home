@@ -222,6 +222,7 @@ export default function OfflinePage() {
                 isMobile={true}
                 href="/offline/mafia"
               />
+              {/* 알파마니또 숨김 처리
               <OfflineCard
                 title="알파마니또"
                 schedule="매달 둘째주"
@@ -232,11 +233,12 @@ export default function OfflinePage() {
                 isMobile={true}
                 href="/offline/manito"
               />
+              */}
             </div>
           </div>
 
           {/* 큰 태블릿 + 데스크톱: 3열 그리드 (>= 768px) */}
-          <div className="hidden md:grid md:grid-cols-3 gap-8 md:gap-12 pb-20 md:pb-32">
+          <div className="hidden md:grid md:grid-cols-2 gap-8 md:gap-12 pb-20 md:pb-32">
             <OfflineCard
               title="일일남매"
               schedule="매주 금~일요일"
@@ -255,6 +257,7 @@ export default function OfflinePage() {
               sizes="33vw"
               href="/offline/social_genius"
             />
+            {/* 알파마니또 숨김 처리
             <OfflineCard
               title="알파마니또"
               schedule="매달 둘째주"
@@ -264,6 +267,7 @@ export default function OfflinePage() {
               sizes="33vw"
               href="/offline/manito"
             />
+            */}
           </div>
         </div>
       </section>
