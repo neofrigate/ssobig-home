@@ -1,0 +1,76 @@
+name: Deploy Notification
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    name: Vercel Production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set deploy info
+        id: info
+        run: |
+          echo "start_time=$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')" >> $GITHUB_OUTPUT
+          echo "short_sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          echo "commit_msg=$(echo '${{ github.event.head_commit.message }}' | head -1)" >> $GITHUB_OUTPUT
+          echo "actor=${{ github.actor }}" >> $GITHUB_OUTPUT
+
+      - name: Notify deploy started
+        run: |
+          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-Type: application/json' \
+            -d "$(cat <<EOF
+          {
+            "text": ":rocket: [배포 시작] ssobig-home (쏘빅 홈페이지)\n\n브랜치: main\n배포 실행자: @${{ steps.info.outputs.actor }}\n커밋: ${{ steps.info.outputs.short_sha }} ${{ steps.info.outputs.commit_msg }}\n서비스 주소: https://ssobig.com/\n실행 링크: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n시작 시각: ${{ steps.info.outputs.start_time }}"
+          }
+          EOF
+          )"
+
+      - name: Wait for Vercel deployment
+        id: vercel
+        run: |
+          echo "Waiting for Vercel deployment to propagate..."
+          sleep 60
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://ssobig.com/")
+          if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 400 ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+          fi
+          echo "end_time=$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')" >> $GITHUB_OUTPUT
+
+      - name: Calculate duration
+        id: duration
+        run: |
+          START_EPOCH=$(date -d "${{ steps.info.outputs.start_time }}" +%s 2>/dev/null || echo "0")
+          END_EPOCH=$(date +%s)
+          DIFF=$((END_EPOCH - START_EPOCH))
+          MINS=$((DIFF / 60))
+          SECS=$((DIFF % 60))
+          echo "elapsed=${MINS}분 ${SECS}초" >> $GITHUB_OUTPUT
+
+      - name: Notify deploy success
+        if: steps.vercel.outputs.status == 'success'
+        run: |
+          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-Type: application/json' \
+            -d "$(cat <<EOF
+          {
+            "text": ":white_check_mark: [배포 완료] ssobig-home (쏘빅 홈페이지)\n\n상태: 성공\n브랜치: main\n배포 실행자: @${{ steps.info.outputs.actor }}\n커밋: ${{ steps.info.outputs.short_sha }} ${{ steps.info.outputs.commit_msg }}\n소요 시간: ${{ steps.duration.outputs.elapsed }}\n실행 링크: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n완료 시각: ${{ steps.vercel.outputs.end_time }}\n서비스 주소: https://ssobig.com/"
+          }
+          EOF
+          )"
+
+      - name: Notify deploy failure
+        if: steps.vercel.outputs.status == 'failure'
+        run: |
+          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-Type: application/json' \
+            -d "$(cat <<EOF
+          {
+            "text": ":x: [배포 실패] ssobig-home (쏘빅 홈페이지)\n\n상태: 실패\n브랜치: main\n배포 실행자: @${{ steps.info.outputs.actor }}\n커밋: ${{ steps.info.outputs.short_sha }} ${{ steps.info.outputs.commit_msg }}\n소요 시간: ${{ steps.duration.outputs.elapsed }}\n실행 링크: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n완료 시각: ${{ steps.vercel.outputs.end_time }}\n서비스 주소: https://ssobig.com/"
+          }
+          EOF
+          )"
