@@ -250,6 +250,15 @@ export default function PlayroomPage() {
   // 배너 데이터
   const banners: BannerData[] = [
     {
+      title1: "한강에서 폭탄이 터졌다.",
+      title2: "다리 위엔 현수막, 섬 안엔 용의자.",
+      subtitle: "4인용 서사 미스터리 [밤 아일랜드]",
+      bgImage: "/ssobig_assets/playroom/히어로_밤아일랜드_데스크톱.jpg",
+      mobileImage: "/ssobig_assets/playroom/히어로_밤아일랜드_모바일.jpg",
+      bgGradient: "from-green-600 to-emerald-600",
+      link: "https://relay.ssobig.com/mlsami",
+    },
+    {
       title1: "황후마마의 죽음,",
       title2: "그 원인은 궁 안에 있다.",
       subtitle:
@@ -257,7 +266,7 @@ export default function PlayroomPage() {
       bgImage: "/ssobig_assets/playroom/히어로_황후마마_데스크톱.jpg",
       mobileImage: "/ssobig_assets/playroom/히어로_황후마마_모바일.jpg",
       bgGradient: "from-red-600 to-pink-600",
-      link: "https://tumblbug.com/ssobig003",
+      link: "https://tool.ssobig.com/templates/d20f00fd",
     },
     {
       title1: "당신의 선택으로 완성되는",
@@ -266,7 +275,7 @@ export default function PlayroomPage() {
       bgImage: "/ssobig_assets/playroom/히어로_기억 속의 너_데스크톱.jpg",
       mobileImage: "/ssobig_assets/playroom/히어로_기억 속의 너_모바일.jpg",
       bgGradient: "from-blue-600 to-cyan-600",
-      link: "https://tumblbug.com/ssobig001",
+      link: "https://tool.ssobig.com/templates/0bb6fcf7",
     },
     {
       title1: "우주선에 선장이 죽었다",
@@ -275,7 +284,7 @@ export default function PlayroomPage() {
       bgImage: "/ssobig_assets/playroom/히어로_도플갱어_데스크톱.jpg",
       mobileImage: "/ssobig_assets/playroom/히어로_도플갱어_모바일.jpg",
       bgGradient: "from-indigo-600 to-purple-600",
-      link: "https://tumblbug.com/ssobig002",
+      link: "https://tool.ssobig.com/templates/3e7a2f6e",
     },
   ];
 
@@ -416,7 +425,7 @@ export default function PlayroomPage() {
             description: "황후마마의 죽음,\n그 원인은 궁 안에 있다.",
             players: "7인, 120분",
             price: "사전예약 진행중",
-            link: "https://tumblbug.com/ssobig003",
+            link: "https://tool.ssobig.com/templates/d20f00fd",
           },
           {
             image: "/ssobig_assets/playroom/백설공주와독사과.jpg",
@@ -484,40 +493,6 @@ export default function PlayroomPage() {
             players: "2~10인",
             price: "무료",
             link: "https://tool.ssobig.com/templates/93fa153c",
-          },
-        ]}
-      />
-
-      {/* 쏘빅툴 체험해보기 */}
-      <ContentRow
-        title="쏘빅툴 체험해보기"
-        cardSize="small"
-        mobileGap={12}
-        imageFit="contain"
-        items={[
-          {
-            image: "/ssobig_assets/playroom/자리배치.jpg",
-            title: "자리배치",
-            description: "공정하고 효율적인\n팀 나누기 도구",
-            players: "2~100인",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/af3a987f",
-          },
-          {
-            image: "/ssobig_assets/playroom/즉석 투표하기.jpg",
-            title: "즉석 투표하기",
-            description: "빠르고 간편한\n실시간 투표 도구",
-            players: "무제한",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/248df6bf",
-          },
-          {
-            image: "/ssobig_assets/playroom/가중치 투표.jpg",
-            title: "가중치 투표",
-            description: "중요도를 반영한\n스마트 투표 시스템",
-            players: "무제한",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/d2e0b7ac",
           },
         ]}
       />
