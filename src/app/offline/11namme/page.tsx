@@ -120,7 +120,19 @@ const ElevenNammePage = () => {
           status: item.status || "",
         };
       })
-      .filter((item): item is ScheduleItem => item !== null);
+      .filter((item): item is ScheduleItem => item !== null)
+      .sort((a, b) => {
+        const parseDate = (item: ScheduleItem) => {
+          const dateMatch = item.date.match(/(\d+)\/(\d+)/);
+          const timeMatch = item.title.match(/^(\d+):(\d+)/);
+          const month = dateMatch ? parseInt(dateMatch[1]) : 0;
+          const day = dateMatch ? parseInt(dateMatch[2]) : 0;
+          const hour = timeMatch ? parseInt(timeMatch[1]) : 0;
+          const minute = timeMatch ? parseInt(timeMatch[2]) : 0;
+          return month * 100000 + day * 1000 + hour * 60 + minute;
+        };
+        return parseDate(a) - parseDate(b);
+      });
   };
 
   // 폴백 데이터 (API 실패 시 사용)
