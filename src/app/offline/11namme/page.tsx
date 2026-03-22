@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { useState, useEffect } from "react";
-import DayNammeApplyFlow from "@/components/day-nammae/DayNammeApplyFlow";
+import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
 import { useDayNammeSchedule } from "@/features/day-nammae/useDayNammeSchedule";
 import { ScheduleItem } from "@/features/day-nammae/types";
 
@@ -410,7 +410,7 @@ const ElevenNammePage = () => {
               className="absolute inset-0 bg-black/55 backdrop-blur-sm"
               aria-label="신청 창 닫기"
             />
-            <DayNammeApplyFlow
+            <LoveBuddiesApplyFlow
               mode="modal"
               scheduleData={scheduleData}
               isLoadingSchedules={isLoading}
