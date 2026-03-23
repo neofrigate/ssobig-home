@@ -229,6 +229,24 @@ export default function LoveBuddiesApplyFlow({
         gender: formValues.gender,
         schedule: formValues.schedule,
       });
+
+      if (typeof window !== "undefined" && window.fbq) {
+        const phoneDigits = formValues.phone.replace(/\D/g, "");
+        const metaPhone = "82" + phoneDigits.slice(1);
+        const metaGender = formValues.gender === "남" ? "m" : "f";
+        const metaBirthDate = formValues.birthYear + "0101";
+
+        window.fbq("init", "1541266446734040", {
+          fn: formValues.name.toLowerCase(),
+          ph: metaPhone,
+          db: metaBirthDate,
+          ge: metaGender,
+        });
+        window.fbq("track", "CompleteRegistration", {
+          content_name: "일일남매",
+        });
+      }
+
       setSubmitState({
         status: "success",
         message: "신청이 정상적으로 접수되었습니다. 검토 후 안내 메시지를 보내드릴게요.",
