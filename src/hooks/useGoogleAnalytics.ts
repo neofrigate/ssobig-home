@@ -8,6 +8,10 @@ export default function useGoogleAnalytics() {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (pathname === "/offline/11namme/apply") {
+      return;
+    }
+
     if (pathname && typeof window !== "undefined") {
       // window.location을 직접 사용하여 searchParams 열거 방지
       // pathname과 window.location.search를 결합하여 전체 URL 생성

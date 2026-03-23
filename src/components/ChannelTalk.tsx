@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 declare global {
   interface Window {
@@ -11,8 +12,11 @@ declare global {
 
 export default function ChannelTalk() {
   const initialized = useRef(false);
+  const pathname = usePathname();
+  const isDayNammeApplyPage = pathname === "/offline/11namme/apply";
 
   useEffect(() => {
+    if (isDayNammeApplyPage) return;
     if (initialized.current) return;
     initialized.current = true;
 
@@ -44,7 +48,7 @@ export default function ChannelTalk() {
         window.ChannelIO("shutdown");
       }
     };
-  }, []);
+  }, [isDayNammeApplyPage]);
 
   return null;
 }
