@@ -1,20 +1,114 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "www.facebook.com",
+        port: "",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: '*.amazonaws.com',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "prod-files-secure.s3.us-west-2.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.s3.us-west-2.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.amazonaws.com",
+        port: "",
+        pathname: "/**",
       },
     ],
+    unoptimized: false,
+  },
+  allowedDevOrigins: [
+    "https://undepressive-makenzie-supernaturally.ngrok-free.dev",
+  ],
+  async redirects() {
+    return [
+      {
+        source: "/brand/love_buddies",
+        destination: "/socialing/love-buddies",
+        permanent: true,
+      },
+      {
+        source: "/brand/love_buddies/detail",
+        destination: "/offline/11namme",
+        permanent: true,
+      },
+      {
+        source: "/brand/love_buddies/alpha",
+        destination: "/offline/manito",
+        permanent: true,
+      },
+      {
+        source: "/offline/alpha",
+        destination: "/offline/manito",
+        permanent: true,
+      },
+      {
+        source: "/brand/game_orb",
+        destination: "/socialing/game-orb",
+        permanent: true,
+      },
+      {
+        source: "/brand/game_orb/real_genius",
+        destination: "/offline/mafia",
+        permanent: true,
+      },
+      {
+        source: "/offline/social_genius",
+        destination: "/offline/mafia",
+        permanent: true,
+      },
+      {
+        source: "/socialing/love-buddies/11namme",
+        destination: "/offline/11namme",
+        permanent: true,
+      },
+      {
+        source: "/socialing/love-buddies/alpha",
+        destination: "/offline/manito",
+        permanent: true,
+      },
+      {
+        source: "/socialing/game-orb/social_genius",
+        destination: "/offline/mafia",
+        permanent: true,
+      },
+      {
+        source: "/lovebuddies",
+        destination: "https://www.ssobig.com/offline/11namme",
+        permanent: true,
+      },
+      {
+        source: "/realgenius",
+        destination: "https://www.ssobig.com/offline/mafia",
+        permanent: true,
+      },
+      {
+        source: "/manito",
+        destination: "https://www.ssobig.com/offline/manito",
+        permanent: true,
+      },
+    ];
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: "ice-crusher",
+  project: "ssobig-home",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+});

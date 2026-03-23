@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { DAY_NAMMAE_NOTICE_SECTIONS } from "@/features/day-nammae/constants";
@@ -77,6 +78,8 @@ interface SubmitState {
 }
 
 const TOTAL_STEPS = 7;
+const DEFAULT_SUBMIT_ERROR_MESSAGE =
+  "신청서 제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
 
 const INITIAL_FORM_VALUES: DayNammeFormValues = {
   gender: "",
@@ -88,6 +91,78 @@ const INITIAL_FORM_VALUES: DayNammeFormValues = {
   traits: "",
   photo: null,
 };
+
+function buildSubmitErrorMessage(requestId?: string) {
+  if (!requestId) {
+    return DEFAULT_SUBMIT_ERROR_MESSAGE;
+  }
+
+  return `${DEFAULT_SUBMIT_ERROR_MESSAGE} 문의 코드: ${requestId}`;
+}
+
+function buildClientDebugContext(photo: File | null) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return {
+    submittedAt: new Date().toISOString(),
+    pageUrl: window.location.href,
+    referrer: document.referrer,
+    userAgent: window.navigator.userAgent,
+    viewport: `${window.innerWidth}x${window.innerHeight}`,
+    photoName: photo?.name || "",
+    photoType: photo?.type || "",
+    photoSize: photo?.size || 0,
+    photoLastModified: photo?.lastModified || 0,
+  };
+}
+
+function getResponseRequestId(result: unknown) {
+  if (!result || typeof result !== "object") {
+    return "";
+  }
+
+  const requestId = (result as { requestId?: unknown }).requestId;
+  return typeof requestId === "string" ? requestId : "";
+}
+
+function getResponseUserMessage(result: unknown) {
+  if (!result || typeof result !== "object") {
+    return "";
+  }
+
+  const userMessage = (result as { userMessage?: unknown }).userMessage;
+  return typeof userMessage === "string" ? userMessage : "";
+}
+
+function createHandledSubmitError(message: string, requestId = "") {
+  const error = new Error(message) as Error & {
+    alreadyReported?: boolean;
+    requestId?: string;
+  };
+
+  error.alreadyReported = Boolean(requestId);
+  error.requestId = requestId;
+  return error;
+}
+
+function getHandledSubmitErrorState(error: unknown) {
+  if (!(error instanceof Error)) {
+    return { alreadyReported: false, requestId: "" };
+  }
+
+  const errorWithMeta = error as Error & {
+    alreadyReported?: boolean;
+    requestId?: string;
+  };
+
+  return {
+    alreadyReported: Boolean(errorWithMeta.alreadyReported),
+    requestId:
+      typeof errorWithMeta.requestId === "string" ? errorWithMeta.requestId : "",
+  };
+}
 
 function formatPhoneNumber(value: string) {
   const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -246,19 +321,30 @@ export default function LoveBuddiesApplyFlow({
       requestBody.append("utm_medium", urlSearchParams.get("utm_medium") || "");
       requestBody.append("utm_content", urlSearchParams.get("utm_content") || "");
 
+      const clientDebugContext = buildClientDebugContext(formValues.photo);
+      if (clientDebugContext) {
+        requestBody.append("debug_client_context", JSON.stringify(clientDebugContext));
+      }
+
       const response = await fetch("/api/offline/day-nammae/apply", {
         method: "POST",
         body: requestBody,
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(
-          typeof result?.error === "string"
-            ? result.error
-            : "신청서를 제출하지 못했습니다."
-        );
+        const requestId = getResponseRequestId(result);
+        const userMessage =
+          getResponseUserMessage(result) || buildSubmitErrorMessage(requestId);
+
+        console.error("[day-nammae submit failed]", {
+          requestId,
+          result,
+          clientDebugContext,
+        });
+
+        throw createHandledSubmitError(userMessage, requestId);
       }
 
       trackEvent("DN_SubmitApplication", {
@@ -272,10 +358,26 @@ export default function LoveBuddiesApplyFlow({
         message: "신청이 정상적으로 접수되었습니다. 검토 후 안내 메시지를 보내드릴게요.",
       });
     } catch (error) {
+      const { alreadyReported, requestId } = getHandledSubmitErrorState(error);
+
+      if (!alreadyReported) {
+        Sentry.withScope((scope) => {
+          scope.setTag("feature", "day-nammae-apply");
+          if (requestId) {
+            scope.setTag("request_id", requestId);
+          }
+          scope.setContext("submit_client_context", buildClientDebugContext(formValues.photo));
+          Sentry.captureException(
+            error instanceof Error ? error : new Error("Unknown client submit error")
+          );
+        });
+      }
+
+      console.error("[day-nammae submit exception]", error);
       setSubmitState({
         status: "error",
         message:
-          error instanceof Error ? error.message : "신청서를 제출하지 못했습니다.",
+          error instanceof Error ? error.message : buildSubmitErrorMessage(requestId),
       });
     }
   };
