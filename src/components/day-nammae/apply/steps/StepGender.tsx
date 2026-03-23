@@ -15,7 +15,7 @@ export default function StepGender({ gender, onSelect }: StepGenderProps) {
             key={option}
             type="button"
             onClick={() => onSelect(option)}
-            className={`rounded-2xl border px-5 py-6 text-left transition ${
+            className={`rounded-2xl border px-5 py-6 text-left transition [touch-action:manipulation] ${
               selected
                 ? isFemale
                   ? "border-[#FF69B4] bg-[#FF69B4]/15 text-[#FFB1D4]"

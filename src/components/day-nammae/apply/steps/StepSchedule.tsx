@@ -57,7 +57,7 @@ export default function StepSchedule({
             type="button"
             disabled={!selectable}
             onClick={() => onSelect(label)}
-            className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
+            className={`w-full rounded-2xl border px-4 py-4 text-left transition [touch-action:manipulation] ${
               selected
                 ? "border-[#FF6B9F] bg-[#FF6B9F]/15"
                 : selectable

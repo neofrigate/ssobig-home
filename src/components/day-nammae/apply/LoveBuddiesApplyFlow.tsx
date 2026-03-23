@@ -174,11 +174,15 @@ export default function LoveBuddiesApplyFlow({
       return { ...current, gender, schedule: nextSchedule };
     });
     setFormError("");
+    setShowFieldErrors(false);
+    setCurrentStep(2);
   };
 
   const handleScheduleSelect = (scheduleLabel: string) => {
     setFormValues((current) => ({ ...current, schedule: scheduleLabel }));
     setFormError("");
+    setShowFieldErrors(false);
+    setCurrentStep(3);
   };
 
   const handleBirthYearSelect = (year: string) => {
@@ -326,6 +330,7 @@ export default function LoveBuddiesApplyFlow({
 
     return (
       <ApplyStepShell
+        mode={mode}
         currentStep={TOTAL_STEPS}
         totalSteps={TOTAL_STEPS}
         title="결제를 진행해주세요"
@@ -383,6 +388,7 @@ export default function LoveBuddiesApplyFlow({
 
   return (
     <ApplyStepShell
+      mode={mode}
       currentStep={currentStep}
       totalSteps={TOTAL_STEPS}
       title={stepConfig.title}

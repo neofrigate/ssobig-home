@@ -3,6 +3,7 @@
 import Image from "next/image";
 
 interface ApplyStepShellProps {
+  mode: "modal" | "page";
   currentStep: number;
   totalSteps: number;
   title: string;
@@ -17,6 +18,7 @@ interface ApplyStepShellProps {
 }
 
 export default function ApplyStepShell({
+  mode,
   currentStep,
   totalSteps,
   title,
@@ -30,21 +32,39 @@ export default function ApplyStepShell({
   children,
 }: ApplyStepShellProps) {
   const progressPercent = (currentStep / totalSteps) * 100;
+  const shellClassName =
+    mode === "modal"
+      ? "relative flex w-full max-w-[560px] flex-col overflow-hidden rounded-[32px] bg-black md:max-h-[90vh]"
+      : "relative flex min-h-[100dvh] w-full flex-col overflow-x-hidden bg-black";
+  const scrollAreaClassName =
+    mode === "modal"
+      ? `relative z-10 flex-1 overflow-y-auto pb-24 ${
+          hideNav ? "flex flex-col justify-center" : ""
+        }`
+      : `relative z-10 flex-1 pb-24 ${hideNav ? "flex flex-col justify-center" : ""}`;
+  const navClassName =
+    mode === "modal"
+      ? "relative z-20 shrink-0 px-5 pb-8 pt-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent"
+      : "sticky bottom-0 z-20 mt-auto px-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent";
+  const headerClassName =
+    mode === "modal"
+      ? "relative z-20 shrink-0"
+      : "sticky top-0 z-20 shrink-0 bg-gradient-to-b from-black/95 via-black/80 to-transparent";
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-black">
+    <div className={shellClassName}>
       {/* Background image - always fixed */}
       <Image
         src="/ssobig_assets/lovebuddies/hero-main.jpg"
         alt=""
         fill
-        className="object-cover opacity-40"
+        className="pointer-events-none object-cover opacity-40"
         priority
       />
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="pointer-events-none absolute inset-0 bg-black/50" />
 
       {/* Fixed top: Progress bar + Logo */}
-      {!hideNav && <div className="relative z-20 shrink-0">
+      {!hideNav && <div className={headerClassName}>
         <div className="h-[8px] w-full bg-white/10">
           <div
             className="h-full bg-[#FF6B9F] transition-[width] duration-300"
@@ -66,7 +86,7 @@ export default function ApplyStepShell({
       </div>}
 
       {/* Scrollable area: Title + Content */}
-      <div className={`relative z-10 flex-1 overflow-y-auto pb-24 ${hideNav ? "flex flex-col justify-center" : ""}`}>
+      <div className={scrollAreaClassName}>
         {/* Title */}
         <div className={`mx-auto w-full max-w-[520px] px-5 pt-4 pb-2 ${hideNav ? "text-center" : ""}`}>
           <h1 className="text-[26px] leading-tight font-black text-white">
@@ -86,14 +106,14 @@ export default function ApplyStepShell({
       </div>
 
       {/* Fixed bottom navigation */}
-      {!hideNav && <div className="relative z-20 shrink-0 px-5 pb-8 pt-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+      {!hideNav && <div className={navClassName}>
         <div className="mx-auto flex max-w-[520px] items-center gap-3">
           <button
-              type="button"
-              onClick={onBack}
-              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition active:scale-95"
-              aria-label="이전 단계"
-            >
+            type="button"
+            onClick={onBack}
+            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition active:scale-95 [touch-action:manipulation]"
+            aria-label="이전 단계"
+          >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
@@ -113,7 +133,7 @@ export default function ApplyStepShell({
             type="button"
             disabled={!canProceed || isSubmitting}
             onClick={onNext}
-            className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98] disabled:bg-[#FF6B9F]/40 disabled:text-white/50"
+            className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98] disabled:bg-[#FF6B9F]/40 disabled:text-white/50 [touch-action:manipulation]"
           >
             {isSubmitting
               ? "제출하는 중..."
