@@ -12,47 +12,21 @@ import {
   DayNammeFormValues,
   ScheduleItem,
 } from "@/features/day-nammae/types";
+import {
+  safeFbq,
+} from "@/utils/metaPixel";
 import { getSafeSearchParams } from "@/utils/utm";
 import ApplyStepShell from "./ApplyStepShell";
-
-declare global {
-  interface Window {
-    fbq?: (...args: unknown[]) => void;
-  }
-}
-
-function safeFbq(...args: unknown[]) {
-  if (typeof window === "undefined" || !window.fbq) {
-    return;
-  }
-
-  try {
-    window.fbq(...args);
-  } catch (error) {
-    console.error("Meta Pixel 호출 실패:", error);
-  }
-}
 
 function trackEvent(eventName: string, params?: Record<string, unknown>) {
   safeFbq("trackCustom", eventName, params);
 }
 
-function trackCompleteRegistration(formValues: DayNammeFormValues) {
+function trackCompleteRegistration() {
   if (typeof window === "undefined") {
     return;
   }
 
-  const phoneDigits = formValues.phone.replace(/\D/g, "");
-  const metaPhone = phoneDigits.length === 11 ? `82${phoneDigits.slice(1)}` : "";
-  const metaGender = formValues.gender === "남" ? "m" : "f";
-  const metaBirthDate = `${formValues.birthYear}0101`;
-
-  safeFbq("init", "1541266446734040", {
-    fn: formValues.name.toLowerCase(),
-    ph: metaPhone,
-    db: metaBirthDate,
-    ge: metaGender,
-  });
   safeFbq("track", "CompleteRegistration", {
     content_name: "일일남매",
   });
@@ -715,7 +689,7 @@ export default function LoveBuddiesApplyFlow({
         gender: formValues.gender,
         schedule: formValues.schedule,
       });
-      trackCompleteRegistration(formValues);
+      trackCompleteRegistration();
 
       setSubmitState({
         status: "success",
