@@ -1,5 +1,7 @@
 // Google Analytics 이벤트 추적 함수들
 
+import { getSafeSearchParams } from "./utm";
+
 declare global {
   interface Window {
     gtag: (
@@ -20,7 +22,7 @@ const setUtmUserProperties = () => {
   const utmAlreadySet = sessionStorage.getItem("utm_properties_set");
   if (utmAlreadySet) return;
 
-  const urlParams = new URLSearchParams(window.location.search);
+  const urlParams = getSafeSearchParams(window.location.search);
   const utmSource = urlParams.get("utm_source");
   const utmMedium = urlParams.get("utm_medium");
   const utmCampaign = urlParams.get("utm_campaign");

@@ -15,6 +15,51 @@ const UTM_PARAMS = [
   "utm_name",
 ];
 
+function safeDecodeQueryComponent(value: string) {
+  const normalizedValue = value.replace(/\+/g, " ");
+
+  try {
+    return decodeURIComponent(normalizedValue);
+  } catch {
+    return normalizedValue;
+  }
+}
+
+export const getSafeSearchParams = (search = ""): URLSearchParams => {
+  const normalizedSearch = search.startsWith("?") ? search.slice(1) : search;
+
+  try {
+    return new URLSearchParams(normalizedSearch);
+  } catch (error) {
+    console.warn("검색 파라미터 파싱 실패, 안전 파서로 대체합니다.", error);
+
+    const fallbackParams = new URLSearchParams();
+
+    if (!normalizedSearch) {
+      return fallbackParams;
+    }
+
+    for (const pair of normalizedSearch.split("&")) {
+      if (!pair) {
+        continue;
+      }
+
+      const separatorIndex = pair.indexOf("=");
+      const rawKey = separatorIndex === -1 ? pair : pair.slice(0, separatorIndex);
+      const rawValue = separatorIndex === -1 ? "" : pair.slice(separatorIndex + 1);
+      const key = safeDecodeQueryComponent(rawKey);
+
+      if (!key) {
+        continue;
+      }
+
+      fallbackParams.append(key, safeDecodeQueryComponent(rawValue));
+    }
+
+    return fallbackParams;
+  }
+};
+
 /**
  * 현재 URL에서 UTM 파라미터를 추출
  */
@@ -22,11 +67,11 @@ export const extractUtmParams = (): Record<string, string> => {
   // 브라우저 환경이 아니면 빈 객체 반환
   if (typeof window === "undefined") return {};
 
-  const url = new URL(window.location.href);
+  const searchParams = getSafeSearchParams(window.location.search);
   const utmParams: Record<string, string> = {};
 
   UTM_PARAMS.forEach((param) => {
-    const value = url.searchParams.get(param);
+    const value = searchParams.get(param);
     if (value) {
       utmParams[param] = value;
     }

@@ -16,6 +16,7 @@ import {
   DayNammeFormValues,
   ScheduleItem,
 } from "@/features/day-nammae/types";
+import { getSafeSearchParams } from "@/utils/utm";
 
 type ApplyFlowMode = "modal" | "page";
 
@@ -241,7 +242,7 @@ export default function DayNammeApplyFlow({
     try {
       const urlSearchParams =
         typeof window !== "undefined"
-          ? new URLSearchParams(window.location.search)
+          ? getSafeSearchParams(window.location.search)
           : new URLSearchParams();
       const requestBody = new FormData();
       requestBody.append("gender", formValues.gender);

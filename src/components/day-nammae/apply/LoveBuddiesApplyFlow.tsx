@@ -11,6 +11,7 @@ import {
   DayNammeFormValues,
   ScheduleItem,
 } from "@/features/day-nammae/types";
+import { getSafeSearchParams } from "@/utils/utm";
 import ApplyStepShell from "./ApplyStepShell";
 
 declare global {
@@ -22,6 +23,31 @@ declare global {
 function trackEvent(eventName: string, params?: Record<string, unknown>) {
   if (typeof window !== "undefined" && window.fbq) {
     window.fbq("trackCustom", eventName, params);
+  }
+}
+
+function trackCompleteRegistration(formValues: DayNammeFormValues) {
+  if (typeof window === "undefined" || !window.fbq) {
+    return;
+  }
+
+  const phoneDigits = formValues.phone.replace(/\D/g, "");
+  const metaPhone = phoneDigits.length === 11 ? `82${phoneDigits.slice(1)}` : "";
+  const metaGender = formValues.gender === "남" ? "m" : "f";
+  const metaBirthDate = `${formValues.birthYear}0101`;
+
+  try {
+    window.fbq("init", "1541266446734040", {
+      fn: formValues.name.toLowerCase(),
+      ph: metaPhone,
+      db: metaBirthDate,
+      ge: metaGender,
+    });
+    window.fbq("track", "CompleteRegistration", {
+      content_name: "일일남매",
+    });
+  } catch (error) {
+    console.error("Meta Pixel CompleteRegistration 추적 실패:", error);
   }
 }
 import StepGender from "./steps/StepGender";
@@ -195,7 +221,7 @@ export default function LoveBuddiesApplyFlow({
     try {
       const urlSearchParams =
         typeof window !== "undefined"
-          ? new URLSearchParams(window.location.search)
+          ? getSafeSearchParams(window.location.search)
           : new URLSearchParams();
       const requestBody = new FormData();
       requestBody.append("gender", formValues.gender);
@@ -229,23 +255,7 @@ export default function LoveBuddiesApplyFlow({
         gender: formValues.gender,
         schedule: formValues.schedule,
       });
-
-      if (typeof window !== "undefined" && window.fbq) {
-        const phoneDigits = formValues.phone.replace(/\D/g, "");
-        const metaPhone = "82" + phoneDigits.slice(1);
-        const metaGender = formValues.gender === "남" ? "m" : "f";
-        const metaBirthDate = formValues.birthYear + "0101";
-
-        window.fbq("init", "1541266446734040", {
-          fn: formValues.name.toLowerCase(),
-          ph: metaPhone,
-          db: metaBirthDate,
-          ge: metaGender,
-        });
-        window.fbq("track", "CompleteRegistration", {
-          content_name: "일일남매",
-        });
-      }
+      trackCompleteRegistration(formValues);
 
       setSubmitState({
         status: "success",
