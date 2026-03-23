@@ -12,7 +12,7 @@ interface StepProfileProps {
 }
 
 function inputClass(hasError: boolean) {
-  return `mt-2 h-12 w-full rounded-xl border bg-[#21161a] px-4 text-sm text-white placeholder:text-white/25 outline-none transition focus:border-[#FF6B9F]/60 ${
+  return `mt-2 h-12 w-full rounded-xl border bg-[#21161a] px-4 text-base md:text-sm text-white placeholder:text-white/25 outline-none transition focus:border-[#FF6B9F]/60 ${
     hasError ? "border-red-500" : "border-[#2c2024]"
   }`;
 }
@@ -44,6 +44,7 @@ export default function StepProfile({
           value={formValues.name}
           onChange={onValueChange("name")}
           placeholder="이름을 입력하세요"
+          autoComplete="name"
           className={inputClass(errors.name)}
         />
         {errors.name && (
@@ -88,6 +89,7 @@ export default function StepProfile({
           onChange={onValueChange("height")}
           inputMode="numeric"
           placeholder="키를 입력하세요"
+          enterKeyHint="next"
           className={inputClass(errors.height)}
         />
         {errors.height && (
@@ -105,6 +107,8 @@ export default function StepProfile({
           onChange={onValueChange("phone")}
           inputMode="tel"
           placeholder="010-0000-0000"
+          autoComplete="tel"
+          enterKeyHint="next"
           className={inputClass(errors.phone)}
         />
         {errors.phone && (
@@ -122,7 +126,8 @@ export default function StepProfile({
           onChange={onValueChange("traits")}
           placeholder="ex - 웃상, MBTI는 ENFP, 여유로운 편"
           rows={4}
-          className={`mt-2 w-full rounded-xl border bg-[#21161a] px-4 py-3 text-sm text-white placeholder:text-white/25 outline-none transition focus:border-[#FF6B9F]/60 ${
+          enterKeyHint="done"
+          className={`mt-2 w-full rounded-xl border bg-[#21161a] px-4 py-3 text-base md:text-sm text-white placeholder:text-white/25 outline-none transition focus:border-[#FF6B9F]/60 ${
             errors.traits ? "border-red-500" : "border-[#2c2024]"
           }`}
         />
