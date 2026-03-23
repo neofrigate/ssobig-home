@@ -78,8 +78,21 @@ interface SubmitState {
 }
 
 const TOTAL_STEPS = 7;
+const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
+const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
 const DEFAULT_SUBMIT_ERROR_MESSAGE =
   "신청서 제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
+
+interface SubmitResponseMeta {
+  requestId: string;
+  clientRequestId: string;
+  userMessage: string;
+  responseStatus: number;
+  responseContentType: string;
+  responseTextSnippet: string;
+  responseUrl: string;
+  parseError: string;
+}
 
 const INITIAL_FORM_VALUES: DayNammeFormValues = {
   gender: "",
@@ -92,20 +105,41 @@ const INITIAL_FORM_VALUES: DayNammeFormValues = {
   photo: null,
 };
 
-function buildSubmitErrorMessage(requestId?: string) {
-  if (!requestId) {
+function buildSubmitErrorMessage(supportCode?: string) {
+  if (!supportCode) {
     return DEFAULT_SUBMIT_ERROR_MESSAGE;
   }
 
-  return `${DEFAULT_SUBMIT_ERROR_MESSAGE} 문의 코드: ${requestId}`;
+  return `${DEFAULT_SUBMIT_ERROR_MESSAGE} 문의 코드: ${supportCode}`;
 }
 
-function buildClientDebugContext(photo: File | null) {
+function createClientRequestId() {
+  return `cdn-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes >= 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+  }
+
+  if (bytes >= 1024) {
+    return `${Math.round(bytes / 1024)}KB`;
+  }
+
+  return `${bytes}B`;
+}
+
+function buildPhotoTooLargeMessage(size: number) {
+  return `사진 용량은 ${MAX_PHOTO_FILE_SIZE_LABEL} 이하만 업로드할 수 있습니다. 현재 파일은 ${formatFileSize(size)}입니다. 용량을 줄인 뒤 다시 시도해주세요.`;
+}
+
+function buildClientDebugContext(photo: File | null, clientRequestId = "") {
   if (typeof window === "undefined") {
     return null;
   }
 
   return {
+    clientRequestId,
     submittedAt: new Date().toISOString(),
     pageUrl: window.location.href,
     referrer: document.referrer,
@@ -127,6 +161,15 @@ function getResponseRequestId(result: unknown) {
   return typeof requestId === "string" ? requestId : "";
 }
 
+function getResponseClientRequestId(result: unknown) {
+  if (!result || typeof result !== "object") {
+    return "";
+  }
+
+  const clientRequestId = (result as { clientRequestId?: unknown }).clientRequestId;
+  return typeof clientRequestId === "string" ? clientRequestId : "";
+}
+
 function getResponseUserMessage(result: unknown) {
   if (!result || typeof result !== "object") {
     return "";
@@ -136,31 +179,162 @@ function getResponseUserMessage(result: unknown) {
   return typeof userMessage === "string" ? userMessage : "";
 }
 
-function createHandledSubmitError(message: string, requestId = "") {
+function summarizeResponseText(text: string) {
+  const normalizedText = text.replace(/\s+/g, " ").trim();
+
+  if (normalizedText.length <= 280) {
+    return normalizedText;
+  }
+
+  return `${normalizedText.slice(0, 277)}...`;
+}
+
+async function parseSubmitResponse(response: Response): Promise<{
+  result: unknown;
+  meta: SubmitResponseMeta;
+}> {
+  const responseContentType = response.headers.get("content-type") || "";
+  const rawText = await response.text();
+  let result: unknown = null;
+  let parseError = "";
+
+  if (rawText) {
+    try {
+      result = JSON.parse(rawText);
+    } catch (error) {
+      if (responseContentType.includes("application/json")) {
+        parseError = error instanceof Error ? error.message : String(error);
+      }
+    }
+  }
+
+  return {
+    result,
+    meta: {
+      requestId:
+        getResponseRequestId(result) ||
+        response.headers.get("x-ssobig-request-id") ||
+        "",
+      clientRequestId:
+        getResponseClientRequestId(result) ||
+        response.headers.get("x-ssobig-client-request-id") ||
+        "",
+      userMessage: getResponseUserMessage(result),
+      responseStatus: response.status,
+      responseContentType,
+      responseTextSnippet: summarizeResponseText(rawText),
+      responseUrl: response.url,
+      parseError,
+    },
+  };
+}
+
+function buildResponseFailureMessage(
+  meta: SubmitResponseMeta,
+  photo: File | null
+) {
+  const supportCode = meta.requestId || meta.clientRequestId;
+
+  if (meta.userMessage) {
+    return meta.userMessage;
+  }
+
+  if (meta.responseStatus === 413) {
+    return `${buildPhotoTooLargeMessage(photo?.size || 0)} 문의 코드: ${supportCode || "upload-too-large"}`;
+  }
+
+  return buildSubmitErrorMessage(supportCode);
+}
+
+function createHandledSubmitError(
+  message: string,
+  options: {
+    requestId?: string;
+    clientRequestId?: string;
+    responseStatus?: number;
+    responseContentType?: string;
+    responseTextSnippet?: string;
+    responseUrl?: string;
+    parseError?: string;
+    stage?: string;
+  } = {}
+) {
   const error = new Error(message) as Error & {
     alreadyReported?: boolean;
     requestId?: string;
+    clientRequestId?: string;
+    responseStatus?: number;
+    responseContentType?: string;
+    responseTextSnippet?: string;
+    responseUrl?: string;
+    parseError?: string;
+    stage?: string;
   };
 
-  error.alreadyReported = Boolean(requestId);
-  error.requestId = requestId;
+  error.alreadyReported = Boolean(options.requestId);
+  error.requestId = options.requestId || "";
+  error.clientRequestId = options.clientRequestId || "";
+  error.responseStatus = options.responseStatus;
+  error.responseContentType = options.responseContentType || "";
+  error.responseTextSnippet = options.responseTextSnippet || "";
+  error.responseUrl = options.responseUrl || "";
+  error.parseError = options.parseError || "";
+  error.stage = options.stage || "";
   return error;
 }
 
 function getHandledSubmitErrorState(error: unknown) {
   if (!(error instanceof Error)) {
-    return { alreadyReported: false, requestId: "" };
+    return {
+      alreadyReported: false,
+      requestId: "",
+      clientRequestId: "",
+      responseStatus: 0,
+      responseContentType: "",
+      responseTextSnippet: "",
+      responseUrl: "",
+      parseError: "",
+      stage: "",
+    };
   }
 
   const errorWithMeta = error as Error & {
     alreadyReported?: boolean;
     requestId?: string;
+    clientRequestId?: string;
+    responseStatus?: number;
+    responseContentType?: string;
+    responseTextSnippet?: string;
+    responseUrl?: string;
+    parseError?: string;
+    stage?: string;
   };
 
   return {
     alreadyReported: Boolean(errorWithMeta.alreadyReported),
     requestId:
       typeof errorWithMeta.requestId === "string" ? errorWithMeta.requestId : "",
+    clientRequestId:
+      typeof errorWithMeta.clientRequestId === "string"
+        ? errorWithMeta.clientRequestId
+        : "",
+    responseStatus:
+      typeof errorWithMeta.responseStatus === "number"
+        ? errorWithMeta.responseStatus
+        : 0,
+    responseContentType:
+      typeof errorWithMeta.responseContentType === "string"
+        ? errorWithMeta.responseContentType
+        : "",
+    responseTextSnippet:
+      typeof errorWithMeta.responseTextSnippet === "string"
+        ? errorWithMeta.responseTextSnippet
+        : "",
+    responseUrl:
+      typeof errorWithMeta.responseUrl === "string" ? errorWithMeta.responseUrl : "",
+    parseError:
+      typeof errorWithMeta.parseError === "string" ? errorWithMeta.parseError : "",
+    stage: typeof errorWithMeta.stage === "string" ? errorWithMeta.stage : "",
   };
 }
 
@@ -233,6 +407,12 @@ export default function LoveBuddiesApplyFlow({
       setFormError("사진은 이미지 파일만 업로드할 수 있습니다.");
       return;
     }
+    if (file && file.size > MAX_PHOTO_FILE_SIZE_BYTES) {
+      setFormValues((current) => ({ ...current, photo: null }));
+      setFormError(buildPhotoTooLargeMessage(file.size));
+      event.target.value = "";
+      return;
+    }
     setFormValues((current) => ({ ...current, photo: file }));
     setFormError("");
   };
@@ -303,6 +483,10 @@ export default function LoveBuddiesApplyFlow({
     setSubmitState({ status: "submitting", message: "" });
     setFormError("");
 
+    const clientRequestId = createClientRequestId();
+    const clientDebugContext = buildClientDebugContext(formValues.photo, clientRequestId);
+    let submitStage = "client:prepare";
+
     try {
       const urlSearchParams =
         typeof window !== "undefined"
@@ -320,33 +504,54 @@ export default function LoveBuddiesApplyFlow({
       requestBody.append("utm_source", urlSearchParams.get("utm_source") || "");
       requestBody.append("utm_medium", urlSearchParams.get("utm_medium") || "");
       requestBody.append("utm_content", urlSearchParams.get("utm_content") || "");
-
-      const clientDebugContext = buildClientDebugContext(formValues.photo);
+      requestBody.append("client_request_id", clientRequestId);
       if (clientDebugContext) {
         requestBody.append("debug_client_context", JSON.stringify(clientDebugContext));
       }
 
+      submitStage = "client:fetch:start";
       const response = await fetch("/api/offline/day-nammae/apply", {
         method: "POST",
         body: requestBody,
       });
 
-      const result = await response.json().catch(() => null);
+      submitStage = "client:response:received";
+      const { result, meta } = await parseSubmitResponse(response);
+      submitStage = meta.parseError
+        ? "client:response:parse_error"
+        : "client:response:parsed";
 
       if (!response.ok) {
-        const requestId = getResponseRequestId(result);
-        const userMessage =
-          getResponseUserMessage(result) || buildSubmitErrorMessage(requestId);
+        submitStage = "client:response:not_ok";
+        const requestId = meta.requestId;
+        const userMessage = buildResponseFailureMessage(meta, formValues.photo);
 
         console.error("[day-nammae submit failed]", {
+          clientRequestId,
           requestId,
+          submitStage,
           result,
+          responseStatus: meta.responseStatus,
+          responseContentType: meta.responseContentType,
+          responseTextSnippet: meta.responseTextSnippet,
+          responseUrl: meta.responseUrl,
+          parseError: meta.parseError,
           clientDebugContext,
         });
 
-        throw createHandledSubmitError(userMessage, requestId);
+        throw createHandledSubmitError(userMessage, {
+          requestId,
+          clientRequestId: meta.clientRequestId || clientRequestId,
+          responseStatus: meta.responseStatus,
+          responseContentType: meta.responseContentType,
+          responseTextSnippet: meta.responseTextSnippet,
+          responseUrl: meta.responseUrl,
+          parseError: meta.parseError,
+          stage: submitStage,
+        });
       }
 
+      submitStage = "client:success";
       trackEvent("DN_SubmitApplication", {
         gender: formValues.gender,
         schedule: formValues.schedule,
@@ -358,26 +563,70 @@ export default function LoveBuddiesApplyFlow({
         message: "신청이 정상적으로 접수되었습니다. 검토 후 안내 메시지를 보내드릴게요.",
       });
     } catch (error) {
-      const { alreadyReported, requestId } = getHandledSubmitErrorState(error);
+      const {
+        alreadyReported,
+        requestId,
+        clientRequestId: capturedClientRequestId,
+        responseStatus,
+        responseContentType,
+        responseTextSnippet,
+        responseUrl,
+        parseError,
+        stage,
+      } = getHandledSubmitErrorState(error);
+      const supportCode = requestId || capturedClientRequestId || clientRequestId;
 
       if (!alreadyReported) {
         Sentry.withScope((scope) => {
           scope.setTag("feature", "day-nammae-apply");
+          scope.setTag("submit_stage", stage || submitStage);
+          scope.setTag(
+            "client_request_id",
+            capturedClientRequestId || clientRequestId
+          );
           if (requestId) {
             scope.setTag("request_id", requestId);
           }
-          scope.setContext("submit_client_context", buildClientDebugContext(formValues.photo));
+          if (responseStatus) {
+            scope.setTag("response_status", String(responseStatus));
+          }
+          scope.setFingerprint([
+            "day-nammae-submit",
+            stage || submitStage || "unknown",
+            String(responseStatus || 0),
+          ]);
+          scope.setContext(
+            "submit_client_context",
+            clientDebugContext || buildClientDebugContext(formValues.photo, clientRequestId)
+          );
+          scope.setContext("submit_response_context", {
+            responseStatus,
+            responseContentType,
+            responseTextSnippet,
+            responseUrl,
+            parseError,
+          });
           Sentry.captureException(
             error instanceof Error ? error : new Error("Unknown client submit error")
           );
         });
       }
 
-      console.error("[day-nammae submit exception]", error);
+      console.error("[day-nammae submit exception]", {
+        error,
+        clientRequestId,
+        supportCode,
+        submitStage,
+        responseStatus,
+        responseContentType,
+        responseTextSnippet,
+        responseUrl,
+        parseError,
+      });
       setSubmitState({
         status: "error",
         message:
-          error instanceof Error ? error.message : buildSubmitErrorMessage(requestId),
+          error instanceof Error ? error.message : buildSubmitErrorMessage(supportCode),
       });
     }
   };

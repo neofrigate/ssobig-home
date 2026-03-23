@@ -53,6 +53,9 @@ export default function StepPhoto({
             <p className="mt-1 text-xs text-white/35">
               본인의 매력이 잘 드러나는 사진 한 장을 올려주세요
             </p>
+            <p className="mt-1 text-[11px] text-white/30">
+              JPG, PNG 등 이미지 파일만 가능하며 4MB 이하만 업로드할 수 있어요
+            </p>
           </>
         )}
         <input

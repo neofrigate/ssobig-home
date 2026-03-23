@@ -58,6 +58,11 @@ function createRequestId() {
   return `dn-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+function getOptionalString(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+}
+
 function maskPhoneNumber(phone: string) {
   const digits = phone.replace(/\D/g, "");
 
@@ -82,6 +87,18 @@ function buildClientErrorMessage(requestId: string, safeMessage?: string) {
   }
 
   return `${DEFAULT_CLIENT_ERROR_MESSAGE} 문의 코드: ${requestId}`;
+}
+
+function buildResponseHeaders(requestId: string, clientRequestId = "") {
+  const headers = new Headers({
+    "x-ssobig-request-id": requestId,
+  });
+
+  if (clientRequestId) {
+    headers.set("x-ssobig-client-request-id", clientRequestId);
+  }
+
+  return headers;
 }
 
 function logSubmitEvent(
@@ -180,6 +197,7 @@ export async function POST(request: Request) {
     DEFAULT_STORAGE_BUCKET;
   const requestHeaderContext = {
     contentType: request.headers.get("content-type") || "",
+    contentLength: request.headers.get("content-length") || "",
     userAgent: request.headers.get("user-agent") || "",
     referer: request.headers.get("referer") || "",
     forwardedFor: request.headers.get("x-forwarded-for") || "",
@@ -200,7 +218,10 @@ export async function POST(request: Request) {
         error: "SUPABASE_SERVICE_ROLE_KEY 환경 변수가 필요합니다.",
         userMessage: buildClientErrorMessage(requestId),
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: buildResponseHeaders(requestId),
+      }
     );
   }
 
@@ -208,6 +229,7 @@ export async function POST(request: Request) {
   let uuid = "";
   let currentStage = "submit:start";
   let maskedPhone = "";
+  let clientRequestId = "";
   let photoContext: Record<string, unknown> = {};
   let debugClientContext: Record<string, unknown> | null = null;
 
@@ -225,6 +247,7 @@ export async function POST(request: Request) {
     const utmSource = (formData.get("utm_source") as string) || "";
     const utmMedium = (formData.get("utm_medium") as string) || "";
     const utmContent = (formData.get("utm_content") as string) || "";
+    clientRequestId = getOptionalString(formData, "client_request_id");
     debugClientContext = parseDebugClientContext(formData.get("debug_client_context"));
 
     if (!(photo instanceof File) || photo.size === 0) {
@@ -244,6 +267,7 @@ export async function POST(request: Request) {
     };
 
     logSubmitEvent(requestId, "submit:validated", {
+      clientRequestId,
       name,
       phoneMasked: maskedPhone,
       schedule,
@@ -345,6 +369,7 @@ export async function POST(request: Request) {
 
     currentStage = "edge:request:start";
     logSubmitEvent(requestId, "edge:request:start", {
+      clientRequestId,
       uuid,
       endpoint: "/functions/v1/ssobig-offline/day-nammae",
       uploadedPath,
@@ -364,6 +389,7 @@ export async function POST(request: Request) {
     const edgeBody = await parseEdgeFunctionResponse(edgeResponse);
 
     logSubmitEvent(requestId, "edge:request:complete", {
+      clientRequestId,
       uuid,
       edgeStatus: edgeResponse.status,
       edgeSuccess: edgeResponse.ok,
@@ -375,6 +401,7 @@ export async function POST(request: Request) {
         requestId,
         "edge:request:error",
         {
+          clientRequestId,
           uuid,
           edgeStatus: edgeResponse.status,
           edgeBody,
@@ -405,8 +432,11 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       requestId,
+      clientRequestId,
       payload,
       edgeBody,
+    }, {
+      headers: buildResponseHeaders(requestId, clientRequestId),
     });
   } catch (error) {
     const errorMessage =
@@ -420,6 +450,7 @@ export async function POST(request: Request) {
       "submit:failed",
       {
         stage: currentStage,
+        clientRequestId,
         uuid,
         uploadedPath,
         phoneMasked: maskedPhone,
@@ -434,8 +465,12 @@ export async function POST(request: Request) {
       Sentry.withScope((scope) => {
         scope.setTag("feature", "day-nammae-apply");
         scope.setTag("request_id", requestId);
+        if (clientRequestId) {
+          scope.setTag("client_request_id", clientRequestId);
+        }
         scope.setTag("submit_stage", currentStage);
         scope.setContext("day_nammae_submit", {
+          clientRequestId,
           uuid,
           uploadedPath,
           phoneMasked: maskedPhone,
@@ -488,10 +523,14 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         requestId,
+        clientRequestId,
         error: safeClientMessage || "신청서 제출 처리 중 내부 오류가 발생했습니다.",
         userMessage: buildClientErrorMessage(requestId, safeClientMessage),
       },
-      { status: safeClientMessage ? 400 : 500 }
+      {
+        status: safeClientMessage ? 400 : 500,
+        headers: buildResponseHeaders(requestId, clientRequestId),
+      }
     );
   }
 }
