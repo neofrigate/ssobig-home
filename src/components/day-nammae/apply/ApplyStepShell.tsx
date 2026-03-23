@@ -36,13 +36,13 @@ export default function ApplyStepShell({
   const shellClassName =
     mode === "modal"
       ? "relative flex h-[100svh] w-full flex-col overflow-hidden bg-[#161012] md:h-auto md:max-h-[90vh] md:max-w-[560px] md:rounded-[28px] md:border md:border-[#2a1d21] md:shadow-[0_28px_80px_rgba(0,0,0,0.45)]"
-      : "relative flex min-h-[100svh] w-full flex-col overflow-x-hidden bg-[#161012]";
+      : "relative w-full overflow-x-hidden bg-[#161012]";
   const scrollAreaClassName =
     mode === "modal"
       ? `relative z-10 flex-1 overflow-y-auto pb-24 ${
           hideNav ? "flex flex-col justify-center" : ""
         }`
-      : `relative z-10 flex-1 ${hideNav ? "flex flex-col justify-center" : ""}`;
+      : `relative z-10 ${hideNav ? "flex flex-col justify-center" : ""}`;
   const navClassName =
     mode === "modal"
       ? "relative z-20 shrink-0 border-t border-[#2a1d21] bg-[#161012] px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-4"

@@ -62,6 +62,7 @@ main {
 }
 
 body.day-nammae-apply-page {
+  background: #161012;
   min-height: auto;
   overflow-y: visible;
   -webkit-overflow-scrolling: auto;
