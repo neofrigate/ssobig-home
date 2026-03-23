@@ -199,19 +199,19 @@ export default function OfflinePage() {
 
         {/* 카드 컨테이너 - 반응형 그리드 */}
         <div className="w-full max-w-[1200px] mx-auto px-5 md:px-8">
-          {/* 모바일 + 작은 태블릿: 가로 스크롤 (< 768px) */}
-          <div className="md:hidden overflow-x-auto -mx-4 px-4 hide-scrollbar pb-20">
-            <div className="flex gap-4 w-max">
+          {/* 모바일 + 작은 태블릿 (< 768px) */}
+          <div className="md:hidden pb-20">
+            <div className="w-full">
               <OfflineCard
                 title="일일남매"
                 schedule="매주 금~일요일"
                 description={`매력쟁이들 사이에 내 남매가?!\n'일일'남매와 혈육 케미 찐친 되기`}
                 imageSrc="/ssobig_assets/socialing/poster_일일남매.png"
                 imageAlt="일일남매 포스터"
-                sizes="(max-width: 640px) 32vw, 40vw"
-                isMobile={true}
+                sizes="100vw"
                 href="/offline/11namme"
               />
+              {/* 불면증마피아 숨김 처리
               <OfflineCard
                 title="불면증마피아"
                 schedule="매주 일요일"
@@ -222,6 +222,7 @@ export default function OfflinePage() {
                 isMobile={true}
                 href="/offline/mafia"
               />
+              */}
               {/* 알파마니또 숨김 처리
               <OfflineCard
                 title="알파마니또"
@@ -248,6 +249,7 @@ export default function OfflinePage() {
               sizes="33vw"
               href="/offline/11namme"
             />
+            {/* 불면증마피아 숨김 처리
             <OfflineCard
               title="불면증마피아"
               schedule="매주 일요일"
@@ -257,6 +259,7 @@ export default function OfflinePage() {
               sizes="33vw"
               href="/offline/social_genius"
             />
+            */}
             {/* 알파마니또 숨김 처리
             <OfflineCard
               title="알파마니또"
