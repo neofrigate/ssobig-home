@@ -1,21 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { useState, useEffect } from "react";
-import LinkWithUtm from "../../../components/LinkWithUtm";
-
-interface ScheduleItem {
-  date: string;
-  title: string;
-  applicants: {
-    total: number;
-    female: number;
-    male: number;
-  };
-  maxCapacity: number;
-  status: string;
-}
+import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
+import { useDayNammeSchedule } from "@/features/day-nammae/useDayNammeSchedule";
+import { ScheduleItem } from "@/features/day-nammae/types";
 
 // FAQ 아이템 컴포넌트
 const FAQItem = ({
@@ -65,140 +56,9 @@ const FAQItem = ({
 };
 
 const ElevenNammePage = () => {
-  const [scheduleData, setScheduleData] = useState<ScheduleItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [lastUpdateTime, setLastUpdateTime] = useState<string>("");
-
-  // 초기 업데이트 시간 설정 (클라이언트에서만)
-  useEffect(() => {
-    const now = new Date();
-    const updateTimeString = `UPDATE : ${now.getFullYear()}.${String(
-      now.getMonth() + 1
-    ).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} ${String(
-      now.getHours()
-    ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-    setLastUpdateTime(updateTimeString);
-  }, []);
-
-  // API 응답 파싱 함수
-  const parseScheduleData = (
-    data: {
-      schedule: string;
-      maxCapacity: number;
-      exposedTotal: number;
-      exposedFemale: number;
-      exposedMale: number;
-      status: string;
-    }[]
-  ): ScheduleItem[] => {
-    return data
-      .map((item) => {
-        const title = item.schedule?.trim();
-        if (!title) return null;
-
-        const dateMatch = title.match(/(\d+\/\d+\s*\([^)]+\))/);
-        const dateStr = dateMatch ? dateMatch[1] : "";
-
-        const timeMatch = title.match(/\d+:\d+/);
-        const timeStr = timeMatch ? timeMatch[0] : "";
-
-        const gameTitle = title
-          .replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "")
-          .trim();
-
-        const cleanTitle = timeStr ? `${timeStr} ${gameTitle}` : gameTitle;
-
-        return {
-          date: dateStr,
-          title: cleanTitle,
-          applicants: {
-            total: item.exposedTotal || 0,
-            female: item.exposedFemale || 0,
-            male: item.exposedMale || 0,
-          },
-          maxCapacity: item.maxCapacity || 40,
-          status: item.status || "",
-        };
-      })
-      .filter((item): item is ScheduleItem => item !== null)
-      .sort((a, b) => {
-        const parseDate = (item: ScheduleItem) => {
-          const dateMatch = item.date.match(/(\d+)\/(\d+)/);
-          const timeMatch = item.title.match(/^(\d+):(\d+)/);
-          const month = dateMatch ? parseInt(dateMatch[1]) : 0;
-          const day = dateMatch ? parseInt(dateMatch[2]) : 0;
-          const hour = timeMatch ? parseInt(timeMatch[1]) : 0;
-          const minute = timeMatch ? parseInt(timeMatch[2]) : 0;
-          return month * 100000 + day * 1000 + hour * 60 + minute;
-        };
-        return parseDate(a) - parseDate(b);
-      });
-  };
-
-  // 폴백 데이터 (API 실패 시 사용)
-  const FALLBACK_DATA = [
-    { schedule: "3/13 (금) 19:30 일일남매", maxCapacity: 48, exposedTotal: 48, exposedFemale: 24, exposedMale: 24, status: "전체마감" },
-    { schedule: "3/14 (토) 15:00 일일남매", maxCapacity: 48, exposedTotal: 47, exposedFemale: 21, exposedMale: 26, status: "남자마감" },
-    { schedule: "3/14 (토) 19:00 일일남매", maxCapacity: 48, exposedTotal: 44, exposedFemale: 22, exposedMale: 22, status: "임박" },
-    { schedule: "3/20 (금) 19:30 일일남매", maxCapacity: 48, exposedTotal: 48, exposedFemale: 24, exposedMale: 24, status: "전체마감" },
-    { schedule: "3/21 (토) 15:00 일일남매", maxCapacity: 48, exposedTotal: 41, exposedFemale: 21, exposedMale: 20, status: "여자마감" },
-    { schedule: "3/21 (토) 19:00 일일남매", maxCapacity: 48, exposedTotal: 39, exposedFemale: 20, exposedMale: 19, status: "임박" },
-    { schedule: "3/27 (금) 19:30 일일남매", maxCapacity: 48, exposedTotal: 32, exposedFemale: 20, exposedMale: 12, status: "임박" },
-    { schedule: "3/28 (토) 15:00 일일남매", maxCapacity: 48, exposedTotal: 35, exposedFemale: 19, exposedMale: 16, status: "여유" },
-    { schedule: "3/28 (토) 19:00 일일남매", maxCapacity: 48, exposedTotal: 32, exposedFemale: 18, exposedMale: 14, status: "여유" },
-  ];
-
-  // Supabase RPC에서 스케줄 데이터 가져오기
-  useEffect(() => {
-    const fetchScheduleData = async () => {
-      try {
-        const SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
-        const SUPABASE_ANON_KEY =
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlcmh3d2p6dHNlb2VnYWl6c2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU4MjY0OTIsImV4cCI6MjA2MTQwMjQ5Mn0.Q7qfAO6ZatGqb84uQt74f5SSxmrvzx_qTooblg20gTg";
-
-        const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/rpc/get_exposure_status`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              apikey: SUPABASE_ANON_KEY,
-            },
-            body: JSON.stringify({ p_request_table: "day-nammae-request" }),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const updatedSchedule = parseScheduleData(data);
-
-        if (updatedSchedule.length === 0) {
-          throw new Error("빈 데이터");
-        }
-
-        setScheduleData(updatedSchedule);
-        setIsLoading(false);
-
-        const now = new Date();
-        const updateTimeString = `UPDATE : ${now.getFullYear()}.${String(
-          now.getMonth() + 1
-        ).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} ${String(
-          now.getHours()
-        ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-        setLastUpdateTime(updateTimeString);
-      } catch (error) {
-        console.error("스케줄 데이터 가져오기 실패, 폴백 사용:", error);
-        setScheduleData(parseScheduleData(FALLBACK_DATA));
-        setIsLoading(false);
-      }
-    };
-
-    fetchScheduleData();
-  }, []);
+  const router = useRouter();
+  const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
+  const [isApplyOpen, setIsApplyOpen] = useState(false);
 
   // 참가자 차트 컴포넌트 - 중앙 기준
   const ApplicantChart = ({
@@ -251,7 +111,38 @@ const ElevenNammePage = () => {
   };
 
   // 스케줄 아이템 컴포넌트
-  const ScheduleItem = ({ schedule }: { schedule: ScheduleItem }) => {
+  useEffect(() => {
+    if (!isApplyOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsApplyOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isApplyOpen]);
+
+  const handleApplyClick = () => {
+    if (window.matchMedia("(min-width: 768px)").matches) {
+      setIsApplyOpen(true);
+      return;
+    }
+
+    router.push(`/offline/11namme/apply${window.location.search}`);
+  };
+
+  const ScheduleRow = ({ schedule }: { schedule: ScheduleItem }) => {
     const isCompleted = schedule.status === "전체마감";
     const timeMatch = schedule.title.match(/^(\d+:\d+)\s+(.+)$/);
     const time = timeMatch ? timeMatch[1] : "";
@@ -396,7 +287,7 @@ const ElevenNammePage = () => {
                     </div>
                   ) : (
                     scheduleData.map((schedule, index) => (
-                      <ScheduleItem key={index} schedule={schedule} />
+                      <ScheduleRow key={index} schedule={schedule} />
                     ))
                   )}
                 </div>
@@ -487,14 +378,10 @@ const ElevenNammePage = () => {
         {/* 하단 고정 CTA 버튼 */}
         <div className="fixed bottom-0 left-0 right-0 p-4 z-30">
           <div className="w-full max-w-[720px] md:max-w-[600px] mx-auto">
-            <LinkWithUtm
-              href="https://tool.ssobig.com/games/6c3bb911"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={handleApplyClick}
               className="w-full h-[56px] bg-[#FF6B9F] hover:bg-[#e45a8b] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-base md:text-lg"
-              brandPage="love_buddies"
-              buttonType="detail_main_cta"
-              destination="smore_form"
             >
               러브버디즈 참여하기 🙋🏻‍♀️
               <svg
@@ -511,9 +398,26 @@ const ElevenNammePage = () => {
                   d="M9 5l7 7-7 7"
                 />
               </svg>
-            </LinkWithUtm>
+            </button>
           </div>
         </div>
+
+        {isApplyOpen && (
+          <div className="fixed inset-0 z-50 hidden items-center justify-center p-6 md:flex">
+            <button
+              type="button"
+              onClick={() => setIsApplyOpen(false)}
+              className="absolute inset-0 bg-black/55 backdrop-blur-sm"
+              aria-label="신청 창 닫기"
+            />
+            <LoveBuddiesApplyFlow
+              mode="modal"
+              scheduleData={scheduleData}
+              isLoadingSchedules={isLoading}
+              onClose={() => setIsApplyOpen(false)}
+            />
+          </div>
+        )}
       </div>
     </>
   );

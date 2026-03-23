@@ -24,6 +24,8 @@ const Sidebar: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
+  if (pathname === "/offline/11namme/apply") return null;
+
   // 현재 경로와 링크 경로를 비교하여 액티브 상태 확인
   const isActive = (href: string) => {
     // 절대 URL은 pathname과 직접 비교할 수 없으므로 제외
