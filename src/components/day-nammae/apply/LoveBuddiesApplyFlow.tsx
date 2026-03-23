@@ -20,14 +20,24 @@ declare global {
   }
 }
 
-function trackEvent(eventName: string, params?: Record<string, unknown>) {
-  if (typeof window !== "undefined" && window.fbq) {
-    window.fbq("trackCustom", eventName, params);
+function safeFbq(...args: unknown[]) {
+  if (typeof window === "undefined" || !window.fbq) {
+    return;
+  }
+
+  try {
+    window.fbq(...args);
+  } catch (error) {
+    console.error("Meta Pixel 호출 실패:", error);
   }
 }
 
+function trackEvent(eventName: string, params?: Record<string, unknown>) {
+  safeFbq("trackCustom", eventName, params);
+}
+
 function trackCompleteRegistration(formValues: DayNammeFormValues) {
-  if (typeof window === "undefined" || !window.fbq) {
+  if (typeof window === "undefined") {
     return;
   }
 
@@ -36,19 +46,15 @@ function trackCompleteRegistration(formValues: DayNammeFormValues) {
   const metaGender = formValues.gender === "남" ? "m" : "f";
   const metaBirthDate = `${formValues.birthYear}0101`;
 
-  try {
-    window.fbq("init", "1541266446734040", {
-      fn: formValues.name.toLowerCase(),
-      ph: metaPhone,
-      db: metaBirthDate,
-      ge: metaGender,
-    });
-    window.fbq("track", "CompleteRegistration", {
-      content_name: "일일남매",
-    });
-  } catch (error) {
-    console.error("Meta Pixel CompleteRegistration 추적 실패:", error);
-  }
+  safeFbq("init", "1541266446734040", {
+    fn: formValues.name.toLowerCase(),
+    ph: metaPhone,
+    db: metaBirthDate,
+    ge: metaGender,
+  });
+  safeFbq("track", "CompleteRegistration", {
+    content_name: "일일남매",
+  });
 }
 import StepGender from "./steps/StepGender";
 import StepSchedule from "./steps/StepSchedule";
@@ -346,13 +352,11 @@ export default function LoveBuddiesApplyFlow({
           rel="noopener noreferrer"
           onClick={() => {
             trackEvent("DN_InitiateCheckout", { schedule: formValues.schedule });
-            if (typeof window !== "undefined" && window.fbq) {
-              window.fbq("track", "InitiateCheckout", {
-                value: 35000,
-                currency: "KRW",
-                content_name: "일일남매",
-              });
-            }
+            safeFbq("track", "InitiateCheckout", {
+              value: 35000,
+              currency: "KRW",
+              content_name: "일일남매",
+            });
           }}
           className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98]"
         >
