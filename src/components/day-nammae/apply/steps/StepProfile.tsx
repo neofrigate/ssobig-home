@@ -12,7 +12,7 @@ interface StepProfileProps {
 }
 
 function inputClass(hasError: boolean) {
-  return `mt-2 h-12 w-full rounded-xl border bg-[#21161a] px-4 text-base md:text-sm text-white placeholder:text-white/25 outline-none transition focus:border-[#FF6B9F]/60 ${
+  return `mt-2 h-12 w-full rounded-lg border bg-white px-4 text-base text-black placeholder:text-black/35 outline-none ${
     hasError ? "border-red-500" : "border-[#2c2024]"
   }`;
 }
@@ -34,17 +34,18 @@ export default function StepProfile({
     : { name: false, birthYear: false, height: false, phone: false, traits: false };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 rounded-2xl border border-[#2c2024] bg-[#1b1416] p-4">
       <div>
-        <label className="text-sm font-semibold text-white/80">이름</label>
-        <p className="mt-1 text-xs text-white/45">
-          닉네임이 아닌 실명을 입력해주세요!
-        </p>
+        <div className="text-sm font-semibold text-white/80">이름</div>
         <input
           value={formValues.name}
           onChange={onValueChange("name")}
           placeholder="이름을 입력하세요"
-          autoComplete="name"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="words"
+          spellCheck={false}
+          name="day_nammae_name"
           className={inputClass(errors.name)}
         />
         {errors.name && (
@@ -53,10 +54,7 @@ export default function StepProfile({
       </div>
 
       <div>
-        <label className="text-sm font-semibold text-white/80">출생연도</label>
-        <p className="mt-1 text-xs text-white/45">
-          태어난 출생 연도를 선택해주세요.
-        </p>
+        <div className="text-sm font-semibold text-white/80">출생연도</div>
         <div className={`mt-2 grid grid-cols-4 gap-2 rounded-xl ${errors.birthYear ? "ring-1 ring-red-500 p-1" : ""}`}>
           {DAY_NAMMAE_BIRTH_YEARS.map((year) => {
             const selected = formValues.birthYear === year;
@@ -65,10 +63,10 @@ export default function StepProfile({
                 key={year}
                 type="button"
                 onClick={() => onBirthYearSelect(year)}
-                className={`h-10 rounded-xl border text-sm font-medium transition ${
+                className={`h-10 rounded-lg border text-sm font-medium ${
                   selected
-                    ? "border-[#FF6B9F] bg-[#351923] text-[#ffd4e7]"
-                    : "border-[#2c2024] bg-[#21161a] text-white/58"
+                    ? "border-[#FF6B9F] bg-[#fff0f7] text-[#cc2c72]"
+                    : "border-[#2c2024] bg-white text-black/75"
                 }`}
               >
                 {year}
@@ -82,14 +80,18 @@ export default function StepProfile({
       </div>
 
       <div>
-        <label className="text-sm font-semibold text-white/80">키</label>
-        <p className="mt-1 text-xs text-white/45">본인의 키를 적어주세요.</p>
+        <div className="text-sm font-semibold text-white/80">키</div>
         <input
           value={formValues.height}
           onChange={onValueChange("height")}
           inputMode="numeric"
+          pattern="[0-9]*"
           placeholder="키를 입력하세요"
           enterKeyHint="next"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          name="day_nammae_height"
           className={inputClass(errors.height)}
         />
         {errors.height && (
@@ -98,17 +100,19 @@ export default function StepProfile({
       </div>
 
       <div>
-        <label className="text-sm font-semibold text-white/80">전화번호</label>
-        <p className="mt-1 text-xs text-white/45">
-          연락받을 번호를 입력해주세요.
-        </p>
+        <div className="text-sm font-semibold text-white/80">전화번호</div>
         <input
           value={formValues.phone}
           onChange={onValueChange("phone")}
           inputMode="tel"
+          pattern="[0-9-]*"
           placeholder="010-0000-0000"
-          autoComplete="tel"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
           enterKeyHint="next"
+          name="day_nammae_phone"
           className={inputClass(errors.phone)}
         />
         {errors.phone && (
@@ -117,17 +121,18 @@ export default function StepProfile({
       </div>
 
       <div>
-        <label className="text-sm font-semibold text-white/80">특징</label>
-        <p className="mt-1 text-xs text-white/45">
-          본인을 설명할 수 있는 특징을 편하게 적어주세요.
-        </p>
+        <div className="text-sm font-semibold text-white/80">특징</div>
         <textarea
           value={formValues.traits}
           onChange={onValueChange("traits")}
           placeholder="ex - 웃상, MBTI는 ENFP, 여유로운 편"
           rows={4}
           enterKeyHint="done"
-          className={`mt-2 w-full rounded-xl border bg-[#21161a] px-4 py-3 text-base md:text-sm text-white placeholder:text-white/25 outline-none transition focus:border-[#FF6B9F]/60 ${
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="sentences"
+          spellCheck={false}
+          className={`mt-2 w-full rounded-lg border bg-white px-4 py-3 text-base text-black placeholder:text-black/35 outline-none ${
             errors.traits ? "border-red-500" : "border-[#2c2024]"
           }`}
         />

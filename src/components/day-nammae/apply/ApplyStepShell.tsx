@@ -35,22 +35,22 @@ export default function ApplyStepShell({
   const isPageMode = mode === "page";
   const shellClassName =
     mode === "modal"
-      ? "relative flex h-[100svh] w-full flex-col overflow-hidden bg-[#161012] md:h-auto md:max-h-[90vh] md:max-w-[560px] md:rounded-[28px] md:border md:border-[#2a1d21] md:shadow-[0_28px_80px_rgba(0,0,0,0.45)]"
-      : "relative w-full overflow-x-hidden bg-[#161012]";
+      ? "relative flex w-full max-w-[560px] flex-col overflow-hidden rounded-[32px] bg-black md:max-h-[90vh]"
+      : "relative flex min-h-screen w-full flex-col overflow-x-hidden bg-[#12090f]";
   const scrollAreaClassName =
     mode === "modal"
       ? `relative z-10 flex-1 overflow-y-auto pb-24 ${
           hideNav ? "flex flex-col justify-center" : ""
         }`
-      : `relative z-10 ${hideNav ? "flex flex-col justify-center" : ""}`;
+      : `relative z-10 flex-1 ${hideNav ? "flex flex-col justify-center" : ""}`;
   const navClassName =
     mode === "modal"
-      ? "relative z-20 shrink-0 border-t border-[#2a1d21] bg-[#161012] px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-4"
-      : "relative z-20 mt-6 border-t border-[#2a1d21] bg-[#161012] px-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-4";
+      ? "relative z-20 shrink-0 px-5 pb-8 pt-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent"
+      : "relative z-20 mt-6 px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-4";
   const headerClassName =
     mode === "modal"
-      ? "relative z-20 shrink-0 border-b border-[#2a1d21] bg-[#161012]"
-      : "relative z-20 shrink-0 border-b border-[#2a1d21] bg-[#161012]";
+      ? "relative z-20 shrink-0"
+      : "relative z-20 shrink-0";
   const contentClassName =
     mode === "modal"
       ? "mx-auto w-full max-w-[520px] px-5 pt-4"
@@ -58,9 +58,24 @@ export default function ApplyStepShell({
 
   return (
     <div className={shellClassName}>
+      {isPageMode ? (
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,107,159,0.18),_transparent_38%),linear-gradient(180deg,_rgba(23,10,18,0.96)_0%,_rgba(11,6,10,1)_100%)]" />
+      ) : (
+        <>
+          <Image
+            src="/ssobig_assets/lovebuddies/hero-main.jpg"
+            alt=""
+            fill
+            className="pointer-events-none object-cover opacity-40"
+            priority
+          />
+          <div className="pointer-events-none absolute inset-0 bg-black/50" />
+        </>
+      )}
+
       {/* Fixed top: Progress bar + Logo */}
       {!hideNav && <div className={headerClassName}>
-        <div className="h-[8px] w-full bg-[#24181d]">
+        <div className="h-[8px] w-full bg-white/10">
           <div
             className="h-full bg-[#FF6B9F]"
             style={{ width: `${progressPercent}%` }}
@@ -73,9 +88,8 @@ export default function ApplyStepShell({
             width={300}
             height={120}
             className={`${isPageMode ? "h-20" : "h-24"} w-auto object-contain`}
-            priority={isPageMode}
           />
-          <span className="text-sm font-medium text-white/55">
+          <span className="text-sm font-medium text-white/50">
             {currentStep}/{totalSteps}
           </span>
         </div>
@@ -89,7 +103,7 @@ export default function ApplyStepShell({
             {title}
           </h1>
           {description && (
-            <p className="mt-2 text-sm leading-relaxed text-white/58">
+            <p className="mt-2 text-sm leading-relaxed text-white/50">
               {description}
             </p>
           )}
@@ -107,7 +121,7 @@ export default function ApplyStepShell({
           <button
             type="button"
             onClick={onBack}
-            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-[#312328] bg-[#24181d] text-white [touch-action:manipulation]"
+            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white/10 text-white [touch-action:manipulation]"
             aria-label="이전 단계"
           >
               <svg
@@ -129,7 +143,7 @@ export default function ApplyStepShell({
             type="button"
             disabled={!canProceed || isSubmitting}
             onClick={onNext}
-            className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white disabled:bg-[#5b3a47] disabled:text-white/40 [touch-action:manipulation]"
+            className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white disabled:bg-[#FF6B9F]/40 disabled:text-white/50 [touch-action:manipulation]"
           >
             {isSubmitting
               ? "제출하는 중..."

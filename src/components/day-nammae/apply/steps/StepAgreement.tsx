@@ -11,9 +11,9 @@ export default function StepAgreement({
 }: StepAgreementProps) {
   return (
     <div>
-      <div className="rounded-2xl border border-[#2c2024] bg-[#21161a] p-5">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
         <h2 className="text-lg font-bold text-white">{section.title}</h2>
-        <div className="mt-4 space-y-3 text-sm leading-relaxed text-white/68">
+        <div className="mt-4 space-y-3 text-sm leading-relaxed text-white/60">
           {section.body.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
@@ -29,7 +29,7 @@ export default function StepAgreement({
           className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition ${
             agreed
               ? "border-[#FF6B9F] bg-[#FF6B9F] text-white"
-              : "border-[#3a292f] bg-[#21161a] text-transparent"
+              : "border-white/20 bg-white/5 text-transparent"
           }`}
         >
           <svg
@@ -48,7 +48,7 @@ export default function StepAgreement({
           </svg>
         </div>
         <span
-          className={`text-sm font-medium ${agreed ? "text-white" : "text-white/58"}`}
+          className={`text-sm font-medium ${agreed ? "text-white" : "text-white/50"}`}
         >
           위 내용을 확인했으며 동의합니다
         </span>

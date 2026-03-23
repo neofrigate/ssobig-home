@@ -14,7 +14,7 @@ export default function StepPhoto({
 }: StepPhotoProps) {
   return (
     <div>
-      <label className="flex min-h-[240px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#3a292f] bg-[#21161a] px-4 py-8 text-center transition active:bg-[#281b20]">
+      <label className="flex min-h-[240px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 bg-white/5 px-4 py-8 text-center transition active:bg-white/10">
         {photoPreviewUrl ? (
           <div className="w-full">
             <div className="relative mx-auto aspect-square w-full max-w-[220px] overflow-hidden rounded-2xl">
@@ -30,14 +30,14 @@ export default function StepPhoto({
               다른 사진으로 변경하기
             </p>
             {isOptimizing && (
-              <p className="mt-2 text-xs text-white/50">
+              <p className="mt-2 text-xs text-white/45">
                 사진을 업로드하기 좋게 최적화하는 중이에요
               </p>
             )}
           </div>
         ) : (
           <>
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2a1d21] text-white/65">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-white/60">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8"
@@ -54,17 +54,17 @@ export default function StepPhoto({
                 <circle cx="12" cy="13" r="3.5" strokeWidth={1.5} />
               </svg>
             </div>
-            <p className="mt-4 text-sm font-semibold text-white/78">
+            <p className="mt-4 text-sm font-semibold text-white/70">
               사진 선택하기
             </p>
-            <p className="mt-1 text-xs text-white/45">
+            <p className="mt-1 text-xs text-white/35">
               본인의 매력이 잘 드러나는 사진 한 장을 올려주세요
             </p>
-            <p className="mt-1 text-[11px] text-white/38">
+            <p className="mt-1 text-[11px] text-white/30">
               JPG, PNG 등 이미지 파일만 가능하며 4MB 이하만 업로드할 수 있어요
             </p>
             {isOptimizing && (
-              <p className="mt-2 text-xs text-white/50">
+              <p className="mt-2 text-xs text-white/45">
                 사진을 업로드하기 좋게 최적화하는 중이에요
               </p>
             )}

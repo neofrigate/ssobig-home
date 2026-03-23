@@ -824,13 +824,13 @@ export default function LoveBuddiesApplyFlow({
         onNext={() => {}}
         onBack={() => {}}
       >
-        <div className="rounded-2xl border border-[#2c2024] bg-[#21161a] px-5 py-5 text-center">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/42">신청 내역</p>
+        <div className="rounded-2xl bg-white/5 border border-white/15 px-5 py-5 text-center">
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-wider">신청 내역</p>
           <p className="mt-3 text-base font-bold text-white">{formValues.schedule}</p>
-          <p className="mt-1 text-sm text-white/74">{formValues.name} · {formValues.phone}</p>
+          <p className="mt-1 text-sm text-white/70">{formValues.name} · {formValues.phone}</p>
         </div>
 
-        <div className="mt-5 px-1 text-left text-sm leading-relaxed text-white/68">
+        <div className="mt-5 px-1 text-left text-sm leading-relaxed text-white/60">
           <p>• 결제가 완료된 순서대로 참가자를 승인해드립니다.</p>
           <p className="mt-1">• 결제 완료 후 &apos;참가 확정 메세지&apos;를 받으셔야 최종 확정입니다.</p>
           <p className="mt-1">• 승인/확정 처리까지 최대 24시간이 소요될 수 있습니다.</p>
@@ -860,7 +860,7 @@ export default function LoveBuddiesApplyFlow({
             setAgreements([false, false, false]);
             setShowFieldErrors(false);
           }}
-          className="mt-3 inline-flex h-12 w-full items-center justify-center rounded-full border border-[#312328] bg-[#21161a] text-sm font-medium text-white/68 transition active:scale-[0.98]"
+          className="mt-3 inline-flex h-12 w-full items-center justify-center rounded-full border border-white/20 text-sm font-medium text-white/60 transition active:scale-[0.98]"
         >
           신청서 다시 작성하기
         </button>
@@ -884,19 +884,19 @@ export default function LoveBuddiesApplyFlow({
       onBack={handleBack}
     >
       {formError && (
-        <div className="mb-4 rounded-xl border border-red-500/35 bg-[#351519] px-4 py-3 text-sm text-red-200">
+        <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {formError}
         </div>
       )}
 
       {currentStep === 4 && photoNotice && (
-        <div className="mb-4 rounded-xl border border-emerald-500/35 bg-[#11261e] px-4 py-3 text-sm text-emerald-200">
+        <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
           {photoNotice}
         </div>
       )}
 
       {submitState.status === "error" && (
-        <div className="mb-4 rounded-xl border border-red-500/35 bg-[#351519] px-4 py-3 text-sm text-red-200">
+        <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {submitState.message}
         </div>
       )}
