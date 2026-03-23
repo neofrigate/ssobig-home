@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import { DAY_NAMMAE_NOTICE_SECTIONS } from "@/features/day-nammae/constants";
@@ -13,6 +12,18 @@ import {
   ScheduleItem,
 } from "@/features/day-nammae/types";
 import ApplyStepShell from "./ApplyStepShell";
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
+function trackEvent(eventName: string, params?: Record<string, unknown>) {
+  if (typeof window !== "undefined" && window.fbq) {
+    window.fbq("trackCustom", eventName, params);
+  }
+}
 import StepGender from "./steps/StepGender";
 import StepSchedule from "./steps/StepSchedule";
 import StepProfile from "./steps/StepProfile";
@@ -214,6 +225,10 @@ export default function LoveBuddiesApplyFlow({
         );
       }
 
+      trackEvent("DN_SubmitApplication", {
+        gender: formValues.gender,
+        schedule: formValues.schedule,
+      });
       setSubmitState({
         status: "success",
         message: "신청이 정상적으로 접수되었습니다. 검토 후 안내 메시지를 보내드릴게요.",
@@ -233,9 +248,21 @@ export default function LoveBuddiesApplyFlow({
       return;
     }
     if (currentStep === TOTAL_STEPS) {
+      trackEvent("DN_Step7_AcceptNotice");
       handleSubmit();
       return;
     }
+
+    const stepEvents: Record<number, () => void> = {
+      1: () => trackEvent("DN_Step1_SelectGender", { gender: formValues.gender }),
+      2: () => trackEvent("DN_Step2_SelectSchedule", { schedule: formValues.schedule }),
+      3: () => trackEvent("DN_Step3_CompleteProfile"),
+      4: () => trackEvent("DN_Step4_UploadPhoto"),
+      5: () => trackEvent("DN_Step5_AcceptApproval"),
+      6: () => trackEvent("DN_Step6_AcceptMarketing"),
+    };
+    stepEvents[currentStep]?.();
+
     setShowFieldErrors(false);
     setCurrentStep((s) => s + 1);
     setFormError("");
@@ -264,37 +291,50 @@ export default function LoveBuddiesApplyFlow({
     })();
 
     return (
-      <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-black px-5">
-        <Image
-          src="/ssobig_assets/lovebuddies/hero-main.jpg"
-          alt=""
-          fill
-          className="object-cover opacity-30"
-        />
-        <div className="absolute inset-0 bg-black/50" />
-
-        <div className="relative z-10 w-full max-w-sm text-center">
-          <h2 className="text-2xl font-black text-white">
-            결제를 진행해주세요
-          </h2>
-          <p className="mt-3 text-base leading-relaxed text-white/70">
-            결제까지 진행해주셔야 신청이 완료됩니다.
-          </p>
-          <div className="mt-6 rounded-2xl bg-white/5 border border-white/10 px-5 py-5 text-left text-sm leading-relaxed text-white/50">
-            <p>• 결제가 완료된 순서대로 참가자를 승인해드립니다.</p>
-            <p className="mt-2">• 결제 완료 후 &apos;참가 확정 메세지&apos;를 받으셔야 최종 확정입니다.</p>
-            <p className="mt-2">• 승인/확정 처리까지 최대 24시간이 소요될 수 있습니다.</p>
-          </div>
-          <a
-            href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98]"
-          >
-            결제 하러가기
-          </a>
+      <ApplyStepShell
+        currentStep={TOTAL_STEPS}
+        totalSteps={TOTAL_STEPS}
+        title="결제를 진행해주세요"
+        description="결제까지 진행해주셔야 신청이 완료됩니다."
+        canProceed={true}
+        hideNav
+        onNext={() => {}}
+        onBack={() => {}}
+      >
+        <div className="rounded-2xl bg-white/5 border border-white/15 px-5 py-5 text-center">
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-wider">신청 내역</p>
+          <p className="mt-3 text-base font-bold text-white">{formValues.schedule}</p>
+          <p className="mt-1 text-sm text-white/70">{formValues.name} · {formValues.phone}</p>
         </div>
-      </div>
+
+        <div className="mt-5 px-1 text-left text-sm leading-relaxed text-white/60">
+          <p>• 결제가 완료된 순서대로 참가자를 승인해드립니다.</p>
+          <p className="mt-1">• 결제 완료 후 &apos;참가 확정 메세지&apos;를 받으셔야 최종 확정입니다.</p>
+          <p className="mt-1">• 승인/확정 처리까지 최대 24시간이 소요될 수 있습니다.</p>
+        </div>
+        <a
+          href={bookingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackEvent("DN_InitiateCheckout", { schedule: formValues.schedule })}
+          className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98]"
+        >
+          35,000원 결제하기
+        </a>
+        <button
+          type="button"
+          onClick={() => {
+            setSubmitState({ status: "idle", message: "" });
+            setCurrentStep(1);
+            setFormValues(INITIAL_FORM_VALUES);
+            setAgreements([false, false, false]);
+            setShowFieldErrors(false);
+          }}
+          className="mt-3 inline-flex h-12 w-full items-center justify-center rounded-full border border-white/20 text-sm font-medium text-white/60 transition active:scale-[0.98]"
+        >
+          신청서 다시 작성하기
+        </button>
+      </ApplyStepShell>
     );
   }
 

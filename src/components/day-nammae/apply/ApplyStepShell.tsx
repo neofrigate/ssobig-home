@@ -10,6 +10,7 @@ interface ApplyStepShellProps {
   canProceed: boolean;
   isSubmitting?: boolean;
   isLastStep?: boolean;
+  hideNav?: boolean;
   onNext: () => void;
   onBack: () => void;
   children: React.ReactNode;
@@ -23,6 +24,7 @@ export default function ApplyStepShell({
   canProceed,
   isSubmitting,
   isLastStep,
+  hideNav,
   onNext,
   onBack,
   children,
@@ -42,7 +44,7 @@ export default function ApplyStepShell({
       <div className="absolute inset-0 bg-black/50" />
 
       {/* Fixed top: Progress bar + Logo */}
-      <div className="relative z-20 shrink-0">
+      {!hideNav && <div className="relative z-20 shrink-0">
         <div className="h-[8px] w-full bg-white/10">
           <div
             className="h-full bg-[#FF6B9F] transition-[width] duration-300"
@@ -61,12 +63,12 @@ export default function ApplyStepShell({
             {currentStep}/{totalSteps}
           </span>
         </div>
-      </div>
+      </div>}
 
       {/* Scrollable area: Title + Content */}
-      <div className="relative z-10 flex-1 overflow-y-auto pb-24">
+      <div className={`relative z-10 flex-1 overflow-y-auto pb-24 ${hideNav ? "flex flex-col justify-center" : ""}`}>
         {/* Title */}
-        <div className="mx-auto w-full max-w-[520px] px-5 pt-4 pb-2">
+        <div className={`mx-auto w-full max-w-[520px] px-5 pt-4 pb-2 ${hideNav ? "text-center" : ""}`}>
           <h1 className="text-[26px] leading-tight font-black text-white">
             {title}
           </h1>
@@ -84,7 +86,7 @@ export default function ApplyStepShell({
       </div>
 
       {/* Fixed bottom navigation */}
-      <div className="relative z-20 shrink-0 px-5 pb-8 pt-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+      {!hideNav && <div className="relative z-20 shrink-0 px-5 pb-8 pt-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
         <div className="mx-auto flex max-w-[520px] items-center gap-3">
           <button
               type="button"
@@ -120,7 +122,7 @@ export default function ApplyStepShell({
                 : "다음"}
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
