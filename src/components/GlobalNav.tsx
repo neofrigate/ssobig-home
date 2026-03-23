@@ -469,7 +469,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             href="https://tool.ssobig.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className={`ml-auto h-[28px] px-3 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all duration-700 ${
+            className={`ml-auto h-[28px] px-3 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all duration-700 ${
               useBlackText
                 ? "bg-gray-900 text-white hover:bg-gray-700"
                 : "bg-white text-gray-900 hover:bg-gray-200"
@@ -597,7 +597,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             href="https://tool.ssobig.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className={`ml-2 h-[32px] px-4 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-all duration-700 ${
+            className={`ml-2 h-[32px] px-4 rounded-lg text-sm font-semibold whitespace-nowrap shrink-0 flex items-center gap-1.5 transition-all duration-700 ${
               useBlackText
                 ? "bg-gray-900 text-white hover:bg-gray-700"
                 : "bg-white text-gray-900 hover:bg-gray-200"
