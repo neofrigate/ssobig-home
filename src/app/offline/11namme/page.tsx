@@ -225,7 +225,7 @@ const ElevenNammePage = () => {
         <div className="fixed inset-0 -z-10">
           <Image
             src="/ssobig_assets/lovebuddies/hero-main.jpg"
-            alt="러브버디즈 배경"
+            alt="일일남매 배경"
             fill
             style={{ objectFit: "cover", objectPosition: "center" }}
             priority
@@ -251,11 +251,11 @@ const ElevenNammePage = () => {
               priority
             />
 
-            {/* 러브버디즈 스케줄 박스 */}
+            {/* 일일남매 스케줄 박스 */}
             <div className="w-full">
               <div className="bg-[#F2F2F2] p-4 md:px-6 md:py-7">
                 <h2 className="text-xl md:text-2xl font-bold text-center text-black mb-3 md:mb-4">
-                  💕 러브버디즈 스케줄
+                  💕 일일남매 스케줄
                 </h2>
 
                 {/* 가격 및 범례 */}
@@ -328,23 +328,23 @@ const ElevenNammePage = () => {
               <div className="space-y-0">
                 {[
                   {
-                    question: "[러브버디즈]는 어떻게 신청하나요?",
+                    question: "[일일남매]는 어떻게 신청하나요?",
                     answer:
-                      "페이지 하단의 <러브버디즈 참여하기> 버튼을 클릭하고<br/>양식에 맞춰 답변을 제출해주시면 됩니다!<br/>신청 후 발송되는 안내 문자에 따라 결제까지 마쳐주셔야 최종 신청 완료이니,<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>꼭 안내 문자 확인 후 결제 부탁드립니다!</strong>",
+                      "페이지 하단의 <일일남매 참여하기> 버튼을 클릭하고<br/>양식에 맞춰 답변을 제출해주시면 됩니다!<br/>신청 후 발송되는 안내 문자에 따라 결제까지 마쳐주셔야 최종 신청 완료이니,<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>꼭 안내 문자 확인 후 결제 부탁드립니다!</strong>",
                   },
                   {
-                    question: "[러브버디즈] 참가자 무드가 궁금해요!",
+                    question: "[일일남매] 참가자 무드가 궁금해요!",
                     answer:
-                      '<strong>"다정한 사람들과 함께 행복해지기"</strong><br/><br/>저희의 꿈을 실현하기 위해 러브버디즈의 모든 콘텐츠는 승인제로 운영됩니다.<br/><br/>참가하시는 분께서 신청해주실 때 사전 질문에 대한 답변과 매력이 드러난 사진을 보내주시게 되요.<br/><br/>저희는 24시간 내로 세심하게 꼼꼼히 읽어보고,<br/>러브버디즈와 결이 맞는 분들만 모실 수 있도록 최선을 다해요.<br/><br/>앞으로도,여러분의 소중한 시간과 마음을 위해 믿고 올 수 있는 모임을 만들게요 : )',
+                      '<strong>"다정한 사람들과 함께 행복해지기"</strong><br/><br/>저희의 꿈을 실현하기 위해 일일남매의 모든 콘텐츠는 승인제로 운영됩니다.<br/><br/>참가하시는 분께서 신청해주실 때 사전 질문에 대한 답변과 매력이 드러난 사진을 보내주시게 되요.<br/><br/>저희는 24시간 내로 세심하게 꼼꼼히 읽어보고,<br/>일일남매와 결이 맞는 분들만 모실 수 있도록 최선을 다해요.<br/><br/>앞으로도,여러분의 소중한 시간과 마음을 위해 믿고 올 수 있는 모임을 만들게요 : )',
                   },
                   {
-                    question: "[러브버디즈] 지각시 참여가 어렵나요?",
+                    question: "[일일남매] 지각시 참여가 어렵나요?",
                     answer:
                       "사전에 고지 드렸듯이 모임 15분 이후에는 참여가 매우 어렵습니다.<br/><br/>콘텐츠가 촘촘하게 구성되어 중간부터 참여하기가 어려운 구조입니다.<br/>다른 분들이 이미 현장에서 기다리고 계셔서 모임이 지연되는 걸 막고자<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>최대 15분까지</strong> 진행 대기 후 모임을 시작하고 있습니다.<br/><strong style='background-color: #FF69B4; color: white; padding: 2px 4px; border-radius: 4px;'>지각의 경우 환불은 불가능</strong>하니 꼭 시간에 맞춰 현장에 도착 부탁드립니다 : )",
                   },
                   {
                     question:
-                      "[러브버디즈] 다른 참가자 연락처가 궁금해요! or 연락처 전달이 가능한가요?",
+                      "[일일남매] 다른 참가자 연락처가 궁금해요! or 연락처 전달이 가능한가요?",
                     answer:
                       "모임이 완료되면 참가자분들이 신청 시 제출한 데이터 중<br/>필수 데이터(성함, 전화번호)를 제외한 모든 정보가 폐기처리되어<br/>따로 식별할 수 있는 방법이 없습니다ㅠㅠ.<br/><br/>또한 개인정보 문제상 다른 참가자분들의 정보를 임의로 전달해드리는<br/>어려운 점 양해 부탁드립니다.",
                   },
@@ -383,7 +383,7 @@ const ElevenNammePage = () => {
               onClick={handleApplyClick}
               className="w-full h-[56px] bg-[#FF6B9F] hover:bg-[#e45a8b] text-white font-bold px-6 rounded-[100px] flex items-center justify-center transition-colors text-base md:text-lg"
             >
-              러브버디즈 참여하기 🙋🏻‍♀️
+              일일남매 참여하기 🙋🏻‍♀️
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"

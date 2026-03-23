@@ -334,7 +334,16 @@ export default function LoveBuddiesApplyFlow({
           href={bookingUrl}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => trackEvent("DN_InitiateCheckout", { schedule: formValues.schedule })}
+          onClick={() => {
+            trackEvent("DN_InitiateCheckout", { schedule: formValues.schedule });
+            if (typeof window !== "undefined" && window.fbq) {
+              window.fbq("track", "InitiateCheckout", {
+                value: 35000,
+                currency: "KRW",
+                content_name: "일일남매",
+              });
+            }
+          }}
           className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98]"
         >
           35,000원 결제하기
