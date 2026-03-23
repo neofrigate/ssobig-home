@@ -132,6 +132,11 @@ const ElevenNammePage = () => {
   }, [isApplyOpen]);
 
   const handleApplyClick = () => {
+    if (!window.matchMedia("(min-width: 768px)").matches) {
+      window.location.assign(`/offline/11namme/apply${window.location.search}`);
+      return;
+    }
+
     setIsApplyOpen(true);
   };
 
@@ -396,7 +401,7 @@ const ElevenNammePage = () => {
         </div>
 
         {isApplyOpen && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6">
+          <div className="fixed inset-0 z-50 hidden items-end justify-center md:flex md:items-center md:p-6">
             <button
               type="button"
               onClick={() => setIsApplyOpen(false)}
