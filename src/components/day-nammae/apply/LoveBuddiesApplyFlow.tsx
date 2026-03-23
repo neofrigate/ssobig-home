@@ -901,6 +901,21 @@ export default function LoveBuddiesApplyFlow({
         </div>
       )}
 
+      {currentStep === TOTAL_STEPS &&
+        submitState.status === "submitting" && (
+          <div className="mb-4 rounded-2xl border border-[#FF6B9F]/30 bg-[#FF6B9F]/10 px-4 py-4 text-white">
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/25 border-t-[#FF6B9F]" />
+              <div>
+                <p className="text-sm font-semibold">신청서를 접수하고 있어요</p>
+                <p className="mt-1 text-xs text-white/65">
+                  제출까지 잠시만 기다려주세요. 완료되면 바로 다음 단계로 넘어갑니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
       {currentStep === 1 && (
         <StepGender gender={formValues.gender} onSelect={handleGenderSelect} />
       )}
