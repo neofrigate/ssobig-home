@@ -80,6 +80,9 @@ interface SubmitState {
 const TOTAL_STEPS = 7;
 const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
 const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
+const MAX_PHOTO_DIMENSION = 1600;
+const INITIAL_PHOTO_JPEG_QUALITY = 0.82;
+const MIN_PHOTO_JPEG_QUALITY = 0.56;
 const DEFAULT_SUBMIT_ERROR_MESSAGE =
   "신청서 제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
 
@@ -131,6 +134,134 @@ function formatFileSize(bytes: number) {
 
 function buildPhotoTooLargeMessage(size: number) {
   return `사진 용량은 ${MAX_PHOTO_FILE_SIZE_LABEL} 이하만 업로드할 수 있습니다. 현재 파일은 ${formatFileSize(size)}입니다. 용량을 줄인 뒤 다시 시도해주세요.`;
+}
+
+function buildPhotoCompressedMessage(originalSize: number, compressedSize: number) {
+  return `사진 용량이 커서 업로드 전에 자동으로 최적화했어요. ${formatFileSize(originalSize)} -> ${formatFileSize(compressedSize)}`;
+}
+
+function replaceFileExtension(fileName: string, extension: string) {
+  const dotIndex = fileName.lastIndexOf(".");
+  const baseName = dotIndex > 0 ? fileName.slice(0, dotIndex) : fileName;
+  return `${baseName}${extension}`;
+}
+
+function loadImageFromFile(file: File) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("이미지 파일을 읽지 못했습니다."));
+    };
+    image.src = objectUrl;
+  });
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, quality: number) {
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("이미지 압축 결과를 만들지 못했습니다."));
+          return;
+        }
+        resolve(blob);
+      },
+      "image/jpeg",
+      quality
+    );
+  });
+}
+
+async function renderCompressedPhoto(
+  image: HTMLImageElement,
+  width: number,
+  height: number,
+  quality: number
+) {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("브라우저에서 이미지 압축을 처리할 수 없습니다.");
+  }
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, width, height);
+  context.drawImage(image, 0, 0, width, height);
+
+  return canvasToBlob(canvas, quality);
+}
+
+async function compressPhotoForUpload(file: File) {
+  if (typeof window === "undefined" || file.size <= MAX_PHOTO_FILE_SIZE_BYTES) {
+    return {
+      file,
+      wasCompressed: false,
+      originalSize: file.size,
+      compressedSize: file.size,
+    };
+  }
+
+  const image = await loadImageFromFile(file);
+  let width = image.naturalWidth;
+  let height = image.naturalHeight;
+  const longestEdge = Math.max(width, height);
+
+  if (longestEdge > MAX_PHOTO_DIMENSION) {
+    const scale = MAX_PHOTO_DIMENSION / longestEdge;
+    width = Math.max(1, Math.round(width * scale));
+    height = Math.max(1, Math.round(height * scale));
+  }
+
+  let quality = INITIAL_PHOTO_JPEG_QUALITY;
+  let blob = await renderCompressedPhoto(image, width, height, quality);
+
+  while (blob.size > MAX_PHOTO_FILE_SIZE_BYTES) {
+    if (quality > MIN_PHOTO_JPEG_QUALITY) {
+      quality = Math.max(MIN_PHOTO_JPEG_QUALITY, quality - 0.08);
+    } else {
+      width = Math.max(1, Math.round(width * 0.85));
+      height = Math.max(1, Math.round(height * 0.85));
+      quality = INITIAL_PHOTO_JPEG_QUALITY;
+    }
+
+    const nextBlob = await renderCompressedPhoto(image, width, height, quality);
+    if (nextBlob.size >= blob.size && quality === MIN_PHOTO_JPEG_QUALITY) {
+      break;
+    }
+    blob = nextBlob;
+  }
+
+  if (blob.size > MAX_PHOTO_FILE_SIZE_BYTES) {
+    throw new Error(
+      "사진 자동 최적화 후에도 용량이 너무 큽니다. 다른 사진을 선택하거나 편집 후 다시 시도해주세요."
+    );
+  }
+
+  const compressedFile = new File(
+    [blob],
+    replaceFileExtension(file.name || "day-nammae-photo", ".jpg"),
+    {
+      type: "image/jpeg",
+      lastModified: Date.now(),
+    }
+  );
+
+  return {
+    file: compressedFile,
+    wasCompressed: true,
+    originalSize: file.size,
+    compressedSize: compressedFile.size,
+  };
 }
 
 function buildClientDebugContext(photo: File | null, clientRequestId = "") {
@@ -365,6 +496,8 @@ export default function LoveBuddiesApplyFlow({
   const [currentStep, setCurrentStep] = useState(1);
   const [formValues, setFormValues] = useState(INITIAL_FORM_VALUES);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
+  const [photoNotice, setPhotoNotice] = useState("");
+  const [isOptimizingPhoto, setIsOptimizingPhoto] = useState(false);
   const [formError, setFormError] = useState("");
   const [showFieldErrors, setShowFieldErrors] = useState(false);
   const [agreements, setAgreements] = useState([false, false, false]);
@@ -404,17 +537,43 @@ export default function LoveBuddiesApplyFlow({
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
     if (file && !file.type.startsWith("image/")) {
+      setPhotoNotice("");
       setFormError("사진은 이미지 파일만 업로드할 수 있습니다.");
       return;
     }
-    if (file && file.size > MAX_PHOTO_FILE_SIZE_BYTES) {
+    if (!file) {
       setFormValues((current) => ({ ...current, photo: null }));
-      setFormError(buildPhotoTooLargeMessage(file.size));
-      event.target.value = "";
+      setPhotoNotice("");
+      setFormError("");
       return;
     }
-    setFormValues((current) => ({ ...current, photo: file }));
+
+    setIsOptimizingPhoto(true);
+    setPhotoNotice("");
     setFormError("");
+
+    compressPhotoForUpload(file)
+      .then(({ file: nextFile, wasCompressed, originalSize, compressedSize }) => {
+        setFormValues((current) => ({ ...current, photo: nextFile }));
+        setPhotoNotice(
+          wasCompressed
+            ? buildPhotoCompressedMessage(originalSize, compressedSize)
+            : ""
+        );
+      })
+      .catch((error) => {
+        setFormValues((current) => ({ ...current, photo: null }));
+        setPhotoNotice("");
+        setFormError(
+          error instanceof Error
+            ? error.message
+            : buildPhotoTooLargeMessage(file.size)
+        );
+        event.target.value = "";
+      })
+      .finally(() => {
+        setIsOptimizingPhoto(false);
+      });
   };
 
   const handleGenderSelect = (gender: "남" | "여") => {
@@ -467,7 +626,7 @@ export default function LoveBuddiesApplyFlow({
           formValues.traits.trim() !== ""
         );
       case 4:
-        return formValues.photo !== null;
+        return formValues.photo !== null && !isOptimizingPhoto;
       case 5:
         return agreements[0];
       case 6:
@@ -756,6 +915,12 @@ export default function LoveBuddiesApplyFlow({
         </div>
       )}
 
+      {currentStep === 4 && photoNotice && (
+        <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          {photoNotice}
+        </div>
+      )}
+
       {submitState.status === "error" && (
         <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {submitState.message}
@@ -788,6 +953,7 @@ export default function LoveBuddiesApplyFlow({
       {currentStep === 4 && (
         <StepPhoto
           photoPreviewUrl={photoPreviewUrl}
+          isOptimizing={isOptimizingPhoto}
           onPhotoChange={handlePhotoChange}
         />
       )}

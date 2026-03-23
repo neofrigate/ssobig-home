@@ -3,11 +3,13 @@ import { ChangeEvent } from "react";
 
 interface StepPhotoProps {
   photoPreviewUrl: string;
+  isOptimizing: boolean;
   onPhotoChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function StepPhoto({
   photoPreviewUrl,
+  isOptimizing,
   onPhotoChange,
 }: StepPhotoProps) {
   return (
@@ -27,6 +29,11 @@ export default function StepPhoto({
             <p className="mt-4 text-xs font-semibold text-[#FF6B9F]">
               다른 사진으로 변경하기
             </p>
+            {isOptimizing && (
+              <p className="mt-2 text-xs text-white/45">
+                사진을 업로드하기 좋게 최적화하는 중이에요
+              </p>
+            )}
           </div>
         ) : (
           <>
@@ -56,6 +63,11 @@ export default function StepPhoto({
             <p className="mt-1 text-[11px] text-white/30">
               JPG, PNG 등 이미지 파일만 가능하며 4MB 이하만 업로드할 수 있어요
             </p>
+            {isOptimizing && (
+              <p className="mt-2 text-xs text-white/45">
+                사진을 업로드하기 좋게 최적화하는 중이에요
+              </p>
+            )}
           </>
         )}
         <input
