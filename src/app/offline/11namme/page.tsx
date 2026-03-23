@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { useState, useEffect } from "react";
 import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
@@ -56,7 +55,6 @@ const FAQItem = ({
 };
 
 const ElevenNammePage = () => {
-  const router = useRouter();
   const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
   const [isApplyOpen, setIsApplyOpen] = useState(false);
 
@@ -134,12 +132,7 @@ const ElevenNammePage = () => {
   }, [isApplyOpen]);
 
   const handleApplyClick = () => {
-    if (window.matchMedia("(min-width: 768px)").matches) {
-      setIsApplyOpen(true);
-      return;
-    }
-
-    router.push(`/offline/11namme/apply${window.location.search}`);
+    setIsApplyOpen(true);
   };
 
   const ScheduleRow = ({ schedule }: { schedule: ScheduleItem }) => {
@@ -403,11 +396,11 @@ const ElevenNammePage = () => {
         </div>
 
         {isApplyOpen && (
-          <div className="fixed inset-0 z-50 hidden items-center justify-center p-6 md:flex">
+          <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6">
             <button
               type="button"
               onClick={() => setIsApplyOpen(false)}
-              className="absolute inset-0 bg-black/55 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/85"
               aria-label="신청 창 닫기"
             />
             <LoveBuddiesApplyFlow

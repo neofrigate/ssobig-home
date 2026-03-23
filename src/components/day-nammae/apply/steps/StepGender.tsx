@@ -18,9 +18,9 @@ export default function StepGender({ gender, onSelect }: StepGenderProps) {
             className={`rounded-2xl border px-5 py-6 text-left transition [touch-action:manipulation] ${
               selected
                 ? isFemale
-                  ? "border-[#FF69B4] bg-[#FF69B4]/15 text-[#FFB1D4]"
-                  : "border-[#4A90E2] bg-[#4A90E2]/15 text-[#8BB8F0]"
-                : "border-white/10 bg-white/5 text-white/60"
+                  ? "border-[#FF69B4] bg-[#351923] text-[#ffd4e7]"
+                  : "border-[#4A90E2] bg-[#16263a] text-[#cfe4ff]"
+                : "border-[#2c2024] bg-[#21161a] text-white/70"
             }`}
           >
             <span className="block text-lg font-bold">
