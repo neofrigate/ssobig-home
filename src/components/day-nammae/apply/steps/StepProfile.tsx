@@ -12,7 +12,7 @@ interface StepProfileProps {
 }
 
 function inputClass(hasError: boolean) {
-  return `mt-2 h-12 w-full rounded-lg border bg-white px-4 text-base text-black placeholder:text-black/35 outline-none ${
+  return `mt-2 h-12 w-full rounded-lg border bg-[#21161a] px-4 text-base text-white placeholder:text-white/30 outline-none ${
     hasError ? "border-red-500" : "border-[#2c2024]"
   }`;
 }
@@ -63,10 +63,10 @@ export default function StepProfile({
                 key={year}
                 type="button"
                 onClick={() => onBirthYearSelect(year)}
-                className={`h-10 rounded-lg border text-sm font-medium ${
+                className={`h-10 rounded-lg border text-sm font-medium [touch-action:manipulation] ${
                   selected
-                    ? "border-[#FF6B9F] bg-[#fff0f7] text-[#cc2c72]"
-                    : "border-[#2c2024] bg-white text-black/75"
+                    ? "border-[#FF6B9F] bg-[#351923] text-[#FFB1D4]"
+                    : "border-[#2c2024] bg-[#21161a] text-white/60"
                 }`}
               >
                 {year}
@@ -132,7 +132,7 @@ export default function StepProfile({
           autoCorrect="off"
           autoCapitalize="sentences"
           spellCheck={false}
-          className={`mt-2 w-full rounded-lg border bg-white px-4 py-3 text-base text-black placeholder:text-black/35 outline-none ${
+          className={`mt-2 w-full rounded-lg border bg-[#21161a] px-4 py-3 text-base text-white placeholder:text-white/30 outline-none ${
             errors.traits ? "border-red-500" : "border-[#2c2024]"
           }`}
         />
