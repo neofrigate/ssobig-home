@@ -12,8 +12,8 @@ interface StepProfileProps {
 }
 
 function inputClass(hasError: boolean) {
-  return `mt-2 h-12 w-full rounded-lg border bg-white px-4 text-base text-black placeholder:text-black/35 outline-none ${
-    hasError ? "border-red-500" : "border-[#2c2024]"
+  return `mt-2 h-12 w-full rounded-xl border bg-white/5 px-4 text-base text-white placeholder:text-white/30 outline-none transition focus:border-[#FF6B9F]/50 focus:bg-white/[0.08] ${
+    hasError ? "border-red-500" : "border-white/10"
   }`;
 }
 
@@ -34,7 +34,7 @@ export default function StepProfile({
     : { name: false, birthYear: false, height: false, phone: false, traits: false };
 
   return (
-    <div className="space-y-5 rounded-2xl border border-[#2c2024] bg-[#1b1416] p-4">
+    <div className="space-y-5 rounded-2xl border border-white/10 bg-white/5 p-5">
       <div>
         <div className="text-sm font-semibold text-white/80">이름</div>
         <input
@@ -63,10 +63,10 @@ export default function StepProfile({
                 key={year}
                 type="button"
                 onClick={() => onBirthYearSelect(year)}
-                className={`h-10 rounded-lg border text-sm font-medium ${
+                className={`h-10 rounded-xl border text-sm font-medium transition [touch-action:manipulation] ${
                   selected
-                    ? "border-[#FF6B9F] bg-[#fff0f7] text-[#cc2c72]"
-                    : "border-[#2c2024] bg-white text-black/75"
+                    ? "border-[#FF6B9F] bg-[#FF6B9F]/15 text-[#FFB1D4]"
+                    : "border-white/10 bg-white/5 text-white/60"
                 }`}
               >
                 {year}
@@ -132,8 +132,8 @@ export default function StepProfile({
           autoCorrect="off"
           autoCapitalize="sentences"
           spellCheck={false}
-          className={`mt-2 w-full rounded-lg border bg-white px-4 py-3 text-base text-black placeholder:text-black/35 outline-none ${
-            errors.traits ? "border-red-500" : "border-[#2c2024]"
+          className={`mt-2 w-full rounded-xl border bg-white/5 px-4 py-3 text-base text-white placeholder:text-white/30 outline-none transition focus:border-[#FF6B9F]/50 focus:bg-white/[0.08] ${
+            errors.traits ? "border-red-500" : "border-white/10"
           }`}
         />
         {errors.traits && (
