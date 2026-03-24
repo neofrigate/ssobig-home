@@ -85,7 +85,6 @@ export default function StepProfile({
           value={formValues.height}
           onChange={onValueChange("height")}
           inputMode="numeric"
-          pattern="[0-9]*"
           placeholder="키를 입력하세요"
           enterKeyHint="next"
           autoComplete="off"
@@ -105,7 +104,6 @@ export default function StepProfile({
           value={formValues.phone}
           onChange={onValueChange("phone")}
           inputMode="tel"
-          pattern="[0-9-]*"
           placeholder="010-0000-0000"
           autoComplete="off"
           autoCorrect="off"
