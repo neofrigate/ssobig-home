@@ -1,5 +1,8 @@
 import * as Sentry from "@sentry/nextjs";
-import { getClientSentryDebugContext } from "@/lib/sentry-debug";
+import {
+  getClientSentryDebugContext,
+  shouldIgnoreKnownInAppBrowserError,
+} from "@/lib/sentry-debug";
 
 const SENTRY_DSN =
   process.env.NEXT_PUBLIC_SENTRY_DSN ||
@@ -43,6 +46,10 @@ Sentry.init({
       ...debugContext.extra,
       ...event.extra,
     };
+
+    if (shouldIgnoreKnownInAppBrowserError(event)) {
+      return null;
+    }
 
     return event;
   },

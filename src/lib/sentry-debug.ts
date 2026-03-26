@@ -6,6 +6,26 @@ const IN_APP_BROWSER_PATTERNS: Array<[string, RegExp]> = [
   ["line", /Line\//i],
 ];
 
+type SentryLikeEvent = {
+  exception?: {
+    values?: Array<{
+      type?: string;
+      value?: string;
+    }>;
+  };
+  logentry?: {
+    formatted?: string;
+    message?: string;
+  };
+  message?: string;
+  tags?: Record<string, unknown>;
+};
+
+const IGNORED_FACEBOOK_WEBVIEW_ERROR_PATTERNS = [
+  /enableDidUserTypeOnKeyboardLogging/i,
+  /Java object is gone/i,
+];
+
 function parseHostname(value: string): string | undefined {
   if (!value) {
     return undefined;
@@ -82,4 +102,31 @@ export function getClientSentryDebugContext() {
       referrer: document.referrer || undefined,
     },
   };
+}
+
+export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
+  const browserName =
+    typeof event.tags?.in_app_browser_name === "string"
+      ? event.tags.in_app_browser_name
+      : undefined;
+
+  if (browserName !== "facebook") {
+    return false;
+  }
+
+  const errorTexts = [
+    event.message,
+    event.logentry?.formatted,
+    event.logentry?.message,
+    ...(event.exception?.values ?? []).flatMap((value) => [
+      value.type,
+      value.value,
+    ]),
+  ].filter((value): value is string => Boolean(value));
+
+  return errorTexts.some((text) =>
+    IGNORED_FACEBOOK_WEBVIEW_ERROR_PATTERNS.every((pattern) =>
+      pattern.test(text)
+    )
+  );
 }
