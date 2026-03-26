@@ -113,7 +113,6 @@ export async function GET() {
     }
 
     const schedules = (exposureSettings as ExposureSettingRow[])
-      .filter((exposure) => !(exposure.closed_female && exposure.closed_male))
       .map((exposure) => {
         const matchedStaffSchedule = (staffSchedules as StaffScheduleRow[]).find(
           (staffSchedule) =>

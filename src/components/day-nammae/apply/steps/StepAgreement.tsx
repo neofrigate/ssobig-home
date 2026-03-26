@@ -14,9 +14,13 @@ export default function StepAgreement({
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
         <h2 className="text-lg font-bold text-white">{section.title}</h2>
         <div className="mt-4 space-y-3 text-sm leading-relaxed text-white/60">
-          {section.body.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+          {section.body.map((paragraph, index) =>
+            paragraph === "" ? (
+              <div key={index} className="border-t border-white/10 mt-1 mb-3" />
+            ) : (
+              <p key={index}>{paragraph}</p>
+            )
+          )}
         </div>
       </div>
 

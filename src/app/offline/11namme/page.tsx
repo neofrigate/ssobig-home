@@ -75,15 +75,23 @@ const ElevenNammePage = () => {
     status?: string;
   }) => {
     const halfCapacity = maxCapacity / 2;
-    const femalePercentage =
-      halfCapacity > 0 ? (applicants.female / halfCapacity) * 100 : 0;
-    const malePercentage =
-      halfCapacity > 0 ? (applicants.male / halfCapacity) * 100 : 0;
+    const femaleClosed = status === "전체마감" || status === "여자마감";
+    const maleClosed = status === "전체마감" || status === "남자마감";
+    const femalePercentage = femaleClosed
+      ? 100
+      : halfCapacity > 0
+        ? (applicants.female / halfCapacity) * 100
+        : 0;
+    const malePercentage = maleClosed
+      ? 100
+      : halfCapacity > 0
+        ? (applicants.male / halfCapacity) * 100
+        : 0;
     const femaleEmpty = Math.max(0, 100 - femalePercentage);
     const maleEmpty = Math.max(0, 100 - malePercentage);
 
-    const femaleFaded = status === "전체마감" || status === "여자마감";
-    const maleFaded = status === "전체마감" || status === "남자마감";
+    const femaleFaded = femaleClosed;
+    const maleFaded = maleClosed;
 
     return (
       <div className="flex h-2 md:h-3 bg-black/10 rounded-full overflow-hidden">
@@ -303,14 +311,119 @@ const ElevenNammePage = () => {
               className="w-full h-auto block"
             />
 
-            {/* Product Detail 3 */}
-            <Image
-              src="/ssobig_assets/lovebuddies/product-detail3.webp"
-              alt="상세 이미지 3"
-              width={1920}
-              height={1080}
-              className="w-full h-auto block"
-            />
+            {/* 사전 안내 공지 + 신청 전 최종 확인 */}
+            <div className="w-full bg-gradient-to-b from-[#C8D6F0] to-[#D8DEF0] px-5 py-10 md:px-10 md:py-16">
+              {/* 사전 안내 공지 헤더 */}
+              <p className="text-center text-sm md:text-base text-[#4A7BD4] font-semibold mb-1">개더링 무드와 약속</p>
+              <h2 className="text-center text-2xl md:text-4xl font-extrabold text-[#1A1A2E] mb-6 md:mb-10">사전 안내 공지</h2>
+
+              {/* 카드 1: 시간 안내 */}
+              <div className="bg-white rounded-2xl p-5 md:p-7 mb-4 md:mb-6 shadow-sm">
+                <div className="flex items-center gap-1.5 md:gap-2 mb-3 md:mb-4">
+                  <span className="text-lg md:text-2xl">🕐</span>
+                  <span className="font-bold text-[#1A1A2E] text-[15px] md:text-lg">원활한 진행을 위해 시간을 꼭 지켜주세요!</span>
+                </div>
+                <ul className="space-y-1.5 md:space-y-2.5 text-sm md:text-base text-[#333] leading-relaxed">
+                  <li className="flex items-start gap-1"><span>•</span><span>입장가능 시간은 정확히 개더링 시작시간에 맞춰서!<br /><span className="text-[#4A7BD4]">👉</span> 늦게 오시는 분을 위해 15분 대기 후 시작해요.</span></li>
+                  <li className="flex items-start gap-1"><span>•</span><span>알찬 콘텐츠와 매력적인 게스트들이 기다리고 있어요!</span></li>
+                </ul>
+                <p className="mt-2 md:mt-4 text-sm md:text-base font-bold text-[#E53E3E]">※ 당일 15분 이상 지각 시 개더링 참여가 <span className="underline">불가</span>합니다.</p>
+              </div>
+
+              {/* 카드 2: 안전 안내 */}
+              <div className="bg-white rounded-2xl p-5 md:p-7 mb-4 md:mb-6 shadow-sm">
+                <div className="flex items-center gap-1.5 md:gap-2 mb-3 md:mb-4">
+                  <span className="text-lg md:text-2xl">🛡️</span>
+                  <span className="font-bold text-[#1A1A2E] text-[15px] md:text-lg">어떤 상황이든 안전이 최우선!</span>
+                </div>
+                <ul className="space-y-1.5 md:space-y-2.5 text-sm md:text-base text-[#333] leading-relaxed">
+                  <li className="flex items-start gap-1"><span>•</span><span>게더링 중 발생한 안전사고에 대한 책임은 본인에게 있으며, 기물 파손 시 동일 금액으로 원 주인에게 배상해야 합니다.</span></li>
+                  <li className="flex items-start gap-1"><span>•</span><span>빌런에겐 강경대응! 블랙리스트를 관리하고 있어요.</span></li>
+                </ul>
+              </div>
+
+              {/* 카드 3: 승인 안내 */}
+              <div className="bg-white rounded-2xl p-5 md:p-7 shadow-sm">
+                <div className="flex items-center gap-1.5 md:gap-2 mb-3 md:mb-4">
+                  <span className="text-lg md:text-2xl">✅</span>
+                  <span className="font-bold text-[#1A1A2E] text-[15px] md:text-lg">사전 신청 내용을 꼼꼼히 보고 승인해요!</span>
+                </div>
+                <ul className="space-y-1.5 md:space-y-2.5 text-sm md:text-base text-[#333] leading-relaxed">
+                  <li className="flex items-start gap-1"><span>•</span><span>소통을 위해 &apos;가급적&apos; 성비·연령대를 맞춰요!</span></li>
+                  <li className="flex items-start gap-1"><span>•</span><span>인스타를 보고 특히 잘 맞을 것 같은 분 위주로 수락!</span></li>
+                  <li className="flex items-start gap-1"><span>•</span><span>세심히 고려하느라 수락에 시간이 걸릴 수 있어요!</span></li>
+                  <li className="flex items-start gap-1"><span>•</span><span>팔로워를 우선 승인드리는 점 양해 부탁드려요😉</span></li>
+                </ul>
+              </div>
+            </div>
+
+            {/* 신청 전 최종 확인 */}
+            <div className="w-full bg-[#EAECF5] px-5 py-10 md:px-10 md:py-16">
+              <h2 className="text-center text-2xl md:text-4xl font-extrabold text-[#1A1A2E] mb-4 md:mb-6">신청 전 최종 확인!</h2>
+
+              {/* 개더링 CHECK LIST 말풍선 */}
+              <div className="flex justify-center mb-5 md:mb-8">
+                <div className="relative bg-[#1A1A2E] text-white text-sm md:text-base font-bold px-5 md:px-7 py-2 md:py-2.5 rounded-full">
+                  개더링 CHECK LIST
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-[#1A1A2E]" />
+                </div>
+              </div>
+
+              {/* 체크리스트 카드 */}
+              <div className="bg-white rounded-2xl p-5 md:p-8 shadow-sm max-w-[480px] mx-auto">
+                {/* 오시는 길 */}
+                <div className="mb-5 md:mb-6">
+                  <span className="inline-block bg-[#4A9EE8] text-white text-xs md:text-sm font-bold px-3 md:px-4 py-1 md:py-1.5 rounded-full mb-2 md:mb-3">오시는 길</span>
+                  <div className="flex items-start gap-2.5 md:gap-3">
+                    <span className="text-[#4A9EE8] text-xl md:text-2xl mt-0.5">✔</span>
+                    <div className="text-sm md:text-base text-[#333] leading-relaxed">
+                      <p className="font-semibold">신논현역 도보 5분거리</p>
+                      <p className="text-[#666]">(상세 주소는 모임 전날 안내됩니다!)</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-dashed border-[#D0D0D0] mb-5 md:mb-6" />
+
+                {/* 소요시간 */}
+                <div className="mb-5 md:mb-6">
+                  <span className="inline-block bg-[#4A9EE8] text-white text-xs md:text-sm font-bold px-3 md:px-4 py-1 md:py-1.5 rounded-full mb-2 md:mb-3">소요시간</span>
+                  <div className="flex items-start gap-2.5 md:gap-3">
+                    <span className="text-[#4A9EE8] text-xl md:text-2xl mt-0.5">✔</span>
+                    <div className="text-sm md:text-base text-[#333] leading-relaxed">
+                      <p className="font-semibold">2시간 30분 ~ 3시간</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-dashed border-[#D0D0D0] mb-5 md:mb-6" />
+
+                {/* 제공사항 */}
+                <div className="mb-5 md:mb-6">
+                  <span className="inline-block bg-[#4A9EE8] text-white text-xs md:text-sm font-bold px-3 md:px-4 py-1 md:py-1.5 rounded-full mb-2 md:mb-3">제공사항</span>
+                  <div className="flex items-start gap-2.5 md:gap-3">
+                    <span className="text-[#4A9EE8] text-xl md:text-2xl mt-0.5">✔</span>
+                    <div className="text-sm md:text-base text-[#333] leading-relaxed">
+                      <p className="font-semibold">독보적인 콘텐츠와 매력적인 친구들 💌</p>
+                      <p>+ 간단한 다과 및 음료</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-dashed border-[#D0D0D0] mb-5 md:mb-6" />
+
+                {/* 준비물품 */}
+                <div>
+                  <span className="inline-block bg-[#4A9EE8] text-white text-xs md:text-sm font-bold px-3 md:px-4 py-1 md:py-1.5 rounded-full mb-2 md:mb-3">준비물품</span>
+                  <div className="flex items-start gap-2.5 md:gap-3">
+                    <span className="text-[#4A9EE8] text-xl md:text-2xl mt-0.5">✔</span>
+                    <div className="text-sm md:text-base text-[#333] leading-relaxed">
+                      <p className="font-semibold">풀충전한 폰(폰 사용 많음!)</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* FAQ 섹션 */}
             <div className="w-full bg-[#EDEBF6] px-6 py-4 md:px-9 md:py-7 pb-24 md:pb-28">
@@ -339,22 +452,22 @@ const ElevenNammePage = () => {
                     question:
                       "[일일남매] 다른 참가자 연락처가 궁금해요! or 연락처 전달이 가능한가요?",
                     answer:
-                      "모임이 완료되면 참가자분들이 신청 시 제출한 데이터 중<br/>필수 데이터(성함, 전화번호)를 제외한 모든 정보가 폐기처리되어<br/>따로 식별할 수 있는 방법이 없습니다ㅠㅠ.<br/><br/>또한 개인정보 문제상 다른 참가자분들의 정보를 임의로 전달해드리는<br/>어려운 점 양해 부탁드립니다.",
+                      "모임 중 서로 호감투표를 하여 매칭된 경우에 한해<br/>모임 종료 후 자동으로 연락처가 전달됩니다.<br/><br/>그 외에는 모임이 완료되면 참가자분들이 신청 시 제출한 데이터 중<br/>필수 데이터(성함, 전화번호)를 제외한 모든 정보가 폐기처리되어<br/>따로 식별할 수 있는 방법이 없습니다ㅠㅠ.<br/><br/>또한 개인정보 문제상 다른 참가자분들의 정보를 임의로 전달해드리는<br/>어려운 점 양해 부탁드립니다.",
                   },
                   {
                     question: "모임 공지와 장소는 어떻게 확인하나요?",
                     answer:
-                      "모임은 전용 웹앱을 통해 진행됩니다.<br/>모임 전용 웹앱 링크에 접속하시면 장소 및 공지를 확인하실 수 있으니<br/>꼭 접속 후 확인 부탁드립니다!<br/>모임 링크는 모임 하루 전날 일괄 전송드리고 있습니다 :)",
+                      "모임에 승인되시면 모임일 하루 전에 알림톡을 전달드리고 있습니다.<br/>알림톡을 통해 모임입장 티켓을 전달해드리며,<br/>장소 및 공지도 해당 링크에서 확인하실 수 있으니<br/>꼭 접속 후 확인 부탁드립니다!",
                   },
                   {
                     question: "음식과 술을 주나요?",
                     answer:
-                      "저희 모임은 서로를 알아가는 시간에 최대한 집중할 수 있도록<br/>콘텐츠에 많은 신경을 썼어요!<br/><br/>몰입을 위해 모임 중엔 음식이 따로 제공되지 않고<br/>모임이 끝난 뒤, 희망자에 한해 2차 장소로 이동해<br/>식사 및 주류를 즐기는 시간을 가져요 :)<br/><br/>가능하시면 식사를 하고 오시는 걸 추천해요!<br/>(간단한 다과류와 물은 구비되어 있습니다😊)",
+                      "저희 모임은 서로를 알아가는 시간에 최대한 집중할 수 있도록<br/>콘텐츠에 많은 신경을 썼어요!<br/><br/>몰입을 위해 모임 중엔 음식이 따로 제공되지 않고,<br/>현재 2차는 별도로 준비해드리고 있지 않습니다. (26/3/27 부터)<br/><br/>가능하시면 식사를 하고 오시는 걸 추천해요!<br/>(간단한 다과류와 물은 구비되어 있습니다😊)",
                   },
                   {
                     question: "정확히 종료시간에 끝나나요?",
                     answer:
-                      "모임은 2시간 30분 정도 진행합니다!<br/><br/>다만, 당일 상황에 따라 약간의 변동이 있을 수 있어요.<br/>모임 특성상 시간이 지날수록 점점 더 궁금한 사람이 많아지실 거예요!<br/>끝나고 2차에 많이 가시니까 스케줄에 참고해주시면 좋아요 : )",
+                      "모임은 2시간 30분 정도 진행합니다!<br/><br/>다만, 당일 상황에 따라 약간의 변동이 있을 수 있어요.<br/>모임 특성상 시간이 지날수록 점점 더 궁금한 사람이 많아지실 거예요!",
                   },
                 ].map((faq, index) => (
                   <FAQItem
