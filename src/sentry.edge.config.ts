@@ -12,4 +12,10 @@ Sentry.init({
   environment: SENTRY_ENVIRONMENT,
   sendDefaultPii: false,
   tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
+  maxValueLength: 1024,
+  normalizeDepth: 5,
+  initialScope: (scope) => {
+    scope.setTag("runtime", "edge");
+    return scope;
+  },
 });

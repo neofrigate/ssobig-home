@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
@@ -18,8 +19,24 @@ export default function GameOrbPage() {
 
   // Google Sheets에서 데이터 가져오기
   useEffect(() => {
+    Sentry.addBreadcrumb({
+      category: "page.lifecycle",
+      message: "game-orb mounted",
+      level: "info",
+      data:
+        typeof window === "undefined"
+          ? undefined
+          : { pathname: window.location.pathname },
+    });
+
     const fetchSheetData = async () => {
       try {
+        Sentry.addBreadcrumb({
+          category: "game-orb.schedule",
+          message: "schedule fetch started",
+          level: "info",
+        });
+
         const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1562356640`;
 
@@ -78,8 +95,28 @@ export default function GameOrbPage() {
 
         console.log("Final schedules:", schedules);
 
+        Sentry.addBreadcrumb({
+          category: "game-orb.schedule",
+          message: "schedule fetch succeeded",
+          level: "info",
+          data: {
+            insomniaMafiaCount: schedules.불면증마피아.length,
+            campusLifeCount: schedules.캠퍼스라이프.length,
+            doubleSpyCount: schedules.이중스파이.length,
+          },
+        });
+
         setGameSchedules(schedules);
       } catch (error) {
+        Sentry.addBreadcrumb({
+          category: "game-orb.schedule",
+          message: "schedule fetch failed",
+          level: "error",
+          data: {
+            errorMessage:
+              error instanceof Error ? error.message : "unknown error",
+          },
+        });
         console.error("Failed to fetch schedule data:", error);
       }
     };

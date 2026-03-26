@@ -111,4 +111,11 @@ export default withSentryConfig(nextConfig, {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   silent: !process.env.CI,
   widenClientFileUpload: true,
+  release: {
+    setCommits: {
+      auto: true,
+      ignoreEmpty: true,
+      ignoreMissing: true,
+    },
+  },
 });
