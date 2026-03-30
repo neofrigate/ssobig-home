@@ -19,4 +19,29 @@ export interface DayNammeFormValues {
   phone: string;
   traits: string;
   photo: File | null;
+  hasCoupon: boolean | null;
+  couponCode: string;
+}
+
+export interface CouponValidationResult {
+  valid: true;
+  id: number;
+  code: string;
+  discount_type?: string;
+  discount_value?: number;
+  discount_label?: string;
+  discount_link?: string | null;
+  normal_link?: string | null;
+  expires_at?: string;
+}
+
+export interface CouponUseResult {
+  success: true;
+  id: number;
+  code: string;
+  discount_type?: string;
+  discount_value?: number;
+  discount_label?: string;
+  discount_link?: string | null;
+  normal_link?: string | null;
 }

@@ -63,6 +63,16 @@ function getOptionalString(formData: FormData, key: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function getOptionalPositiveInt(formData: FormData, key: string) {
+  const value = formData.get(key);
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const parsed = Number.parseInt(value.trim(), 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
 function maskPhoneNumber(phone: string) {
   const digits = phone.replace(/\D/g, "");
 
@@ -247,6 +257,7 @@ export async function POST(request: Request) {
     const utmSource = (formData.get("utm_source") as string) || "";
     const utmMedium = (formData.get("utm_medium") as string) || "";
     const utmContent = (formData.get("utm_content") as string) || "";
+    const usedCouponId = getOptionalPositiveInt(formData, "usedCouponId");
     clientRequestId = getOptionalString(formData, "client_request_id");
     debugClientContext = parseDebugClientContext(formData.get("debug_client_context"));
 
@@ -365,6 +376,7 @@ export async function POST(request: Request) {
       "Q. 전화번호": phone,
       "Q. 기대되는점": "",
       "[일일남매] 일정 선택": schedule,
+      usedCouponId,
     };
 
     currentStage = "edge:request:start";

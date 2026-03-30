@@ -9,14 +9,21 @@ import {
   isDayNammeScheduleSelectable,
 } from "@/features/day-nammae/schedule";
 import {
+  CouponUseResult,
+  CouponValidationResult,
   DayNammeFormValues,
   ScheduleItem,
 } from "@/features/day-nammae/types";
-import {
-  safeFbq,
-} from "@/utils/metaPixel";
+import { safeFbq } from "@/utils/metaPixel";
 import { getSafeSearchParams } from "@/utils/utm";
 import ApplyStepShell from "./ApplyStepShell";
+import StepAgreement from "./steps/StepAgreement";
+import StepCouponChoice from "./steps/StepCouponChoice";
+import StepCouponCode from "./steps/StepCouponCode";
+import StepGender from "./steps/StepGender";
+import StepPhoto from "./steps/StepPhoto";
+import StepProfile from "./steps/StepProfile";
+import StepSchedule from "./steps/StepSchedule";
 
 function trackEvent(eventName: string, params?: Record<string, unknown>) {
   safeFbq("trackCustom", eventName, params);
@@ -31,13 +38,9 @@ function trackCompleteRegistration() {
     content_name: "일일남매",
   });
 }
-import StepGender from "./steps/StepGender";
-import StepSchedule from "./steps/StepSchedule";
-import StepProfile from "./steps/StepProfile";
-import StepPhoto from "./steps/StepPhoto";
-import StepAgreement from "./steps/StepAgreement";
 
 type ApplyFlowMode = "modal" | "page";
+type CouponValidationStatus = "idle" | "validating" | "valid" | "invalid";
 
 interface LoveBuddiesApplyFlowProps {
   mode: ApplyFlowMode;
@@ -46,19 +49,22 @@ interface LoveBuddiesApplyFlowProps {
   onClose?: () => void;
 }
 
+interface CheckoutState {
+  url: string;
+  buttonLabel: string;
+  value: number;
+  originalPrice: number;
+  finalPrice: number;
+  couponLabel: string;
+  isDiscounted: boolean;
+}
+
 interface SubmitState {
   status: "idle" | "submitting" | "success" | "error";
   message: string;
+  checkout: CheckoutState | null;
+  applicationSubmitted: boolean;
 }
-
-const TOTAL_STEPS = 7;
-const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
-const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
-const MAX_PHOTO_DIMENSION = 1600;
-const INITIAL_PHOTO_JPEG_QUALITY = 0.82;
-const MIN_PHOTO_JPEG_QUALITY = 0.56;
-const DEFAULT_SUBMIT_ERROR_MESSAGE =
-  "신청서 제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
 
 interface SubmitResponseMeta {
   requestId: string;
@@ -71,6 +77,31 @@ interface SubmitResponseMeta {
   parseError: string;
 }
 
+const TOTAL_BASE_STEPS = 7;
+const COUPON_CHOICE_STEP = 8;
+const COUPON_CODE_STEP = 9;
+const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
+const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
+const MAX_PHOTO_DIMENSION = 1600;
+const INITIAL_PHOTO_JPEG_QUALITY = 0.82;
+const MIN_PHOTO_JPEG_QUALITY = 0.56;
+const BASE_PRICE = 35000;
+const DEFAULT_NORMAL_BOOKING_URL =
+  "https://booking.naver.com/booking/12/bizes/1378688/items/6629371";
+const DEFAULT_TEN_PERCENT_BOOKING_URL =
+  "https://booking.naver.com/booking/12/bizes/1378688/items/7553785";
+const DEFAULT_FIFTY_PERCENT_BOOKING_URL =
+  "https://booking.naver.com/booking/12/bizes/1378688/items/7553757";
+const DEFAULT_SUBMIT_ERROR_MESSAGE =
+  "신청서 제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
+const DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE =
+  "쿠폰 검증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+const DEFAULT_COUPON_USE_ERROR_MESSAGE =
+  "신청서는 접수되었지만 쿠폰 처리에 실패했습니다. 쿠폰 코드를 다시 확인하거나 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
+const COUPON_CODE_PREFIX = "SSOBIG-";
+const COUPON_CODE_SUFFIX_LENGTH = 8;
+const COUPON_VALIDATE_DELAY_MS = 700;
+
 const INITIAL_FORM_VALUES: DayNammeFormValues = {
   gender: "",
   schedule: "",
@@ -80,6 +111,27 @@ const INITIAL_FORM_VALUES: DayNammeFormValues = {
   phone: "",
   traits: "",
   photo: null,
+  hasCoupon: null,
+  couponCode: "",
+};
+
+const INITIAL_SUBMIT_STATE: SubmitState = {
+  status: "idle",
+  message: "",
+  checkout: null,
+  applicationSubmitted: false,
+};
+
+const STEP_CONFIG: Record<number, { title: string; description: string }> = {
+  1: { title: "성별을 선택해주세요", description: "해당 성별 기준으로 일정 마감 여부가 달라집니다." },
+  2: { title: "일정을 선택해주세요", description: "참여하고 싶은 일정을 골라주세요." },
+  3: { title: "신청서를 작성해주세요", description: "프로필 정보를 입력해주세요." },
+  4: { title: "사진을 등록해주세요", description: "본인의 매력이 잘 드러나는 사진 한 장을 올려주세요." },
+  5: { title: "승인 기준을 확인해주세요", description: "신청 전 꼭 확인해야 하는 내용이에요." },
+  6: { title: "마케팅 동의를 확인해주세요", description: "촬영 및 콘텐츠 활용에 대한 안내예요." },
+  7: { title: "주의 사항을 확인해주세요", description: "참여 전 꼭 알아두셔야 할 사항이에요." },
+  8: { title: "쿠폰이 있으신가요?", description: "쿠폰이 있다면 결제 전에 할인 여부를 확인해드릴게요." },
+  9: { title: "쿠폰 번호를 입력해주세요", description: "쿠폰 확인이 완료되면 할인 결제 링크로 안내됩니다." },
 };
 
 function buildSubmitErrorMessage(supportCode?: string) {
@@ -90,8 +142,43 @@ function buildSubmitErrorMessage(supportCode?: string) {
   return `${DEFAULT_SUBMIT_ERROR_MESSAGE} 문의 코드: ${supportCode}`;
 }
 
+function buildCouponUseErrorMessage(reason = "") {
+  if (!reason) {
+    return DEFAULT_COUPON_USE_ERROR_MESSAGE;
+  }
+
+  return `${DEFAULT_COUPON_USE_ERROR_MESSAGE} 사유: ${reason}`;
+}
+
 function createClientRequestId() {
   return `cdn-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
+function normalizeCouponCode(value: string) {
+  const normalized = value.replace(/\s+/g, "").toUpperCase();
+
+  if (normalized.startsWith(COUPON_CODE_PREFIX)) {
+    return normalized
+      .slice(COUPON_CODE_PREFIX.length)
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, COUPON_CODE_SUFFIX_LENGTH);
+  }
+
+  return normalized
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, COUPON_CODE_SUFFIX_LENGTH);
+}
+
+function buildCouponCode(suffix: string) {
+  if (!suffix) {
+    return "";
+  }
+
+  return `${COUPON_CODE_PREFIX}${suffix}`;
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function formatFileSize(bytes: number) {
@@ -334,10 +421,7 @@ async function parseSubmitResponse(response: Response): Promise<{
   };
 }
 
-function buildResponseFailureMessage(
-  meta: SubmitResponseMeta,
-  photo: File | null
-) {
+function buildResponseFailureMessage(meta: SubmitResponseMeta, photo: File | null) {
   const supportCode = meta.requestId || meta.clientRequestId;
 
   if (meta.userMessage) {
@@ -450,15 +534,234 @@ function formatPhoneNumber(value: string) {
   return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
 
-const STEP_CONFIG = [
-  { title: "성별을 선택해주세요", description: "해당 성별 기준으로 일정 마감 여부가 달라집니다." },
-  { title: "일정을 선택해주세요", description: "참여하고 싶은 일정을 골라주세요." },
-  { title: "신청서를 작성해주세요", description: "프로필 정보를 입력해주세요." },
-  { title: "사진을 등록해주세요", description: "본인의 매력이 잘 드러나는 사진 한 장을 올려주세요." },
-  { title: "승인 기준을 확인해주세요", description: "신청 전 꼭 확인해야 하는 내용이에요." },
-  { title: "마케팅 동의를 확인해주세요", description: "촬영 및 콘텐츠 활용에 대한 안내예요." },
-  { title: "주의 사항을 확인해주세요", description: "참여 전 꼭 알아두셔야 할 사항이에요." },
-];
+function getCouponReason(payload: unknown, fallbackMessage: string) {
+  if (!payload || typeof payload !== "object") {
+    return fallbackMessage;
+  }
+
+  if ("reason" in payload && typeof payload.reason === "string" && payload.reason) {
+    return payload.reason;
+  }
+
+  if ("error" in payload && typeof payload.error === "string" && payload.error) {
+    return payload.error;
+  }
+
+  if ("detail" in payload && typeof payload.detail === "string" && payload.detail) {
+    return payload.detail;
+  }
+
+  return fallbackMessage;
+}
+
+async function parseJsonResponse<T>(response: Response) {
+  const rawText = await response.text();
+
+  if (!rawText) {
+    return null as T | null;
+  }
+
+  try {
+    return JSON.parse(rawText) as T;
+  } catch {
+    return null as T | null;
+  }
+}
+
+async function requestCouponValidation(code: string) {
+  const response = await fetch("/api/offline/day-nammae/coupon/validate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  });
+
+  const payload = await parseJsonResponse<CouponValidationResult | Record<string, unknown>>(
+    response
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      getCouponReason(payload, DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE)
+    );
+  }
+
+  if (!payload || typeof payload !== "object") {
+    throw new Error(DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE);
+  }
+
+  if (!("valid" in payload) || payload.valid !== true) {
+    throw new Error(getCouponReason(payload, "사용할 수 없는 쿠폰입니다."));
+  }
+
+  if (!("id" in payload) || typeof payload.id !== "number") {
+    throw new Error(DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE);
+  }
+
+  return payload as CouponValidationResult;
+}
+
+async function requestCouponUse(code: string) {
+  const response = await fetch("/api/offline/day-nammae/coupon/use", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  });
+
+  const payload = await parseJsonResponse<CouponUseResult | Record<string, unknown>>(
+    response
+  );
+
+  if (!response.ok) {
+    throw new Error(getCouponReason(payload, DEFAULT_COUPON_USE_ERROR_MESSAGE));
+  }
+
+  if (!payload || typeof payload !== "object") {
+    throw new Error(DEFAULT_COUPON_USE_ERROR_MESSAGE);
+  }
+
+  if (!("success" in payload) || payload.success !== true) {
+    throw new Error(getCouponReason(payload, "쿠폰을 사용할 수 없습니다."));
+  }
+
+  if (!("id" in payload) || typeof payload.id !== "number") {
+    throw new Error(DEFAULT_COUPON_USE_ERROR_MESSAGE);
+  }
+
+  return payload as CouponUseResult;
+}
+
+function getTodayDateParam() {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  const parts = formatter.formatToParts(new Date());
+  const year = parts.find((part) => part.type === "year")?.value || "";
+  const month = parts.find((part) => part.type === "month")?.value || "";
+  const day = parts.find((part) => part.type === "day")?.value || "";
+
+  if (!year || !month || !day) {
+    return "";
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
+function appendStartDateTime(baseUrl: string) {
+  try {
+    const url = new URL(baseUrl);
+    const startDateTime = getTodayDateParam();
+
+    if (startDateTime) {
+      url.searchParams.set("startDateTime", startDateTime);
+    }
+
+    return url.toString();
+  } catch {
+    return baseUrl;
+  }
+}
+
+function getCouponDiscountRate(
+  coupon?: Partial<CouponValidationResult & CouponUseResult> | null
+) {
+  if (!coupon) {
+    return 0;
+  }
+
+  if (coupon.discount_type === "percent") {
+    return typeof coupon.discount_value === "number" ? coupon.discount_value : 0;
+  }
+
+  if (coupon.discount_type === "amount" && typeof coupon.discount_value === "number") {
+    if (coupon.discount_value === 3500) {
+      return 10;
+    }
+
+    if (coupon.discount_value === 17500) {
+      return 50;
+    }
+  }
+
+  const label = typeof coupon.discount_label === "string" ? coupon.discount_label : "";
+  if (label.includes("반값") || label.includes("50%")) {
+    return 50;
+  }
+
+  if (label.includes("10%")) {
+    return 10;
+  }
+
+  return 0;
+}
+
+function getMappedBookingUrl(
+  discountRate: number,
+  normalLink: string
+) {
+  if (discountRate === 10) {
+    return DEFAULT_TEN_PERCENT_BOOKING_URL;
+  }
+
+  if (discountRate === 50) {
+    return DEFAULT_FIFTY_PERCENT_BOOKING_URL;
+  }
+
+  return normalLink || DEFAULT_NORMAL_BOOKING_URL;
+}
+
+function formatPrice(value: number) {
+  return `${value.toLocaleString("ko-KR")}원`;
+}
+
+function buildCheckoutState(
+  _scheduleLabel: string,
+  _scheduleData: ScheduleItem[],
+  coupon?: Partial<CouponValidationResult & CouponUseResult> | null
+): CheckoutState {
+  const discountRate = getCouponDiscountRate(coupon);
+  const normalLink =
+    typeof coupon?.normal_link === "string" && coupon.normal_link.trim()
+      ? coupon.normal_link.trim()
+      : DEFAULT_NORMAL_BOOKING_URL;
+  const isDiscounted = Boolean(coupon) && (discountRate === 10 || discountRate === 50);
+  const baseUrl = isDiscounted
+    ? getMappedBookingUrl(discountRate, normalLink)
+    : normalLink;
+
+  let buttonLabel = `${formatPrice(BASE_PRICE)} 결제하기`;
+  let value = BASE_PRICE;
+  let finalPrice = BASE_PRICE;
+
+  if (discountRate === 10) {
+    value = 31500;
+    finalPrice = 31500;
+  } else if (discountRate === 50) {
+    value = 17500;
+    finalPrice = 17500;
+  } else if (isDiscounted) {
+    finalPrice = BASE_PRICE;
+  }
+
+  buttonLabel = `${formatPrice(finalPrice)} 구매하기`;
+
+  return {
+    url: appendStartDateTime(baseUrl),
+    buttonLabel,
+    value,
+    originalPrice: BASE_PRICE,
+    finalPrice,
+    couponLabel: coupon?.discount_label || "",
+    isDiscounted,
+  };
+}
 
 export default function LoveBuddiesApplyFlow({
   mode,
@@ -475,16 +778,18 @@ export default function LoveBuddiesApplyFlow({
   const [formError, setFormError] = useState("");
   const [showFieldErrors, setShowFieldErrors] = useState(false);
   const [agreements, setAgreements] = useState([false, false, false]);
-  const [submitState, setSubmitState] = useState<SubmitState>({
-    status: "idle",
-    message: "",
-  });
+  const [couponValidationStatus, setCouponValidationStatus] =
+    useState<CouponValidationStatus>("idle");
+  const [validatedCoupon, setValidatedCoupon] =
+    useState<CouponValidationResult | null>(null);
+  const [submitState, setSubmitState] = useState<SubmitState>(INITIAL_SUBMIT_STATE);
 
   useEffect(() => {
     if (!formValues.photo) {
       setPhotoPreviewUrl("");
       return;
     }
+
     const previewUrl = URL.createObjectURL(formValues.photo);
     setPhotoPreviewUrl(previewUrl);
     return () => URL.revokeObjectURL(previewUrl);
@@ -495,7 +800,20 @@ export default function LoveBuddiesApplyFlow({
       router.push("/offline/11namme");
       return;
     }
+
     onClose?.();
+  };
+
+  const resetFlow = () => {
+    setSubmitState(INITIAL_SUBMIT_STATE);
+    setCurrentStep(1);
+    setFormValues(INITIAL_FORM_VALUES);
+    setAgreements([false, false, false]);
+    setShowFieldErrors(false);
+    setFormError("");
+    setPhotoNotice("");
+    setCouponValidationStatus("idle");
+    setValidatedCoupon(null);
   };
 
   const handleValueChange =
@@ -515,6 +833,7 @@ export default function LoveBuddiesApplyFlow({
       setFormError("사진은 이미지 파일만 업로드할 수 있습니다.");
       return;
     }
+
     if (!file) {
       setFormValues((current) => ({ ...current, photo: null }));
       setPhotoNotice("");
@@ -585,6 +904,66 @@ export default function LoveBuddiesApplyFlow({
     });
   };
 
+  const handleCouponChoice = (nextValue: boolean) => {
+    setFormValues((current) => ({
+      ...current,
+      hasCoupon: nextValue,
+      couponCode: nextValue ? current.couponCode : "",
+    }));
+    if (!nextValue) {
+      setValidatedCoupon(null);
+      setCouponValidationStatus("idle");
+    }
+    setFormError("");
+  };
+
+  const handleCouponCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const couponCode = normalizeCouponCode(event.target.value);
+    setFormValues((current) => ({ ...current, couponCode }));
+    setValidatedCoupon(null);
+    setCouponValidationStatus(couponCode ? "idle" : "invalid");
+    setFormError("");
+  };
+
+  const handleValidateCoupon = async () => {
+    const couponCodeSuffix = normalizeCouponCode(formValues.couponCode);
+
+    if (couponCodeSuffix.length !== COUPON_CODE_SUFFIX_LENGTH) {
+      setCouponValidationStatus("invalid");
+      setValidatedCoupon(null);
+      setFormError("쿠폰 번호 8자리를 입력해주세요.");
+      return;
+    }
+
+    setCouponValidationStatus("validating");
+    setValidatedCoupon(null);
+    setFormError("");
+
+    try {
+      await delay(COUPON_VALIDATE_DELAY_MS);
+      const result = await requestCouponValidation(buildCouponCode(couponCodeSuffix));
+      setCouponValidationStatus("valid");
+      setValidatedCoupon(result);
+      setFormValues((current) => ({
+        ...current,
+        couponCode: normalizeCouponCode(result.code),
+      }));
+      trackEvent("DN_ValidateCoupon", {
+        code: result.code,
+        discount_label: result.discount_label || "",
+      });
+    } catch (error) {
+      setCouponValidationStatus("invalid");
+      setValidatedCoupon(null);
+      setFormError(
+        error instanceof Error ? error.message : DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE
+      );
+    }
+  };
+
+  const totalSteps = formValues.hasCoupon === true ? COUPON_CODE_STEP : COUPON_CHOICE_STEP;
+  const isLastStep = currentStep === totalSteps;
+
   const canProceed = (() => {
     switch (currentStep) {
       case 1:
@@ -607,93 +986,150 @@ export default function LoveBuddiesApplyFlow({
         return agreements[1];
       case 7:
         return agreements[2];
+      case 8:
+        return formValues.hasCoupon !== null;
+      case 9:
+        return (
+          couponValidationStatus === "valid" &&
+          Boolean(validatedCoupon) &&
+          validatedCoupon?.code === buildCouponCode(normalizeCouponCode(formValues.couponCode))
+        );
       default:
         return false;
     }
   })();
 
   const handleSubmit = async () => {
-    setSubmitState({ status: "submitting", message: "" });
+    const wantsCoupon = formValues.hasCoupon === true;
+    const normalizedCouponCode = buildCouponCode(
+      normalizeCouponCode(formValues.couponCode)
+    );
+
+    if (wantsCoupon) {
+      if (
+        couponValidationStatus !== "valid" ||
+        !validatedCoupon ||
+        typeof validatedCoupon.id !== "number" ||
+        validatedCoupon.code !== normalizedCouponCode
+      ) {
+        setFormError("쿠폰 확인을 완료해주세요.");
+        return;
+      }
+    }
+
+    setSubmitState((current) => ({
+      ...current,
+      status: "submitting",
+      message: "",
+      checkout: null,
+    }));
     setFormError("");
 
     const clientRequestId = createClientRequestId();
     const clientDebugContext = buildClientDebugContext(formValues.photo, clientRequestId);
-    let submitStage = "client:prepare";
+    let submitStage = submitState.applicationSubmitted
+      ? "client:coupon-use:retry"
+      : "client:prepare";
+    let applicationSubmitted = submitState.applicationSubmitted;
 
     try {
-      const urlSearchParams =
-        typeof window !== "undefined"
-          ? getSafeSearchParams(window.location.search)
-          : new URLSearchParams();
-      const requestBody = new FormData();
-      requestBody.append("gender", formValues.gender);
-      requestBody.append("schedule", formValues.schedule);
-      requestBody.append("name", formValues.name.trim());
-      requestBody.append("birthYear", formValues.birthYear);
-      requestBody.append("height", formValues.height.trim());
-      requestBody.append("phone", formValues.phone.trim());
-      requestBody.append("traits", formValues.traits.trim());
-      requestBody.append("photo", formValues.photo as File);
-      requestBody.append("utm_source", urlSearchParams.get("utm_source") || "");
-      requestBody.append("utm_medium", urlSearchParams.get("utm_medium") || "");
-      requestBody.append("utm_content", urlSearchParams.get("utm_content") || "");
-      requestBody.append("client_request_id", clientRequestId);
-      if (clientDebugContext) {
-        requestBody.append("debug_client_context", JSON.stringify(clientDebugContext));
-      }
+      if (!applicationSubmitted) {
+        const urlSearchParams =
+          typeof window !== "undefined"
+            ? getSafeSearchParams(window.location.search)
+            : new URLSearchParams();
+        const requestBody = new FormData();
+        requestBody.append("gender", formValues.gender);
+        requestBody.append("schedule", formValues.schedule);
+        requestBody.append("name", formValues.name.trim());
+        requestBody.append("birthYear", formValues.birthYear);
+        requestBody.append("height", formValues.height.trim());
+        requestBody.append("phone", formValues.phone.trim());
+        requestBody.append("traits", formValues.traits.trim());
+        requestBody.append("photo", formValues.photo as File);
+        requestBody.append("utm_source", urlSearchParams.get("utm_source") || "");
+        requestBody.append("utm_medium", urlSearchParams.get("utm_medium") || "");
+        requestBody.append("utm_content", urlSearchParams.get("utm_content") || "");
+        requestBody.append("client_request_id", clientRequestId);
+        if (wantsCoupon && validatedCoupon) {
+          requestBody.append("usedCouponId", String(validatedCoupon.id));
+        }
+        if (clientDebugContext) {
+          requestBody.append("debug_client_context", JSON.stringify(clientDebugContext));
+        }
 
-      submitStage = "client:fetch:start";
-      const response = await fetch("/api/offline/day-nammae/apply", {
-        method: "POST",
-        body: requestBody,
-      });
-
-      submitStage = "client:response:received";
-      const { result, meta } = await parseSubmitResponse(response);
-      submitStage = meta.parseError
-        ? "client:response:parse_error"
-        : "client:response:parsed";
-
-      if (!response.ok) {
-        submitStage = "client:response:not_ok";
-        const requestId = meta.requestId;
-        const userMessage = buildResponseFailureMessage(meta, formValues.photo);
-
-        console.error("[day-nammae submit failed]", {
-          clientRequestId,
-          requestId,
-          submitStage,
-          result,
-          responseStatus: meta.responseStatus,
-          responseContentType: meta.responseContentType,
-          responseTextSnippet: meta.responseTextSnippet,
-          responseUrl: meta.responseUrl,
-          parseError: meta.parseError,
-          clientDebugContext,
+        submitStage = "client:fetch:start";
+        const response = await fetch("/api/offline/day-nammae/apply", {
+          method: "POST",
+          body: requestBody,
         });
 
-        throw createHandledSubmitError(userMessage, {
-          requestId,
-          clientRequestId: meta.clientRequestId || clientRequestId,
-          responseStatus: meta.responseStatus,
-          responseContentType: meta.responseContentType,
-          responseTextSnippet: meta.responseTextSnippet,
-          responseUrl: meta.responseUrl,
-          parseError: meta.parseError,
-          stage: submitStage,
+        submitStage = "client:response:received";
+        const { result, meta } = await parseSubmitResponse(response);
+        submitStage = meta.parseError
+          ? "client:response:parse_error"
+          : "client:response:parsed";
+
+        if (!response.ok) {
+          submitStage = "client:response:not_ok";
+          const requestId = meta.requestId;
+          const userMessage = buildResponseFailureMessage(meta, formValues.photo);
+
+          console.error("[day-nammae submit failed]", {
+            clientRequestId,
+            requestId,
+            submitStage,
+            result,
+            responseStatus: meta.responseStatus,
+            responseContentType: meta.responseContentType,
+            responseTextSnippet: meta.responseTextSnippet,
+            responseUrl: meta.responseUrl,
+            parseError: meta.parseError,
+            clientDebugContext,
+          });
+
+          throw createHandledSubmitError(userMessage, {
+            requestId,
+            clientRequestId: meta.clientRequestId || clientRequestId,
+            responseStatus: meta.responseStatus,
+            responseContentType: meta.responseContentType,
+            responseTextSnippet: meta.responseTextSnippet,
+            responseUrl: meta.responseUrl,
+            parseError: meta.parseError,
+            stage: submitStage,
+          });
+        }
+
+        submitStage = "client:apply:success";
+        applicationSubmitted = true;
+        trackEvent("DN_SubmitApplication", {
+          gender: formValues.gender,
+          schedule: formValues.schedule,
+          has_coupon: wantsCoupon,
+        });
+        trackCompleteRegistration();
+      }
+
+      let checkoutSource: Partial<CouponValidationResult & CouponUseResult> | null = null;
+
+      if (wantsCoupon && validatedCoupon) {
+        submitStage = "client:coupon-use:start";
+        const usedCoupon = await requestCouponUse(validatedCoupon.code);
+        submitStage = "client:coupon-use:success";
+        checkoutSource = usedCoupon;
+        trackEvent("DN_UseCoupon", {
+          code: usedCoupon.code,
+          discount_label: usedCoupon.discount_label || "",
         });
       }
 
-      submitStage = "client:success";
-      trackEvent("DN_SubmitApplication", {
-        gender: formValues.gender,
-        schedule: formValues.schedule,
-      });
-      trackCompleteRegistration();
+      const checkout = buildCheckoutState(formValues.schedule, scheduleData, checkoutSource);
 
       setSubmitState({
         status: "success",
         message: "신청이 정상적으로 접수되었습니다. 검토 후 안내 메시지를 보내드릴게요.",
+        checkout,
+        applicationSubmitted,
       });
     } catch (error) {
       const {
@@ -713,6 +1149,8 @@ export default function LoveBuddiesApplyFlow({
         Sentry.withScope((scope) => {
           scope.setTag("feature", "day-nammae-apply");
           scope.setTag("submit_stage", stage || submitStage);
+          scope.setTag("coupon_flow", wantsCoupon ? "with_coupon" : "without_coupon");
+          scope.setTag("application_submitted", applicationSubmitted ? "true" : "false");
           scope.setTag(
             "client_request_id",
             capturedClientRequestId || clientRequestId
@@ -755,11 +1193,23 @@ export default function LoveBuddiesApplyFlow({
         responseTextSnippet,
         responseUrl,
         parseError,
+        applicationSubmitted,
       });
+
+      const errorMessage =
+        applicationSubmitted && wantsCoupon
+          ? buildCouponUseErrorMessage(
+              error instanceof Error ? error.message : ""
+            )
+          : error instanceof Error
+            ? error.message
+            : buildSubmitErrorMessage(supportCode);
+
       setSubmitState({
         status: "error",
-        message:
-          error instanceof Error ? error.message : buildSubmitErrorMessage(supportCode),
+        message: errorMessage,
+        checkout: null,
+        applicationSubmitted,
       });
     }
   };
@@ -769,9 +1219,33 @@ export default function LoveBuddiesApplyFlow({
       setShowFieldErrors(true);
       return;
     }
-    if (currentStep === TOTAL_STEPS) {
+
+    if (currentStep === TOTAL_BASE_STEPS) {
       trackEvent("DN_Step7_AcceptNotice");
-      handleSubmit();
+      setCurrentStep(COUPON_CHOICE_STEP);
+      setFormError("");
+      return;
+    }
+
+    if (currentStep === COUPON_CHOICE_STEP) {
+      if (formValues.hasCoupon === true) {
+        trackEvent("DN_Step8_SelectCoupon", { has_coupon: true });
+        setCurrentStep(COUPON_CODE_STEP);
+        setFormError("");
+        return;
+      }
+
+      trackEvent("DN_Step8_SelectCoupon", { has_coupon: false });
+      void handleSubmit();
+      return;
+    }
+
+    if (currentStep === COUPON_CODE_STEP) {
+      trackEvent("DN_Step9_ConfirmCoupon", {
+        code: validatedCoupon?.code || "",
+        discount_label: validatedCoupon?.discount_label || "",
+      });
+      void handleSubmit();
       return;
     }
 
@@ -786,7 +1260,7 @@ export default function LoveBuddiesApplyFlow({
     stepEvents[currentStep]?.();
 
     setShowFieldErrors(false);
-    setCurrentStep((s) => s + 1);
+    setCurrentStep((step) => step + 1);
     setFormError("");
   };
 
@@ -795,28 +1269,19 @@ export default function LoveBuddiesApplyFlow({
       closeFlow();
       return;
     }
-    setCurrentStep((s) => s - 1);
+
+    setCurrentStep((step) => step - 1);
     setFormError("");
   };
 
-  if (submitState.status === "success") {
-    const bookingUrl = (() => {
-      const match = formValues.schedule.match(/(\d+)\/(\d+)/);
-      if (!match) return "https://booking.naver.com/booking/12/bizes/1378688/items/6629371";
-      const now = new Date();
-      const month = parseInt(match[1], 10);
-      const day = parseInt(match[2], 10);
-      let year = now.getFullYear();
-      if (month < now.getMonth() + 1) year += 1;
-      const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-      return `https://booking.naver.com/booking/12/bizes/1378688/items/6629371?startDateTime=${encodeURIComponent(`${dateStr}T00:00:00+09:00`)}`;
-    })();
+  if (submitState.status === "success" && submitState.checkout) {
+    const checkout = submitState.checkout;
 
     return (
       <ApplyStepShell
         mode={mode}
-        currentStep={TOTAL_STEPS}
-        totalSteps={TOTAL_STEPS}
+        currentStep={totalSteps}
+        totalSteps={totalSteps}
         title="결제를 진행해주세요"
         description="결제까지 진행해주셔야 신청이 완료됩니다."
         canProceed={true}
@@ -824,42 +1289,70 @@ export default function LoveBuddiesApplyFlow({
         onNext={() => {}}
         onBack={() => {}}
       >
-        <div className="rounded-2xl bg-white/5 border border-white/15 px-5 py-5 text-center">
-          <p className="text-xs font-semibold text-white/40 uppercase tracking-wider">신청 내역</p>
+        <div className="rounded-2xl border border-white/15 bg-white/5 px-5 py-5 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
+            신청 내역
+          </p>
           <p className="mt-3 text-base font-bold text-white">{formValues.schedule}</p>
-          <p className="mt-1 text-sm text-white/70">{formValues.name} · {formValues.phone}</p>
+          <p className="mt-1 text-sm text-white/70">
+            {formValues.name} · {formValues.phone}
+          </p>
+          {checkout.isDiscounted && checkout.couponLabel && (
+            <div className="mt-4 inline-flex rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">
+              {checkout.couponLabel}
+            </div>
+          )}
         </div>
 
         <div className="mt-5 px-1 text-left text-sm leading-relaxed text-white/60">
           <p>• 결제가 완료된 순서대로 참가자를 승인해드립니다.</p>
-          <p className="mt-1">• 결제 완료 후 &apos;참가 확정 메세지&apos;를 받으셔야 최종 확정입니다.</p>
+          <p className="mt-1">
+            • 결제 완료 후 &apos;참가 확정 메세지&apos;를 받으셔야 최종 확정입니다.
+          </p>
           <p className="mt-1">• 승인/확정 처리까지 최대 24시간이 소요될 수 있습니다.</p>
         </div>
+
+        <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-5 py-5 text-center">
+          {checkout.isDiscounted ? (
+            <>
+              <p className="text-sm font-medium text-white/45 line-through">
+                {formatPrice(checkout.originalPrice)}
+              </p>
+              <p className="mt-2 text-3xl font-black text-[#FFB1D4]">
+                {formatPrice(checkout.finalPrice)}
+              </p>
+            </>
+          ) : (
+            <p className="text-3xl font-black text-white">
+              {formatPrice(checkout.finalPrice)}
+            </p>
+          )}
+        </div>
+
         <a
-          href={bookingUrl}
+          href={checkout.url}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => {
-            trackEvent("DN_InitiateCheckout", { schedule: formValues.schedule });
+            trackEvent("DN_InitiateCheckout", {
+              schedule: formValues.schedule,
+              coupon_applied: checkout.isDiscounted,
+              coupon_label: checkout.couponLabel,
+            });
             safeFbq("track", "InitiateCheckout", {
-              value: 35000,
+              value: checkout.value,
               currency: "KRW",
               content_name: "일일남매",
             });
           }}
           className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98]"
         >
-          35,000원 결제하기
+          {checkout.buttonLabel}
         </a>
+
         <button
           type="button"
-          onClick={() => {
-            setSubmitState({ status: "idle", message: "" });
-            setCurrentStep(1);
-            setFormValues(INITIAL_FORM_VALUES);
-            setAgreements([false, false, false]);
-            setShowFieldErrors(false);
-          }}
+          onClick={resetFlow}
           className="mt-3 inline-flex h-12 w-full items-center justify-center rounded-full border border-white/20 text-sm font-medium text-white/60 transition active:scale-[0.98]"
         >
           신청서 다시 작성하기
@@ -868,18 +1361,18 @@ export default function LoveBuddiesApplyFlow({
     );
   }
 
-  const stepConfig = STEP_CONFIG[currentStep - 1];
+  const stepConfig = STEP_CONFIG[currentStep];
 
   return (
     <ApplyStepShell
       mode={mode}
       currentStep={currentStep}
-      totalSteps={TOTAL_STEPS}
+      totalSteps={totalSteps}
       title={stepConfig.title}
       description={stepConfig.description}
       canProceed={currentStep === 3 ? true : canProceed}
       isSubmitting={submitState.status === "submitting"}
-      isLastStep={currentStep === TOTAL_STEPS}
+      isLastStep={isLastStep}
       onNext={handleNext}
       onBack={handleBack}
     >
@@ -901,20 +1394,23 @@ export default function LoveBuddiesApplyFlow({
         </div>
       )}
 
-      {currentStep === TOTAL_STEPS &&
-        submitState.status === "submitting" && (
-          <div className="mb-4 rounded-2xl border border-[#FF6B9F]/30 bg-[#FF6B9F]/10 px-4 py-4 text-white">
-            <div className="flex items-center gap-3">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/25 border-t-[#FF6B9F]" />
-              <div>
-                <p className="text-sm font-semibold">신청서를 접수하고 있어요</p>
-                <p className="mt-1 text-xs text-white/65">
-                  제출까지 잠시만 기다려주세요. 완료되면 바로 다음 단계로 넘어갑니다.
-                </p>
-              </div>
+      {isLastStep && submitState.status === "submitting" && (
+        <div className="mb-4 rounded-2xl border border-[#FF6B9F]/30 bg-[#FF6B9F]/10 px-4 py-4 text-white">
+          <div className="flex items-center gap-3">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/25 border-t-[#FF6B9F]" />
+            <div>
+              <p className="text-sm font-semibold">
+                {submitState.applicationSubmitted
+                  ? "쿠폰을 처리하고 있어요"
+                  : "신청서를 접수하고 있어요"}
+              </p>
+              <p className="mt-1 text-xs text-white/65">
+                완료되면 바로 결제 단계로 넘어갑니다.
+              </p>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
       {currentStep === 1 && (
         <StepGender gender={formValues.gender} onSelect={handleGenderSelect} />
@@ -969,6 +1465,37 @@ export default function LoveBuddiesApplyFlow({
           agreed={agreements[2]}
           onAgreeChange={handleAgreementChange(2)}
         />
+      )}
+
+      {currentStep === 8 && (
+        <StepCouponChoice
+          hasCoupon={formValues.hasCoupon}
+          onSelect={handleCouponChoice}
+        />
+      )}
+
+      {currentStep === 9 && (
+        <>
+          <StepCouponCode
+            couponCode={formValues.couponCode}
+            validationStatus={couponValidationStatus}
+            validatedCoupon={validatedCoupon}
+            onCodeChange={handleCouponCodeChange}
+            onValidate={handleValidateCoupon}
+          />
+
+          {couponValidationStatus === "valid" && validatedCoupon && (
+            <div className="mt-4 rounded-2xl border border-amber-400/35 bg-amber-500/10 px-4 py-4 text-sm leading-relaxed text-amber-100">
+              <p className="font-semibold">신청 완료 전 꼭 확인해주세요.</p>
+              <p className="mt-2">
+                `신청 완료` 버튼을 누르면 이 쿠폰은 바로 사용 처리됩니다.
+              </p>
+              <p className="mt-1">
+                사용 처리 후에는 이전 단계로 돌아가 쿠폰을 다시 수정할 수 없습니다.
+              </p>
+            </div>
+          )}
+        </>
       )}
     </ApplyStepShell>
   );
