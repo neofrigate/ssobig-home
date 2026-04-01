@@ -654,10 +654,42 @@ function getTodayDateParam() {
   return `${year}-${month}-${day}`;
 }
 
-function appendStartDateTime(baseUrl: string) {
+function getScheduleDateParam(scheduleLabel: string) {
+  const todayDate = getTodayDateParam();
+  const dateMatch = scheduleLabel.match(/(\d{1,2})\/(\d{1,2})/);
+
+  if (!dateMatch || !todayDate) {
+    return todayDate;
+  }
+
+  const [, monthRaw, dayRaw] = dateMatch;
+  const [yearRaw, todayMonthRaw, todayDayRaw] = todayDate.split("-");
+  const year = Number.parseInt(yearRaw || "", 10);
+  const month = Number.parseInt(monthRaw, 10);
+  const day = Number.parseInt(dayRaw, 10);
+  const todayMonth = Number.parseInt(todayMonthRaw || "", 10);
+  const todayDay = Number.parseInt(todayDayRaw || "", 10);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day) ||
+    !Number.isInteger(todayMonth) ||
+    !Number.isInteger(todayDay)
+  ) {
+    return todayDate;
+  }
+
+  const resolvedYear =
+    month < todayMonth || (month === todayMonth && day < todayDay) ? year + 1 : year;
+
+  return `${resolvedYear}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+function appendStartDateTime(baseUrl: string, scheduleLabel: string) {
   try {
     const url = new URL(baseUrl);
-    const startDateTime = getTodayDateParam();
+    const startDateTime = getScheduleDateParam(scheduleLabel);
 
     if (startDateTime) {
       url.searchParams.set("startDateTime", startDateTime);
@@ -722,8 +754,7 @@ function formatPrice(value: number) {
 }
 
 function buildCheckoutState(
-  _scheduleLabel: string,
-  _scheduleData: ScheduleItem[],
+  scheduleLabel: string,
   coupon?: Partial<CouponValidationResult & CouponUseResult> | null
 ): CheckoutState {
   const discountRate = getCouponDiscountRate(coupon);
@@ -753,7 +784,7 @@ function buildCheckoutState(
   buttonLabel = `${formatPrice(finalPrice)} 구매하기`;
 
   return {
-    url: appendStartDateTime(baseUrl),
+    url: appendStartDateTime(baseUrl, scheduleLabel),
     buttonLabel,
     value,
     originalPrice: BASE_PRICE,
@@ -1123,7 +1154,7 @@ export default function LoveBuddiesApplyFlow({
         });
       }
 
-      const checkout = buildCheckoutState(formValues.schedule, scheduleData, checkoutSource);
+      const checkout = buildCheckoutState(formValues.schedule, checkoutSource);
 
       setSubmitState({
         status: "success",
