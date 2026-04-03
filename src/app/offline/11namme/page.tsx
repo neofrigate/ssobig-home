@@ -572,9 +572,7 @@ const ElevenNammePage = () => {
                 쿠폰이 적용돼요
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-white/75">
-                지금 일일남매 신청하시면 쿠폰{" "}
-                <span className="font-bold text-[#FFB1D4]">{couponCode}</span>가
-                적용됩니다.
+                지금 일일남매 신청하시면 쿠폰이 적용됩니다.
               </p>
               <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4">
                 <p className="text-[11px] font-semibold tracking-[0.18em] text-white/35">

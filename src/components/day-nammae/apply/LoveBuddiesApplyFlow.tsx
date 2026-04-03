@@ -83,9 +83,15 @@ interface SubmitResponseMeta {
   parseError: string;
 }
 
-const TOTAL_BASE_STEPS = 7;
-const COUPON_CHOICE_STEP = 8;
-const COUPON_CODE_STEP = 9;
+const COUPON_CHOICE_STEP = 1;
+const COUPON_CODE_STEP = 2;
+const GENDER_STEP = 3;
+const SCHEDULE_STEP = 4;
+const PROFILE_STEP = 5;
+const PHOTO_STEP = 6;
+const APPROVAL_STEP = 7;
+const MARKETING_STEP = 8;
+const NOTICE_STEP = 9;
 const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
 const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
 const MAX_PHOTO_DIMENSION = 1600;
@@ -139,15 +145,15 @@ const INITIAL_SUBMIT_STATE: SubmitState = {
 };
 
 const STEP_CONFIG: Record<number, { title: string; description: string }> = {
-  1: { title: "성별을 선택해주세요", description: "해당 성별 기준으로 일정 마감 여부가 달라집니다." },
-  2: { title: "일정을 선택해주세요", description: "참여하고 싶은 일정을 골라주세요." },
-  3: { title: "신청서를 작성해주세요", description: "프로필 정보를 입력해주세요." },
-  4: { title: "사진을 등록해주세요", description: "본인의 매력이 잘 드러나는 사진 한 장을 올려주세요." },
-  5: { title: "승인 기준을 확인해주세요", description: "신청 전 꼭 확인해야 하는 내용이에요." },
-  6: { title: "마케팅 동의를 확인해주세요", description: "촬영 및 콘텐츠 활용에 대한 안내예요." },
-  7: { title: "주의 사항을 확인해주세요", description: "참여 전 꼭 알아두셔야 할 사항이에요." },
-  8: { title: "쿠폰이 있으신가요?", description: "쿠폰이 있다면 결제 전에 할인 여부를 확인해드릴게요." },
-  9: { title: "쿠폰 번호를 입력해주세요", description: "쿠폰 확인이 완료되면 할인 결제 링크로 안내됩니다." },
+  1: { title: "쿠폰이 있으신가요?", description: "쿠폰이 있다면 결제 전에 할인 여부를 확인해드릴게요." },
+  2: { title: "쿠폰 번호를 입력해주세요", description: "쿠폰 확인이 완료되면 할인 결제 링크로 안내됩니다." },
+  3: { title: "성별을 선택해주세요", description: "해당 성별 기준으로 일정 마감 여부가 달라집니다." },
+  4: { title: "일정을 선택해주세요", description: "참여하고 싶은 일정을 골라주세요." },
+  5: { title: "신청서를 작성해주세요", description: "프로필 정보를 입력해주세요." },
+  6: { title: "사진을 등록해주세요", description: "본인의 매력이 잘 드러나는 사진 한 장을 올려주세요." },
+  7: { title: "승인 기준을 확인해주세요", description: "신청 전 꼭 확인해야 하는 내용이에요." },
+  8: { title: "마케팅 동의를 확인해주세요", description: "촬영 및 콘텐츠 활용에 대한 안내예요." },
+  9: { title: "주의 사항을 확인해주세요", description: "참여 전 꼭 알아두셔야 할 사항이에요." },
 };
 
 function buildSubmitErrorMessage(supportCode?: string) {
@@ -824,6 +830,27 @@ export default function LoveBuddiesApplyFlow({
     return () => URL.revokeObjectURL(previewUrl);
   }, [formValues.photo]);
 
+  useEffect(() => {
+    if (!normalizedInitialCouponCode) {
+      return;
+    }
+
+    setFormValues((current) => {
+      if (
+        current.couponCode === normalizedInitialCouponCode &&
+        current.hasCoupon === true
+      ) {
+        return current;
+      }
+
+      return {
+        ...current,
+        hasCoupon: true,
+        couponCode: normalizedInitialCouponCode,
+      };
+    });
+  }, [normalizedInitialCouponCode]);
+
   const closeFlow = () => {
     if (mode === "page") {
       router.push("/offline/11namme");
@@ -911,14 +938,14 @@ export default function LoveBuddiesApplyFlow({
     });
     setFormError("");
     setShowFieldErrors(false);
-    setCurrentStep(2);
+    setCurrentStep(SCHEDULE_STEP);
   };
 
   const handleScheduleSelect = (scheduleLabel: string) => {
     setFormValues((current) => ({ ...current, schedule: scheduleLabel }));
     setFormError("");
     setShowFieldErrors(false);
-    setCurrentStep(3);
+    setCurrentStep(PROFILE_STEP);
   };
 
   const handleBirthYearSelect = (year: string) => {
@@ -992,34 +1019,18 @@ export default function LoveBuddiesApplyFlow({
     }
   };
 
-  const totalSteps = formValues.hasCoupon === true ? COUPON_CODE_STEP : COUPON_CHOICE_STEP;
-  const isLastStep = currentStep === totalSteps;
+  const totalSteps = formValues.hasCoupon === true ? NOTICE_STEP : NOTICE_STEP - 1;
+  const displayStep =
+    formValues.hasCoupon === false && currentStep > COUPON_CODE_STEP
+      ? currentStep - 1
+      : currentStep;
+  const isLastStep = displayStep === totalSteps;
 
   const canProceed = (() => {
     switch (currentStep) {
-      case 1:
-        return formValues.gender !== "";
-      case 2:
-        return formValues.schedule !== "";
-      case 3:
-        return (
-          formValues.name.trim() !== "" &&
-          formValues.birthYear !== "" &&
-          formValues.height.trim() !== "" &&
-          formValues.phone.replace(/\D/g, "").length === 11 &&
-          formValues.traits.trim() !== ""
-        );
-      case 4:
-        return formValues.photo !== null && !isOptimizingPhoto;
-      case 5:
-        return agreements[0];
-      case 6:
-        return agreements[1];
-      case 7:
-        return agreements[2];
-      case 8:
+      case COUPON_CHOICE_STEP:
         return formValues.hasCoupon !== null;
-      case 9:
+      case COUPON_CODE_STEP:
         return (
           couponValidationStatus === "valid" &&
           Boolean(validatedCoupon) &&
@@ -1028,6 +1039,26 @@ export default function LoveBuddiesApplyFlow({
               normalizeDayNammeCouponCode(formValues.couponCode)
             )
         );
+      case GENDER_STEP:
+        return formValues.gender !== "";
+      case SCHEDULE_STEP:
+        return formValues.schedule !== "";
+      case PROFILE_STEP:
+        return (
+          formValues.name.trim() !== "" &&
+          formValues.birthYear !== "" &&
+          formValues.height.trim() !== "" &&
+          formValues.phone.replace(/\D/g, "").length === 11 &&
+          formValues.traits.trim() !== ""
+        );
+      case PHOTO_STEP:
+        return formValues.photo !== null && !isOptimizingPhoto;
+      case APPROVAL_STEP:
+        return agreements[0];
+      case MARKETING_STEP:
+        return agreements[1];
+      case NOTICE_STEP:
+        return agreements[2];
       default:
         return false;
     }
@@ -1249,47 +1280,50 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const handleNext = () => {
-    if (currentStep === 3 && !canProceed) {
+    if (currentStep === PROFILE_STEP && !canProceed) {
       setShowFieldErrors(true);
-      return;
-    }
-
-    if (currentStep === TOTAL_BASE_STEPS) {
-      trackEvent("DN_Step7_AcceptNotice");
-      setCurrentStep(COUPON_CHOICE_STEP);
-      setFormError("");
       return;
     }
 
     if (currentStep === COUPON_CHOICE_STEP) {
       if (formValues.hasCoupon === true) {
-        trackEvent("DN_Step8_SelectCoupon", { has_coupon: true });
+        trackEvent("DN_Step1_SelectCoupon", { has_coupon: true });
         setCurrentStep(COUPON_CODE_STEP);
         setFormError("");
         return;
       }
 
-      trackEvent("DN_Step8_SelectCoupon", { has_coupon: false });
-      void handleSubmit();
+      trackEvent("DN_Step1_SelectCoupon", { has_coupon: false });
+      setCurrentStep(GENDER_STEP);
+      setFormError("");
       return;
     }
 
     if (currentStep === COUPON_CODE_STEP) {
-      trackEvent("DN_Step9_ConfirmCoupon", {
+      trackEvent("DN_Step2_ConfirmCoupon", {
         code: validatedCoupon?.code || "",
         discount_label: validatedCoupon?.discount_label || "",
       });
+      setCurrentStep(GENDER_STEP);
+      setFormError("");
+      return;
+    }
+
+    if (currentStep === NOTICE_STEP) {
+      if (currentStep === NOTICE_STEP) {
+        trackEvent("DN_Step9_AcceptNotice");
+      }
       void handleSubmit();
       return;
     }
 
     const stepEvents: Record<number, () => void> = {
-      1: () => trackEvent("DN_Step1_SelectGender", { gender: formValues.gender }),
-      2: () => trackEvent("DN_Step2_SelectSchedule", { schedule: formValues.schedule }),
-      3: () => trackEvent("DN_Step3_CompleteProfile"),
-      4: () => trackEvent("DN_Step4_UploadPhoto"),
-      5: () => trackEvent("DN_Step5_AcceptApproval"),
-      6: () => trackEvent("DN_Step6_AcceptMarketing"),
+      3: () => trackEvent("DN_Step3_SelectGender", { gender: formValues.gender }),
+      4: () => trackEvent("DN_Step4_SelectSchedule", { schedule: formValues.schedule }),
+      5: () => trackEvent("DN_Step5_CompleteProfile"),
+      6: () => trackEvent("DN_Step6_UploadPhoto"),
+      7: () => trackEvent("DN_Step7_AcceptApproval"),
+      8: () => trackEvent("DN_Step8_AcceptMarketing"),
     };
     stepEvents[currentStep]?.();
 
@@ -1304,7 +1338,13 @@ export default function LoveBuddiesApplyFlow({
       return;
     }
 
-    setCurrentStep((step) => step - 1);
+    setCurrentStep((step) => {
+      if (!formValues.hasCoupon && step === GENDER_STEP) {
+        return COUPON_CHOICE_STEP;
+      }
+
+      return step - 1;
+    });
     setFormError("");
   };
 
@@ -1400,11 +1440,11 @@ export default function LoveBuddiesApplyFlow({
   return (
     <ApplyStepShell
       mode={mode}
-      currentStep={currentStep}
+      currentStep={displayStep}
       totalSteps={totalSteps}
       title={stepConfig.title}
       description={stepConfig.description}
-      canProceed={currentStep === 3 ? true : canProceed}
+      canProceed={currentStep === PROFILE_STEP ? true : canProceed}
       isSubmitting={submitState.status === "submitting"}
       isLastStep={isLastStep}
       onNext={handleNext}
@@ -1416,7 +1456,7 @@ export default function LoveBuddiesApplyFlow({
         </div>
       )}
 
-      {currentStep === 4 && photoNotice && (
+      {currentStep === PHOTO_STEP && photoNotice && (
         <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
           {photoNotice}
         </div>
@@ -1446,69 +1486,14 @@ export default function LoveBuddiesApplyFlow({
         </div>
       )}
 
-      {currentStep === 1 && (
-        <StepGender gender={formValues.gender} onSelect={handleGenderSelect} />
-      )}
-
-      {currentStep === 2 && (
-        <StepSchedule
-          scheduleData={scheduleData}
-          isLoading={isLoadingSchedules}
-          gender={formValues.gender}
-          selectedSchedule={formValues.schedule}
-          onSelect={handleScheduleSelect}
-        />
-      )}
-
-      {currentStep === 3 && (
-        <StepProfile
-          formValues={formValues}
-          onValueChange={handleValueChange}
-          onBirthYearSelect={handleBirthYearSelect}
-          showErrors={showFieldErrors}
-        />
-      )}
-
-      {currentStep === 4 && (
-        <StepPhoto
-          photoPreviewUrl={photoPreviewUrl}
-          isOptimizing={isOptimizingPhoto}
-          onPhotoChange={handlePhotoChange}
-        />
-      )}
-
-      {currentStep === 5 && (
-        <StepAgreement
-          section={DAY_NAMMAE_NOTICE_SECTIONS[0]}
-          agreed={agreements[0]}
-          onAgreeChange={handleAgreementChange(0)}
-        />
-      )}
-
-      {currentStep === 6 && (
-        <StepAgreement
-          section={DAY_NAMMAE_NOTICE_SECTIONS[1]}
-          agreed={agreements[1]}
-          onAgreeChange={handleAgreementChange(1)}
-        />
-      )}
-
-      {currentStep === 7 && (
-        <StepAgreement
-          section={DAY_NAMMAE_NOTICE_SECTIONS[2]}
-          agreed={agreements[2]}
-          onAgreeChange={handleAgreementChange(2)}
-        />
-      )}
-
-      {currentStep === 8 && (
+      {currentStep === COUPON_CHOICE_STEP && (
         <StepCouponChoice
           hasCoupon={formValues.hasCoupon}
           onSelect={handleCouponChoice}
         />
       )}
 
-      {currentStep === 9 && (
+      {currentStep === COUPON_CODE_STEP && (
         <>
           <StepCouponCode
             couponCode={formValues.couponCode}
@@ -1530,6 +1515,61 @@ export default function LoveBuddiesApplyFlow({
             </div>
           )}
         </>
+      )}
+
+      {currentStep === GENDER_STEP && (
+        <StepGender gender={formValues.gender} onSelect={handleGenderSelect} />
+      )}
+
+      {currentStep === SCHEDULE_STEP && (
+        <StepSchedule
+          scheduleData={scheduleData}
+          isLoading={isLoadingSchedules}
+          gender={formValues.gender}
+          selectedSchedule={formValues.schedule}
+          onSelect={handleScheduleSelect}
+        />
+      )}
+
+      {currentStep === PROFILE_STEP && (
+        <StepProfile
+          formValues={formValues}
+          onValueChange={handleValueChange}
+          onBirthYearSelect={handleBirthYearSelect}
+          showErrors={showFieldErrors}
+        />
+      )}
+
+      {currentStep === PHOTO_STEP && (
+        <StepPhoto
+          photoPreviewUrl={photoPreviewUrl}
+          isOptimizing={isOptimizingPhoto}
+          onPhotoChange={handlePhotoChange}
+        />
+      )}
+
+      {currentStep === APPROVAL_STEP && (
+        <StepAgreement
+          section={DAY_NAMMAE_NOTICE_SECTIONS[0]}
+          agreed={agreements[0]}
+          onAgreeChange={handleAgreementChange(0)}
+        />
+      )}
+
+      {currentStep === MARKETING_STEP && (
+        <StepAgreement
+          section={DAY_NAMMAE_NOTICE_SECTIONS[1]}
+          agreed={agreements[1]}
+          onAgreeChange={handleAgreementChange(1)}
+        />
+      )}
+
+      {currentStep === NOTICE_STEP && (
+        <StepAgreement
+          section={DAY_NAMMAE_NOTICE_SECTIONS[2]}
+          agreed={agreements[2]}
+          onAgreeChange={handleAgreementChange(2)}
+        />
       )}
     </ApplyStepShell>
   );
