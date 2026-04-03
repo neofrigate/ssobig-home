@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { useState, useEffect } from "react";
 import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
@@ -62,13 +62,10 @@ const FAQItem = ({
 
 const ElevenNammePage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
   const [isApplyOpen, setIsApplyOpen] = useState(false);
   const [isCouponNoticeOpen, setIsCouponNoticeOpen] = useState(false);
-  const couponCode = getDayNammeCouponSuffixFromSearchParam(
-    searchParams.get("coupon")
-  );
+  const [couponCode, setCouponCode] = useState("");
 
   // 참가자 차트 컴포넌트 - 중앙 기준
   const ApplicantChart = ({
@@ -129,6 +126,14 @@ const ElevenNammePage = () => {
   };
 
   // 스케줄 아이템 컴포넌트
+  useEffect(() => {
+    setCouponCode(
+      getDayNammeCouponSuffixFromSearchParam(
+        new URLSearchParams(window.location.search).get("coupon")
+      )
+    );
+  }, []);
+
   useEffect(() => {
     if (!isApplyOpen && !isCouponNoticeOpen) {
       return;
