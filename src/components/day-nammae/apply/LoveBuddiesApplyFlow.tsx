@@ -3,6 +3,11 @@
 import * as Sentry from "@sentry/nextjs";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
+import {
+  buildDayNammeCouponCode,
+  DAY_NAMMAE_COUPON_CODE_SUFFIX_LENGTH,
+  normalizeDayNammeCouponCode,
+} from "@/features/day-nammae/coupon";
 import { DAY_NAMMAE_NOTICE_SECTIONS } from "@/features/day-nammae/constants";
 import {
   getDayNammeScheduleLabel,
@@ -46,6 +51,7 @@ interface LoveBuddiesApplyFlowProps {
   mode: ApplyFlowMode;
   scheduleData: ScheduleItem[];
   isLoadingSchedules: boolean;
+  initialCouponCode?: string;
   onClose?: () => void;
 }
 
@@ -98,8 +104,6 @@ const DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE =
   "쿠폰 검증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
 const DEFAULT_COUPON_USE_ERROR_MESSAGE =
   "신청서는 접수되었지만 쿠폰 처리에 실패했습니다. 쿠폰 코드를 다시 확인하거나 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
-const COUPON_CODE_PREFIX = "SSOBIG-";
-const COUPON_CODE_SUFFIX_LENGTH = 8;
 const COUPON_VALIDATE_DELAY_MS = 700;
 
 const INITIAL_FORM_VALUES: DayNammeFormValues = {
@@ -114,6 +118,18 @@ const INITIAL_FORM_VALUES: DayNammeFormValues = {
   hasCoupon: null,
   couponCode: "",
 };
+
+function createInitialFormValues(initialCouponCode = ""): DayNammeFormValues {
+  if (!initialCouponCode) {
+    return { ...INITIAL_FORM_VALUES };
+  }
+
+  return {
+    ...INITIAL_FORM_VALUES,
+    hasCoupon: true,
+    couponCode: initialCouponCode,
+  };
+}
 
 const INITIAL_SUBMIT_STATE: SubmitState = {
   status: "idle",
@@ -152,29 +168,6 @@ function buildCouponUseErrorMessage(reason = "") {
 
 function createClientRequestId() {
   return `cdn-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
-}
-
-function normalizeCouponCode(value: string) {
-  const normalized = value.replace(/\s+/g, "").toUpperCase();
-
-  if (normalized.startsWith(COUPON_CODE_PREFIX)) {
-    return normalized
-      .slice(COUPON_CODE_PREFIX.length)
-      .replace(/[^A-Z0-9]/g, "")
-      .slice(0, COUPON_CODE_SUFFIX_LENGTH);
-  }
-
-  return normalized
-    .replace(/[^A-Z0-9]/g, "")
-    .slice(0, COUPON_CODE_SUFFIX_LENGTH);
-}
-
-function buildCouponCode(suffix: string) {
-  if (!suffix) {
-    return "";
-  }
-
-  return `${COUPON_CODE_PREFIX}${suffix}`;
 }
 
 function delay(ms: number) {
@@ -798,11 +791,16 @@ export default function LoveBuddiesApplyFlow({
   mode,
   scheduleData,
   isLoadingSchedules,
+  initialCouponCode,
   onClose,
 }: LoveBuddiesApplyFlowProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formValues, setFormValues] = useState(INITIAL_FORM_VALUES);
+  const normalizedInitialCouponCode = normalizeDayNammeCouponCode(
+    initialCouponCode || ""
+  );
+  const initialFormValues = createInitialFormValues(normalizedInitialCouponCode);
+  const [formValues, setFormValues] = useState(initialFormValues);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
   const [photoNotice, setPhotoNotice] = useState("");
   const [isOptimizingPhoto, setIsOptimizingPhoto] = useState(false);
@@ -838,7 +836,7 @@ export default function LoveBuddiesApplyFlow({
   const resetFlow = () => {
     setSubmitState(INITIAL_SUBMIT_STATE);
     setCurrentStep(1);
-    setFormValues(INITIAL_FORM_VALUES);
+    setFormValues(initialFormValues);
     setAgreements([false, false, false]);
     setShowFieldErrors(false);
     setFormError("");
@@ -949,7 +947,7 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const handleCouponCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const couponCode = normalizeCouponCode(event.target.value);
+    const couponCode = normalizeDayNammeCouponCode(event.target.value);
     setFormValues((current) => ({ ...current, couponCode }));
     setValidatedCoupon(null);
     setCouponValidationStatus(couponCode ? "idle" : "invalid");
@@ -957,9 +955,9 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const handleValidateCoupon = async () => {
-    const couponCodeSuffix = normalizeCouponCode(formValues.couponCode);
+    const couponCodeSuffix = normalizeDayNammeCouponCode(formValues.couponCode);
 
-    if (couponCodeSuffix.length !== COUPON_CODE_SUFFIX_LENGTH) {
+    if (couponCodeSuffix.length !== DAY_NAMMAE_COUPON_CODE_SUFFIX_LENGTH) {
       setCouponValidationStatus("invalid");
       setValidatedCoupon(null);
       setFormError("쿠폰 번호 8자리를 입력해주세요.");
@@ -972,12 +970,14 @@ export default function LoveBuddiesApplyFlow({
 
     try {
       await delay(COUPON_VALIDATE_DELAY_MS);
-      const result = await requestCouponValidation(buildCouponCode(couponCodeSuffix));
+      const result = await requestCouponValidation(
+        buildDayNammeCouponCode(couponCodeSuffix)
+      );
       setCouponValidationStatus("valid");
       setValidatedCoupon(result);
       setFormValues((current) => ({
         ...current,
-        couponCode: normalizeCouponCode(result.code),
+        couponCode: normalizeDayNammeCouponCode(result.code),
       }));
       trackEvent("DN_ValidateCoupon", {
         code: result.code,
@@ -1023,7 +1023,10 @@ export default function LoveBuddiesApplyFlow({
         return (
           couponValidationStatus === "valid" &&
           Boolean(validatedCoupon) &&
-          validatedCoupon?.code === buildCouponCode(normalizeCouponCode(formValues.couponCode))
+          validatedCoupon?.code ===
+            buildDayNammeCouponCode(
+              normalizeDayNammeCouponCode(formValues.couponCode)
+            )
         );
       default:
         return false;
@@ -1032,8 +1035,8 @@ export default function LoveBuddiesApplyFlow({
 
   const handleSubmit = async () => {
     const wantsCoupon = formValues.hasCoupon === true;
-    const normalizedCouponCode = buildCouponCode(
-      normalizeCouponCode(formValues.couponCode)
+    const normalizedCouponCode = buildDayNammeCouponCode(
+      normalizeDayNammeCouponCode(formValues.couponCode)
     );
 
     if (wantsCoupon) {

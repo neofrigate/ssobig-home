@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { useState, useEffect } from "react";
 import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
+import { getDayNammeCouponSuffixFromSearchParam } from "@/features/day-nammae/coupon";
 import { useDayNammeSchedule } from "@/features/day-nammae/useDayNammeSchedule";
 import { ScheduleItem } from "@/features/day-nammae/types";
 import {
@@ -61,8 +62,13 @@ const FAQItem = ({
 
 const ElevenNammePage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
   const [isApplyOpen, setIsApplyOpen] = useState(false);
+  const [isCouponNoticeOpen, setIsCouponNoticeOpen] = useState(false);
+  const couponCode = getDayNammeCouponSuffixFromSearchParam(
+    searchParams.get("coupon")
+  );
 
   // 참가자 차트 컴포넌트 - 중앙 기준
   const ApplicantChart = ({
@@ -124,7 +130,7 @@ const ElevenNammePage = () => {
 
   // 스케줄 아이템 컴포넌트
   useEffect(() => {
-    if (!isApplyOpen) {
+    if (!isApplyOpen && !isCouponNoticeOpen) {
       return;
     }
 
@@ -133,7 +139,12 @@ const ElevenNammePage = () => {
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsApplyOpen(false);
+        if (isApplyOpen) {
+          setIsApplyOpen(false);
+          return;
+        }
+
+        setIsCouponNoticeOpen(false);
       }
     };
 
@@ -143,9 +154,15 @@ const ElevenNammePage = () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [isApplyOpen]);
+  }, [isApplyOpen, isCouponNoticeOpen]);
+
+  useEffect(() => {
+    setIsCouponNoticeOpen(Boolean(couponCode));
+  }, [couponCode]);
 
   const handleApplyClick = () => {
+    setIsCouponNoticeOpen(false);
+
     if (window.matchMedia("(min-width: 768px)").matches) {
       setIsApplyOpen(true);
       return;
@@ -520,8 +537,65 @@ const ElevenNammePage = () => {
               mode="modal"
               scheduleData={scheduleData}
               isLoadingSchedules={isLoading}
+              initialCouponCode={couponCode}
               onClose={() => setIsApplyOpen(false)}
             />
+          </div>
+        )}
+
+        {isCouponNoticeOpen && couponCode && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-5">
+            <button
+              type="button"
+              onClick={() => setIsCouponNoticeOpen(false)}
+              className="absolute inset-0 bg-black/55 backdrop-blur-sm"
+              aria-label="쿠폰 안내 닫기"
+            />
+            <div className="relative w-full max-w-[360px] rounded-[28px] bg-[#171113] px-6 py-7 text-center shadow-2xl">
+              <button
+                type="button"
+                onClick={() => setIsCouponNoticeOpen(false)}
+                className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/8 text-white/60"
+                aria-label="쿠폰 안내 닫기"
+              >
+                ×
+              </button>
+              <div className="mx-auto inline-flex rounded-full bg-[#FF6B9F]/15 px-4 py-1 text-xs font-semibold tracking-[0.18em] text-[#FFB1D4]">
+                COUPON
+              </div>
+              <h2 className="mt-4 text-2xl font-black text-white">
+                쿠폰이 적용돼요
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-white/75">
+                지금 일일남매 신청하시면 쿠폰{" "}
+                <span className="font-bold text-[#FFB1D4]">{couponCode}</span>가
+                적용됩니다.
+              </p>
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4">
+                <p className="text-[11px] font-semibold tracking-[0.18em] text-white/35">
+                  SSOBIG-
+                </p>
+                <p className="mt-2 text-xl font-black tracking-[0.16em] text-white">
+                  {couponCode}
+                </p>
+              </div>
+              <div className="mt-6 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsCouponNoticeOpen(false)}
+                  className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-white/15 text-sm font-semibold text-white/65"
+                >
+                  닫기
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApplyClick}
+                  className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-[#FF6B9F] text-sm font-bold text-white"
+                >
+                  지금 신청
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
