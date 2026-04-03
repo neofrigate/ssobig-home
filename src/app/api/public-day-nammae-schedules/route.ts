@@ -8,13 +8,22 @@ function getPublicSchedulesApiUrl() {
   return configuredUrl || DEFAULT_PUBLIC_SCHEDULES_API_URL;
 }
 
-function jsonResponse(body: unknown, status = 200) {
+function jsonResponse(
+  body: unknown,
+  status = 200,
+  cacheControl = "no-store"
+) {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Origin": "*",
+  };
+
+  if (cacheControl) {
+    headers["Cache-Control"] = cacheControl;
+  }
+
   return NextResponse.json(body, {
     status,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "no-store",
-    },
+    headers,
   });
 }
 
@@ -63,7 +72,11 @@ export async function GET() {
       throw new Error("Invalid upstream JSON payload");
     }
 
-    return jsonResponse(payload, 200);
+    return jsonResponse(
+      payload,
+      200,
+      upstreamResponse.headers.get("cache-control") || ""
+    );
   } catch (error) {
     return jsonResponse(
       {
