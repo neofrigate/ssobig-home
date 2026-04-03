@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 const DEFAULT_PUBLIC_SCHEDULES_API_URL =
   "https://manage.ssobig.com/api/public-day-nammae-schedules";
+const BROWSER_CACHE_CONTROL = "public, max-age=0, must-revalidate";
+const CDN_CACHE_CONTROL = "max-age=30, stale-while-revalidate=30";
 
 function getPublicSchedulesApiUrl() {
   const configuredUrl = process.env.DAY_NAMMAE_PUBLIC_SCHEDULES_API_URL?.trim();
@@ -11,7 +13,9 @@ function getPublicSchedulesApiUrl() {
 function jsonResponse(
   body: unknown,
   status = 200,
-  cacheControl = "no-store"
+  cacheControl = "no-store",
+  vercelCacheControl?: string,
+  cdnCacheControl?: string
 ) {
   const headers: Record<string, string> = {
     "Access-Control-Allow-Origin": "*",
@@ -19,6 +23,14 @@ function jsonResponse(
 
   if (cacheControl) {
     headers["Cache-Control"] = cacheControl;
+  }
+
+  if (cdnCacheControl) {
+    headers["CDN-Cache-Control"] = cdnCacheControl;
+  }
+
+  if (vercelCacheControl) {
+    headers["Vercel-CDN-Cache-Control"] = vercelCacheControl;
   }
 
   return NextResponse.json(body, {
@@ -32,7 +44,9 @@ export async function GET() {
 
   try {
     const upstreamResponse = await fetch(upstreamUrl, {
-      cache: "no-store",
+      next: {
+        revalidate: 30,
+      },
       headers: {
         Accept: "application/json",
       },
@@ -75,7 +89,10 @@ export async function GET() {
     return jsonResponse(
       payload,
       200,
-      upstreamResponse.headers.get("cache-control") || ""
+      BROWSER_CACHE_CONTROL,
+      upstreamResponse.headers.get("vercel-cdn-cache-control") ||
+        CDN_CACHE_CONTROL,
+      upstreamResponse.headers.get("cdn-cache-control") || CDN_CACHE_CONTROL
     );
   } catch (error) {
     return jsonResponse(
