@@ -19,12 +19,24 @@ type SentryLikeEvent = {
   };
   message?: string;
   tags?: Record<string, unknown>;
+  extra?: Record<string, unknown>;
+  request?: {
+    url?: string;
+  };
 };
 
-const IGNORED_FACEBOOK_WEBVIEW_ERROR_PATTERNS = [
+const KNOWN_META_WEBVIEW_ERROR_PATTERNS = [
   /enableDidUserTypeOnKeyboardLogging/i,
   /Java object is gone/i,
 ];
+const KNOWN_META_WEBVIEW_NAMES = new Set(["facebook", "instagram"]);
+const KNOWN_PATHNAME_REDIRECTS: Record<string, string> = {
+  "/offline/11namme에": "/offline/11namme",
+};
+
+function normalizeKnownSsobigPathname(pathname: string): string | undefined {
+  return KNOWN_PATHNAME_REDIRECTS[pathname];
+}
 
 function parseHostname(value: string): string | undefined {
   if (!value) {
@@ -63,11 +75,18 @@ export function getClientSentryDebugContext() {
     ? new URLSearchParams(location.search)
     : null;
   const inAppBrowser = getInAppBrowserName(userAgent);
+  const normalizedPathname = normalizeKnownSsobigPathname(location.pathname);
 
   return {
     tags: {
       runtime: "client",
       pathname: location.pathname,
+      ...(normalizedPathname
+        ? {
+            pathname_normalized_candidate: normalizedPathname,
+            pathname_needs_redirect: "true",
+          }
+        : {}),
       in_app_browser: inAppBrowser ? "true" : "false",
       ...(inAppBrowser ? { in_app_browser_name: inAppBrowser } : {}),
       ...(searchParams?.get("utm_source")
@@ -84,6 +103,7 @@ export function getClientSentryDebugContext() {
     contexts: {
       app: {
         route: location.pathname,
+        normalizedRoute: normalizedPathname,
         search: {
           hasUtmSource: searchParams?.has("utm_source") ?? false,
           hasUtmMedium: searchParams?.has("utm_medium") ?? false,
@@ -100,6 +120,7 @@ export function getClientSentryDebugContext() {
     extra: {
       url: location.href,
       referrer: document.referrer || undefined,
+      normalizedPathnameCandidate: normalizedPathname,
     },
   };
 }
@@ -110,7 +131,7 @@ export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
       ? event.tags.in_app_browser_name
       : undefined;
 
-  if (browserName !== "facebook") {
+  if (!browserName || !KNOWN_META_WEBVIEW_NAMES.has(browserName)) {
     return false;
   }
 
@@ -125,8 +146,71 @@ export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
   ].filter((value): value is string => Boolean(value));
 
   return errorTexts.some((text) =>
-    IGNORED_FACEBOOK_WEBVIEW_ERROR_PATTERNS.every((pattern) =>
-      pattern.test(text)
-    )
+    KNOWN_META_WEBVIEW_ERROR_PATTERNS.some((pattern) => pattern.test(text))
   );
+}
+
+export function getHydrationDebugContext(event: SentryLikeEvent) {
+  const errorTexts = [
+    event.message,
+    event.logentry?.formatted,
+    event.logentry?.message,
+    ...(event.exception?.values ?? []).flatMap((value) => [
+      value.type,
+      value.value,
+    ]),
+  ].filter((value): value is string => Boolean(value));
+
+  const isHydrationError = errorTexts.some(
+    (text) =>
+      /hydration error/i.test(text) ||
+      /hydration failed/i.test(text) ||
+      /server rendered html didn't match the client/i.test(text)
+  );
+
+  if (!isHydrationError) {
+    return null;
+  }
+
+  const eventPathname =
+    typeof event.tags?.pathname === "string"
+      ? event.tags.pathname
+      : undefined;
+  const eventUrl =
+    typeof event.extra?.url === "string"
+      ? event.extra.url
+      : typeof event.request?.url === "string"
+        ? event.request.url
+        : undefined;
+
+  let pathnameFromUrl: string | undefined;
+  if (eventUrl) {
+    try {
+      pathnameFromUrl = new URL(eventUrl).pathname;
+    } catch {
+      pathnameFromUrl = undefined;
+    }
+  }
+
+  const observedPathname = eventPathname || pathnameFromUrl;
+  const normalizedPathname = observedPathname
+    ? normalizeKnownSsobigPathname(observedPathname)
+    : undefined;
+
+  return {
+    tags: {
+      ssobig_issue_kind: "hydration",
+      ...(normalizedPathname
+        ? {
+            pathname_normalized_candidate: normalizedPathname,
+            pathname_needs_redirect: "true",
+          }
+        : {}),
+    },
+    extra: {
+      hydrationObservedPathname: observedPathname,
+      hydrationObservedUrl: eventUrl,
+      hydrationNormalizedPathnameCandidate: normalizedPathname,
+    },
+  };
 }

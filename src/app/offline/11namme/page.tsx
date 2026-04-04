@@ -12,6 +12,7 @@ import {
   buildMetaPixelPageViewScript,
   LOVE_BUDDIES_PIXEL_ID,
 } from "@/utils/metaPixel";
+import { getSafeSearchParams } from "@/utils/utm";
 
 // FAQ 아이템 컴포넌트
 const FAQItem = ({
@@ -129,7 +130,7 @@ const ElevenNammePage = () => {
   useEffect(() => {
     setCouponCode(
       getDayNammeCouponSuffixFromSearchParam(
-        new URLSearchParams(window.location.search).get("coupon")
+        getSafeSearchParams(window.location.search).get("coupon")
       )
     );
   }, []);

@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: false,
   },
+  productionBrowserSourceMaps: true,
   allowedDevOrigins: [
     "https://undepressive-makenzie-supernaturally.ngrok-free.dev",
   ],
@@ -77,6 +78,11 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/offline/11namme에",
+        destination: "/offline/11namme",
+        permanent: true,
+      },
+      {
         source: "/socialing/love-buddies/alpha",
         destination: "/offline/manito",
         permanent: true,
@@ -109,8 +115,16 @@ export default withSentryConfig(nextConfig, {
   org: "ice-crusher",
   project: "ssobig-home",
   authToken: process.env.SENTRY_AUTH_TOKEN,
+  debug: Boolean(process.env.SENTRY_DEBUG),
   silent: !process.env.CI,
   widenClientFileUpload: true,
+  sourcemaps: {
+    assets: [
+      ".next/static/chunks/**/*.js",
+      ".next/static/chunks/**/*.js.map",
+    ],
+    deleteSourcemapsAfterUpload: false,
+  },
   release: {
     setCommits: {
       auto: true,

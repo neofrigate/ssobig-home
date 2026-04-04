@@ -172,8 +172,28 @@ function buildCouponUseErrorMessage(reason = "") {
   return `${DEFAULT_COUPON_USE_ERROR_MESSAGE} 사유: ${reason}`;
 }
 
+function createRandomIdSuffix() {
+  const fallbackSuffix = Math.random().toString(36).slice(2, 10);
+
+  try {
+    const cryptoObject = globalThis.crypto;
+    if (typeof cryptoObject?.randomUUID === "function") {
+      return cryptoObject.randomUUID().slice(0, 8);
+    }
+
+    if (typeof cryptoObject?.getRandomValues === "function") {
+      const bytes = cryptoObject.getRandomValues(new Uint8Array(4));
+      return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    }
+  } catch {
+    return fallbackSuffix;
+  }
+
+  return fallbackSuffix;
+}
+
 function createClientRequestId() {
-  return `cdn-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+  return `cdn-${Date.now()}-${createRandomIdSuffix()}`;
 }
 
 function delay(ms: number) {
