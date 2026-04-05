@@ -6,6 +6,15 @@ const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
 const DEFAULT_CLIENT_ERROR_MESSAGE =
   "신청서 제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
+const UNSUPPORTED_HEIC_PHOTO_ERROR_MESSAGE =
+  "HEIC/HEIF 사진은 자동 변환에 실패해 업로드할 수 없습니다. 사진 앱에서 JPG로 저장한 뒤 다시 시도해주세요.";
+const HEIC_HEIF_MIME_TYPES = new Set([
+  "image/heic",
+  "image/heif",
+  "image/heic-sequence",
+  "image/heif-sequence",
+]);
+const HEIC_HEIF_FILE_PATTERN = /\.(heic|heif)$/i;
 
 function getRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -87,7 +96,17 @@ function isSafeClientErrorMessage(message: string) {
   return (
     message.endsWith("값이 비어 있습니다.") ||
     message === "업로드할 사진 파일이 필요합니다." ||
-    message === "이미지 파일만 업로드할 수 있습니다."
+    message === "이미지 파일만 업로드할 수 있습니다." ||
+    message === UNSUPPORTED_HEIC_PHOTO_ERROR_MESSAGE
+  );
+}
+
+function isUnsupportedHeicLikeFile(file: File) {
+  const normalizedType = file.type.trim().toLowerCase();
+
+  return (
+    HEIC_HEIF_MIME_TYPES.has(normalizedType) ||
+    HEIC_HEIF_FILE_PATTERN.test(file.name)
   );
 }
 
@@ -263,6 +282,10 @@ export async function POST(request: Request) {
 
     if (!(photo instanceof File) || photo.size === 0) {
       throw new Error("업로드할 사진 파일이 필요합니다.");
+    }
+
+    if (isUnsupportedHeicLikeFile(photo)) {
+      throw new Error(UNSUPPORTED_HEIC_PHOTO_ERROR_MESSAGE);
     }
 
     if (!photo.type.startsWith("image/")) {

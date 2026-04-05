@@ -97,6 +97,13 @@ const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
 const MAX_PHOTO_DIMENSION = 1600;
 const INITIAL_PHOTO_JPEG_QUALITY = 0.82;
 const MIN_PHOTO_JPEG_QUALITY = 0.56;
+const HEIC_HEIF_MIME_TYPES = new Set([
+  "image/heic",
+  "image/heif",
+  "image/heic-sequence",
+  "image/heif-sequence",
+]);
+const HEIC_HEIF_FILE_PATTERN = /\.(heic|heif)$/i;
 const BASE_PRICE = 35000;
 const DEFAULT_NORMAL_BOOKING_URL =
   "https://booking.naver.com/booking/12/bizes/1378688/items/6629371";
@@ -220,10 +227,30 @@ function buildPhotoCompressedMessage(originalSize: number, compressedSize: numbe
   return `사진 용량이 커서 업로드 전에 자동으로 최적화했어요. ${formatFileSize(originalSize)} -> ${formatFileSize(compressedSize)}`;
 }
 
+function buildPhotoConvertedMessage(originalSize: number, convertedSize: number) {
+  return `HEIC/HEIF 사진을 JPG로 자동 변환했어요. ${formatFileSize(originalSize)} -> ${formatFileSize(convertedSize)}`;
+}
+
+function buildPhotoConvertedAndCompressedMessage(
+  originalSize: number,
+  convertedSize: number
+) {
+  return `HEIC/HEIF 사진을 JPG로 변환하고 업로드 전에 자동으로 최적화했어요. ${formatFileSize(originalSize)} -> ${formatFileSize(convertedSize)}`;
+}
+
 function replaceFileExtension(fileName: string, extension: string) {
   const dotIndex = fileName.lastIndexOf(".");
   const baseName = dotIndex > 0 ? fileName.slice(0, dotIndex) : fileName;
   return `${baseName}${extension}`;
+}
+
+function isHeicLikeFile(file: File) {
+  const normalizedType = file.type.trim().toLowerCase();
+
+  return (
+    HEIC_HEIF_MIME_TYPES.has(normalizedType) ||
+    HEIC_HEIF_FILE_PATTERN.test(file.name)
+  );
 }
 
 function loadImageFromFile(file: File) {
@@ -281,17 +308,60 @@ async function renderCompressedPhoto(
   return canvasToBlob(canvas, quality);
 }
 
+async function convertHeicToJpeg(file: File) {
+  try {
+    const { default: heic2any } = await import("heic2any");
+    const converted = await heic2any({
+      blob: file,
+      toType: "image/jpeg",
+      quality: INITIAL_PHOTO_JPEG_QUALITY,
+    });
+    const convertedBlob = Array.isArray(converted) ? converted[0] : converted;
+
+    if (!(convertedBlob instanceof Blob)) {
+      throw new Error("HEIC conversion did not return a Blob.");
+    }
+
+    return new File(
+      [convertedBlob],
+      replaceFileExtension(file.name || "day-nammae-photo", ".jpg"),
+      {
+        type: "image/jpeg",
+        lastModified: Date.now(),
+      }
+    );
+  } catch {
+    throw new Error(
+      "HEIC/HEIF 사진을 JPG로 변환하지 못했습니다. 사진 앱에서 JPG로 저장한 뒤 다시 시도해주세요."
+    );
+  }
+}
+
 async function compressPhotoForUpload(file: File) {
-  if (typeof window === "undefined" || file.size <= MAX_PHOTO_FILE_SIZE_BYTES) {
+  if (typeof window === "undefined") {
     return {
       file,
       wasCompressed: false,
+      wasConverted: false,
       originalSize: file.size,
-      compressedSize: file.size,
+      preparedSize: file.size,
     };
   }
 
-  const image = await loadImageFromFile(file);
+  const originalSize = file.size;
+  const workingFile = isHeicLikeFile(file) ? await convertHeicToJpeg(file) : file;
+
+  if (workingFile.size <= MAX_PHOTO_FILE_SIZE_BYTES) {
+    return {
+      file: workingFile,
+      wasCompressed: false,
+      wasConverted: workingFile !== file,
+      originalSize,
+      preparedSize: workingFile.size,
+    };
+  }
+
+  const image = await loadImageFromFile(workingFile);
   let width = image.naturalWidth;
   let height = image.naturalHeight;
   const longestEdge = Math.max(width, height);
@@ -329,7 +399,7 @@ async function compressPhotoForUpload(file: File) {
 
   const compressedFile = new File(
     [blob],
-    replaceFileExtension(file.name || "day-nammae-photo", ".jpg"),
+    replaceFileExtension(workingFile.name || "day-nammae-photo", ".jpg"),
     {
       type: "image/jpeg",
       lastModified: Date.now(),
@@ -339,8 +409,9 @@ async function compressPhotoForUpload(file: File) {
   return {
     file: compressedFile,
     wasCompressed: true,
-    originalSize: file.size,
-    compressedSize: compressedFile.size,
+    wasConverted: workingFile !== file,
+    originalSize,
+    preparedSize: compressedFile.size,
   };
 }
 
@@ -922,13 +993,17 @@ export default function LoveBuddiesApplyFlow({
     setFormError("");
 
     compressPhotoForUpload(file)
-      .then(({ file: nextFile, wasCompressed, originalSize, compressedSize }) => {
+      .then(({ file: nextFile, wasCompressed, wasConverted, originalSize, preparedSize }) => {
         setFormValues((current) => ({ ...current, photo: nextFile }));
-        setPhotoNotice(
-          wasCompressed
-            ? buildPhotoCompressedMessage(originalSize, compressedSize)
-            : ""
-        );
+        const nextNotice = wasConverted
+          ? wasCompressed
+            ? buildPhotoConvertedAndCompressedMessage(originalSize, preparedSize)
+            : buildPhotoConvertedMessage(originalSize, preparedSize)
+          : wasCompressed
+            ? buildPhotoCompressedMessage(originalSize, preparedSize)
+            : "";
+
+        setPhotoNotice(nextNotice);
       })
       .catch((error) => {
         setFormValues((current) => ({ ...current, photo: null }));
