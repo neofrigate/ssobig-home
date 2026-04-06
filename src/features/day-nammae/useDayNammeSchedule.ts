@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getDayNammeFallbackSchedule, parseDayNammeSchedule } from "./schedule";
 import { ScheduleItem } from "./types";
+import { getPublicDayNammeSchedulesUrl } from "./upstream";
 
 interface PublicDayNammeSchedulesResponse {
   generatedAt?: string;
@@ -41,8 +42,8 @@ export function useDayNammeSchedule() {
       setLastUpdateTime(formatUpdateTime());
 
       try {
-        const response = await fetch("/api/public-day-nammae-schedules", {
-          cache: "no-store",
+        const response = await fetch(getPublicDayNammeSchedulesUrl(), {
+          cache: "default",
         });
 
         if (!response.ok) {
