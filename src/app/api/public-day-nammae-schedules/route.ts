@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 
 const DEFAULT_PUBLIC_SCHEDULES_API_URL =
-  "https://manage.ssobig.com/api/public-day-nammae-schedules";
+  "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-schedules";
 const BROWSER_CACHE_CONTROL = "public, max-age=0, must-revalidate";
-const CDN_CACHE_CONTROL = "max-age=30, stale-while-revalidate=30";
+const CDN_CACHE_CONTROL = "max-age=5, stale-while-revalidate=5";
 
 function getPublicSchedulesApiUrl() {
   const configuredUrl = process.env.DAY_NAMMAE_PUBLIC_SCHEDULES_API_URL?.trim();
@@ -45,7 +45,7 @@ export async function GET() {
   try {
     const upstreamResponse = await fetch(upstreamUrl, {
       next: {
-        revalidate: 30,
+        revalidate: 5,
       },
       headers: {
         Accept: "application/json",

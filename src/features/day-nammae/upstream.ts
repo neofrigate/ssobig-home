@@ -1,5 +1,5 @@
 const DEFAULT_PUBLIC_SCHEDULES_API_URL =
-  "https://manage.ssobig.com/api/public-day-nammae-schedules";
+  "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-schedules";
 const DEFAULT_COUPON_API_BASE_URL =
   "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/coupon";
 
