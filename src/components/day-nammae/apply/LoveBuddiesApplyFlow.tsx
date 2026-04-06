@@ -13,6 +13,7 @@ import {
   getDayNammeScheduleLabel,
   isDayNammeScheduleSelectable,
 } from "@/features/day-nammae/schedule";
+import { getDayNammeCouponApiBaseUrl } from "@/features/day-nammae/upstream";
 import {
   CouponUseResult,
   CouponValidationResult,
@@ -659,7 +660,7 @@ async function parseJsonResponse<T>(response: Response) {
 }
 
 async function requestCouponValidation(code: string) {
-  const response = await fetch("/api/offline/day-nammae/coupon/validate", {
+  const response = await fetch(`${getDayNammeCouponApiBaseUrl()}/validate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -693,7 +694,7 @@ async function requestCouponValidation(code: string) {
 }
 
 async function requestCouponUse(code: string) {
-  const response = await fetch("/api/offline/day-nammae/coupon/use", {
+  const response = await fetch(`${getDayNammeCouponApiBaseUrl()}/use`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
