@@ -103,30 +103,21 @@ export default function OfflinePage() {
     null
   );
 
-  // Google Sheets에서 총 신청자 수 가져오기
+  // Supabase 승인 누계를 서버 API를 통해 가져오기
   useEffect(() => {
     const fetchTotalParticipants = async () => {
       try {
-        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
-        const GID = "1757320005";
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
-
-        const response = await fetch(url);
+        const response = await fetch("/api/offline/participant-count");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const csvText = await response.text();
-        const rows = csvText.split("\n");
+        const payload = (await response.json()) as {
+          totalParticipants?: number;
+        };
 
-        // A2 셀은 두 번째 행(인덱스 1)의 첫 번째 열
-        if (rows.length > 1) {
-          const secondRow = rows[1].split(",");
-          const a2Value = secondRow[0]?.trim();
-
-          if (a2Value && !isNaN(Number(a2Value))) {
-            setTotalParticipants(Number(a2Value));
-          }
+        if (typeof payload.totalParticipants === "number") {
+          setTotalParticipants(payload.totalParticipants);
         }
       } catch (error) {
         console.error("총 신청자 수를 가져오는 중 오류 발생:", error);
