@@ -24,7 +24,12 @@ const Sidebar: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
-  if (pathname === "/offline/11namme/apply") return null;
+  if (
+    pathname === "/offline/11namme/apply" ||
+    pathname?.startsWith("/offline/11namme/survey/")
+  ) {
+    return null;
+  }
 
   // 현재 경로와 링크 경로를 비교하여 액티브 상태 확인
   const isActive = (href: string) => {

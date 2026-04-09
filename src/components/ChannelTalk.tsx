@@ -13,10 +13,12 @@ declare global {
 export default function ChannelTalk() {
   const initialized = useRef(false);
   const pathname = usePathname();
-  const isDayNammeApplyPage = pathname === "/offline/11namme/apply";
+  const isDayNammeFocusedPage =
+    pathname === "/offline/11namme/apply" ||
+    pathname?.startsWith("/offline/11namme/survey/");
 
   useEffect(() => {
-    if (isDayNammeApplyPage) return;
+    if (isDayNammeFocusedPage) return;
     if (initialized.current) return;
     initialized.current = true;
 
@@ -48,7 +50,7 @@ export default function ChannelTalk() {
         window.ChannelIO("shutdown");
       }
     };
-  }, [isDayNammeApplyPage]);
+  }, [isDayNammeFocusedPage]);
 
   return null;
 }
