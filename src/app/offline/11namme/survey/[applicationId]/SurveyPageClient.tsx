@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 type SurveyContext = {
-  requestId: string;
   customerName?: string | null;
   phoneMasked?: string | null;
   schedule?: string | null;
@@ -31,7 +30,7 @@ type FormState = {
 };
 
 type SurveyPageClientProps = {
-  applicationId: string;
+  surveyToken: string;
 };
 
 const ACQUISITION_CHANNEL_OPTIONS = [
@@ -182,7 +181,7 @@ function Section({
 }
 
 export default function SurveyPageClient({
-  applicationId,
+  surveyToken,
 }: SurveyPageClientProps) {
   const [context, setContext] = useState<SurveyContext | null>(null);
   const [form, setForm] = useState<FormState>(INITIAL_FORM_STATE);
@@ -201,7 +200,7 @@ export default function SurveyPageClient({
 
       try {
         const response = await fetch(
-          `/api/offline/day-nammae/survey?requestId=${encodeURIComponent(applicationId)}`,
+          `/api/offline/day-nammae/survey?token=${encodeURIComponent(surveyToken)}`,
           {
             cache: "no-store",
           }
@@ -238,7 +237,7 @@ export default function SurveyPageClient({
     return () => {
       cancelled = true;
     };
-  }, [applicationId]);
+  }, [surveyToken]);
 
   const scheduleLabel = formatSchedule(
     context?.schedule,
@@ -300,7 +299,7 @@ export default function SurveyPageClient({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          requestId: context.requestId,
+          token: surveyToken,
           overallSatisfaction: form.overallSatisfaction,
           acquisitionChannels: form.acquisitionChannels,
           acquisitionChannelEtc: form.acquisitionChannelEtc.trim() || null,
@@ -413,8 +412,8 @@ export default function SurveyPageClient({
 
           <div className="mt-6 grid gap-3 md:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <p className="text-xs text-white/45">신청 번호</p>
-              <p className="mt-2 text-sm font-medium text-white">{context.requestId}</p>
+              <p className="text-xs text-white/45">응답 링크</p>
+              <p className="mt-2 text-sm font-medium text-white">개인 전용 링크</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
               <p className="text-xs text-white/45">참여자</p>

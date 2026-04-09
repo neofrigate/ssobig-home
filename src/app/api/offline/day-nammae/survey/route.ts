@@ -30,7 +30,7 @@ function jsonResponse(body: unknown, status = 200) {
 
 function normalizeSurveyPayload(body: Record<string, unknown>) {
   return {
-    requestId: body.requestId,
+    token: body.token,
     overallSatisfaction: body.overallSatisfaction,
     discoveryChannels: body.discoveryChannels ?? body.acquisitionChannels,
     discoveryChannelOther:
@@ -48,15 +48,15 @@ function normalizeSurveyPayload(body: Record<string, unknown>) {
 }
 
 export async function GET(request: Request) {
-  const requestId = new URL(request.url).searchParams.get("requestId")?.trim();
+  const token = new URL(request.url).searchParams.get("token")?.trim();
 
-  if (!requestId) {
-    return jsonResponse({ error: "requestId query parameter is required" }, 400);
+  if (!token) {
+    return jsonResponse({ error: "token query parameter is required" }, 400);
   }
 
   try {
     const upstreamUrl = new URL(getSurveyApiUrl());
-    upstreamUrl.searchParams.set("requestId", requestId);
+    upstreamUrl.searchParams.set("token", token);
 
     const upstreamResponse = await fetch(upstreamUrl.toString(), {
       cache: "no-store",

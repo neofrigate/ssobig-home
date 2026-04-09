@@ -16,7 +16,7 @@ type PageProps = {
 };
 
 export default async function DayNammeSurveyPage({ params }: PageProps) {
-  const { applicationId } = await params;
+  const { applicationId: token } = await params;
 
-  return <SurveyPageClient applicationId={applicationId} />;
+  return <SurveyPageClient surveyToken={token} />;
 }
