@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     default: "쏘빅 SSOBIG | 머더미스터리 · 추리게임 · 소셜링 플랫폼",
     template: "%s | 쏘빅 SSOBIG",
   },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/favicon.ico",
+    apple: "/icon.svg",
+  },
   description:
     "술 없이도 즐거운 소셜 플랫폼 쏘빅! 머더미스터리, 스토리 추리게임, 보드게임, 일일남매, 불면증마피아, 알파마니또 등 다양한 오프라인 소셜링과 온라인 콘텐츠를 만나보세요.",
   keywords: [
@@ -90,7 +95,6 @@ export default function RootLayout({
           name="viewport"
           content="width=device-width, initial-scale=1.0"
         />
-        <link rel="icon" href="/쏘빅 로고.svg" type="image/svg+xml" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -99,7 +103,7 @@ export default function RootLayout({
               "@type": "Organization",
               name: "쏘빅 SSOBIG",
               url: "https://www.ssobig.com",
-              logo: "https://www.ssobig.com/쏘빅 로고.svg",
+              logo: "https://www.ssobig.com/icon.svg",
               description:
                 "술 없이도 즐거운 소셜 플랫폼. 머더미스터리, 추리게임, 보드게임, 소셜링 등 다양한 콘텐츠를 제공합니다.",
               sameAs: [
