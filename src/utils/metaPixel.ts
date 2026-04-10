@@ -1,4 +1,5 @@
 export const LOVE_BUDDIES_PIXEL_ID = "1541266446734040";
+export const SSOBIG_STORY_PIXEL_ID = "2156713988421222";
 
 declare global {
   interface Window {
