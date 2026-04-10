@@ -150,7 +150,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
           <div className={`${isLight ? "text-gray-400" : "text-white/40"} pt-3 flex items-center justify-between`}>
             <p>
               <Link
-                href="https://about.ssobig.com/privacy_policy"
+                href="https://www.ssobig.com/privacy_policy.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`underline ${
@@ -163,7 +163,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
               </Link>
               <span className="mx-2">|</span>
               <Link
-                href="https://about.ssobig.com/terms_of_service"
+                href="https://www.ssobig.com/terms_of_service.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`underline ${
@@ -208,4 +208,3 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
 };
 
 export default Footer;
-
