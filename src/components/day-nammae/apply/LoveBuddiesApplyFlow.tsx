@@ -22,6 +22,19 @@ function trackEvent(eventName: string, params?: Record<string, unknown>) {
   safeFbq("trackCustom", eventName, params);
 }
 
+function getMetaCookie(name: "_fbp" | "_fbc") {
+  if (typeof document === "undefined") {
+    return "";
+  }
+
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()?.split(";").shift() || "";
+  }
+  return "";
+}
+
 function trackCompleteRegistration() {
   if (typeof window === "undefined") {
     return;
@@ -637,6 +650,8 @@ export default function LoveBuddiesApplyFlow({
       requestBody.append("utm_source", urlSearchParams.get("utm_source") || "");
       requestBody.append("utm_medium", urlSearchParams.get("utm_medium") || "");
       requestBody.append("utm_content", urlSearchParams.get("utm_content") || "");
+      requestBody.append("fbp", getMetaCookie("_fbp"));
+      requestBody.append("fbc", getMetaCookie("_fbc"));
       requestBody.append("client_request_id", clientRequestId);
       if (clientDebugContext) {
         requestBody.append("debug_client_context", JSON.stringify(clientDebugContext));
