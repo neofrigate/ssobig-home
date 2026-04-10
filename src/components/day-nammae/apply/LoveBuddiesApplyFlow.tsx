@@ -204,6 +204,21 @@ function createClientRequestId() {
   return `cdn-${Date.now()}-${createRandomIdSuffix()}`;
 }
 
+function getCookieValue(name: string) {
+  if (typeof document === "undefined") {
+    return "";
+  }
+
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+
+  if (parts.length !== 2) {
+    return "";
+  }
+
+  return parts.pop()?.split(";").shift()?.trim() || "";
+}
+
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -1200,6 +1215,8 @@ export default function LoveBuddiesApplyFlow({
             ? getSafeSearchParams(window.location.search)
             : new URLSearchParams();
         const requestBody = new FormData();
+        const fbp = getCookieValue("_fbp");
+        const fbc = getCookieValue("_fbc");
         requestBody.append("gender", formValues.gender);
         requestBody.append("schedule", formValues.schedule);
         requestBody.append("name", formValues.name.trim());
@@ -1211,6 +1228,12 @@ export default function LoveBuddiesApplyFlow({
         requestBody.append("utm_source", urlSearchParams.get("utm_source") || "");
         requestBody.append("utm_medium", urlSearchParams.get("utm_medium") || "");
         requestBody.append("utm_content", urlSearchParams.get("utm_content") || "");
+        if (fbp) {
+          requestBody.append("fbp", fbp);
+        }
+        if (fbc) {
+          requestBody.append("fbc", fbc);
+        }
         requestBody.append("client_request_id", clientRequestId);
         if (wantsCoupon && validatedCoupon) {
           requestBody.append("usedCouponId", String(validatedCoupon.id));

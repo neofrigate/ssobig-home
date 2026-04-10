@@ -276,6 +276,8 @@ export async function POST(request: Request) {
     const utmSource = (formData.get("utm_source") as string) || "";
     const utmMedium = (formData.get("utm_medium") as string) || "";
     const utmContent = (formData.get("utm_content") as string) || "";
+    const fbp = getOptionalString(formData, "fbp");
+    const fbc = getOptionalString(formData, "fbc");
     const usedCouponId = getOptionalPositiveInt(formData, "usedCouponId");
     clientRequestId = getOptionalString(formData, "client_request_id");
     debugClientContext = parseDebugClientContext(formData.get("debug_client_context"));
@@ -305,6 +307,8 @@ export async function POST(request: Request) {
       name,
       phoneMasked: maskedPhone,
       schedule,
+      hasFbp: Boolean(fbp),
+      hasFbc: Boolean(fbc),
       ...photoContext,
       debugClientContext,
     });
@@ -396,6 +400,8 @@ export async function POST(request: Request) {
       utm_source: utmSource,
       PhoneNumber: phone,
       utm_content: utmContent,
+      ...(fbp ? { fbp } : {}),
+      ...(fbc ? { fbc } : {}),
       "Q. 전화번호": phone,
       "Q. 기대되는점": "",
       "[일일남매] 일정 선택": schedule,
