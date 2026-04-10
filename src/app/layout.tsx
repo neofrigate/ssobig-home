@@ -24,9 +24,9 @@ export const metadata: Metadata = {
     template: "%s | 쏘빅 SSOBIG",
   },
   icons: {
-    icon: "/icon.svg",
+    icon: "/icon.png",
     shortcut: "/favicon.ico",
-    apple: "/icon.svg",
+    apple: "/icon.png",
   },
   description:
     "술 없이도 즐거운 소셜 플랫폼 쏘빅! 머더미스터리, 스토리 추리게임, 보드게임, 일일남매, 불면증마피아, 알파마니또 등 다양한 오프라인 소셜링과 온라인 콘텐츠를 만나보세요.",
