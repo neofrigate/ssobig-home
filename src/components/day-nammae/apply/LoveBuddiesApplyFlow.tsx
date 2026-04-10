@@ -845,6 +845,7 @@ export default function LoveBuddiesApplyFlow({
               value: 35000,
               currency: "KRW",
               content_name: "일일남매",
+              content_category: "오프라인 모임",
             });
           }}
           className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98]"
