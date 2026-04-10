@@ -744,7 +744,7 @@ export default function PlayroomPage() {
               }`}
             >
               <div className="pt-2 pb-3">
-                <p className="mb-1">대표자 : 안민우, 조원철</p>
+                <p className="mb-1">대표자 : 조원철</p>
                 <p className="mb-1">사업자등록번호 : 140-87-03096</p>
                 <p className="mb-1">전화번호 : 02-2635-7942</p>
                 <p className="mb-1">E-mail : ssobigstudio@gmail.com</p>
@@ -776,6 +776,15 @@ export default function PlayroomPage() {
                 className="hover:text-gray-600 underline"
               >
                 이용약관
+              </Link>
+              <span className="mx-2">|</span>
+              <Link
+                href="https://www.ssobig.com/refund_policy.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-600 underline"
+              >
+                환불 정책
               </Link>
             </p>
           </div>
