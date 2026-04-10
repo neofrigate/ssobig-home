@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 const EventPopup: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
 
   useEffect(() => {
     setIsMounted(true);

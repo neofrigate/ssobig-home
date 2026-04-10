@@ -91,6 +91,25 @@ function buildTemplateClickPayload({
   }
 }
 
+function buildViewContentPayload({
+  href,
+  title,
+}: {
+  href: string;
+  title: string;
+}) {
+  const templateId = extractTemplateId(href);
+  if (!templateId) {
+    return null;
+  }
+
+  return {
+    content_ids: [templateId],
+    content_name: title,
+    content_type: "product",
+  };
+}
+
 interface TrackedLinkProps {
   href: string;
   title: string;
@@ -130,6 +149,14 @@ function TrackedLink({
       destination: payload.destination_host ?? "external",
     });
     safeFbq("trackCustom", "TemplateClick", payload);
+
+    const viewContentPayload = buildViewContentPayload({
+      href: trackedHref,
+      title,
+    });
+    if (viewContentPayload) {
+      safeFbq("track", "ViewContent", viewContentPayload);
+    }
   };
 
   return (

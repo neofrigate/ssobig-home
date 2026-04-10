@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Script from "next/script";
-import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
 import { useState, useEffect } from "react";
 import { FAQSection } from "../../../../components/FAQ";
@@ -195,11 +194,6 @@ export default function LoveBuddiesDetailPage() {
 
   return (
     <>
-      <Head>
-        <title>러브버디즈 상세 - Love Buddies</title>
-        <meta name="description" content="러브버디즈 상세 정보 페이지입니다" />
-      </Head>
-
       {/* Google Tag Manager */}
       <Script id="google-tag-manager" strategy="afterInteractive">
         {`
