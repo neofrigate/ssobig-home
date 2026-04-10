@@ -14,6 +14,8 @@ interface PublicDayNammeSchedulesResponse {
     exposedTotal: number;
     exposedFemale: number;
     exposedMale: number;
+    waitlistAvailableFemale?: boolean;
+    waitlistAvailableMale?: boolean;
   }[];
 }
 

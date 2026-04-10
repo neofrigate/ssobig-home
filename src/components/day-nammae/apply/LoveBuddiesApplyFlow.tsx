@@ -10,6 +10,7 @@ import {
 } from "@/features/day-nammae/coupon";
 import { DAY_NAMMAE_NOTICE_SECTIONS } from "@/features/day-nammae/constants";
 import {
+  getDayNammeScheduleApplicationMode,
   getDayNammeScheduleLabel,
   isDayNammeScheduleSelectable,
 } from "@/features/day-nammae/schedule";
@@ -17,6 +18,7 @@ import { getDayNammeCouponApiBaseUrl } from "@/features/day-nammae/upstream";
 import {
   CouponUseResult,
   CouponValidationResult,
+  DayNammeApplicationMode,
   DayNammeFormValues,
   ScheduleItem,
 } from "@/features/day-nammae/types";
@@ -71,6 +73,7 @@ interface SubmitState {
   message: string;
   checkout: CheckoutState | null;
   applicationSubmitted: boolean;
+  applicationMode: DayNammeApplicationMode | null;
 }
 
 interface SubmitResponseMeta {
@@ -118,6 +121,8 @@ const DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE =
   "쿠폰 검증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
 const DEFAULT_COUPON_USE_ERROR_MESSAGE =
   "신청서는 접수되었지만 쿠폰 처리에 실패했습니다. 쿠폰 코드를 다시 확인하거나 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
+const DEFAULT_WAITLIST_SUBMIT_SUCCESS_MESSAGE =
+  "예약 신청이 접수되었습니다. 다른 분 취소로 자리가 생기면 결제 안내를 다시 보내드릴게요.";
 const COUPON_VALIDATE_DELAY_MS = 700;
 
 const INITIAL_FORM_VALUES: DayNammeFormValues = {
@@ -150,7 +155,75 @@ const INITIAL_SUBMIT_STATE: SubmitState = {
   message: "",
   checkout: null,
   applicationSubmitted: false,
+  applicationMode: null,
 };
+
+interface WaitlistConfirmModalProps {
+  scheduleLabel: string;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+function WaitlistConfirmModal({
+  scheduleLabel,
+  onClose,
+  onConfirm,
+}: WaitlistConfirmModalProps) {
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-5">
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/55 backdrop-blur-sm"
+        aria-label="예약대기 안내 닫기"
+      />
+      <div className="relative w-full max-w-[380px] rounded-[28px] bg-[#171113] px-6 py-7 shadow-2xl">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/8 text-white/60"
+          aria-label="예약대기 안내 닫기"
+        >
+          ×
+        </button>
+        <div className="inline-flex rounded-full bg-[#F6C66A]/15 px-4 py-1 text-xs font-semibold tracking-[0.16em] text-[#FFE2A4]">
+          WAITLIST
+        </div>
+        <h2 className="mt-4 text-2xl font-black text-white">
+          예약대기로 접수할게요
+        </h2>
+        <p className="mt-4 text-sm leading-relaxed text-white/75">
+          선택하신 일정은 지금 마감된 회차입니다.
+        </p>
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left">
+          <p className="text-sm font-semibold text-white">{scheduleLabel}</p>
+          <p className="mt-3 text-sm leading-relaxed text-white/68">
+            예약대기로 먼저 신청해두시면, 다른 분이 취소해서 자리가 생겼을 때 결제 안내를 다시 보내드립니다.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-white/68">
+            그때 결제하시면 참가가 확정됩니다.
+          </p>
+        </div>
+        <div className="mt-6 flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-white/15 text-sm font-semibold text-white/65"
+          >
+            다른 일정 보기
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-[#F6C66A] text-sm font-bold text-[#1E1405]"
+          >
+            예약대기 진행
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const STEP_CONFIG: Record<number, { title: string; description: string }> = {
   1: { title: "쿠폰이 있으신가요?", description: "쿠폰이 있다면 결제 전에 할인 여부를 확인해드릴게요." },
@@ -910,6 +983,18 @@ export default function LoveBuddiesApplyFlow({
   const [validatedCoupon, setValidatedCoupon] =
     useState<CouponValidationResult | null>(null);
   const [submitState, setSubmitState] = useState<SubmitState>(INITIAL_SUBMIT_STATE);
+  const [waitlistModalSchedule, setWaitlistModalSchedule] =
+    useState<ScheduleItem | null>(null);
+  const [confirmedWaitlistSchedule, setConfirmedWaitlistSchedule] = useState("");
+
+  const selectedScheduleItem =
+    scheduleData.find(
+      (schedule) => getDayNammeScheduleLabel(schedule) === formValues.schedule
+    ) || null;
+  const selectedApplicationMode: DayNammeApplicationMode = selectedScheduleItem
+    ? getDayNammeScheduleApplicationMode(selectedScheduleItem, formValues.gender)
+    : "normal";
+  const isWaitlistApplication = selectedApplicationMode === "waitlist";
 
   useEffect(() => {
     if (!formValues.photo) {
@@ -962,6 +1047,8 @@ export default function LoveBuddiesApplyFlow({
     setPhotoNotice("");
     setCouponValidationStatus("idle");
     setValidatedCoupon(null);
+    setWaitlistModalSchedule(null);
+    setConfirmedWaitlistSchedule("");
   };
 
   const handleValueChange =
@@ -1034,13 +1121,37 @@ export default function LoveBuddiesApplyFlow({
     });
     setFormError("");
     setShowFieldErrors(false);
+    setWaitlistModalSchedule(null);
+    setConfirmedWaitlistSchedule("");
     setCurrentStep(SCHEDULE_STEP);
   };
 
-  const handleScheduleSelect = (scheduleLabel: string) => {
+  const handleScheduleSelect = (schedule: ScheduleItem) => {
+    const scheduleLabel = getDayNammeScheduleLabel(schedule);
+
     setFormValues((current) => ({ ...current, schedule: scheduleLabel }));
     setFormError("");
     setShowFieldErrors(false);
+    setConfirmedWaitlistSchedule("");
+
+    if (
+      getDayNammeScheduleApplicationMode(schedule, formValues.gender) ===
+      "waitlist"
+    ) {
+      setWaitlistModalSchedule(schedule);
+      return;
+    }
+
+    setCurrentStep(PROFILE_STEP);
+  };
+
+  const handleWaitlistConfirm = () => {
+    if (waitlistModalSchedule) {
+      setConfirmedWaitlistSchedule(
+        getDayNammeScheduleLabel(waitlistModalSchedule)
+      );
+    }
+    setWaitlistModalSchedule(null);
     setCurrentStep(PROFILE_STEP);
   };
 
@@ -1138,7 +1249,11 @@ export default function LoveBuddiesApplyFlow({
       case GENDER_STEP:
         return formValues.gender !== "";
       case SCHEDULE_STEP:
-        return formValues.schedule !== "";
+        return (
+          formValues.schedule !== "" &&
+          (!isWaitlistApplication ||
+            confirmedWaitlistSchedule === formValues.schedule)
+        );
       case PROFILE_STEP:
         return (
           formValues.name.trim() !== "" &&
@@ -1183,6 +1298,7 @@ export default function LoveBuddiesApplyFlow({
       status: "submitting",
       message: "",
       checkout: null,
+      applicationMode: selectedApplicationMode,
     }));
     setFormError("");
 
@@ -1211,6 +1327,7 @@ export default function LoveBuddiesApplyFlow({
         requestBody.append("utm_source", urlSearchParams.get("utm_source") || "");
         requestBody.append("utm_medium", urlSearchParams.get("utm_medium") || "");
         requestBody.append("utm_content", urlSearchParams.get("utm_content") || "");
+        requestBody.append("applicationMode", selectedApplicationMode);
         requestBody.append("client_request_id", clientRequestId);
         if (wantsCoupon && validatedCoupon) {
           requestBody.append("usedCouponId", String(validatedCoupon.id));
@@ -1267,13 +1384,14 @@ export default function LoveBuddiesApplyFlow({
           gender: formValues.gender,
           schedule: formValues.schedule,
           has_coupon: wantsCoupon,
+          application_mode: selectedApplicationMode,
         });
         trackCompleteRegistration();
       }
 
       let checkoutSource: Partial<CouponValidationResult & CouponUseResult> | null = null;
 
-      if (wantsCoupon && validatedCoupon) {
+      if (!isWaitlistApplication && wantsCoupon && validatedCoupon) {
         submitStage = "client:coupon-use:start";
         const usedCoupon = await requestCouponUse(validatedCoupon.code);
         submitStage = "client:coupon-use:success";
@@ -1284,6 +1402,17 @@ export default function LoveBuddiesApplyFlow({
         });
       }
 
+      if (isWaitlistApplication) {
+        setSubmitState({
+          status: "success",
+          message: DEFAULT_WAITLIST_SUBMIT_SUCCESS_MESSAGE,
+          checkout: null,
+          applicationSubmitted,
+          applicationMode: selectedApplicationMode,
+        });
+        return;
+      }
+
       const checkout = buildCheckoutState(formValues.schedule, checkoutSource);
 
       setSubmitState({
@@ -1291,6 +1420,7 @@ export default function LoveBuddiesApplyFlow({
         message: "신청이 정상적으로 접수되었습니다. 검토 후 안내 메시지를 보내드릴게요.",
         checkout,
         applicationSubmitted,
+        applicationMode: selectedApplicationMode,
       });
     } catch (error) {
       const {
@@ -1371,6 +1501,7 @@ export default function LoveBuddiesApplyFlow({
         message: errorMessage,
         checkout: null,
         applicationSubmitted,
+        applicationMode: selectedApplicationMode,
       });
     }
   };
@@ -1423,6 +1554,16 @@ export default function LoveBuddiesApplyFlow({
     };
     stepEvents[currentStep]?.();
 
+    if (
+      currentStep === SCHEDULE_STEP &&
+      selectedScheduleItem &&
+      isWaitlistApplication &&
+      confirmedWaitlistSchedule !== formValues.schedule
+    ) {
+      setWaitlistModalSchedule(selectedScheduleItem);
+      return;
+    }
+
     setShowFieldErrors(false);
     setCurrentStep((step) => step + 1);
     setFormError("");
@@ -1443,6 +1584,53 @@ export default function LoveBuddiesApplyFlow({
     });
     setFormError("");
   };
+
+  if (
+    submitState.status === "success" &&
+    submitState.applicationMode === "waitlist"
+  ) {
+    return (
+      <ApplyStepShell
+        mode={mode}
+        currentStep={totalSteps}
+        totalSteps={totalSteps}
+        title="예약 신청이 접수되었어요"
+        description="지금은 마감된 일정이라 자리가 생기면 다시 안내드립니다."
+        canProceed={true}
+        hideNav
+        onNext={() => {}}
+        onBack={() => {}}
+      >
+        <div className="rounded-2xl border border-[#F6C66A]/25 bg-[#F6C66A]/10 px-5 py-5 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#FFE2A4]/80">
+            WAITLIST
+          </p>
+          <p className="mt-3 text-base font-bold text-white">{formValues.schedule}</p>
+          <p className="mt-1 text-sm text-white/70">
+            {formValues.name} · {formValues.phone}
+          </p>
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-5 py-5 text-left text-sm leading-relaxed text-white/68">
+          <p>{submitState.message}</p>
+          <p className="mt-3">
+            자리가 비워져서 확정 가능한 상태가 되면 결제 안내 알림을 다시 보내드립니다.
+          </p>
+          <p className="mt-2">
+            그때 결제를 완료하시면 참가가 확정됩니다.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={resetFlow}
+          className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full border border-white/20 text-sm font-medium text-white/70 transition active:scale-[0.98]"
+        >
+          다른 일정도 보기
+        </button>
+      </ApplyStepShell>
+    );
+  }
 
   if (submitState.status === "success" && submitState.checkout) {
     const checkout = submitState.checkout;
@@ -1570,12 +1758,16 @@ export default function LoveBuddiesApplyFlow({
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/25 border-t-[#FF6B9F]" />
             <div>
               <p className="text-sm font-semibold">
-                {submitState.applicationSubmitted
-                  ? "쿠폰을 처리하고 있어요"
-                  : "신청서를 접수하고 있어요"}
+                {isWaitlistApplication
+                  ? "예약대기 신청을 접수하고 있어요"
+                  : submitState.applicationSubmitted
+                    ? "쿠폰을 처리하고 있어요"
+                    : "신청서를 접수하고 있어요"}
               </p>
               <p className="mt-1 text-xs text-white/65">
-                완료되면 바로 결제 단계로 넘어갑니다.
+                {isWaitlistApplication
+                  ? "완료되면 예약대기 안내 화면으로 이동합니다."
+                  : "완료되면 바로 결제 단계로 넘어갑니다."}
               </p>
             </div>
           </div>
@@ -1601,13 +1793,24 @@ export default function LoveBuddiesApplyFlow({
 
           {couponValidationStatus === "valid" && validatedCoupon && (
             <div className="mt-4 rounded-2xl border border-amber-400/35 bg-amber-500/10 px-4 py-4 text-sm leading-relaxed text-amber-100">
-              <p className="font-semibold">신청 완료 전 꼭 확인해주세요.</p>
-              <p className="mt-2">
-                `신청 완료` 버튼을 누르면 이 쿠폰은 바로 사용 처리됩니다.
-              </p>
-              <p className="mt-1">
-                사용 처리 후에는 이전 단계로 돌아가 쿠폰을 다시 수정할 수 없습니다.
-              </p>
+              {isWaitlistApplication ? (
+                <>
+                  <p className="font-semibold">예약대기 신청에서는 바로 결제하지 않습니다.</p>
+                  <p className="mt-2">
+                    자리가 생겨 결제 안내를 받기 전까지는 이 쿠폰을 사용 처리하지 않습니다.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold">신청 완료 전 꼭 확인해주세요.</p>
+                  <p className="mt-2">
+                    `신청 완료` 버튼을 누르면 이 쿠폰은 바로 사용 처리됩니다.
+                  </p>
+                  <p className="mt-1">
+                    사용 처리 후에는 이전 단계로 돌아가 쿠폰을 다시 수정할 수 없습니다.
+                  </p>
+                </>
+              )}
             </div>
           )}
         </>
@@ -1665,6 +1868,14 @@ export default function LoveBuddiesApplyFlow({
           section={DAY_NAMMAE_NOTICE_SECTIONS[2]}
           agreed={agreements[2]}
           onAgreeChange={handleAgreementChange(2)}
+        />
+      )}
+
+      {waitlistModalSchedule && (
+        <WaitlistConfirmModal
+          scheduleLabel={getDayNammeScheduleLabel(waitlistModalSchedule)}
+          onClose={() => setWaitlistModalSchedule(null)}
+          onConfirm={handleWaitlistConfirm}
         />
       )}
     </ApplyStepShell>

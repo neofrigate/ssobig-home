@@ -1,3 +1,5 @@
+export type DayNammeApplicationMode = "normal" | "waitlist";
+
 export interface ScheduleItem {
   date: string;
   title: string;
@@ -8,6 +10,8 @@ export interface ScheduleItem {
   };
   maxCapacity: number;
   status: string;
+  waitlistAvailableFemale: boolean;
+  waitlistAvailableMale: boolean;
 }
 
 export interface DayNammeFormValues {

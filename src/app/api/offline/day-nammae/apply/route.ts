@@ -82,6 +82,11 @@ function getOptionalPositiveInt(formData: FormData, key: string) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
+function getApplicationMode(formData: FormData) {
+  const value = formData.get("applicationMode");
+  return value === "waitlist" ? "waitlist" : "normal";
+}
+
 function maskPhoneNumber(phone: string) {
   const digits = phone.replace(/\D/g, "");
 
@@ -277,6 +282,7 @@ export async function POST(request: Request) {
     const utmMedium = (formData.get("utm_medium") as string) || "";
     const utmContent = (formData.get("utm_content") as string) || "";
     const usedCouponId = getOptionalPositiveInt(formData, "usedCouponId");
+    const applicationMode = getApplicationMode(formData);
     clientRequestId = getOptionalString(formData, "client_request_id");
     debugClientContext = parseDebugClientContext(formData.get("debug_client_context"));
 
@@ -400,6 +406,7 @@ export async function POST(request: Request) {
       "Q. 기대되는점": "",
       "[일일남매] 일정 선택": schedule,
       usedCouponId,
+      applicationMode,
     };
 
     currentStage = "edge:request:start";

@@ -1,30 +1,18 @@
 import {
+  getDayNammeScheduleHelperDescription,
+  getDayNammeScheduleHelperText,
   getDayNammeScheduleLabel,
+  isDayNammeScheduleWaitlistSelectable,
   isDayNammeScheduleSelectable,
 } from "@/features/day-nammae/schedule";
 import { ScheduleItem } from "@/features/day-nammae/types";
-
-function getScheduleHelperText(
-  schedule: ScheduleItem,
-  gender: "남" | "여" | ""
-) {
-  if (schedule.status === "전체마감") return "전체 마감";
-  if (gender === "여" && schedule.status === "여자마감") return "여성 마감";
-  if (gender === "남" && schedule.status === "남자마감") return "남성 마감";
-  if (
-    !gender &&
-    (schedule.status === "여자마감" || schedule.status === "남자마감")
-  )
-    return "성별 선택 후 확인";
-  return schedule.status || "신청 가능";
-}
 
 interface StepScheduleProps {
   scheduleData: ScheduleItem[];
   isLoading: boolean;
   gender: "남" | "여" | "";
   selectedSchedule: string;
-  onSelect: (label: string) => void;
+  onSelect: (schedule: ScheduleItem) => void;
 }
 
 export default function StepSchedule({
@@ -50,18 +38,26 @@ export default function StepSchedule({
         const label = getDayNammeScheduleLabel(schedule);
         const selectable = isDayNammeScheduleSelectable(schedule, gender);
         const selected = selectedSchedule === label;
+        const waitlistSelectable = isDayNammeScheduleWaitlistSelectable(
+          schedule,
+          gender
+        );
 
         return (
           <button
             key={label}
             type="button"
             disabled={!selectable}
-            onClick={() => onSelect(label)}
+            onClick={() => onSelect(schedule)}
             className={`w-full rounded-2xl border px-4 py-4 text-left transition [touch-action:manipulation] ${
               selected
-                ? "border-[#FF6B9F] bg-[#FF6B9F]/15"
+                ? waitlistSelectable
+                  ? "border-[#F6C66A] bg-[#F6C66A]/14"
+                  : "border-[#FF6B9F] bg-[#FF6B9F]/15"
                 : selectable
-                  ? "border-white/10 bg-white/5"
+                  ? waitlistSelectable
+                    ? "border-[#F6C66A]/35 bg-[#F6C66A]/8"
+                    : "border-white/10 bg-white/5"
                   : "border-white/5 bg-white/[0.02] opacity-40"
             }`}
           >
@@ -72,20 +68,36 @@ export default function StepSchedule({
                 >
                   {label}
                 </p>
-                <p className="mt-1 text-xs text-white/40">
-                  현재 {schedule.applicants.total}/{schedule.maxCapacity}명 신청
+                <p
+                  className={`mt-1 text-xs ${
+                    waitlistSelectable
+                      ? selectable
+                        ? "text-[#F8D999]"
+                        : "text-white/30"
+                      : "text-white/40"
+                  }`}
+                >
+                  {getDayNammeScheduleHelperDescription(schedule, gender)}
                 </p>
               </div>
               <span
                 className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                  selectable
-                    ? "bg-[#FF6B9F]/20 text-[#FFB1D4]"
-                    : "bg-white/5 text-white/30"
+                  waitlistSelectable
+                    ? "bg-[#F6C66A]/18 text-[#FFE2A4]"
+                    : selectable
+                      ? "bg-[#FF6B9F]/20 text-[#FFB1D4]"
+                      : "bg-white/5 text-white/30"
                 }`}
               >
-                {getScheduleHelperText(schedule, gender)}
+                {getDayNammeScheduleHelperText(schedule, gender)}
               </span>
             </div>
+
+            {waitlistSelectable && (
+              <div className="mt-3 rounded-xl border border-[#F6C66A]/18 bg-black/20 px-3 py-2 text-[11px] leading-relaxed text-[#FFE9BA]">
+                지금은 마감된 회차예요. 취소 자리가 생기면 결제 안내 후 확정할 수 있어요.
+              </div>
+            )}
           </button>
         );
       })}

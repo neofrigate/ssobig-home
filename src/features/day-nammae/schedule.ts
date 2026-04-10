@@ -1,5 +1,5 @@
 import { DAY_NAMMAE_FALLBACK_SCHEDULE } from "./constants";
-import { ScheduleItem } from "./types";
+import { DayNammeApplicationMode, ScheduleItem } from "./types";
 
 interface RawScheduleItem {
   schedule: string;
@@ -9,6 +9,8 @@ interface RawScheduleItem {
   exposedFemale: number;
   exposedMale: number;
   status?: string;
+  waitlistAvailableFemale?: boolean;
+  waitlistAvailableMale?: boolean;
 }
 
 export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
@@ -38,6 +40,8 @@ export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
         },
         maxCapacity: item.maxCapacity || 40,
         status: item.closeStatus || item.status || "",
+        waitlistAvailableFemale: Boolean(item.waitlistAvailableFemale),
+        waitlistAvailableMale: Boolean(item.waitlistAvailableMale),
       };
     })
     .filter((item): item is ScheduleItem => item !== null)
@@ -64,21 +68,79 @@ export function getDayNammeScheduleLabel(schedule: ScheduleItem) {
   return `${schedule.date} ${schedule.title}`.trim();
 }
 
-export function isDayNammeScheduleSelectable(
+export function isDayNammeScheduleWaitlistSelectable(
   schedule: ScheduleItem,
   gender: "남" | "여" | ""
 ) {
   if (schedule.status === "전체마감") {
-    return false;
+    if (gender === "여") return schedule.waitlistAvailableFemale;
+    if (gender === "남") return schedule.waitlistAvailableMale;
+    return schedule.waitlistAvailableFemale || schedule.waitlistAvailableMale;
   }
 
   if (gender === "여" && schedule.status === "여자마감") {
-    return false;
+    return schedule.waitlistAvailableFemale;
   }
 
   if (gender === "남" && schedule.status === "남자마감") {
-    return false;
+    return schedule.waitlistAvailableMale;
   }
 
-  return true;
+  return false;
+}
+
+export function isDayNammeScheduleSelectable(
+  schedule: ScheduleItem,
+  gender: "남" | "여" | ""
+) {
+  return (
+    schedule.status !== "전체마감" &&
+    !(gender === "여" && schedule.status === "여자마감") &&
+    !(gender === "남" && schedule.status === "남자마감")
+  ) || isDayNammeScheduleWaitlistSelectable(schedule, gender);
+}
+
+export function getDayNammeScheduleApplicationMode(
+  schedule: ScheduleItem,
+  gender: "남" | "여" | ""
+): DayNammeApplicationMode {
+  return isDayNammeScheduleWaitlistSelectable(schedule, gender)
+    ? "waitlist"
+    : "normal";
+}
+
+export function getDayNammeScheduleHelperText(
+  schedule: ScheduleItem,
+  gender: "남" | "여" | ""
+) {
+  if (isDayNammeScheduleWaitlistSelectable(schedule, gender)) {
+    return "예약대기 가능";
+  }
+
+  if (schedule.status === "전체마감") return "전체 마감";
+  if (gender === "여" && schedule.status === "여자마감") return "여성 마감";
+  if (gender === "남" && schedule.status === "남자마감") return "남성 마감";
+  if (
+    !gender &&
+    (schedule.status === "여자마감" || schedule.status === "남자마감")
+  ) {
+    return "성별 선택 후 확인";
+  }
+
+  return schedule.status || "신청 가능";
+}
+
+export function getDayNammeScheduleHelperDescription(
+  schedule: ScheduleItem,
+  gender: "남" | "여" | ""
+) {
+  if (isDayNammeScheduleWaitlistSelectable(schedule, gender)) {
+    return "마감 일정이지만 자리가 생기면 결제 후 확정할 수 있어요.";
+  }
+
+  if (!gender && (schedule.status === "여자마감" || schedule.status === "남자마감")) {
+    return "성별에 따라 신청 가능 여부가 달라져요.";
+  }
+
+  return `현재 ${schedule.applicants.total}/${schedule.maxCapacity}명 신청`;
 }
