@@ -1,6 +1,8 @@
 import { DAY_NAMMAE_FALLBACK_SCHEDULE } from "./constants";
 import { DayNammeApplicationMode, ScheduleItem } from "./types";
 
+const DAY_NAMMAE_WAITLIST_UI_ENABLED = false;
+
 interface RawScheduleItem {
   schedule: string;
   closeStatus?: string;
@@ -72,6 +74,10 @@ export function isDayNammeScheduleWaitlistSelectable(
   schedule: ScheduleItem,
   gender: "남" | "여" | ""
 ) {
+  if (!DAY_NAMMAE_WAITLIST_UI_ENABLED) {
+    return false;
+  }
+
   if (schedule.status === "전체마감") {
     if (gender === "여") return schedule.waitlistAvailableFemale;
     if (gender === "남") return schedule.waitlistAvailableMale;
