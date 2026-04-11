@@ -1,7 +1,7 @@
 import { DAY_NAMMAE_FALLBACK_SCHEDULE } from "./constants";
 import { DayNammeApplicationMode, ScheduleItem } from "./types";
 
-const DAY_NAMMAE_WAITLIST_UI_ENABLED = false;
+const DAY_NAMMAE_WAITLIST_UI_ENABLED = true;
 
 interface RawScheduleItem {
   schedule: string;
