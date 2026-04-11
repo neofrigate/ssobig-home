@@ -6,13 +6,15 @@ const DAY_NAMMAE_WAITLIST_UI_ENABLED = true;
 interface RawScheduleItem {
   schedule: string;
   closeStatus?: string;
+  recruitClosed?: boolean;
   maxCapacity: number;
   exposedTotal: number;
   exposedFemale: number;
   exposedMale: number;
   status?: string;
-  waitlistAvailableFemale?: boolean;
-  waitlistAvailableMale?: boolean;
+  waitlistAlertFemale?: number;
+  waitlistAlertMale?: number;
+  waitlistAlertTotal?: number;
 }
 
 export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
@@ -35,6 +37,8 @@ export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
       return {
         date: dateStr,
         title: cleanTitle,
+        fullLabel: title,
+        recruitClosed: item.recruitClosed === true,
         applicants: {
           total: item.exposedTotal || 0,
           female: item.exposedFemale || 0,
@@ -42,8 +46,11 @@ export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
         },
         maxCapacity: item.maxCapacity || 40,
         status: item.closeStatus || item.status || "",
-        waitlistAvailableFemale: Boolean(item.waitlistAvailableFemale),
-        waitlistAvailableMale: Boolean(item.waitlistAvailableMale),
+        waitlistAlerts: {
+          total: item.waitlistAlertTotal || 0,
+          female: item.waitlistAlertFemale || 0,
+          male: item.waitlistAlertMale || 0,
+        },
       };
     })
     .filter((item): item is ScheduleItem => item !== null)
@@ -70,26 +77,36 @@ export function getDayNammeScheduleLabel(schedule: ScheduleItem) {
   return `${schedule.date} ${schedule.title}`.trim();
 }
 
+export function isDayNammeScheduleRecruitClosed(schedule: ScheduleItem) {
+  return schedule.recruitClosed === true;
+}
+
+export function getVisibleDayNammeSchedules(scheduleData: ScheduleItem[]) {
+  return scheduleData.filter((schedule) => !isDayNammeScheduleRecruitClosed(schedule));
+}
+
 export function isDayNammeScheduleWaitlistSelectable(
   schedule: ScheduleItem,
   gender: "남" | "여" | ""
 ) {
+  if (isDayNammeScheduleRecruitClosed(schedule)) {
+    return false;
+  }
+
   if (!DAY_NAMMAE_WAITLIST_UI_ENABLED) {
     return false;
   }
 
   if (schedule.status === "전체마감") {
-    if (gender === "여") return schedule.waitlistAvailableFemale;
-    if (gender === "남") return schedule.waitlistAvailableMale;
-    return schedule.waitlistAvailableFemale || schedule.waitlistAvailableMale;
+    return true;
   }
 
   if (gender === "여" && schedule.status === "여자마감") {
-    return schedule.waitlistAvailableFemale;
+    return true;
   }
 
   if (gender === "남" && schedule.status === "남자마감") {
-    return schedule.waitlistAvailableMale;
+    return true;
   }
 
   return false;
@@ -99,6 +116,10 @@ export function isDayNammeScheduleSelectable(
   schedule: ScheduleItem,
   gender: "남" | "여" | ""
 ) {
+  if (isDayNammeScheduleRecruitClosed(schedule)) {
+    return false;
+  }
+
   return (
     schedule.status !== "전체마감" &&
     !(gender === "여" && schedule.status === "여자마감") &&
@@ -111,7 +132,7 @@ export function getDayNammeScheduleApplicationMode(
   gender: "남" | "여" | ""
 ): DayNammeApplicationMode {
   return isDayNammeScheduleWaitlistSelectable(schedule, gender)
-    ? "waitlist"
+    ? "waitlist_alert"
     : "normal";
 }
 
@@ -119,8 +140,12 @@ export function getDayNammeScheduleHelperText(
   schedule: ScheduleItem,
   gender: "남" | "여" | ""
 ) {
+  if (isDayNammeScheduleRecruitClosed(schedule)) {
+    return "모집마감";
+  }
+
   if (isDayNammeScheduleWaitlistSelectable(schedule, gender)) {
-    return "예약대기 가능";
+    return "알림신청 가능";
   }
 
   if (schedule.status === "전체마감") return "전체 마감";
@@ -140,8 +165,12 @@ export function getDayNammeScheduleHelperDescription(
   schedule: ScheduleItem,
   gender: "남" | "여" | ""
 ) {
+  if (isDayNammeScheduleRecruitClosed(schedule)) {
+    return "현재 모집이 종료된 회차예요.";
+  }
+
   if (isDayNammeScheduleWaitlistSelectable(schedule, gender)) {
-    return "마감 일정이지만 자리가 생기면 결제 후 확정할 수 있어요.";
+    return "마감 일정이지만 자리가 생기면 신청 가능 안내를 다시 보내드려요.";
   }
 
   if (!gender && (schedule.status === "여자마감" || schedule.status === "남자마감")) {

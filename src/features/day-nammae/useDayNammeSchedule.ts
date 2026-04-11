@@ -10,12 +10,14 @@ interface PublicDayNammeSchedulesResponse {
   schedules?: {
     schedule: string;
     closeStatus: string;
+    recruitClosed?: boolean;
     maxCapacity: number;
     exposedTotal: number;
     exposedFemale: number;
     exposedMale: number;
-    waitlistAvailableFemale?: boolean;
-    waitlistAvailableMale?: boolean;
+    waitlistAlertFemale?: number;
+    waitlistAlertMale?: number;
+    waitlistAlertTotal?: number;
   }[];
 }
 

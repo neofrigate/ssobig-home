@@ -95,7 +95,7 @@ export default function StepSchedule({
 
             {waitlistSelectable && (
               <div className="mt-3 rounded-xl border border-[#F6C66A]/18 bg-black/20 px-3 py-2 text-[11px] leading-relaxed text-[#FFE9BA]">
-                지금은 마감된 회차예요. 취소 자리가 생기면 결제 안내 후 확정할 수 있어요.
+                현재 알림신청 {schedule.waitlistAlerts.total}명 (여 {schedule.waitlistAlerts.female}명 / 남 {schedule.waitlistAlerts.male}명)
               </div>
             )}
           </button>

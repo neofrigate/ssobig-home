@@ -4,6 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 
 const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
+const DEFAULT_WAITLIST_ALERT_API_URL =
+  "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-waitlist-alert";
 const DEFAULT_CLIENT_ERROR_MESSAGE =
   "신청서 제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
 const UNSUPPORTED_HEIC_PHOTO_ERROR_MESSAGE =
@@ -84,7 +86,15 @@ function getOptionalPositiveInt(formData: FormData, key: string) {
 
 function getApplicationMode(formData: FormData) {
   const value = formData.get("applicationMode");
-  return value === "waitlist" ? "waitlist" : "normal";
+  return value === "waitlist_alert" ? "waitlist_alert" : "normal";
+}
+
+function getWaitlistAlertApiUrl() {
+  return (
+    process.env.DAY_NAMMAE_WAITLIST_ALERT_API_URL?.trim() ||
+    process.env.NEXT_PUBLIC_DAY_NAMMAE_WAITLIST_ALERT_API_URL?.trim() ||
+    DEFAULT_WAITLIST_ALERT_API_URL
+  );
 }
 
 function maskPhoneNumber(phone: string) {
@@ -273,20 +283,107 @@ export async function POST(request: Request) {
     const gender = getRequiredString(formData, "gender");
     const schedule = getRequiredString(formData, "schedule");
     const name = getRequiredString(formData, "name");
-    const birthYear = getRequiredString(formData, "birthYear");
-    const height = getRequiredString(formData, "height");
     const phone = getRequiredString(formData, "phone");
-    const traits = getRequiredString(formData, "traits");
-    const photo = formData.get("photo");
+    const applicationMode = getApplicationMode(formData);
+    clientRequestId = getOptionalString(formData, "client_request_id");
+    debugClientContext = parseDebugClientContext(formData.get("debug_client_context"));
     const utmSource = (formData.get("utm_source") as string) || "";
     const utmMedium = (formData.get("utm_medium") as string) || "";
     const utmContent = (formData.get("utm_content") as string) || "";
     const fbp = getOptionalString(formData, "fbp");
     const fbc = getOptionalString(formData, "fbc");
+
+    maskedPhone = maskPhoneNumber(phone);
+
+    logSubmitEvent(requestId, "submit:validated", {
+      clientRequestId,
+      name,
+      phoneMasked: maskedPhone,
+      schedule,
+      applicationMode,
+      hasFbp: Boolean(fbp),
+      hasFbc: Boolean(fbc),
+      debugClientContext,
+    });
+
+    if (applicationMode === "waitlist_alert") {
+      currentStage = "edge:request:start";
+
+      const edgeResponse = await fetch(getWaitlistAlertApiUrl(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requestId,
+          schedule,
+          name,
+          phone,
+          gender,
+        }),
+      });
+
+      const edgeBody = await parseEdgeFunctionResponse(edgeResponse);
+
+      logSubmitEvent(requestId, "edge:request:complete", {
+        clientRequestId,
+        edgeStatus: edgeResponse.status,
+        edgeSuccess: edgeResponse.ok,
+        applicationMode,
+      });
+
+      if (!edgeResponse.ok) {
+        currentStage = "edge:request:error";
+        logSubmitEvent(
+          requestId,
+          "edge:request:error",
+          {
+            clientRequestId,
+            edgeStatus: edgeResponse.status,
+            edgeBody,
+            applicationMode,
+          },
+          "error"
+        );
+        throw new Error(
+          typeof edgeBody === "string"
+            ? edgeBody
+            : edgeBody?.error || "대기 알림 신청 요청에 실패했습니다."
+        );
+      }
+
+      currentStage = "submit:success";
+      logSubmitEvent(requestId, "submit:success", {
+        schedule,
+        applicationMode,
+      });
+
+      return NextResponse.json(
+        {
+          success: true,
+          requestId,
+          clientRequestId,
+          payload: {
+            requestId,
+            gender,
+            schedule,
+            name,
+            phone,
+            applicationMode,
+          },
+          edgeBody,
+        },
+        {
+          headers: buildResponseHeaders(requestId, clientRequestId),
+        }
+      );
+    }
+
+    const birthYear = getRequiredString(formData, "birthYear");
+    const height = getRequiredString(formData, "height");
+    const traits = getRequiredString(formData, "traits");
+    const photo = formData.get("photo");
     const usedCouponId = getOptionalPositiveInt(formData, "usedCouponId");
-    const applicationMode = getApplicationMode(formData);
-    clientRequestId = getOptionalString(formData, "client_request_id");
-    debugClientContext = parseDebugClientContext(formData.get("debug_client_context"));
 
     if (!(photo instanceof File) || photo.size === 0) {
       throw new Error("업로드할 사진 파일이 필요합니다.");
@@ -300,7 +397,6 @@ export async function POST(request: Request) {
       throw new Error("이미지 파일만 업로드할 수 있습니다.");
     }
 
-    maskedPhone = maskPhoneNumber(phone);
     photoContext = {
       photoName: photo.name,
       photoType: photo.type,
@@ -308,7 +404,7 @@ export async function POST(request: Request) {
       photoLastModified: photo.lastModified,
     };
 
-    logSubmitEvent(requestId, "submit:validated", {
+    logSubmitEvent(requestId, "submit:validated:apply", {
       clientRequestId,
       name,
       phoneMasked: maskedPhone,

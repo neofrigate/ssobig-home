@@ -32,6 +32,7 @@ import StepGender from "./steps/StepGender";
 import StepPhoto from "./steps/StepPhoto";
 import StepProfile from "./steps/StepProfile";
 import StepSchedule from "./steps/StepSchedule";
+import StepWaitlistContact from "./steps/StepWaitlistContact";
 
 function trackEvent(eventName: string, params?: Record<string, unknown>) {
   safeFbq("trackCustom", eventName, params);
@@ -87,15 +88,37 @@ interface SubmitResponseMeta {
   parseError: string;
 }
 
-const COUPON_CHOICE_STEP = 1;
-const COUPON_CODE_STEP = 2;
-const GENDER_STEP = 3;
-const SCHEDULE_STEP = 4;
-const PROFILE_STEP = 5;
-const PHOTO_STEP = 6;
-const APPROVAL_STEP = 7;
-const MARKETING_STEP = 8;
-const NOTICE_STEP = 9;
+type FlowStepKey =
+  | "gender"
+  | "schedule"
+  | "waitlist_contact"
+  | "coupon_choice"
+  | "coupon_code"
+  | "profile"
+  | "photo"
+  | "approval"
+  | "marketing"
+  | "notice";
+
+const WAITLIST_ALERT_FLOW_STEPS: FlowStepKey[] = [
+  "gender",
+  "schedule",
+  "waitlist_contact",
+];
+
+function getNormalFlowSteps(hasCoupon: boolean | null): FlowStepKey[] {
+  return [
+    "gender",
+    "schedule",
+    "coupon_choice",
+    ...(hasCoupon === true ? ["coupon_code" as const] : []),
+    "profile",
+    "photo",
+    "approval",
+    "marketing",
+    "notice",
+  ];
+}
 const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
 const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
 const MAX_PHOTO_DIMENSION = 1600;
@@ -122,7 +145,7 @@ const DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE =
 const DEFAULT_COUPON_USE_ERROR_MESSAGE =
   "신청서는 접수되었지만 쿠폰 처리에 실패했습니다. 쿠폰 코드를 다시 확인하거나 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
 const DEFAULT_WAITLIST_SUBMIT_SUCCESS_MESSAGE =
-  "예약 신청이 접수되었습니다. 다른 분 취소로 자리가 생기면 결제 안내를 다시 보내드릴게요.";
+  "알림신청이 완료되었습니다. 신청 가능한 자리가 생기면 다시 안내드릴게요.";
 const COUPON_VALIDATE_DELAY_MS = 700;
 
 const INITIAL_FORM_VALUES: DayNammeFormValues = {
@@ -175,22 +198,22 @@ function WaitlistConfirmModal({
         type="button"
         onClick={onClose}
         className="absolute inset-0 bg-black/55 backdrop-blur-sm"
-        aria-label="예약대기 안내 닫기"
+        aria-label="알림신청 안내 닫기"
       />
       <div className="relative w-full max-w-[380px] rounded-[28px] bg-[#171113] px-6 py-7 shadow-2xl">
         <button
           type="button"
           onClick={onClose}
           className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/8 text-white/60"
-          aria-label="예약대기 안내 닫기"
+          aria-label="알림신청 안내 닫기"
         >
           ×
         </button>
         <div className="inline-flex rounded-full bg-[#F6C66A]/15 px-4 py-1 text-xs font-semibold tracking-[0.16em] text-[#FFE2A4]">
-          WAITLIST
+          ALERT
         </div>
         <h2 className="mt-4 text-2xl font-black text-white">
-          예약대기로 접수할게요
+          알림신청으로 접수할게요
         </h2>
         <p className="mt-4 text-sm leading-relaxed text-white/75">
           선택하신 일정은 지금 마감된 회차입니다.
@@ -198,10 +221,7 @@ function WaitlistConfirmModal({
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left">
           <p className="text-sm font-semibold text-white">{scheduleLabel}</p>
           <p className="mt-3 text-sm leading-relaxed text-white/68">
-            예약대기로 먼저 신청해두시면, 다른 분이 취소해서 자리가 생겼을 때 결제 안내를 다시 보내드립니다.
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-white/68">
-            그때 결제하시면 참가가 확정됩니다.
+            이름과 전화번호만 먼저 남겨두시면, 다른 분 취소로 신청 가능한 자리가 생겼을 때 신청 링크를 다시 보내드립니다.
           </p>
         </div>
         <div className="mt-6 flex gap-3">
@@ -217,7 +237,7 @@ function WaitlistConfirmModal({
             onClick={onConfirm}
             className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-[#F6C66A] text-sm font-bold text-[#1E1405]"
           >
-            예약대기 진행
+            알림신청 진행
           </button>
         </div>
       </div>
@@ -225,16 +245,50 @@ function WaitlistConfirmModal({
   );
 }
 
-const STEP_CONFIG: Record<number, { title: string; description: string }> = {
-  1: { title: "쿠폰이 있으신가요?", description: "쿠폰이 있다면 결제 전에 할인 여부를 확인해드릴게요." },
-  2: { title: "쿠폰 번호를 입력해주세요", description: "쿠폰 확인이 완료되면 할인 결제 링크로 안내됩니다." },
-  3: { title: "성별을 선택해주세요", description: "해당 성별 기준으로 일정 마감 여부가 달라집니다." },
-  4: { title: "일정을 선택해주세요", description: "참여하고 싶은 일정을 골라주세요." },
-  5: { title: "신청서를 작성해주세요", description: "프로필 정보를 입력해주세요." },
-  6: { title: "사진을 등록해주세요", description: "본인의 매력이 잘 드러나는 사진 한 장을 올려주세요." },
-  7: { title: "승인 기준을 확인해주세요", description: "신청 전 꼭 확인해야 하는 내용이에요." },
-  8: { title: "마케팅 동의를 확인해주세요", description: "촬영 및 콘텐츠 활용에 대한 안내예요." },
-  9: { title: "주의 사항을 확인해주세요", description: "참여 전 꼭 알아두셔야 할 사항이에요." },
+const STEP_CONFIG: Record<
+  FlowStepKey,
+  { title: string; description: string }
+> = {
+  gender: {
+    title: "성별을 선택해주세요",
+    description: "해당 성별 기준으로 일정 마감 여부가 달라집니다.",
+  },
+  schedule: {
+    title: "일정을 선택해주세요",
+    description: "참여하고 싶은 일정을 골라주세요.",
+  },
+  waitlist_contact: {
+    title: "알림신청 정보를 입력해주세요",
+    description: "이름과 전화번호만 남겨두시면 신청 가능한 자리가 생겼을 때 다시 안내드립니다.",
+  },
+  coupon_choice: {
+    title: "쿠폰이 있으신가요?",
+    description: "쿠폰이 있다면 결제 전에 할인 여부를 확인해드릴게요.",
+  },
+  coupon_code: {
+    title: "쿠폰 번호를 입력해주세요",
+    description: "쿠폰 확인이 완료되면 할인 결제 링크로 안내됩니다.",
+  },
+  profile: {
+    title: "신청서를 작성해주세요",
+    description: "프로필 정보를 입력해주세요.",
+  },
+  photo: {
+    title: "사진을 등록해주세요",
+    description: "본인의 매력이 잘 드러나는 사진 한 장을 올려주세요.",
+  },
+  approval: {
+    title: "승인 기준을 확인해주세요",
+    description: "신청 전 꼭 확인해야 하는 내용이에요.",
+  },
+  marketing: {
+    title: "마케팅 동의를 확인해주세요",
+    description: "촬영 및 콘텐츠 활용에 대한 안내예요.",
+  },
+  notice: {
+    title: "주의 사항을 확인해주세요",
+    description: "참여 전 꼭 알아두셔야 할 사항이에요.",
+  },
 };
 
 function buildSubmitErrorMessage(supportCode?: string) {
@@ -981,7 +1035,7 @@ export default function LoveBuddiesApplyFlow({
   onClose,
 }: LoveBuddiesApplyFlowProps) {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const normalizedInitialCouponCode = normalizeDayNammeCouponCode(
     initialCouponCode || ""
   );
@@ -1009,7 +1063,14 @@ export default function LoveBuddiesApplyFlow({
   const selectedApplicationMode: DayNammeApplicationMode = selectedScheduleItem
     ? getDayNammeScheduleApplicationMode(selectedScheduleItem, formValues.gender)
     : "normal";
-  const isWaitlistApplication = selectedApplicationMode === "waitlist";
+  const isWaitlistApplication = selectedApplicationMode === "waitlist_alert";
+  const flowSteps = isWaitlistApplication
+    ? WAITLIST_ALERT_FLOW_STEPS
+    : getNormalFlowSteps(formValues.hasCoupon);
+  const currentStepKey = flowSteps[currentStepIndex] || flowSteps[0];
+  const totalSteps = flowSteps.length;
+  const displayStep = currentStepIndex + 1;
+  const isLastStep = currentStepIndex === totalSteps - 1;
 
   useEffect(() => {
     if (!formValues.photo) {
@@ -1054,7 +1115,7 @@ export default function LoveBuddiesApplyFlow({
 
   const resetFlow = () => {
     setSubmitState(INITIAL_SUBMIT_STATE);
-    setCurrentStep(1);
+    setCurrentStepIndex(0);
     setFormValues(initialFormValues);
     setAgreements([false, false, false]);
     setShowFieldErrors(false);
@@ -1138,7 +1199,7 @@ export default function LoveBuddiesApplyFlow({
     setShowFieldErrors(false);
     setWaitlistModalSchedule(null);
     setConfirmedWaitlistSchedule("");
-    setCurrentStep(SCHEDULE_STEP);
+    setCurrentStepIndex(1);
   };
 
   const handleScheduleSelect = (schedule: ScheduleItem) => {
@@ -1151,13 +1212,13 @@ export default function LoveBuddiesApplyFlow({
 
     if (
       getDayNammeScheduleApplicationMode(schedule, formValues.gender) ===
-      "waitlist"
+      "waitlist_alert"
     ) {
       setWaitlistModalSchedule(schedule);
       return;
     }
 
-    setCurrentStep(PROFILE_STEP);
+    setCurrentStepIndex(2);
   };
 
   const handleWaitlistConfirm = () => {
@@ -1167,7 +1228,7 @@ export default function LoveBuddiesApplyFlow({
       );
     }
     setWaitlistModalSchedule(null);
-    setCurrentStep(PROFILE_STEP);
+    setCurrentStepIndex(2);
   };
 
   const handleBirthYearSelect = (year: string) => {
@@ -1241,18 +1302,24 @@ export default function LoveBuddiesApplyFlow({
     }
   };
 
-  const totalSteps = formValues.hasCoupon === true ? NOTICE_STEP : NOTICE_STEP - 1;
-  const displayStep =
-    formValues.hasCoupon === false && currentStep > COUPON_CODE_STEP
-      ? currentStep - 1
-      : currentStep;
-  const isLastStep = displayStep === totalSteps;
-
   const canProceed = (() => {
-    switch (currentStep) {
-      case COUPON_CHOICE_STEP:
+    switch (currentStepKey) {
+      case "gender":
+        return formValues.gender !== "";
+      case "schedule":
+        return (
+          formValues.schedule !== "" &&
+          (!isWaitlistApplication ||
+            confirmedWaitlistSchedule === formValues.schedule)
+        );
+      case "waitlist_contact":
+        return (
+          formValues.name.trim() !== "" &&
+          formValues.phone.replace(/\D/g, "").length === 11
+        );
+      case "coupon_choice":
         return formValues.hasCoupon !== null;
-      case COUPON_CODE_STEP:
+      case "coupon_code":
         return (
           couponValidationStatus === "valid" &&
           Boolean(validatedCoupon) &&
@@ -1261,15 +1328,7 @@ export default function LoveBuddiesApplyFlow({
               normalizeDayNammeCouponCode(formValues.couponCode)
             )
         );
-      case GENDER_STEP:
-        return formValues.gender !== "";
-      case SCHEDULE_STEP:
-        return (
-          formValues.schedule !== "" &&
-          (!isWaitlistApplication ||
-            confirmedWaitlistSchedule === formValues.schedule)
-        );
-      case PROFILE_STEP:
+      case "profile":
         return (
           formValues.name.trim() !== "" &&
           formValues.birthYear !== "" &&
@@ -1277,13 +1336,13 @@ export default function LoveBuddiesApplyFlow({
           formValues.phone.replace(/\D/g, "").length === 11 &&
           formValues.traits.trim() !== ""
         );
-      case PHOTO_STEP:
+      case "photo":
         return formValues.photo !== null && !isOptimizingPhoto;
-      case APPROVAL_STEP:
+      case "approval":
         return agreements[0];
-      case MARKETING_STEP:
+      case "marketing":
         return agreements[1];
-      case NOTICE_STEP:
+      case "notice":
         return agreements[2];
       default:
         return false;
@@ -1291,7 +1350,7 @@ export default function LoveBuddiesApplyFlow({
   })();
 
   const handleSubmit = async () => {
-    const wantsCoupon = formValues.hasCoupon === true;
+    const wantsCoupon = !isWaitlistApplication && formValues.hasCoupon === true;
     const normalizedCouponCode = buildDayNammeCouponCode(
       normalizeDayNammeCouponCode(formValues.couponCode)
     );
@@ -1336,15 +1395,17 @@ export default function LoveBuddiesApplyFlow({
         requestBody.append("gender", formValues.gender);
         requestBody.append("schedule", formValues.schedule);
         requestBody.append("name", formValues.name.trim());
-        requestBody.append("birthYear", formValues.birthYear);
-        requestBody.append("height", formValues.height.trim());
         requestBody.append("phone", formValues.phone.trim());
-        requestBody.append("traits", formValues.traits.trim());
-        requestBody.append("photo", formValues.photo as File);
         requestBody.append("utm_source", urlSearchParams.get("utm_source") || "");
         requestBody.append("utm_medium", urlSearchParams.get("utm_medium") || "");
         requestBody.append("utm_content", urlSearchParams.get("utm_content") || "");
         requestBody.append("applicationMode", selectedApplicationMode);
+        if (!isWaitlistApplication) {
+          requestBody.append("birthYear", formValues.birthYear);
+          requestBody.append("height", formValues.height.trim());
+          requestBody.append("traits", formValues.traits.trim());
+          requestBody.append("photo", formValues.photo as File);
+        }
         if (fbp) {
           requestBody.append("fbp", fbp);
         }
@@ -1530,55 +1591,64 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const handleNext = () => {
-    if (currentStep === PROFILE_STEP && !canProceed) {
+    if (
+      (currentStepKey === "profile" || currentStepKey === "waitlist_contact") &&
+      !canProceed
+    ) {
       setShowFieldErrors(true);
       return;
     }
 
-    if (currentStep === COUPON_CHOICE_STEP) {
-      if (formValues.hasCoupon === true) {
-        trackEvent("DN_Step1_SelectCoupon", { has_coupon: true });
-        setCurrentStep(COUPON_CODE_STEP);
-        setFormError("");
-        return;
+    if (isLastStep) {
+      if (currentStepKey === "notice") {
+        trackEvent("DN_Step8_AcceptNotice");
       }
-
-      trackEvent("DN_Step1_SelectCoupon", { has_coupon: false });
-      setCurrentStep(GENDER_STEP);
-      setFormError("");
-      return;
-    }
-
-    if (currentStep === COUPON_CODE_STEP) {
-      trackEvent("DN_Step2_ConfirmCoupon", {
-        code: validatedCoupon?.code || "",
-        discount_label: validatedCoupon?.discount_label || "",
-      });
-      setCurrentStep(GENDER_STEP);
-      setFormError("");
-      return;
-    }
-
-    if (currentStep === NOTICE_STEP) {
-      if (currentStep === NOTICE_STEP) {
-        trackEvent("DN_Step9_AcceptNotice");
+      if (currentStepKey === "waitlist_contact") {
+        trackEvent("DN_WaitlistAlertSubmit", {
+          schedule: formValues.schedule,
+          gender: formValues.gender,
+        });
       }
       void handleSubmit();
       return;
     }
 
-    const stepEvents: Record<number, () => void> = {
-      3: () => trackEvent("DN_Step3_SelectGender", { gender: formValues.gender }),
-      4: () => trackEvent("DN_Step4_SelectSchedule", { schedule: formValues.schedule }),
-      5: () => trackEvent("DN_Step5_CompleteProfile"),
-      6: () => trackEvent("DN_Step6_UploadPhoto"),
-      7: () => trackEvent("DN_Step7_AcceptApproval"),
-      8: () => trackEvent("DN_Step8_AcceptMarketing"),
+    if (currentStepKey === "coupon_choice") {
+      if (formValues.hasCoupon === true) {
+        trackEvent("DN_SelectCoupon", { has_coupon: true });
+        setCurrentStepIndex((step) => step + 1);
+        setFormError("");
+        return;
+      }
+
+      trackEvent("DN_SelectCoupon", { has_coupon: false });
+      setCurrentStepIndex((step) => step + 1);
+      setFormError("");
+      return;
+    }
+
+    if (currentStepKey === "coupon_code") {
+      trackEvent("DN_ConfirmCoupon", {
+        code: validatedCoupon?.code || "",
+        discount_label: validatedCoupon?.discount_label || "",
+      });
+      setCurrentStepIndex((step) => step + 1);
+      setFormError("");
+      return;
+    }
+
+    const stepEvents: Partial<Record<FlowStepKey, () => void>> = {
+      gender: () => trackEvent("DN_SelectGender", { gender: formValues.gender }),
+      schedule: () => trackEvent("DN_SelectSchedule", { schedule: formValues.schedule }),
+      profile: () => trackEvent("DN_CompleteProfile"),
+      photo: () => trackEvent("DN_UploadPhoto"),
+      approval: () => trackEvent("DN_AcceptApproval"),
+      marketing: () => trackEvent("DN_AcceptMarketing"),
     };
-    stepEvents[currentStep]?.();
+    stepEvents[currentStepKey]?.();
 
     if (
-      currentStep === SCHEDULE_STEP &&
+      currentStepKey === "schedule" &&
       selectedScheduleItem &&
       isWaitlistApplication &&
       confirmedWaitlistSchedule !== formValues.schedule
@@ -1588,37 +1658,31 @@ export default function LoveBuddiesApplyFlow({
     }
 
     setShowFieldErrors(false);
-    setCurrentStep((step) => step + 1);
+    setCurrentStepIndex((step) => step + 1);
     setFormError("");
   };
 
   const handleBack = () => {
-    if (currentStep === 1) {
+    if (currentStepIndex === 0) {
       closeFlow();
       return;
     }
 
-    setCurrentStep((step) => {
-      if (!formValues.hasCoupon && step === GENDER_STEP) {
-        return COUPON_CHOICE_STEP;
-      }
-
-      return step - 1;
-    });
+    setCurrentStepIndex((step) => Math.max(0, step - 1));
     setFormError("");
   };
 
   if (
     submitState.status === "success" &&
-    submitState.applicationMode === "waitlist"
+    submitState.applicationMode === "waitlist_alert"
   ) {
     return (
       <ApplyStepShell
         mode={mode}
         currentStep={totalSteps}
         totalSteps={totalSteps}
-        title="예약 신청이 접수되었어요"
-        description="지금은 마감된 일정이라 자리가 생기면 다시 안내드립니다."
+        title="알림신청이 완료되었어요"
+        description="지금은 마감된 일정이라 신청 가능한 자리가 생기면 다시 안내드립니다."
         canProceed={true}
         hideNav
         onNext={() => {}}
@@ -1626,7 +1690,7 @@ export default function LoveBuddiesApplyFlow({
       >
         <div className="rounded-2xl border border-[#F6C66A]/25 bg-[#F6C66A]/10 px-5 py-5 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#FFE2A4]/80">
-            WAITLIST
+            ALERT
           </p>
           <p className="mt-3 text-base font-bold text-white">{formValues.schedule}</p>
           <p className="mt-1 text-sm text-white/70">
@@ -1637,10 +1701,10 @@ export default function LoveBuddiesApplyFlow({
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-5 py-5 text-left text-sm leading-relaxed text-white/68">
           <p>{submitState.message}</p>
           <p className="mt-3">
-            자리가 비워져서 확정 가능한 상태가 되면 결제 안내 알림을 다시 보내드립니다.
+            실제 신청과 결제는 이 단계에서 진행되지 않습니다.
           </p>
           <p className="mt-2">
-            그때 결제를 완료하시면 참가가 확정됩니다.
+            신청 가능한 자리가 생기면 링크를 다시 보내드리고, 그때 기존 신청 절차를 진행하시면 됩니다.
           </p>
         </div>
 
@@ -1742,7 +1806,7 @@ export default function LoveBuddiesApplyFlow({
     );
   }
 
-  const stepConfig = STEP_CONFIG[currentStep];
+  const stepConfig = STEP_CONFIG[currentStepKey];
 
   return (
     <ApplyStepShell
@@ -1751,7 +1815,11 @@ export default function LoveBuddiesApplyFlow({
       totalSteps={totalSteps}
       title={stepConfig.title}
       description={stepConfig.description}
-      canProceed={currentStep === PROFILE_STEP ? true : canProceed}
+      canProceed={
+        currentStepKey === "profile" || currentStepKey === "waitlist_contact"
+          ? true
+          : canProceed
+      }
       isSubmitting={submitState.status === "submitting"}
       isLastStep={isLastStep}
       onNext={handleNext}
@@ -1763,7 +1831,7 @@ export default function LoveBuddiesApplyFlow({
         </div>
       )}
 
-      {currentStep === PHOTO_STEP && photoNotice && (
+      {currentStepKey === "photo" && photoNotice && (
         <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
           {photoNotice}
         </div>
@@ -1782,14 +1850,14 @@ export default function LoveBuddiesApplyFlow({
             <div>
               <p className="text-sm font-semibold">
                 {isWaitlistApplication
-                  ? "예약대기 신청을 접수하고 있어요"
+                  ? "알림신청을 접수하고 있어요"
                   : submitState.applicationSubmitted
                     ? "쿠폰을 처리하고 있어요"
                     : "신청서를 접수하고 있어요"}
               </p>
               <p className="mt-1 text-xs text-white/65">
                 {isWaitlistApplication
-                  ? "완료되면 예약대기 안내 화면으로 이동합니다."
+                  ? "완료되면 알림신청 완료 화면으로 이동합니다."
                   : "완료되면 바로 결제 단계로 넘어갑니다."}
               </p>
             </div>
@@ -1797,14 +1865,14 @@ export default function LoveBuddiesApplyFlow({
         </div>
       )}
 
-      {currentStep === COUPON_CHOICE_STEP && (
+      {currentStepKey === "coupon_choice" && (
         <StepCouponChoice
           hasCoupon={formValues.hasCoupon}
           onSelect={handleCouponChoice}
         />
       )}
 
-      {currentStep === COUPON_CODE_STEP && (
+      {currentStepKey === "coupon_code" && (
         <>
           <StepCouponCode
             couponCode={formValues.couponCode}
@@ -1816,34 +1884,23 @@ export default function LoveBuddiesApplyFlow({
 
           {couponValidationStatus === "valid" && validatedCoupon && (
             <div className="mt-4 rounded-2xl border border-amber-400/35 bg-amber-500/10 px-4 py-4 text-sm leading-relaxed text-amber-100">
-              {isWaitlistApplication ? (
-                <>
-                  <p className="font-semibold">예약대기 신청에서는 바로 결제하지 않습니다.</p>
-                  <p className="mt-2">
-                    자리가 생겨 결제 안내를 받기 전까지는 이 쿠폰을 사용 처리하지 않습니다.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="font-semibold">신청 완료 전 꼭 확인해주세요.</p>
-                  <p className="mt-2">
-                    `신청 완료` 버튼을 누르면 이 쿠폰은 바로 사용 처리됩니다.
-                  </p>
-                  <p className="mt-1">
-                    사용 처리 후에는 이전 단계로 돌아가 쿠폰을 다시 수정할 수 없습니다.
-                  </p>
-                </>
-              )}
+              <p className="font-semibold">신청 완료 전 꼭 확인해주세요.</p>
+              <p className="mt-2">
+                `신청 완료` 버튼을 누르면 이 쿠폰은 바로 사용 처리됩니다.
+              </p>
+              <p className="mt-1">
+                사용 처리 후에는 이전 단계로 돌아가 쿠폰을 다시 수정할 수 없습니다.
+              </p>
             </div>
           )}
         </>
       )}
 
-      {currentStep === GENDER_STEP && (
+      {currentStepKey === "gender" && (
         <StepGender gender={formValues.gender} onSelect={handleGenderSelect} />
       )}
 
-      {currentStep === SCHEDULE_STEP && (
+      {currentStepKey === "schedule" && (
         <StepSchedule
           scheduleData={scheduleData}
           isLoading={isLoadingSchedules}
@@ -1853,7 +1910,15 @@ export default function LoveBuddiesApplyFlow({
         />
       )}
 
-      {currentStep === PROFILE_STEP && (
+      {currentStepKey === "waitlist_contact" && (
+        <StepWaitlistContact
+          formValues={formValues}
+          onValueChange={handleValueChange}
+          showErrors={showFieldErrors}
+        />
+      )}
+
+      {currentStepKey === "profile" && (
         <StepProfile
           formValues={formValues}
           onValueChange={handleValueChange}
@@ -1862,7 +1927,7 @@ export default function LoveBuddiesApplyFlow({
         />
       )}
 
-      {currentStep === PHOTO_STEP && (
+      {currentStepKey === "photo" && (
         <StepPhoto
           photoPreviewUrl={photoPreviewUrl}
           isOptimizing={isOptimizingPhoto}
@@ -1870,7 +1935,7 @@ export default function LoveBuddiesApplyFlow({
         />
       )}
 
-      {currentStep === APPROVAL_STEP && (
+      {currentStepKey === "approval" && (
         <StepAgreement
           section={DAY_NAMMAE_NOTICE_SECTIONS[0]}
           agreed={agreements[0]}
@@ -1878,7 +1943,7 @@ export default function LoveBuddiesApplyFlow({
         />
       )}
 
-      {currentStep === MARKETING_STEP && (
+      {currentStepKey === "marketing" && (
         <StepAgreement
           section={DAY_NAMMAE_NOTICE_SECTIONS[1]}
           agreed={agreements[1]}
@@ -1886,7 +1951,7 @@ export default function LoveBuddiesApplyFlow({
         />
       )}
 
-      {currentStep === NOTICE_STEP && (
+      {currentStepKey === "notice" && (
         <StepAgreement
           section={DAY_NAMMAE_NOTICE_SECTIONS[2]}
           agreed={agreements[2]}

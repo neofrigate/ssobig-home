@@ -34,6 +34,7 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: true,
   allowedDevOrigins: [
     "https://undepressive-makenzie-supernaturally.ngrok-free.dev",
+    "https://leah-energetistic-exhilaratingly.ngrok-free.dev",
   ],
   async redirects() {
     return [

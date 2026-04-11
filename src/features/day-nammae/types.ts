@@ -1,8 +1,10 @@
-export type DayNammeApplicationMode = "normal" | "waitlist";
+export type DayNammeApplicationMode = "normal" | "waitlist_alert";
 
 export interface ScheduleItem {
   date: string;
   title: string;
+  fullLabel: string;
+  recruitClosed: boolean;
   applicants: {
     total: number;
     female: number;
@@ -10,8 +12,11 @@ export interface ScheduleItem {
   };
   maxCapacity: number;
   status: string;
-  waitlistAvailableFemale: boolean;
-  waitlistAvailableMale: boolean;
+  waitlistAlerts: {
+    total: number;
+    female: number;
+    male: number;
+  };
 }
 
 export interface DayNammeFormValues {
