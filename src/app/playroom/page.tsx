@@ -91,6 +91,25 @@ function buildTemplateClickPayload({
   }
 }
 
+function buildViewContentPayload({
+  href,
+  title,
+}: {
+  href: string;
+  title: string;
+}) {
+  const templateId = extractTemplateId(href);
+  if (!templateId) {
+    return null;
+  }
+
+  return {
+    content_ids: [templateId],
+    content_name: title,
+    content_type: "product",
+  };
+}
+
 interface TrackedLinkProps {
   href: string;
   title: string;
@@ -130,6 +149,14 @@ function TrackedLink({
       destination: payload.destination_host ?? "external",
     });
     safeFbq("trackCustom", "TemplateClick", payload);
+
+    const viewContentPayload = buildViewContentPayload({
+      href: trackedHref,
+      title,
+    });
+    if (viewContentPayload) {
+      safeFbq("track", "ViewContent", viewContentPayload);
+    }
   };
 
   return (
@@ -717,7 +744,7 @@ export default function PlayroomPage() {
               }`}
             >
               <div className="pt-2 pb-3">
-                <p className="mb-1">대표자 : 안민우, 조원철</p>
+                <p className="mb-1">대표자 : 조원철</p>
                 <p className="mb-1">사업자등록번호 : 140-87-03096</p>
                 <p className="mb-1">전화번호 : 02-2635-7942</p>
                 <p className="mb-1">E-mail : ssobigstudio@gmail.com</p>
@@ -734,7 +761,7 @@ export default function PlayroomPage() {
             {/* 약관 링크 - 항상 표시 */}
             <p className="text-gray-400 pt-3">
               <Link
-                href="https://about.ssobig.com/privacy_policy"
+                href="https://www.ssobig.com/privacy_policy.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
@@ -743,12 +770,21 @@ export default function PlayroomPage() {
               </Link>
               <span className="mx-2">|</span>
               <Link
-                href="https://about.ssobig.com/terms_of_service"
+                href="https://www.ssobig.com/terms_of_service.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
               >
                 이용약관
+              </Link>
+              <span className="mx-2">|</span>
+              <Link
+                href="https://www.ssobig.com/refund_policy.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-600 underline"
+              >
+                환불 정책
               </Link>
             </p>
           </div>

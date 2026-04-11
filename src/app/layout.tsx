@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "../components/Sidebar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
-import GoogleAnalytics from "../components/GoogleAnalytics";
-import PageViewTracker from "../components/PageViewTracker";
-import ChannelTalk from "../components/ChannelTalk";
+import ClientShell from "../components/ClientShell";
+
+export const dynamic = "force-dynamic";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,9 +24,9 @@ export const metadata: Metadata = {
     template: "%s | 쏘빅 SSOBIG",
   },
   icons: {
-    icon: "/icon.svg",
+    icon: "/icon.png",
     shortcut: "/favicon.ico",
-    apple: "/icon.svg",
+    apple: "/icon.png",
   },
   description:
     "술 없이도 즐거운 소셜 플랫폼 쏘빅! 머더미스터리, 스토리 추리게임, 보드게임, 일일남매, 불면증마피아, 알파마니또 등 다양한 오프라인 소셜링과 온라인 콘텐츠를 만나보세요.",
@@ -90,38 +89,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0"
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "쏘빅 SSOBIG",
-              url: "https://www.ssobig.com",
-              logo: "https://www.ssobig.com/icon.svg",
-              description:
-                "술 없이도 즐거운 소셜 플랫폼. 머더미스터리, 추리게임, 보드게임, 소셜링 등 다양한 콘텐츠를 제공합니다.",
-              sameAs: [
-                "https://www.instagram.com/ssobig_official",
-              ],
-            }),
-          }}
-        />
-      </head>
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <GoogleAnalytics />
-        <PageViewTracker />
-        <Sidebar />
+        <ClientShell />
         <main>{children}</main>
-        <ChannelTalk />
         <SpeedInsights />
         <Analytics />
       </body>

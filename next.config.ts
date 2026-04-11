@@ -38,6 +38,63 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/",
+        has: [{ type: "host", value: "about.ssobig.com" }],
+        destination: "https://www.ssobig.com/",
+        permanent: true,
+      },
+      {
+        source: "/privacy_policy",
+        has: [{ type: "host", value: "about.ssobig.com" }],
+        destination: "https://www.ssobig.com/privacy_policy.html",
+        permanent: true,
+      },
+      {
+        source: "/privacy_policy.html",
+        has: [{ type: "host", value: "about.ssobig.com" }],
+        destination: "https://www.ssobig.com/privacy_policy.html",
+        permanent: true,
+      },
+      {
+        source: "/terms_of_service",
+        has: [{ type: "host", value: "about.ssobig.com" }],
+        destination: "https://www.ssobig.com/terms_of_service.html",
+        permanent: true,
+      },
+      {
+        source: "/terms_of_service.html",
+        has: [{ type: "host", value: "about.ssobig.com" }],
+        destination: "https://www.ssobig.com/terms_of_service.html",
+        permanent: true,
+      },
+      {
+        source: "/refund_policy",
+        has: [{ type: "host", value: "about.ssobig.com" }],
+        destination: "https://www.ssobig.com/refund_policy.html",
+        permanent: true,
+      },
+      {
+        source: "/refund_policy.html",
+        has: [{ type: "host", value: "about.ssobig.com" }],
+        destination: "https://www.ssobig.com/refund_policy.html",
+        permanent: true,
+      },
+      {
+        source: "/privacy_policy",
+        destination: "/privacy_policy.html",
+        permanent: true,
+      },
+      {
+        source: "/terms_of_service",
+        destination: "/terms_of_service.html",
+        permanent: true,
+      },
+      {
+        source: "/refund_policy",
+        destination: "/refund_policy.html",
+        permanent: true,
+      },
+      {
         source: "/brand/love_buddies",
         destination: "/socialing/love-buddies",
         permanent: true,

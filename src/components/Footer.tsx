@@ -132,7 +132,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
                 isLight ? "text-gray-600" : "text-white/60"
               } text-xs leading-relaxed pt-2`}
             >
-              <p className="mb-1">대표자 : 안민우, 조원철</p>
+              <p className="mb-1">대표자 : 조원철</p>
               <p className="mb-1">사업자등록번호 : 140-87-03096</p>
               <p className="mb-1">전화번호 : 02-2635-7942</p>
               <p className="mb-1">E-mail : ssobigstudio@gmail.com</p>
@@ -150,7 +150,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
           <div className={`${isLight ? "text-gray-400" : "text-white/40"} pt-3 flex items-center justify-between`}>
             <p>
               <Link
-                href="https://about.ssobig.com/privacy_policy"
+                href="https://www.ssobig.com/privacy_policy.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`underline ${
@@ -163,7 +163,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
               </Link>
               <span className="mx-2">|</span>
               <Link
-                href="https://about.ssobig.com/terms_of_service"
+                href="https://www.ssobig.com/terms_of_service.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`underline ${
@@ -173,6 +173,19 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
                 }`}
               >
                 이용약관
+              </Link>
+              <span className="mx-2">|</span>
+              <Link
+                href="https://www.ssobig.com/refund_policy.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`underline ${
+                  isLight
+                    ? "hover:text-gray-600"
+                    : "hover:text-white/60"
+                }`}
+              >
+                환불 정책
               </Link>
             </p>
             <button
@@ -208,4 +221,3 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
 };
 
 export default Footer;
-

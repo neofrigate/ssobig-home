@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [platform, setPlatform] = useState<"ios" | "android" | "other">("other");
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
 
   useEffect(() => {
     const ua = navigator.userAgent;

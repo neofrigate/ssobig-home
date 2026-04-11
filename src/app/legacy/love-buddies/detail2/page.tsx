@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Script from "next/script";
-import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
 import { FAQSection } from "../../../../components/FAQ";
 
@@ -120,13 +119,6 @@ export default function LoveBuddiesPage() {
 
   return (
     <>
-      <Head>
-        <title>일일남매 - 러브버디즈</title>
-        <meta
-          name="description"
-          content="하루동안 남매가 되어 서로의 진친을 찾아가는, 술 없이도 즐겁고 편안하게 친해질 수 있는, 매력적인 소셜 개더링"
-        />
-      </Head>
       {/* Meta Pixel Code */}
       <Script
         id="facebook-pixel"

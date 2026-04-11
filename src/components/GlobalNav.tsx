@@ -31,7 +31,7 @@ type GlobalNavProps = {
 };
 
 const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
 
   // 플레이룸 페이지 체크 (실제 컨텐츠 페이지 - 화이트 배경 고정)
   const isPlayroomPage = pathname === "/playroom";

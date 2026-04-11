@@ -12,7 +12,7 @@ declare global {
 
 export default function ChannelTalk() {
   const initialized = useRef(false);
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
   const isDayNammeFocusedPage =
     pathname === "/offline/11namme/apply" ||
     pathname?.startsWith("/offline/11namme/survey/");
