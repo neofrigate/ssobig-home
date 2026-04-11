@@ -178,19 +178,23 @@ const ElevenNammePage = () => {
       여유: { bg: "bg-green-100", text: "text-green-600" },
     };
     const statusStyle = statusConfig[schedule.status];
+    const shouldShowStatusRow =
+      statusStyle && schedule.status !== "여유" && schedule.status !== "임박";
 
     return (
       <div className="mb-4 md:mb-6">
         <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-4">
-          <div className="flex items-center space-x-2 md:space-x-3 flex-grow flex-wrap">
-            <span className="font-medium md:font-semibold text-sm md:text-base text-black whitespace-nowrap">
-              {schedule.date} {time}
-            </span>
-            <span className="font-bold text-sm md:text-base text-black">
-              {gameName}
-            </span>
-            {statusStyle && schedule.status !== "여유" && schedule.status !== "임박" && (
-              <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-grow flex-col gap-1">
+            <div className="flex items-center space-x-2 md:space-x-3 flex-wrap">
+              <span className="font-medium md:font-semibold text-sm md:text-base text-black whitespace-nowrap">
+                {schedule.date} {time}
+              </span>
+              <span className="font-bold text-sm md:text-base text-black">
+                {gameName}
+              </span>
+            </div>
+            {shouldShowStatusRow && (
+              <div className="flex items-center gap-2 pl-0.5">
                 <span
                   className={`text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
                 >
@@ -320,9 +324,6 @@ const ElevenNammePage = () => {
 
   const CalendarSection = () => {
     const weekLabels = ["일", "월", "화", "수", "목", "금", "토"];
-    const mobileDays = upcomingCalendar.days.filter(
-      (day) => day.inRange && day.items.length > 0
-    );
 
     return (
       <div className="mt-[100px]">
@@ -335,62 +336,11 @@ const ElevenNammePage = () => {
           </p>
         </div>
 
-        <div className="mt-4 space-y-3 md:hidden">
-          {mobileDays.map((day) => (
-            <div
-              key={day.key}
-              className={`rounded-2xl border px-3 py-3 ${
-                day.isToday
-                  ? "border-[#FF6B9F]/35 bg-[#FFF2F7]"
-                  : "border-black/10 bg-white/80"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-black">
-                  {day.date.getMonth() + 1}/{day.date.getDate()} (
-                  {weekLabels[day.date.getDay()]})
-                </p>
-                {day.isToday && (
-                  <span className="rounded-full bg-[#FF6B9F]/12 px-2 py-0.5 text-[10px] font-semibold text-[#D9487D]">
-                    오늘
-                  </span>
-                )}
-              </div>
-              <div className="mt-3 space-y-2">
-                {day.items.map((item) => {
-                  const chipClass =
-                    item.stateLabel === "모집마감"
-                      ? "border-[#7048E8]/28 bg-[#7048E8]/10 text-[#5F3DC4]"
-                      : item.stateLabel === "마감(대기가능)"
-                      ? "border-[#F6C66A]/35 bg-[#F6C66A]/16 text-[#8A5A00]"
-                      : "border-[#FF6B9F]/20 bg-[#FF6B9F]/10 text-[#C73F72]";
-
-                  return (
-                    <div
-                      key={`${item.schedule.fullLabel}-${item.date.getTime()}-mobile`}
-                      className={`rounded-xl border px-3 py-2 ${chipClass}`}
-                    >
-                      <p className="text-xs font-bold">
-                        {String(item.date.getHours()).padStart(2, "0")}:
-                        {String(item.date.getMinutes()).padStart(2, "0")}{" "}
-                        {item.schedule.title.replace(/^\d+:\d+\s+/, "")}
-                      </p>
-                      <p className="mt-1 whitespace-nowrap text-[11px] font-medium leading-tight">
-                        {item.stateLabel}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 hidden grid-cols-7 gap-2 md:grid">
+        <div className="mt-4 grid grid-cols-7 gap-1.5 md:gap-2">
           {weekLabels.map((label) => (
             <div
               key={label}
-              className="text-center text-[11px] font-semibold text-black/45"
+              className="text-center text-[10px] font-semibold text-black/45 md:text-[11px]"
             >
               {label}
             </div>
@@ -399,36 +349,36 @@ const ElevenNammePage = () => {
           {upcomingCalendar.days.map((day) => (
             <div
               key={day.key}
-              className={`min-h-[86px] rounded-2xl border px-2 py-2 md:min-h-[110px] md:px-3 ${
+              className={`min-h-[76px] rounded-xl border px-1.5 py-1.5 md:min-h-[110px] md:rounded-2xl md:px-3 md:py-2 ${
                 day.inRange
                   ? "border-black/10 bg-white/80"
                   : "border-black/5 bg-black/[0.02]"
-              } ${day.isToday ? "ring-2 ring-[#FF6B9F]/35" : ""}`}
+              } ${day.isToday ? "border-[#FF6B9F]/35 bg-[#FFF2F7] ring-1 ring-[#FF6B9F]/30 md:ring-2 md:ring-[#FF6B9F]/35" : ""}`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span
-                    className={`text-[11px] font-bold ${
+                    className={`text-[10px] font-bold md:text-[11px] ${
                       day.inRange ? "text-black/80" : "text-black/25"
                     }`}
                   >
                     {day.date.getDate()}
                   </span>
                   {day.date.getDate() === 1 && (
-                    <span className="rounded-full bg-[#FFE3F0] px-1.5 py-0.5 text-[9px] font-semibold text-[#D9487D]">
-                      {day.date.getMonth() + 1}월-
+                    <span className="rounded-full bg-[#FFE3F0] px-1 py-0.5 text-[8px] font-semibold text-[#D9487D] md:px-1.5 md:text-[9px]">
+                      {day.date.getMonth() + 1}월
                     </span>
                   )}
                 </div>
                 {day.isToday && (
-                  <span className="rounded-full bg-[#FF6B9F]/12 px-1.5 py-0.5 text-[10px] font-semibold text-[#D9487D]">
+                  <span className="rounded-full bg-[#FF6B9F]/12 px-1 py-0.5 text-[8px] font-semibold text-[#D9487D] md:px-1.5 md:text-[10px]">
                     오늘
                   </span>
                 )}
               </div>
 
-              <div className="mt-2 space-y-1.5">
-                {day.items.map((item) => {
+              <div className="mt-1.5 space-y-1 md:mt-2 md:space-y-1.5">
+                {day.items.slice(0, 2).map((item) => {
                   const chipClass =
                     item.stateLabel === "모집마감"
                       ? "border-[#7048E8]/28 bg-[#7048E8]/10 text-[#5F3DC4]"
@@ -439,18 +389,23 @@ const ElevenNammePage = () => {
                   return (
                     <div
                       key={`${item.schedule.fullLabel}-${item.date.getTime()}`}
-                      className={`rounded-xl border px-2 py-1.5 ${chipClass}`}
+                      className={`rounded-lg border px-1 py-1 md:rounded-xl md:px-2 md:py-1.5 ${chipClass}`}
                     >
-                      <p className="text-[10px] font-bold leading-none md:text-[11px]">
+                      <p className="text-[8px] font-bold leading-none md:text-[11px]">
                         {String(item.date.getHours()).padStart(2, "0")}:
                         {String(item.date.getMinutes()).padStart(2, "0")}
                       </p>
-                      <p className="mt-1 whitespace-nowrap text-[9px] font-medium leading-tight md:text-[10px]">
+                      <p className="mt-0.5 truncate text-[7px] font-medium leading-tight md:mt-1 md:text-[10px]">
                         {item.stateLabel}
                       </p>
                     </div>
                   );
                 })}
+                {day.items.length > 2 && (
+                  <p className="px-0.5 text-[8px] font-semibold text-black/45 md:px-1 md:text-[10px]">
+                    +{day.items.length - 2}
+                  </p>
+                )}
               </div>
             </div>
           ))}
@@ -492,15 +447,11 @@ const ElevenNammePage = () => {
             </p>
           </div>
 
-          <div className="mt-4 flex items-center justify-center rounded-2xl border border-dashed border-black/10 bg-black/[0.02] px-4 py-3 text-xs font-medium text-black/45 md:hidden">
-            일정을 불러오는 중입니다...
-          </div>
-
-          <div className="mt-4 hidden grid-cols-7 gap-2 md:grid">
+          <div className="mt-4 grid grid-cols-7 gap-1.5 md:gap-2">
             {weekLabels.map((label) => (
               <div
                 key={`calendar-label-skeleton-${label}`}
-                className="text-center text-[11px] font-semibold text-black/45"
+                className="text-center text-[10px] font-semibold text-black/45 md:text-[11px]"
               >
                 {label}
               </div>
@@ -509,13 +460,13 @@ const ElevenNammePage = () => {
             {Array.from({ length: 28 }).map((_, index) => (
               <div
                 key={`calendar-skeleton-${index}`}
-                className="min-h-[110px] rounded-2xl border border-black/8 bg-white/80 px-3 py-2"
+                className="min-h-[76px] rounded-xl border border-black/8 bg-white/80 px-1.5 py-1.5 md:min-h-[110px] md:rounded-2xl md:px-3 md:py-2"
               >
-                <div className="h-3 w-5 animate-pulse rounded-full bg-black/8" />
-                <div className="mt-3 space-y-2">
-                  <div className="h-10 animate-pulse rounded-xl bg-black/6" />
+                <div className="h-3 w-5 animate-pulse rounded-full bg-black/8 md:h-3" />
+                <div className="mt-2 space-y-1 md:mt-3 md:space-y-2">
+                  <div className="h-6 animate-pulse rounded-lg bg-black/6 md:h-10 md:rounded-xl" />
                   {index % 5 === 0 && (
-                    <div className="h-10 animate-pulse rounded-xl bg-black/6" />
+                    <div className="h-6 animate-pulse rounded-lg bg-black/6 md:h-10 md:rounded-xl" />
                   )}
                 </div>
               </div>
