@@ -183,7 +183,7 @@ const ElevenNammePage = () => {
 
     return (
       <div className="mb-4 md:mb-6">
-        <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-4">
+        <div className="flex items-start justify-between gap-3 px-3 py-2 md:px-4 md:py-4">
           <div className="flex min-w-0 flex-grow flex-col gap-1">
             <div className="flex items-center space-x-2 md:space-x-3 flex-wrap">
               <span className="font-medium md:font-semibold text-sm md:text-base text-black whitespace-nowrap">
@@ -193,24 +193,19 @@ const ElevenNammePage = () => {
                 {gameName}
               </span>
             </div>
-            {shouldShowStatusRow && (
-              <div className="flex items-center gap-2 pl-0.5">
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
-                >
-                  {schedule.status === "전체마감" ? `🔒 ${schedule.status}` : schedule.status}
-                </span>
-                {schedule.waitlistAlerts.total > 0 && (
-                  <span className="text-xs font-semibold text-[#8A5A00] whitespace-nowrap">
-                    예약대기 {schedule.waitlistAlerts.total}명
-                  </span>
-                )}
-              </div>
-            )}
           </div>
-          <span className="font-light text-xs md:text-sm text-black/70 ml-3 whitespace-nowrap">
-            {schedule.applicants.total}/{schedule.maxCapacity}명
-          </span>
+          <div className="flex shrink-0 flex-col items-end gap-1 text-right">
+            {shouldShowStatusRow && (
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
+              >
+                {schedule.status === "전체마감" ? `🔒 ${schedule.status}` : schedule.status}
+              </span>
+            )}
+            <span className="font-light text-xs md:text-sm text-black/70 whitespace-nowrap">
+              {schedule.applicants.total}/{schedule.maxCapacity}명
+            </span>
+          </div>
         </div>
         <div className="px-3 md:px-4">
           <ApplicantChart
