@@ -270,15 +270,18 @@ const ElevenNammePage = () => {
         candidate.getMonth() === start.getMonth() &&
         candidate.getDate() === start.getDate();
 
-      const stateLabel = schedule.recruitClosed
-        ? "모집마감"
-        : isTodaySchedule
-        ? "마감(대기가능)"
-        : schedule.status === "전체마감" ||
-            schedule.status === "여자마감" ||
-            schedule.status === "남자마감"
+      const hasWaitlistAvailable =
+        schedule.waitlistAvailable.female || schedule.waitlistAvailable.male;
+      const isClosedSchedule =
+        isTodaySchedule ||
+        schedule.status === "전체마감" ||
+        schedule.status === "여자마감" ||
+        schedule.status === "남자마감";
+      const stateLabel = isClosedSchedule
+        ? hasWaitlistAvailable
           ? "마감(대기가능)"
-          : "신청가능";
+          : "마감"
+        : "신청가능";
 
       const bucket = itemsByDay.get(dayKey) || [];
       bucket.push({ schedule, date: candidate, stateLabel });

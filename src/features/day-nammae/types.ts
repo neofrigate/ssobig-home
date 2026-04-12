@@ -4,7 +4,6 @@ export interface ScheduleItem {
   date: string;
   title: string;
   fullLabel: string;
-  recruitClosed: boolean;
   applicants: {
     total: number;
     female: number;
@@ -12,6 +11,10 @@ export interface ScheduleItem {
   };
   maxCapacity: number;
   status: string;
+  waitlistAvailable: {
+    female: boolean;
+    male: boolean;
+  };
   waitlistAlerts: {
     total: number;
     female: number;
