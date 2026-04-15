@@ -3,17 +3,14 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import { useEffect, useMemo, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
-import { getDayNammeCouponSuffixFromSearchParam } from "@/features/day-nammae/coupon";
-import { getVisibleDayNammeSchedules } from "@/features/day-nammae/schedule";
 import { useDayNammeSchedule } from "@/features/day-nammae/useDayNammeSchedule";
 import { ScheduleItem } from "@/features/day-nammae/types";
 import {
   buildMetaPixelPageViewScript,
   LOVE_BUDDIES_PIXEL_ID,
 } from "@/utils/metaPixel";
-import { getSafeSearchParams } from "@/utils/utm";
 
 // FAQ 아이템 컴포넌트
 const FAQItem = ({
@@ -65,36 +62,46 @@ const FAQItem = ({
 const ElevenNammePage = () => {
   const router = useRouter();
   const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
-  const visibleScheduleData = useMemo(
-    () => getVisibleDayNammeSchedules(scheduleData),
-    [scheduleData]
-  );
   const [isApplyOpen, setIsApplyOpen] = useState(false);
-  const [isCouponNoticeOpen, setIsCouponNoticeOpen] = useState(false);
-  const [couponCode, setCouponCode] = useState("");
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
 
   // 참가자 차트 컴포넌트 - 중앙 기준
   const ApplicantChart = ({
     applicants,
     maxCapacity,
+    status = "",
   }: {
     applicants: { total: number; female: number; male: number };
     maxCapacity: number;
+    status?: string;
   }) => {
     const halfCapacity = maxCapacity / 2;
-    const femalePercentage =
-      halfCapacity > 0 ? Math.min(100, (applicants.female / halfCapacity) * 100) : 0;
-    const malePercentage =
-      halfCapacity > 0 ? Math.min(100, (applicants.male / halfCapacity) * 100) : 0;
+    const femaleClosed = status === "전체마감" || status === "여자마감";
+    const maleClosed = status === "전체마감" || status === "남자마감";
+    const femalePercentage = femaleClosed
+      ? 100
+      : halfCapacity > 0
+        ? (applicants.female / halfCapacity) * 100
+        : 0;
+    const malePercentage = maleClosed
+      ? 100
+      : halfCapacity > 0
+        ? (applicants.male / halfCapacity) * 100
+        : 0;
     const femaleEmpty = Math.max(0, 100 - femalePercentage);
     const maleEmpty = Math.max(0, 100 - malePercentage);
+
+    const femaleFaded = femaleClosed;
+    const maleFaded = maleClosed;
 
     return (
       <div className="flex h-2 md:h-3 bg-black/10 rounded-full overflow-hidden">
         {/* 왼쪽 절반 - 여자 */}
         <div className="flex w-1/2 flex-row-reverse">
           <div
-            className="transition-all duration-700 ease-out rounded-l-full bg-[#FF69B4]"
+            className={`transition-all duration-700 ease-out rounded-l-full ${
+              femaleFaded ? "bg-[#FF69B4]/30" : "bg-[#FF69B4]"
+            }`}
             style={{ width: `${femalePercentage}%` }}
           />
           <div
@@ -105,7 +112,9 @@ const ElevenNammePage = () => {
         {/* 오른쪽 절반 - 남자 */}
         <div className="flex w-1/2">
           <div
-            className="transition-all duration-700 ease-out rounded-r-full bg-[#4A90E2]"
+            className={`transition-all duration-700 ease-out rounded-r-full ${
+              maleFaded ? "bg-[#4A90E2]/30" : "bg-[#4A90E2]"
+            }`}
             style={{ width: `${malePercentage}%` }}
           />
           <div className="bg-transparent" style={{ width: `${maleEmpty}%` }} />
@@ -116,15 +125,7 @@ const ElevenNammePage = () => {
 
   // 스케줄 아이템 컴포넌트
   useEffect(() => {
-    setCouponCode(
-      getDayNammeCouponSuffixFromSearchParam(
-        getSafeSearchParams(window.location.search).get("coupon")
-      )
-    );
-  }, []);
-
-  useEffect(() => {
-    if (!isApplyOpen && !isCouponNoticeOpen) {
+    if (!isApplyOpen) {
       return;
     }
 
@@ -133,12 +134,7 @@ const ElevenNammePage = () => {
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        if (isApplyOpen) {
-          setIsApplyOpen(false);
-          return;
-        }
-
-        setIsCouponNoticeOpen(false);
+        setIsApplyOpen(false);
       }
     };
 
@@ -148,15 +144,9 @@ const ElevenNammePage = () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [isApplyOpen, isCouponNoticeOpen]);
-
-  useEffect(() => {
-    setIsCouponNoticeOpen(Boolean(couponCode));
-  }, [couponCode]);
+  }, [isApplyOpen]);
 
   const handleApplyClick = () => {
-    setIsCouponNoticeOpen(false);
-
     if (window.matchMedia("(min-width: 768px)").matches) {
       setIsApplyOpen(true);
       return;
@@ -166,51 +156,55 @@ const ElevenNammePage = () => {
   };
 
   const ScheduleRow = ({ schedule }: { schedule: ScheduleItem }) => {
+    const isCompleted = schedule.status === "전체마감";
     const timeMatch = schedule.title.match(/^(\d+:\d+)\s+(.+)$/);
     const time = timeMatch ? timeMatch[1] : "";
     const gameName = timeMatch ? timeMatch[2] : schedule.title;
 
+    const textOpacity = isCompleted ? "opacity-30" : "";
+
     const statusConfig: Record<string, { bg: string; text: string }> = {
-      전체마감: { bg: "bg-[#F6C66A]/18", text: "text-[#8A5A00]" },
+      전체마감: { bg: "bg-black/10", text: "text-black/40" },
       여자마감: { bg: "bg-[#FF69B4]/15", text: "text-[#FF69B4]" },
       남자마감: { bg: "bg-[#4A90E2]/15", text: "text-[#4A90E2]" },
       임박: { bg: "bg-orange-100", text: "text-orange-500" },
       여유: { bg: "bg-green-100", text: "text-green-600" },
     };
     const statusStyle = statusConfig[schedule.status];
-    const shouldShowStatusRow =
-      statusStyle && schedule.status !== "여유" && schedule.status !== "임박";
 
     return (
       <div className="mb-4 md:mb-6">
-        <div className="flex items-start justify-between gap-3 px-3 py-2 md:px-4 md:py-4">
-          <div className="flex min-w-0 flex-grow flex-col gap-1">
-            <div className="flex items-center space-x-2 md:space-x-3 flex-wrap">
-              <span className="font-medium md:font-semibold text-sm md:text-base text-black whitespace-nowrap">
-                {schedule.date} {time}
-              </span>
-              <span className="font-bold text-sm md:text-base text-black">
-                {gameName}
-              </span>
-            </div>
-          </div>
-          <div className="flex shrink-0 flex-col items-end gap-1 text-right">
-            {shouldShowStatusRow && (
+        <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-4">
+          <div className="flex items-center space-x-2 md:space-x-3 flex-grow flex-wrap">
+            <span
+              className={`font-medium md:font-semibold text-sm md:text-base text-black whitespace-nowrap ${textOpacity}`}
+            >
+              {schedule.date} {time}
+            </span>
+            <span
+              className={`font-bold text-sm md:text-base text-black ${textOpacity}`}
+            >
+              {gameName}
+            </span>
+            {statusStyle && schedule.status !== "여유" && schedule.status !== "임박" && (
               <span
                 className={`text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
               >
                 {schedule.status === "전체마감" ? `🔒 ${schedule.status}` : schedule.status}
               </span>
             )}
-            <span className="font-light text-xs md:text-sm text-black/70 whitespace-nowrap">
-              {schedule.applicants.total}/{schedule.maxCapacity}명
-            </span>
           </div>
+          <span
+            className={`font-light text-xs md:text-sm text-black/70 ml-3 whitespace-nowrap ${textOpacity}`}
+          >
+            {schedule.applicants.total}/{schedule.maxCapacity}명
+          </span>
         </div>
         <div className="px-3 md:px-4">
           <ApplicantChart
             applicants={schedule.applicants}
             maxCapacity={schedule.maxCapacity}
+            status={schedule.status}
           />
         </div>
       </div>
@@ -233,7 +227,7 @@ const ElevenNammePage = () => {
       }[]
     >();
     scheduleData.forEach((schedule) => {
-      const source = schedule.fullLabel || `${schedule.date} ${schedule.title}`;
+      const source = `${schedule.date} ${schedule.title}`;
       const match = source.match(/(\d+)\/(\d+)\s*\([^)]+\)\s*(\d+):(\d+)/);
 
       if (!match) {
@@ -265,24 +259,19 @@ const ElevenNammePage = () => {
         candidate.getMonth() === start.getMonth() &&
         candidate.getDate() === start.getDate();
 
-      const hasWaitlistAvailable =
-        schedule.waitlistAvailable.female || schedule.waitlistAvailable.male;
-      const isClosedSchedule =
-        isTodaySchedule ||
-        schedule.status === "전체마감" ||
-        schedule.status === "여자마감" ||
-        schedule.status === "남자마감";
-      const stateLabel = isClosedSchedule
-        ? hasWaitlistAvailable
-          ? "마감(대기가능)"
-          : "마감"
-        : "신청가능";
+      const stateLabel =
+        isTodaySchedule
+          ? "전체마감"
+          : schedule.status === "전체마감"
+            ? "전체마감"
+            : schedule.status === "여자마감" || schedule.status === "남자마감"
+              ? "일부마감"
+              : "신청가능";
 
       const bucket = itemsByDay.get(dayKey) || [];
       bucket.push({ schedule, date: candidate, stateLabel });
       bucket.sort((a, b) => a.date.getTime() - b.date.getTime());
       itemsByDay.set(dayKey, bucket);
-
     });
 
     const gridStart = new Date(start);
@@ -321,92 +310,124 @@ const ElevenNammePage = () => {
   }, [scheduleData]);
 
   const CalendarSection = () => {
-    const weekLabels = ["일", "월", "화", "수", "목", "금", "토"];
+    const weekLabels = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
     return (
-      <div className="mt-[100px]">
+      <div className="mt-6">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[11px] font-semibold tracking-[0.16em] text-black/40">
-            CALENDAR
-          </p>
-          <p className="text-xs font-medium text-black/45 md:text-sm">
-            {upcomingCalendar.label}
-          </p>
+          <div>
+            <p className="text-xs font-bold tracking-[0.16em] text-black/60 md:text-sm">
+              CALENDAR <span className="tracking-normal font-normal text-black/35">{upcomingCalendar.label}</span>
+            </p>
+            <p className="mt-0.5 text-[10px] text-black/35 md:text-xs">일정을 클릭하면 참가현황을 볼 수 있어요</p>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <span className="text-sm font-bold text-black/55 md:text-base">참가비 35,000원</span>
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-sm bg-[#D6ECFA]" />
+                <span className="text-[10px] text-black/50 md:text-xs">신청가능</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-sm bg-[#FFF3CD]" />
+                <span className="text-[10px] text-black/50 md:text-xs">일부마감</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-sm bg-black/10" />
+                <span className="text-[10px] text-black/50 md:text-xs">전체마감</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-7 gap-1.5 md:gap-2">
-          {weekLabels.map((label) => (
-            <div
-              key={label}
-              className="text-center text-[10px] font-semibold text-black/45 md:text-[11px]"
-            >
-              {label}
-            </div>
-          ))}
+        {/* 요일 헤더 - 볼드 중앙정렬, 상하 굵은 선 */}
+        <div className="mt-4 border-t-2 border-b border-black/80">
+          <div className="grid grid-cols-7">
+            {weekLabels.map((label) => (
+              <div
+                key={label}
+                className="py-2 text-center text-xs font-bold text-black/70 md:text-sm"
+              >
+                {label}
+              </div>
+            ))}
+          </div>
+        </div>
 
-          {upcomingCalendar.days.map((day) => (
+        {/* 날짜 그리드 - 선 없이 깔끔하게 */}
+        <div className="grid grid-cols-7">
+          {upcomingCalendar.days.map((day) => {
+            const hasItems = day.items.length > 0;
+            const isSelected = selectedCalendarDate === day.key;
+            return (
             <div
               key={day.key}
-              className={`min-h-[76px] rounded-xl border px-1.5 py-1.5 md:min-h-[110px] md:rounded-2xl md:px-3 md:py-2 ${
-                day.inRange
-                  ? "border-black/10 bg-white/80"
-                  : "border-black/5 bg-black/[0.02]"
-              } ${day.isToday ? "border-[#FF6B9F]/35 bg-[#FFF2F7] ring-1 ring-[#FF6B9F]/30 md:ring-2 md:ring-[#FF6B9F]/35" : ""}`}
+              className={`min-h-[80px] px-1 py-2 md:min-h-[110px] md:px-2 md:py-3 text-center ${hasItems ? "cursor-pointer" : ""} ${isSelected ? "bg-black/5" : ""}`}
+              onClick={() => hasItems && setSelectedCalendarDate(isSelected ? null : day.key)}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className={`text-[10px] font-bold md:text-[11px] ${
-                      day.inRange ? "text-black/80" : "text-black/25"
-                    }`}
-                  >
-                    {day.date.getDate()}
-                  </span>
-                  {day.date.getDate() === 1 && (
-                    <span className="rounded-full bg-[#FFE3F0] px-1 py-0.5 text-[8px] font-semibold text-[#D9487D] md:px-1.5 md:text-[9px]">
-                      {day.date.getMonth() + 1}월
-                    </span>
-                  )}
-                </div>
-                {day.isToday && (
-                  <span className="rounded-full bg-[#FF6B9F]/12 px-1 py-0.5 text-[8px] font-semibold text-[#D9487D] md:px-1.5 md:text-[10px]">
-                    오늘
-                  </span>
-                )}
+              {/* 날짜 숫자 - 볼드 중앙정렬 */}
+              <div className="flex items-center justify-center gap-1">
+                <span
+                  className={`text-base font-bold md:text-lg ${
+                    day.isToday
+                      ? "text-[#FF6B9F]"
+                      : hasItems
+                        ? "text-black/85"
+                        : day.inRange
+                          ? "text-black/35"
+                          : "text-black/15"
+                  }`}
+                >
+                  {day.date.getMonth() + 1}.{day.date.getDate()}
+                </span>
               </div>
+              {day.isToday && (
+                <p className="text-[9px] font-bold text-[#FF6B9F] md:text-[10px]">오늘</p>
+              )}
 
-              <div className="mt-1.5 space-y-1 md:mt-2 md:space-y-1.5">
+              {/* 이벤트 칩 - 작은 라운드 */}
+              <div className="mt-1 space-y-0.5 md:mt-1.5 md:space-y-1">
                 {day.items.slice(0, 2).map((item) => {
                   const chipClass =
-                    item.stateLabel === "모집마감"
-                      ? "border-[#7048E8]/28 bg-[#7048E8]/10 text-[#5F3DC4]"
-                      : item.stateLabel === "마감(대기가능)"
-                      ? "border-[#F6C66A]/35 bg-[#F6C66A]/16 text-[#8A5A00]"
-                      : "border-[#FF6B9F]/20 bg-[#FF6B9F]/10 text-[#C73F72]";
+                    item.stateLabel === "전체마감"
+                      ? "bg-black/5 text-black/30"
+                      : item.stateLabel === "일부마감"
+                      ? "bg-[#FFF3CD] text-[#8A6D00]"
+                      : "bg-[#D6ECFA] text-[#1A6BAF]";
 
                   return (
                     <div
-                      key={`${item.schedule.fullLabel}-${item.date.getTime()}`}
-                      className={`rounded-lg border px-1 py-1 md:rounded-xl md:px-2 md:py-1.5 ${chipClass}`}
+                      key={`${item.schedule.date}-${item.date.getTime()}`}
+                      className={`rounded-sm px-0.5 py-0.5 md:rounded md:px-1 md:py-0.5 ${chipClass}`}
                     >
-                      <p className="text-[8px] font-bold leading-none md:text-[11px]">
+                      <p className="text-[10px] font-bold leading-tight md:text-xs">
                         {String(item.date.getHours()).padStart(2, "0")}:
                         {String(item.date.getMinutes()).padStart(2, "0")}
                       </p>
-                      <p className="mt-0.5 truncate text-[7px] font-medium leading-tight md:mt-1 md:text-[10px]">
+                      <p className="whitespace-pre-line text-[8px] font-semibold leading-tight md:text-[10px]">
                         {item.stateLabel}
                       </p>
+                      {(item.stateLabel === "신청가능" || item.stateLabel === "일부마감") && (
+                        <p className="text-[7px] font-medium leading-tight md:text-[9px] opacity-70">
+                          {item.schedule.status === "남자마감"
+                            ? `남마감 / 여${item.schedule.applicants.female}`
+                            : item.schedule.status === "여자마감"
+                            ? `남${item.schedule.applicants.male} / 여마감`
+                            : `남${item.schedule.applicants.male} / 여${item.schedule.applicants.female}`}
+                        </p>
+                      )}
                     </div>
                   );
                 })}
                 {day.items.length > 2 && (
-                  <p className="px-0.5 text-[8px] font-semibold text-black/45 md:px-1 md:text-[10px]">
+                  <p className="text-[8px] font-semibold text-black/40 md:text-[9px]">
                     +{day.items.length - 2}
                   </p>
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );
@@ -474,6 +495,7 @@ const ElevenNammePage = () => {
       </div>
     );
   };
+
   return (
     <>
       {/* Meta Pixel Code */}
@@ -520,46 +542,62 @@ const ElevenNammePage = () => {
             {/* 일일남매 스케줄 박스 */}
             <div className="w-full">
               <div className="bg-[#F2F2F2] p-4 md:px-6 md:py-7">
-                <h2 className="text-xl md:text-2xl font-bold text-center text-black mb-3 md:mb-4">
+                <h2 className="text-xl md:text-2xl font-bold text-center text-black mb-4 md:mb-6">
                   💕 일일남매 스케줄
                 </h2>
 
-                {/* 가격 및 범례 */}
-                <div className="flex gap-2 md:gap-3 justify-between items-center mb-4 md:mb-6 px-3 md:px-4">
-                  <div className="text-sm md:text-base font-semibold text-black">
-                    참가비 : 35,000원
-                  </div>
-                  <div className="flex gap-2 md:gap-3">
-                    <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-black/10 bg-[#FF69B4]/15">
-                      <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#FF69B4]" />
-                      <span className="text-black/80">여자</span>
-                    </div>
-                    <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-black/10 bg-[#4A90E2]/15">
-                      <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#4A90E2]" />
-                      <span className="text-black/80">남자</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 일정 목록 */}
+                {/* 캘린더 */}
                 <div>
                   {isLoading ? (
                     <ScheduleLoadingSkeleton />
-                  ) : visibleScheduleData.length === 0 ? (
+                  ) : scheduleData.length === 0 ? (
                     <div className="flex items-center justify-center py-6 text-black/60 text-sm md:text-base">
                       📅 참여하기 버튼을 눌러주세요
                     </div>
-                ) : (
-                  visibleScheduleData.map((schedule, index) => (
-                    <ScheduleRow key={index} schedule={schedule} />
-                  ))
-                )}
-              </div>
+                  ) : (
+                    <CalendarSection />
+                  )}
+                </div>
 
-              {!isLoading && scheduleData.length > 0 && <CalendarSection />}
+                {/* 선택된 날짜 스케줄 상세 */}
+                {selectedCalendarDate && upcomingCalendar.days.find(d => d.key === selectedCalendarDate)?.items.length && (() => {
+                  const selectedDay = upcomingCalendar.days.find(d => d.key === selectedCalendarDate);
+                  if (!selectedDay) return null;
+                  const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+                  const dateLabel = `${selectedDay.date.getMonth() + 1}/${selectedDay.date.getDate()} (${dayNames[selectedDay.date.getDay()]})`;
+                  return (
+                  <div className="mt-6 border-t border-black/10 pt-5">
+                    {/* 범례 + 닫기 */}
+                    <div className="flex items-center justify-end gap-3 mb-3">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#FF69B4]" />
+                        <span className="text-xs text-black/60">여</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
+                        <span className="text-xs text-black/60">남</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCalendarDate(null)}
+                        className="text-xs text-black/35 hover:text-black/60"
+                      >
+                        닫기
+                      </button>
+                    </div>
+                    {/* 날짜 타이틀 - 가운데 굵고 크게 */}
+                    <h3 className="text-lg md:text-xl font-extrabold text-black text-center mb-4">
+                      {dateLabel}
+                    </h3>
+                    {selectedDay.items.map((item) => (
+                      <ScheduleRow key={`${item.schedule.date}-${item.date.getTime()}`} schedule={item.schedule} />
+                    ))}
+                  </div>
+                  );
+                })()}
 
-              {/* 업데이트 시간 */}
-              {lastUpdateTime && (
+                {/* 업데이트 시간 */}
+                {lastUpdateTime && (
                   <div className="text-right mt-2 pr-2 text-black/60 text-xs">
                     {lastUpdateTime}
                   </div>
@@ -569,7 +607,7 @@ const ElevenNammePage = () => {
 
             {/* Product Detail 2 */}
             <Image
-              src="/ssobig_assets/lovebuddies/product-detail2.webp"
+              src="/ssobig_assets/lovebuddies/product-detail 2.jpg"
               alt="상세 이미지 2"
               width={1920}
               height={1080}
@@ -783,65 +821,10 @@ const ElevenNammePage = () => {
             />
             <LoveBuddiesApplyFlow
               mode="modal"
-              scheduleData={visibleScheduleData}
+              scheduleData={scheduleData}
               isLoadingSchedules={isLoading}
-              initialCouponCode={couponCode}
               onClose={() => setIsApplyOpen(false)}
             />
-          </div>
-        )}
-
-        {isCouponNoticeOpen && couponCode && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-5">
-            <button
-              type="button"
-              onClick={() => setIsCouponNoticeOpen(false)}
-              className="absolute inset-0 bg-black/55 backdrop-blur-sm"
-              aria-label="쿠폰 안내 닫기"
-            />
-            <div className="relative w-full max-w-[360px] rounded-[28px] bg-[#171113] px-6 py-7 text-center shadow-2xl">
-              <button
-                type="button"
-                onClick={() => setIsCouponNoticeOpen(false)}
-                className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/8 text-white/60"
-                aria-label="쿠폰 안내 닫기"
-              >
-                ×
-              </button>
-              <div className="mx-auto inline-flex rounded-full bg-[#FF6B9F]/15 px-4 py-1 text-xs font-semibold tracking-[0.18em] text-[#FFB1D4]">
-                COUPON
-              </div>
-              <h2 className="mt-4 text-2xl font-black text-white">
-                쿠폰이 적용돼요
-              </h2>
-              <p className="mt-4 text-sm leading-relaxed text-white/75">
-                지금 일일남매 신청하시면 쿠폰이 적용됩니다.
-              </p>
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4">
-                <p className="text-[11px] font-semibold tracking-[0.18em] text-white/35">
-                  SSOBIG-
-                </p>
-                <p className="mt-2 text-xl font-black tracking-[0.16em] text-white">
-                  {couponCode}
-                </p>
-              </div>
-              <div className="mt-6 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsCouponNoticeOpen(false)}
-                  className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-white/15 text-sm font-semibold text-white/65"
-                >
-                  닫기
-                </button>
-                <button
-                  type="button"
-                  onClick={handleApplyClick}
-                  className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-[#FF6B9F] text-sm font-bold text-white"
-                >
-                  지금 신청
-                </button>
-              </div>
-            </div>
           </div>
         )}
       </div>
