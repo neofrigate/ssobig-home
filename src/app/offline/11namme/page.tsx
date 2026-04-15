@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
 import { useDayNammeSchedule } from "@/features/day-nammae/useDayNammeSchedule";
 import { ScheduleItem } from "@/features/day-nammae/types";
@@ -63,6 +63,7 @@ const ElevenNammePage = () => {
   const router = useRouter();
   const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
   const [isApplyOpen, setIsApplyOpen] = useState(false);
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
 
   // 참가자 차트 컴포넌트 - 중앙 기준
   const ApplicantChart = ({
@@ -209,6 +210,292 @@ const ElevenNammePage = () => {
       </div>
     );
   };
+
+  const upcomingCalendar = useMemo(() => {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const searchEnd = new Date(start);
+    searchEnd.setMonth(searchEnd.getMonth() + 1);
+    searchEnd.setHours(23, 59, 59, 999);
+
+    const itemsByDay = new Map<
+      string,
+      {
+        schedule: ScheduleItem;
+        date: Date;
+        stateLabel: string;
+      }[]
+    >();
+    scheduleData.forEach((schedule) => {
+      const source = `${schedule.date} ${schedule.title}`;
+      const match = source.match(/(\d+)\/(\d+)\s*\([^)]+\)\s*(\d+):(\d+)/);
+
+      if (!match) {
+        return;
+      }
+
+      const candidate = new Date(
+        start.getFullYear(),
+        Number(match[1]) - 1,
+        Number(match[2]),
+        Number(match[3]),
+        Number(match[4])
+      );
+
+      if (
+        Number.isNaN(candidate.getTime()) ||
+        candidate < start ||
+        candidate > searchEnd
+      ) {
+        return;
+      }
+
+      const dayKey = `${candidate.getFullYear()}-${String(
+        candidate.getMonth() + 1
+      ).padStart(2, "0")}-${String(candidate.getDate()).padStart(2, "0")}`;
+
+      const isTodaySchedule =
+        candidate.getFullYear() === start.getFullYear() &&
+        candidate.getMonth() === start.getMonth() &&
+        candidate.getDate() === start.getDate();
+
+      const stateLabel =
+        isTodaySchedule
+          ? "전체마감"
+          : schedule.status === "전체마감"
+            ? "전체마감"
+            : schedule.status === "여자마감" || schedule.status === "남자마감"
+              ? "일부마감"
+              : "신청가능";
+
+      const bucket = itemsByDay.get(dayKey) || [];
+      bucket.push({ schedule, date: candidate, stateLabel });
+      bucket.sort((a, b) => a.date.getTime() - b.date.getTime());
+      itemsByDay.set(dayKey, bucket);
+    });
+
+    const gridStart = new Date(start);
+    gridStart.setDate(gridStart.getDate() - gridStart.getDay());
+    const gridEnd = new Date(gridStart);
+    gridEnd.setDate(gridEnd.getDate() + 27);
+    gridEnd.setHours(23, 59, 59, 999);
+
+    const days = [];
+    for (
+      const cursor = new Date(gridStart);
+      cursor <= gridEnd;
+      cursor.setDate(cursor.getDate() + 1)
+    ) {
+      const current = new Date(cursor);
+      const dayKey = `${current.getFullYear()}-${String(
+        current.getMonth() + 1
+      ).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`;
+
+      days.push({
+        key: dayKey,
+        date: current,
+        isToday: current.getTime() === start.getTime(),
+        inRange: current >= gridStart && current <= gridEnd,
+        items: itemsByDay.get(dayKey) || [],
+      });
+    }
+
+    return {
+      label: `${start.getFullYear()}.${String(start.getMonth() + 1).padStart(
+        2,
+        "0"
+      )} - ${String(gridEnd.getMonth() + 1).padStart(2, "0")}`,
+      days,
+    };
+  }, [scheduleData]);
+
+  const CalendarSection = () => {
+    const weekLabels = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+    return (
+      <div className="mt-6">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold tracking-[0.16em] text-black/60 md:text-sm">
+              CALENDAR <span className="tracking-normal font-normal text-black/35">{upcomingCalendar.label}</span>
+            </p>
+            <p className="mt-0.5 text-[10px] text-black/35 md:text-xs">일정을 클릭하면 참가현황을 볼 수 있어요</p>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <span className="text-sm font-bold text-black/55 md:text-base">참가비 35,000원</span>
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-sm bg-[#D6ECFA]" />
+                <span className="text-[10px] text-black/50 md:text-xs">신청가능</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-sm bg-[#FFF3CD]" />
+                <span className="text-[10px] text-black/50 md:text-xs">일부마감</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-sm bg-black/10" />
+                <span className="text-[10px] text-black/50 md:text-xs">전체마감</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 요일 헤더 - 볼드 중앙정렬, 상하 굵은 선 */}
+        <div className="mt-4 border-t-2 border-b border-black/80">
+          <div className="grid grid-cols-7">
+            {weekLabels.map((label) => (
+              <div
+                key={label}
+                className="py-2 text-center text-xs font-bold text-black/70 md:text-sm"
+              >
+                {label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 날짜 그리드 - 선 없이 깔끔하게 */}
+        <div className="grid grid-cols-7">
+          {upcomingCalendar.days.map((day) => {
+            const hasItems = day.items.length > 0;
+            const isSelected = selectedCalendarDate === day.key;
+            return (
+            <div
+              key={day.key}
+              className={`min-h-[80px] px-1 py-2 md:min-h-[110px] md:px-2 md:py-3 text-center ${hasItems ? "cursor-pointer" : ""} ${isSelected ? "bg-black/5" : ""}`}
+              onClick={() => hasItems && setSelectedCalendarDate(isSelected ? null : day.key)}
+            >
+              {/* 날짜 숫자 - 볼드 중앙정렬 */}
+              <div className="flex items-center justify-center gap-1">
+                <span
+                  className={`text-base font-bold md:text-lg ${
+                    day.isToday
+                      ? "text-[#FF6B9F]"
+                      : hasItems
+                        ? "text-black/85"
+                        : day.inRange
+                          ? "text-black/35"
+                          : "text-black/15"
+                  }`}
+                >
+                  {day.date.getMonth() + 1}.{day.date.getDate()}
+                </span>
+              </div>
+              {day.isToday && (
+                <p className="text-[9px] font-bold text-[#FF6B9F] md:text-[10px]">오늘</p>
+              )}
+
+              {/* 이벤트 칩 - 작은 라운드 */}
+              <div className="mt-1 space-y-0.5 md:mt-1.5 md:space-y-1">
+                {day.items.slice(0, 2).map((item) => {
+                  const chipClass =
+                    item.stateLabel === "전체마감"
+                      ? "bg-black/5 text-black/30"
+                      : item.stateLabel === "일부마감"
+                      ? "bg-[#FFF3CD] text-[#8A6D00]"
+                      : "bg-[#D6ECFA] text-[#1A6BAF]";
+
+                  return (
+                    <div
+                      key={`${item.schedule.date}-${item.date.getTime()}`}
+                      className={`rounded-sm px-0.5 py-0.5 md:rounded md:px-1 md:py-0.5 ${chipClass}`}
+                    >
+                      <p className="text-[10px] font-bold leading-tight md:text-xs">
+                        {String(item.date.getHours()).padStart(2, "0")}:
+                        {String(item.date.getMinutes()).padStart(2, "0")}
+                      </p>
+                      <p className="whitespace-pre-line text-[8px] font-semibold leading-tight md:text-[10px]">
+                        {item.stateLabel}
+                      </p>
+                      {(item.stateLabel === "신청가능" || item.stateLabel === "일부마감") && (
+                        <p className="text-[7px] font-medium leading-tight md:text-[9px] opacity-70">
+                          {item.schedule.status === "남자마감"
+                            ? `남마감 / 여${item.schedule.applicants.female}`
+                            : item.schedule.status === "여자마감"
+                            ? `남${item.schedule.applicants.male} / 여마감`
+                            : `남${item.schedule.applicants.male} / 여${item.schedule.applicants.female}`}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+                {day.items.length > 2 && (
+                  <p className="text-[8px] font-semibold text-black/40 md:text-[9px]">
+                    +{day.items.length - 2}
+                  </p>
+                )}
+              </div>
+            </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const ScheduleLoadingSkeleton = () => {
+    const weekLabels = ["일", "월", "화", "수", "목", "금", "토"];
+
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4">
+          {[0, 1, 2, 3].map((index) => (
+            <div key={`schedule-skeleton-${index}`} className="mb-4 md:mb-6">
+              <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-4">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                  <div className="h-5 w-28 animate-pulse rounded-full bg-black/8" />
+                  <div className="h-5 w-24 animate-pulse rounded-full bg-black/8" />
+                  <div className="h-5 w-16 animate-pulse rounded-full bg-black/8" />
+                </div>
+                <div className="h-4 w-12 animate-pulse rounded-full bg-black/8" />
+              </div>
+              <div className="px-3 md:px-4">
+                <div className="h-2 md:h-3 animate-pulse rounded-full bg-black/8" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-[100px]">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[11px] font-semibold tracking-[0.16em] text-black/40">
+              CALENDAR
+            </p>
+            <p className="text-xs font-medium text-black/45 md:text-sm">
+              로딩 중
+            </p>
+          </div>
+
+          <div className="mt-4 grid grid-cols-7 gap-1.5 md:gap-2">
+            {weekLabels.map((label) => (
+              <div
+                key={`calendar-label-skeleton-${label}`}
+                className="text-center text-[10px] font-semibold text-black/45 md:text-[11px]"
+              >
+                {label}
+              </div>
+            ))}
+
+            {Array.from({ length: 28 }).map((_, index) => (
+              <div
+                key={`calendar-skeleton-${index}`}
+                className="min-h-[76px] rounded-xl border border-black/8 bg-white/80 px-1.5 py-1.5 md:min-h-[110px] md:rounded-2xl md:px-3 md:py-2"
+              >
+                <div className="h-3 w-5 animate-pulse rounded-full bg-black/8 md:h-3" />
+                <div className="mt-2 space-y-1 md:mt-3 md:space-y-2">
+                  <div className="h-6 animate-pulse rounded-lg bg-black/6 md:h-10 md:rounded-xl" />
+                  {index % 5 === 0 && (
+                    <div className="h-6 animate-pulse rounded-lg bg-black/6 md:h-10 md:rounded-xl" />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       {/* Meta Pixel Code */}
@@ -255,43 +542,59 @@ const ElevenNammePage = () => {
             {/* 일일남매 스케줄 박스 */}
             <div className="w-full">
               <div className="bg-[#F2F2F2] p-4 md:px-6 md:py-7">
-                <h2 className="text-xl md:text-2xl font-bold text-center text-black mb-3 md:mb-4">
+                <h2 className="text-xl md:text-2xl font-bold text-center text-black mb-4 md:mb-6">
                   💕 일일남매 스케줄
                 </h2>
 
-                {/* 가격 및 범례 */}
-                <div className="flex gap-2 md:gap-3 justify-between items-center mb-4 md:mb-6 px-3 md:px-4">
-                  <div className="text-sm md:text-base font-semibold text-black">
-                    참가비 : 35,000원
-                  </div>
-                  <div className="flex gap-2 md:gap-3">
-                    <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-black/10 bg-[#FF69B4]/15">
-                      <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#FF69B4]" />
-                      <span className="text-black/80">여자</span>
-                    </div>
-                    <div className="flex items-center space-x-1 md:space-x-2 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs md:text-sm border border-black/10 bg-[#4A90E2]/15">
-                      <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#4A90E2]" />
-                      <span className="text-black/80">남자</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 일정 목록 */}
+                {/* 캘린더 */}
                 <div>
                   {isLoading ? (
-                    <div className="flex items-center justify-center py-6 text-black/60 text-sm md:text-base">
-                      📅 스케줄 정보를 불러오는 중...
-                    </div>
+                    <ScheduleLoadingSkeleton />
                   ) : scheduleData.length === 0 ? (
                     <div className="flex items-center justify-center py-6 text-black/60 text-sm md:text-base">
                       📅 참여하기 버튼을 눌러주세요
                     </div>
                   ) : (
-                    scheduleData.map((schedule, index) => (
-                      <ScheduleRow key={index} schedule={schedule} />
-                    ))
+                    <CalendarSection />
                   )}
                 </div>
+
+                {/* 선택된 날짜 스케줄 상세 */}
+                {selectedCalendarDate && upcomingCalendar.days.find(d => d.key === selectedCalendarDate)?.items.length && (() => {
+                  const selectedDay = upcomingCalendar.days.find(d => d.key === selectedCalendarDate);
+                  if (!selectedDay) return null;
+                  const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+                  const dateLabel = `${selectedDay.date.getMonth() + 1}/${selectedDay.date.getDate()} (${dayNames[selectedDay.date.getDay()]})`;
+                  return (
+                  <div className="mt-6 border-t border-black/10 pt-5">
+                    {/* 범례 + 닫기 */}
+                    <div className="flex items-center justify-end gap-3 mb-3">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#FF69B4]" />
+                        <span className="text-xs text-black/60">여</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
+                        <span className="text-xs text-black/60">남</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCalendarDate(null)}
+                        className="text-xs text-black/35 hover:text-black/60"
+                      >
+                        닫기
+                      </button>
+                    </div>
+                    {/* 날짜 타이틀 - 가운데 굵고 크게 */}
+                    <h3 className="text-lg md:text-xl font-extrabold text-black text-center mb-4">
+                      {dateLabel}
+                    </h3>
+                    {selectedDay.items.map((item) => (
+                      <ScheduleRow key={`${item.schedule.date}-${item.date.getTime()}`} schedule={item.schedule} />
+                    ))}
+                  </div>
+                  );
+                })()}
 
                 {/* 업데이트 시간 */}
                 {lastUpdateTime && (
@@ -304,7 +607,7 @@ const ElevenNammePage = () => {
 
             {/* Product Detail 2 */}
             <Image
-              src="/ssobig_assets/lovebuddies/product-detail2.webp"
+              src="/ssobig_assets/lovebuddies/product-detail 2.jpg"
               alt="상세 이미지 2"
               width={1920}
               height={1080}
