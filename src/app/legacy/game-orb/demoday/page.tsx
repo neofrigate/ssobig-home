@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Script from "next/script";
-import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
 import React, { useState, useEffect } from "react";
 
@@ -274,13 +273,6 @@ export default function DemoDayPage() {
 
   return (
     <>
-      <Head>
-        <title>DEMODAY - Game Orb</title>
-        <meta
-          name="description"
-          content="게임 창작자와 플레이어가 만나는 특별한 데모데이 - 게임오브 소셜링"
-        />
-      </Head>
       {/* Meta Pixel Code */}
       <Script
         id="facebook-pixel"

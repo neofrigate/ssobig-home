@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import {
   getClientSentryDebugContext,
+  getHydrationDebugContext,
   shouldIgnoreKnownInAppBrowserError,
 } from "@/lib/sentry-debug";
 
@@ -33,9 +34,11 @@ Sentry.init({
   },
   beforeSend: (event) => {
     const debugContext = getClientSentryDebugContext();
+    const hydrationDebugContext = getHydrationDebugContext(event);
 
     event.tags = {
       ...debugContext.tags,
+      ...hydrationDebugContext?.tags,
       ...event.tags,
     };
     event.contexts = {
@@ -44,6 +47,7 @@ Sentry.init({
     };
     event.extra = {
       ...debugContext.extra,
+      ...hydrationDebugContext?.extra,
       ...event.extra,
     };
 

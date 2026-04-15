@@ -1,4 +1,9 @@
+import Script from "next/script";
 import type { Metadata } from "next";
+import {
+  buildMetaPixelPageViewScript,
+  SSOBIG_STORY_PIXEL_ID,
+} from "../../utils/metaPixel";
 
 export const metadata: Metadata = {
   title: "플레이룸 | 추리게임 & 머더미스터리",
@@ -20,5 +25,16 @@ export default function PlayroomLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <Script
+        id="facebook-pixel-ssobig-story-playroom"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: buildMetaPixelPageViewScript(SSOBIG_STORY_PIXEL_ID),
+        }}
+      />
+      {children}
+    </>
+  );
 }

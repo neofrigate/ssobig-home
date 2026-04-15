@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Script from "next/script";
-import Head from "next/head";
 import LinkWithUtm from "../../../../components/LinkWithUtm";
 import { FAQSection } from "../../../../components/FAQ";
 import { useState, useEffect } from "react";
@@ -310,13 +309,6 @@ export default function RealGeniusPage() {
 
   return (
     <>
-      <Head>
-        <title>REAL GENIUS - Game Orb</title>
-        <meta
-          name="description"
-          content="당신이 주인공이 되는 게임예능 현실판 - 소셜 지니어스"
-        />
-      </Head>
       {/* Meta Pixel Code */}
       <Script
         id="facebook-pixel"

@@ -46,3 +46,7 @@ local.ngrok-domain
 # AI agent configs
 .codex/
 AGENTS.md
+
+# local work artifacts
+.obsidian/
+output/

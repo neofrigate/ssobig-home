@@ -98,35 +98,32 @@ function OfflineCard({
   );
 }
 
+function generateRollingCount() {
+  const value = Math.floor(10000 + Math.random() * 90000);
+  return value.toLocaleString("ko-KR");
+}
+
 export default function OfflinePage() {
   const [totalParticipants, setTotalParticipants] = useState<number | null>(
     null
   );
+  const [rollingCount, setRollingCount] = useState(generateRollingCount);
 
-  // Google Sheets에서 총 신청자 수 가져오기
+  // Supabase 승인 누계를 서버 API를 통해 가져오기
   useEffect(() => {
     const fetchTotalParticipants = async () => {
       try {
-        const SHEET_ID = "1onzeBFDNKuJwWwgZG1fvdi_Ch-mTBTwvGsv2NO5Fac8";
-        const GID = "1757320005";
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
-
-        const response = await fetch(url);
+        const response = await fetch("/api/offline/participant-count");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const csvText = await response.text();
-        const rows = csvText.split("\n");
+        const payload = (await response.json()) as {
+          totalParticipants?: number;
+        };
 
-        // A2 셀은 두 번째 행(인덱스 1)의 첫 번째 열
-        if (rows.length > 1) {
-          const secondRow = rows[1].split(",");
-          const a2Value = secondRow[0]?.trim();
-
-          if (a2Value && !isNaN(Number(a2Value))) {
-            setTotalParticipants(Number(a2Value));
-          }
+        if (typeof payload.totalParticipants === "number") {
+          setTotalParticipants(payload.totalParticipants);
         }
       } catch (error) {
         console.error("총 신청자 수를 가져오는 중 오류 발생:", error);
@@ -137,11 +134,25 @@ export default function OfflinePage() {
     fetchTotalParticipants();
   }, []);
 
+  useEffect(() => {
+    if (totalParticipants !== null) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setRollingCount(generateRollingCount());
+    }, 90);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [totalParticipants]);
+
   // 숫자 포맷팅 (천 단위 콤마)
   const formattedCount =
     totalParticipants !== null
       ? totalParticipants.toLocaleString("ko-KR")
-      : "...";
+      : rollingCount;
 
   return (
     <div className="min-h-screen bg-black -mt-[88px] md:-mt-[60px]">
@@ -190,7 +201,13 @@ export default function OfflinePage() {
           </h1>
           <p className="text-base md:text-lg text-gray-300 font-medium break-keep">
             지금까지{" "}
-            <span className="animate-blink inline-block font-bold">
+            <span
+              className={`inline-block min-w-[5ch] font-bold tabular-nums ${
+                totalParticipants === null
+                  ? "font-mono text-white/95"
+                  : "animate-blink"
+              }`}
+            >
               {formattedCount}명
             </span>
             이 함께했어요

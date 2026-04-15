@@ -1,20 +1,41 @@
 import { NextResponse } from "next/server";
 
 const DEFAULT_PUBLIC_SCHEDULES_API_URL =
-  "https://manage.ssobig.com/api/public-day-nammae-schedules";
+  "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-schedules";
+const BROWSER_CACHE_CONTROL = "public, max-age=0, must-revalidate";
+const CDN_CACHE_CONTROL = "max-age=5, stale-while-revalidate=5";
 
 function getPublicSchedulesApiUrl() {
   const configuredUrl = process.env.DAY_NAMMAE_PUBLIC_SCHEDULES_API_URL?.trim();
   return configuredUrl || DEFAULT_PUBLIC_SCHEDULES_API_URL;
 }
 
-function jsonResponse(body: unknown, status = 200) {
+function jsonResponse(
+  body: unknown,
+  status = 200,
+  cacheControl = "no-store",
+  vercelCacheControl?: string,
+  cdnCacheControl?: string
+) {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Origin": "*",
+  };
+
+  if (cacheControl) {
+    headers["Cache-Control"] = cacheControl;
+  }
+
+  if (cdnCacheControl) {
+    headers["CDN-Cache-Control"] = cdnCacheControl;
+  }
+
+  if (vercelCacheControl) {
+    headers["Vercel-CDN-Cache-Control"] = vercelCacheControl;
+  }
+
   return NextResponse.json(body, {
     status,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "no-store",
-    },
+    headers,
   });
 }
 
@@ -23,7 +44,9 @@ export async function GET() {
 
   try {
     const upstreamResponse = await fetch(upstreamUrl, {
-      cache: "no-store",
+      next: {
+        revalidate: 5,
+      },
       headers: {
         Accept: "application/json",
       },
@@ -63,7 +86,14 @@ export async function GET() {
       throw new Error("Invalid upstream JSON payload");
     }
 
-    return jsonResponse(payload, 200);
+    return jsonResponse(
+      payload,
+      200,
+      BROWSER_CACHE_CONTROL,
+      upstreamResponse.headers.get("vercel-cdn-cache-control") ||
+        CDN_CACHE_CONTROL,
+      upstreamResponse.headers.get("cdn-cache-control") || CDN_CACHE_CONTROL
+    );
   } catch (error) {
     return jsonResponse(
       {

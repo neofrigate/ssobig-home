@@ -33,6 +33,7 @@ export default function ApplyStepShell({
 }: ApplyStepShellProps) {
   const progressPercent = (currentStep / totalSteps) * 100;
   const isPageMode = mode === "page";
+  const shouldFixNav = isPageMode && !hideNav;
   const shellClassName =
     mode === "modal"
       ? "relative flex w-full max-w-[560px] flex-col overflow-hidden rounded-[32px] bg-black md:max-h-[90vh]"
@@ -46,7 +47,9 @@ export default function ApplyStepShell({
   const navClassName =
     mode === "modal"
       ? "relative z-20 shrink-0 px-5 pb-8 pt-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent"
-      : "relative z-20 mt-6 px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-4";
+      : shouldFixNav
+        ? "fixed inset-x-0 bottom-0 z-30 px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-5 bg-gradient-to-t from-[#12090f] via-[#12090f]/96 to-transparent"
+        : "relative z-20 mt-6 px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-4";
   const headerClassName =
     mode === "modal"
       ? "relative z-20 shrink-0"
@@ -54,7 +57,9 @@ export default function ApplyStepShell({
   const contentClassName =
     mode === "modal"
       ? "mx-auto w-full max-w-[520px] px-5 pt-4"
-      : "mx-auto w-full max-w-[520px] px-5 pt-4 pb-6";
+      : `mx-auto w-full max-w-[520px] px-5 pt-4 ${
+          shouldFixNav ? "pb-28" : "pb-6"
+        }`;
 
   return (
     <div className={shellClassName}>

@@ -3,6 +3,174 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { trackLinkClick } from "../../utils/gtag";
+import { safeFbq } from "../../utils/metaPixel";
+
+const PLAYROOM_TRACKING_QUERY_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+  "utm_id",
+  "utm_creative",
+  "utm_keyword",
+  "utm_name",
+  "fbclid",
+];
+
+function appendPlayroomTrackingParams(url: string): string {
+  if (typeof window === "undefined") {
+    return url;
+  }
+
+  try {
+    const sourceParams = new URLSearchParams(window.location.search);
+    const isExternalUrl = url.startsWith("http");
+    const urlObj = isExternalUrl
+      ? new URL(url)
+      : new URL(url, window.location.origin);
+
+    PLAYROOM_TRACKING_QUERY_KEYS.forEach((key) => {
+      const value = sourceParams.get(key);
+      if (value && !urlObj.searchParams.has(key)) {
+        urlObj.searchParams.set(key, value);
+      }
+    });
+
+    return isExternalUrl
+      ? urlObj.toString()
+      : `${urlObj.pathname}${urlObj.search}`;
+  } catch (error) {
+    console.error("플레이룸 추적 파라미터 추가 실패:", error);
+    return url;
+  }
+}
+
+function extractTemplateId(url: string) {
+  try {
+    const parsedUrl = new URL(url, "https://www.ssobig.com");
+    const match = parsedUrl.pathname.match(/^\/templates\/([^/?#]+)/);
+
+    if (match?.[1]) {
+      return match[1];
+    }
+  } catch {}
+
+  return null;
+}
+
+function buildTemplateClickPayload({
+  href,
+  title,
+  price,
+  sourceArea,
+}: {
+  href: string;
+  title: string;
+  price?: string;
+  sourceArea: string;
+}) {
+  try {
+    const parsedUrl = new URL(href, "https://www.ssobig.com");
+    return {
+      template_id: extractTemplateId(parsedUrl.pathname) ?? undefined,
+      template_name: title,
+      price_label: price,
+      source_area: sourceArea,
+      destination_host: parsedUrl.hostname,
+      target_url: parsedUrl.toString(),
+    };
+  } catch {
+    return {
+      template_name: title,
+      price_label: price,
+      source_area: sourceArea,
+      target_url: href,
+    };
+  }
+}
+
+function buildViewContentPayload({
+  href,
+  title,
+}: {
+  href: string;
+  title: string;
+}) {
+  const templateId = extractTemplateId(href);
+  if (!templateId) {
+    return null;
+  }
+
+  return {
+    content_ids: [templateId],
+    content_name: title,
+    content_type: "product",
+  };
+}
+
+interface TrackedLinkProps {
+  href: string;
+  title: string;
+  sourceArea: string;
+  price?: string;
+  className?: string;
+  children: React.ReactNode;
+}
+
+function TrackedLink({
+  href,
+  title,
+  sourceArea,
+  price,
+  className,
+  children,
+}: TrackedLinkProps) {
+  const [trackedHref, setTrackedHref] = useState(href);
+
+  useEffect(() => {
+    setTrackedHref(appendPlayroomTrackingParams(href));
+  }, [href]);
+
+  const handleClick = () => {
+    const payload = buildTemplateClickPayload({
+      href: trackedHref,
+      title,
+      price,
+      sourceArea,
+    });
+
+    trackLinkClick({
+      linkUrl: trackedHref,
+      linkText: title,
+      brandPage: "playroom",
+      buttonType: sourceArea,
+      destination: payload.destination_host ?? "external",
+    });
+    safeFbq("trackCustom", "TemplateClick", payload);
+
+    const viewContentPayload = buildViewContentPayload({
+      href: trackedHref,
+      title,
+    });
+    if (viewContentPayload) {
+      safeFbq("track", "ViewContent", viewContentPayload);
+    }
+  };
+
+  return (
+    <a
+      href={trackedHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+      onClick={handleClick}
+    >
+      {children}
+    </a>
+  );
+}
 
 // 컨텐츠 카드 컴포넌트
 interface ContentCardProps {
@@ -45,10 +213,11 @@ function ContentCard({
   return (
     <>
       {/* 모바일 버전 - 오프라인 스타일 */}
-      <a
+      <TrackedLink
         href={link}
-        target="_blank"
-        rel="noopener noreferrer"
+        title={title}
+        price={price}
+        sourceArea="card"
         className={`md:hidden flex flex-col items-center flex-shrink-0 group ${mobileClass}`}
       >
         <div className="relative w-full aspect-[3/4] mb-4 rounded-lg overflow-hidden transition-opacity group-hover:opacity-90 bg-gray-100">
@@ -92,13 +261,14 @@ function ContentCard({
         <p className="text-gray-600 text-xs sm:text-sm text-left w-full whitespace-pre-wrap mb-2 line-clamp-2">
           {description}
         </p>
-      </a>
+      </TrackedLink>
 
       {/* 태블릿/데스크톱 버전 - 기존 스타일 */}
-      <a
+      <TrackedLink
         href={link}
-        target="_blank"
-        rel="noopener noreferrer"
+        title={title}
+        price={price}
+        sourceArea="card"
         className={`hidden md:block group flex-shrink-0 cursor-pointer ${desktopClass}`}
       >
         <div className="relative aspect-[3/4] rounded-lg overflow-hidden mb-3 bg-gray-100">
@@ -149,7 +319,7 @@ function ContentCard({
             {description}
           </p>
         </div>
-      </a>
+      </TrackedLink>
     </>
   );
 }
@@ -331,11 +501,12 @@ export default function PlayroomPage() {
             onTouchEnd={handleTouchEnd}
           >
             {banners.map((banner, index) => (
-              <a
+              <TrackedLink
                 key={index}
                 href={banner.link}
-                target="_blank"
-                rel="noopener noreferrer"
+                title={`${banner.title1} ${banner.title2}`}
+                price={banner.subtitle}
+                sourceArea="banner"
                 className={`absolute inset-0 transition-opacity duration-700 cursor-pointer ${
                   index === currentBannerIndex
                     ? "opacity-100"
@@ -390,7 +561,7 @@ export default function PlayroomPage() {
                     </div>
                   </div>
                 </div>
-              </a>
+              </TrackedLink>
             ))}
 
             {/* 인디케이터 */}
@@ -573,7 +744,7 @@ export default function PlayroomPage() {
               }`}
             >
               <div className="pt-2 pb-3">
-                <p className="mb-1">대표자 : 안민우, 조원철</p>
+                <p className="mb-1">대표자 : 조원철</p>
                 <p className="mb-1">사업자등록번호 : 140-87-03096</p>
                 <p className="mb-1">전화번호 : 02-2635-7942</p>
                 <p className="mb-1">E-mail : ssobigstudio@gmail.com</p>
@@ -590,7 +761,7 @@ export default function PlayroomPage() {
             {/* 약관 링크 - 항상 표시 */}
             <p className="text-gray-400 pt-3">
               <Link
-                href="https://about.ssobig.com/privacy_policy"
+                href="https://www.ssobig.com/privacy_policy.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
@@ -599,12 +770,21 @@ export default function PlayroomPage() {
               </Link>
               <span className="mx-2">|</span>
               <Link
-                href="https://about.ssobig.com/terms_of_service"
+                href="https://www.ssobig.com/terms_of_service.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
               >
                 이용약관
+              </Link>
+              <span className="mx-2">|</span>
+              <Link
+                href="https://www.ssobig.com/refund_policy.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-600 underline"
+              >
+                환불 정책
               </Link>
             </p>
           </div>

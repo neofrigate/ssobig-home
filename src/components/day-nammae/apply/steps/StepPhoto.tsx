@@ -61,7 +61,7 @@ export default function StepPhoto({
               본인의 매력이 잘 드러나는 사진 한 장을 올려주세요
             </p>
             <p className="mt-1 text-[11px] text-white/30">
-              JPG, PNG 등 이미지 파일만 가능하며 4MB 이하만 업로드할 수 있어요
+              JPG, PNG, HEIC/HEIF 등 이미지 파일을 올릴 수 있고 4MB를 넘으면 자동으로 최적화해요
             </p>
             {isOptimizing && (
               <p className="mt-2 text-xs text-white/45">

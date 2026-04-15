@@ -41,6 +41,8 @@ const INITIAL_FORM_VALUES: DayNammeFormValues = {
   phone: "",
   traits: "",
   photo: null,
+  hasCoupon: null,
+  couponCode: "",
 };
 
 function formatPhoneNumber(value: string) {
