@@ -12,6 +12,66 @@ import {
   LOVE_BUDDIES_PIXEL_ID,
 } from "@/utils/metaPixel";
 
+// 한국 공휴일 (2025-2027)
+const KOREAN_HOLIDAYS: Record<string, string> = {
+  // 2025
+  "2025-01-01": "신정",
+  "2025-01-28": "설날",
+  "2025-01-29": "설날",
+  "2025-01-30": "설날",
+  "2025-03-01": "삼일절",
+  "2025-03-03": "대체공휴일",
+  "2025-05-05": "어린이날",
+  "2025-05-06": "대체공휴일",
+  "2025-06-06": "현충일",
+  "2025-08-15": "광복절",
+  "2025-10-03": "개천절",
+  "2025-10-05": "추석",
+  "2025-10-06": "추석",
+  "2025-10-07": "추석",
+  "2025-10-08": "대체공휴일",
+  "2025-10-09": "한글날",
+  "2025-12-25": "크리스마스",
+  // 2026
+  "2026-01-01": "신정",
+  "2026-02-16": "설날",
+  "2026-02-17": "설날",
+  "2026-02-18": "설날",
+  "2026-03-01": "삼일절",
+  "2026-03-02": "대체공휴일",
+  "2026-05-05": "어린이날",
+  "2026-05-24": "부처님오신날",
+  "2026-05-25": "대체공휴일",
+  "2026-06-06": "현충일",
+  "2026-08-15": "광복절",
+  "2026-09-24": "추석",
+  "2026-09-25": "추석",
+  "2026-09-26": "추석",
+  "2026-10-03": "개천절",
+  "2026-10-09": "한글날",
+  "2026-12-25": "크리스마스",
+  // 2027
+  "2027-01-01": "신정",
+  "2027-02-06": "설날",
+  "2027-02-07": "설날",
+  "2027-02-08": "설날",
+  "2027-02-09": "대체공휴일",
+  "2027-03-01": "삼일절",
+  "2027-05-05": "어린이날",
+  "2027-05-13": "부처님오신날",
+  "2027-06-06": "현충일",
+  "2027-06-07": "대체공휴일",
+  "2027-08-15": "광복절",
+  "2027-08-16": "대체공휴일",
+  "2027-09-15": "추석",
+  "2027-09-16": "추석",
+  "2027-09-17": "추석",
+  "2027-10-03": "개천절",
+  "2027-10-04": "대체공휴일",
+  "2027-10-09": "한글날",
+  "2027-12-25": "크리스마스",
+};
+
 // FAQ 아이템 컴포넌트
 const FAQItem = ({
   question,
@@ -353,18 +413,24 @@ const ElevenNammePage = () => {
           {upcomingCalendar.days.map((day) => {
             const hasItems = day.items.length > 0;
             const isSelected = selectedCalendarDate === day.key;
+            const isSunday = day.date.getDay() === 0;
+            const holidayName = KOREAN_HOLIDAYS[day.key];
+            const isHoliday = Boolean(holidayName);
+            const isRedDay = isSunday || isHoliday;
             return (
             <div
               key={day.key}
-              className={`min-h-[80px] px-1 py-2 md:min-h-[110px] md:px-2 md:py-3 text-center transition-all ${hasItems ? "cursor-pointer" : ""} ${isSelected ? "bg-white rounded-lg md:rounded-xl" : ""}`}
+              className={`min-h-[80px] px-1 py-2 md:min-h-[110px] md:px-2 md:py-3 text-center transition-all ${hasItems ? "cursor-pointer" : ""} ${isSelected ? "bg-white rounded-lg md:rounded-xl" : day.isToday ? "bg-white/50 rounded-lg md:rounded-xl" : ""}`}
               onClick={() => hasItems && setSelectedCalendarDate(isSelected ? null : day.key)}
             >
               {/* 날짜 숫자 - 볼드 중앙정렬 */}
               <div className="flex items-center justify-center gap-1">
                 <span
                   className={`text-base font-bold md:text-lg ${
-                    day.isToday
-                      ? "text-[#FF6B9F]"
+                    isRedDay
+                      ? day.inRange
+                        ? "text-[#FF69B4]"
+                        : "text-[#FF69B4]/40"
                       : hasItems
                         ? "text-black/85"
                         : day.inRange
@@ -376,7 +442,22 @@ const ElevenNammePage = () => {
                 </span>
               </div>
               {day.isToday && (
-                <p className="text-[9px] font-bold text-[#FF6B9F] md:text-[10px]">오늘</p>
+                <p
+                  className={`text-[9px] font-bold md:text-[10px] ${
+                    isRedDay ? "text-[#FF69B4]" : "text-black/60"
+                  }`}
+                >
+                  오늘
+                </p>
+              )}
+              {!day.isToday && holidayName && (
+                <p
+                  className={`text-[9px] font-semibold md:text-[10px] ${
+                    day.inRange ? "text-[#FF69B4]" : "text-[#FF69B4]/40"
+                  }`}
+                >
+                  {holidayName}
+                </p>
               )}
 
               {/* 이벤트 칩 - 작은 라운드 */}
