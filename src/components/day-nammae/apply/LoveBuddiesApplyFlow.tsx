@@ -136,6 +136,8 @@ const DEFAULT_NORMAL_BOOKING_URL =
   "https://booking.naver.com/booking/12/bizes/1378688/items/6629371";
 const DEFAULT_TEN_PERCENT_BOOKING_URL =
   "https://booking.naver.com/booking/12/bizes/1378688/items/7553785";
+const DEFAULT_THIRTY_PERCENT_BOOKING_URL =
+  "https://booking.naver.com/booking/12/bizes/1378688/items/7577876";
 const DEFAULT_FIFTY_PERCENT_BOOKING_URL =
   "https://booking.naver.com/booking/12/bizes/1378688/items/7553757";
 const DEFAULT_SUBMIT_ERROR_MESSAGE =
@@ -950,6 +952,10 @@ function getCouponDiscountRate(
       return 10;
     }
 
+    if (coupon.discount_value === 10500) {
+      return 30;
+    }
+
     if (coupon.discount_value === 17500) {
       return 50;
     }
@@ -958,6 +964,10 @@ function getCouponDiscountRate(
   const label = typeof coupon.discount_label === "string" ? coupon.discount_label : "";
   if (label.includes("반값") || label.includes("50%")) {
     return 50;
+  }
+
+  if (label.includes("30%")) {
+    return 30;
   }
 
   if (label.includes("10%")) {
@@ -973,6 +983,10 @@ function getMappedBookingUrl(
 ) {
   if (discountRate === 10) {
     return DEFAULT_TEN_PERCENT_BOOKING_URL;
+  }
+
+  if (discountRate === 30) {
+    return DEFAULT_THIRTY_PERCENT_BOOKING_URL;
   }
 
   if (discountRate === 50) {
@@ -995,7 +1009,8 @@ function buildCheckoutState(
     typeof coupon?.normal_link === "string" && coupon.normal_link.trim()
       ? coupon.normal_link.trim()
       : DEFAULT_NORMAL_BOOKING_URL;
-  const isDiscounted = Boolean(coupon) && (discountRate === 10 || discountRate === 50);
+  const isDiscounted = Boolean(coupon) &&
+    (discountRate === 10 || discountRate === 30 || discountRate === 50);
   const baseUrl = isDiscounted
     ? getMappedBookingUrl(discountRate, normalLink)
     : normalLink;
@@ -1007,6 +1022,9 @@ function buildCheckoutState(
   if (discountRate === 10) {
     value = 31500;
     finalPrice = 31500;
+  } else if (discountRate === 30) {
+    value = 24500;
+    finalPrice = 24500;
   } else if (discountRate === 50) {
     value = 17500;
     finalPrice = 17500;
