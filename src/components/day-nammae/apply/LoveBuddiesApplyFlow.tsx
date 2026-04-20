@@ -88,6 +88,26 @@ interface SubmitResponseMeta {
   parseError: string;
 }
 
+type SubmitFailureKind = "abort" | "timeout" | "network" | "unknown";
+
+interface SubmitTransportContext {
+  attemptCount: number;
+  attemptDurationMs: number;
+  failureKind: SubmitFailureKind;
+  errorName: string;
+  errorMessage: string;
+  retryAttempted: boolean;
+  retryEligible: boolean;
+  inAppBrowserName: string;
+  onLine: string;
+  visibilityState: string;
+  connectionType: string;
+  connectionEffectiveType: string;
+  connectionRtt: string;
+  connectionDownlink: string;
+  connectionSaveData: string;
+}
+
 type FlowStepKey =
   | "gender"
   | "schedule"
@@ -122,8 +142,13 @@ function getNormalFlowSteps(hasCoupon: boolean | null): FlowStepKey[] {
 const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
 const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
 const MAX_PHOTO_DIMENSION = 1600;
+const IN_APP_BROWSER_UPLOAD_MAX_FILE_SIZE_BYTES = 1536 * 1024;
+const IN_APP_BROWSER_UPLOAD_MAX_FILE_SIZE_LABEL = "1.5MB";
+const IN_APP_BROWSER_MAX_PHOTO_DIMENSION = 1280;
 const INITIAL_PHOTO_JPEG_QUALITY = 0.82;
 const MIN_PHOTO_JPEG_QUALITY = 0.56;
+const SUBMIT_NETWORK_RETRY_DELAY_MS = 700;
+const SUBMIT_FAST_FAIL_RETRY_WINDOW_MS = 1500;
 const HEIC_HEIF_MIME_TYPES = new Set([
   "image/heic",
   "image/heif",
@@ -131,6 +156,13 @@ const HEIC_HEIF_MIME_TYPES = new Set([
   "image/heif-sequence",
 ]);
 const HEIC_HEIF_FILE_PATTERN = /\.(heic|heif)$/i;
+const IN_APP_BROWSER_PATTERNS: Array<[string, RegExp]> = [
+  ["instagram", /Instagram/i],
+  ["facebook", /FBAN|FBAV|FB_IAB|FB4A|FBIOS/i],
+  ["kakao", /KAKAOTALK/i],
+  ["naver", /NAVER/i],
+  ["line", /Line\//i],
+];
 const BASE_PRICE = 35000;
 const DEFAULT_NORMAL_BOOKING_URL =
   "https://booking.naver.com/booking/12/bizes/1378688/items/6629371";
@@ -352,6 +384,178 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function getInAppBrowserName(userAgent: string) {
+  for (const [name, pattern] of IN_APP_BROWSER_PATTERNS) {
+    if (pattern.test(userAgent)) {
+      return name;
+    }
+  }
+
+  return "";
+}
+
+function getCurrentInAppBrowserName() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return getInAppBrowserName(window.navigator.userAgent);
+}
+
+function getInAppBrowserLabel(inAppBrowserName: string) {
+  switch (inAppBrowserName) {
+    case "instagram":
+      return "인스타그램";
+    case "facebook":
+      return "페이스북";
+    case "kakao":
+      return "카카오톡";
+    case "naver":
+      return "네이버";
+    case "line":
+      return "라인";
+    default:
+      return "앱 내";
+  }
+}
+
+function buildTransportFailureMessage(
+  supportCode: string,
+  failureKind: SubmitFailureKind,
+  inAppBrowserName: string
+) {
+  const guidance = inAppBrowserName
+    ? `${getInAppBrowserLabel(inAppBrowserName)} 앱 안 브라우저에서는 사진 업로드가 중간에 끊길 수 있어요. 우측 상단 메뉴에서 외부 브라우저로 열어 다시 시도해주세요.`
+    : "";
+
+  if (failureKind === "abort") {
+    return [
+      "제출 요청이 중간에 중단되었습니다.",
+      guidance,
+      supportCode ? `문의 코드: ${supportCode}` : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  if (failureKind === "network" || failureKind === "timeout") {
+    return [
+      "네트워크 연결 문제로 제출을 완료하지 못했습니다.",
+      guidance,
+      supportCode ? `문의 코드: ${supportCode}` : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  return [
+    DEFAULT_SUBMIT_ERROR_MESSAGE,
+    guidance,
+    supportCode ? `문의 코드: ${supportCode}` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function classifySubmitFailure(error: unknown): {
+  failureKind: SubmitFailureKind;
+  errorName: string;
+  errorMessage: string;
+} {
+  const errorName = error instanceof Error ? error.name : "";
+  const errorMessage = error instanceof Error ? error.message : String(error || "");
+  const normalizedMessage = errorMessage.toLowerCase();
+
+  if (
+    errorName === "AbortError" ||
+    normalizedMessage.includes("abort") ||
+    normalizedMessage.includes("aborted")
+  ) {
+    return {
+      failureKind: "abort",
+      errorName,
+      errorMessage,
+    };
+  }
+
+  if (errorName === "TimeoutError" || normalizedMessage.includes("timeout")) {
+    return {
+      failureKind: "timeout",
+      errorName,
+      errorMessage,
+    };
+  }
+
+  if (
+    error instanceof TypeError ||
+    normalizedMessage.includes("failed to fetch") ||
+    normalizedMessage.includes("load failed") ||
+    normalizedMessage.includes("networkerror") ||
+    normalizedMessage.includes("network request failed")
+  ) {
+    return {
+      failureKind: "network",
+      errorName,
+      errorMessage,
+    };
+  }
+
+  return {
+    failureKind: "unknown",
+    errorName,
+    errorMessage,
+  };
+}
+
+function getSubmitTransportContext(params: {
+  attemptCount: number;
+  attemptDurationMs: number;
+  failureKind: SubmitFailureKind;
+  errorName: string;
+  errorMessage: string;
+  retryAttempted: boolean;
+  retryEligible: boolean;
+  inAppBrowserName: string;
+}): SubmitTransportContext {
+  if (typeof window === "undefined") {
+    return {
+      ...params,
+      onLine: "unknown",
+      visibilityState: "unknown",
+      connectionType: "",
+      connectionEffectiveType: "",
+      connectionRtt: "",
+      connectionDownlink: "",
+      connectionSaveData: "",
+    };
+  }
+
+  const nav = window.navigator as Navigator & {
+    connection?: {
+      type?: string;
+      effectiveType?: string;
+      rtt?: number;
+      downlink?: number;
+      saveData?: boolean;
+    };
+  };
+  const connection = nav.connection;
+
+  return {
+    ...params,
+    onLine: String(window.navigator.onLine),
+    visibilityState: document.visibilityState || "unknown",
+    connectionType: connection?.type || "",
+    connectionEffectiveType: connection?.effectiveType || "",
+    connectionRtt:
+      typeof connection?.rtt === "number" ? String(connection.rtt) : "",
+    connectionDownlink:
+      typeof connection?.downlink === "number" ? String(connection.downlink) : "",
+    connectionSaveData:
+      typeof connection?.saveData === "boolean" ? String(connection.saveData) : "",
+  };
+}
+
 function formatFileSize(bytes: number) {
   if (bytes >= 1024 * 1024) {
     return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
@@ -364,8 +568,11 @@ function formatFileSize(bytes: number) {
   return `${bytes}B`;
 }
 
-function buildPhotoTooLargeMessage(size: number) {
-  return `사진 용량은 ${MAX_PHOTO_FILE_SIZE_LABEL} 이하만 업로드할 수 있습니다. 현재 파일은 ${formatFileSize(size)}입니다. 용량을 줄인 뒤 다시 시도해주세요.`;
+function buildPhotoTooLargeMessage(
+  size: number,
+  limitLabel = MAX_PHOTO_FILE_SIZE_LABEL
+) {
+  return `사진 용량은 ${limitLabel} 이하만 업로드할 수 있습니다. 현재 파일은 ${formatFileSize(size)}입니다. 용량을 줄인 뒤 다시 시도해주세요.`;
 }
 
 function buildPhotoCompressedMessage(originalSize: number, compressedSize: number) {
@@ -482,7 +689,14 @@ async function convertHeicToJpeg(file: File) {
   }
 }
 
-async function compressPhotoForUpload(file: File) {
+async function compressPhotoForUpload(
+  file: File,
+  options: {
+    maxFileSizeBytes?: number;
+    maxFileSizeLabel?: string;
+    maxDimension?: number;
+  } = {}
+) {
   if (typeof window === "undefined") {
     return {
       file,
@@ -493,10 +707,18 @@ async function compressPhotoForUpload(file: File) {
     };
   }
 
+  const maxFileSizeBytes = options.maxFileSizeBytes ?? MAX_PHOTO_FILE_SIZE_BYTES;
+  const maxFileSizeLabel = options.maxFileSizeLabel ?? MAX_PHOTO_FILE_SIZE_LABEL;
+  const maxDimension = options.maxDimension ?? MAX_PHOTO_DIMENSION;
   const originalSize = file.size;
   const workingFile = isHeicLikeFile(file) ? await convertHeicToJpeg(file) : file;
+  const image = await loadImageFromFile(workingFile);
+  let width = image.naturalWidth;
+  let height = image.naturalHeight;
+  const longestEdge = Math.max(width, height);
+  const needsResize = longestEdge > maxDimension;
 
-  if (workingFile.size <= MAX_PHOTO_FILE_SIZE_BYTES) {
+  if (!needsResize && workingFile.size <= maxFileSizeBytes) {
     return {
       file: workingFile,
       wasCompressed: false,
@@ -506,13 +728,8 @@ async function compressPhotoForUpload(file: File) {
     };
   }
 
-  const image = await loadImageFromFile(workingFile);
-  let width = image.naturalWidth;
-  let height = image.naturalHeight;
-  const longestEdge = Math.max(width, height);
-
-  if (longestEdge > MAX_PHOTO_DIMENSION) {
-    const scale = MAX_PHOTO_DIMENSION / longestEdge;
+  if (needsResize) {
+    const scale = maxDimension / longestEdge;
     width = Math.max(1, Math.round(width * scale));
     height = Math.max(1, Math.round(height * scale));
   }
@@ -520,7 +737,7 @@ async function compressPhotoForUpload(file: File) {
   let quality = INITIAL_PHOTO_JPEG_QUALITY;
   let blob = await renderCompressedPhoto(image, width, height, quality);
 
-  while (blob.size > MAX_PHOTO_FILE_SIZE_BYTES) {
+  while (blob.size > maxFileSizeBytes) {
     if (quality > MIN_PHOTO_JPEG_QUALITY) {
       quality = Math.max(MIN_PHOTO_JPEG_QUALITY, quality - 0.08);
     } else {
@@ -536,9 +753,9 @@ async function compressPhotoForUpload(file: File) {
     blob = nextBlob;
   }
 
-  if (blob.size > MAX_PHOTO_FILE_SIZE_BYTES) {
+  if (blob.size > maxFileSizeBytes) {
     throw new Error(
-      "사진 자동 최적화 후에도 용량이 너무 큽니다. 다른 사진을 선택하거나 편집 후 다시 시도해주세요."
+      buildPhotoTooLargeMessage(blob.size, maxFileSizeLabel)
     );
   }
 
@@ -565,13 +782,33 @@ function buildClientDebugContext(photo: File | null, clientRequestId = "") {
     return null;
   }
 
+  const nav = window.navigator as Navigator & {
+    connection?: {
+      effectiveType?: string;
+      rtt?: number;
+      downlink?: number;
+      saveData?: boolean;
+    };
+  };
+  const connection = nav.connection;
+  const inAppBrowserName = getCurrentInAppBrowserName();
+
   return {
     clientRequestId,
     submittedAt: new Date().toISOString(),
     pageUrl: window.location.href,
     referrer: document.referrer,
     userAgent: window.navigator.userAgent,
+    inAppBrowserName,
     viewport: `${window.innerWidth}x${window.innerHeight}`,
+    onLine: window.navigator.onLine,
+    visibilityState: document.visibilityState,
+    connectionEffectiveType: connection?.effectiveType || "",
+    connectionRtt: typeof connection?.rtt === "number" ? connection.rtt : 0,
+    connectionDownlink:
+      typeof connection?.downlink === "number" ? connection.downlink : 0,
+    connectionSaveData:
+      typeof connection?.saveData === "boolean" ? connection.saveData : false,
     photoName: photo?.name || "",
     photoType: photo?.type || "",
     photoSize: photo?.size || 0,
@@ -681,6 +918,7 @@ function createHandledSubmitError(
     responseUrl?: string;
     parseError?: string;
     stage?: string;
+    transportContext?: SubmitTransportContext | null;
   } = {}
 ) {
   const error = new Error(message) as Error & {
@@ -693,6 +931,7 @@ function createHandledSubmitError(
     responseUrl?: string;
     parseError?: string;
     stage?: string;
+    transportContext?: SubmitTransportContext | null;
   };
 
   error.alreadyReported = Boolean(options.requestId);
@@ -704,6 +943,7 @@ function createHandledSubmitError(
   error.responseUrl = options.responseUrl || "";
   error.parseError = options.parseError || "";
   error.stage = options.stage || "";
+  error.transportContext = options.transportContext || null;
   return error;
 }
 
@@ -719,6 +959,7 @@ function getHandledSubmitErrorState(error: unknown) {
       responseUrl: "",
       parseError: "",
       stage: "",
+      transportContext: null as SubmitTransportContext | null,
     };
   }
 
@@ -732,6 +973,7 @@ function getHandledSubmitErrorState(error: unknown) {
     responseUrl?: string;
     parseError?: string;
     stage?: string;
+    transportContext?: SubmitTransportContext | null;
   };
 
   return {
@@ -759,6 +1001,10 @@ function getHandledSubmitErrorState(error: unknown) {
     parseError:
       typeof errorWithMeta.parseError === "string" ? errorWithMeta.parseError : "",
     stage: typeof errorWithMeta.stage === "string" ? errorWithMeta.stage : "",
+    transportContext:
+      errorWithMeta.transportContext && typeof errorWithMeta.transportContext === "object"
+        ? errorWithMeta.transportContext
+        : null,
   };
 }
 
@@ -1045,6 +1291,87 @@ function buildCheckoutState(
   };
 }
 
+async function submitDayNammeApplyRequest(params: {
+  requestBody: FormData;
+  clientRequestId: string;
+  inAppBrowserName: string;
+}) {
+  const { requestBody, clientRequestId, inAppBrowserName } = params;
+  const maxAttempts = inAppBrowserName ? 2 : 1;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const attemptStartedAt =
+      typeof performance !== "undefined" ? performance.now() : Date.now();
+
+    try {
+      const response = await fetch("/api/offline/day-nammae/apply", {
+        method: "POST",
+        body: requestBody,
+      });
+
+      return response;
+    } catch (error) {
+      const attemptDurationMs = Math.max(
+        0,
+        Math.round(
+          (typeof performance !== "undefined" ? performance.now() : Date.now()) -
+            attemptStartedAt
+        )
+      );
+      const { failureKind, errorName, errorMessage } = classifySubmitFailure(error);
+      const retryEligible =
+        Boolean(inAppBrowserName) &&
+        failureKind === "network" &&
+        attempt < maxAttempts &&
+        attemptDurationMs <= SUBMIT_FAST_FAIL_RETRY_WINDOW_MS;
+      const transportContext = getSubmitTransportContext({
+        attemptCount: attempt,
+        attemptDurationMs,
+        failureKind,
+        errorName,
+        errorMessage,
+        retryAttempted: attempt > 1,
+        retryEligible,
+        inAppBrowserName,
+      });
+
+      console.warn("[day-nammae submit transport failure]", {
+        clientRequestId,
+        ...transportContext,
+      });
+
+      if (!retryEligible) {
+        const stage =
+          failureKind === "abort"
+            ? "client:fetch:aborted"
+            : failureKind === "timeout"
+              ? "client:fetch:timeout"
+              : "client:fetch:transport_error";
+
+        throw createHandledSubmitError(
+          buildTransportFailureMessage(
+            clientRequestId,
+            failureKind,
+            inAppBrowserName
+          ),
+          {
+            clientRequestId,
+            stage,
+            transportContext,
+          }
+        );
+      }
+
+      await delay(SUBMIT_NETWORK_RETRY_DELAY_MS);
+    }
+  }
+
+  throw createHandledSubmitError(buildSubmitErrorMessage(clientRequestId), {
+    clientRequestId,
+    stage: "client:fetch:unknown",
+  });
+}
+
 export default function LoveBuddiesApplyFlow({
   mode,
   scheduleData,
@@ -1089,6 +1416,7 @@ export default function LoveBuddiesApplyFlow({
   const totalSteps = flowSteps.length;
   const displayStep = currentStepIndex + 1;
   const isLastStep = currentStepIndex === totalSteps - 1;
+  const inAppBrowserName = getCurrentInAppBrowserName();
 
   useEffect(() => {
     if (!formValues.photo) {
@@ -1174,7 +1502,15 @@ export default function LoveBuddiesApplyFlow({
     setPhotoNotice("");
     setFormError("");
 
-    compressPhotoForUpload(file)
+    const photoUploadOptions = inAppBrowserName
+      ? {
+          maxFileSizeBytes: IN_APP_BROWSER_UPLOAD_MAX_FILE_SIZE_BYTES,
+          maxFileSizeLabel: IN_APP_BROWSER_UPLOAD_MAX_FILE_SIZE_LABEL,
+          maxDimension: IN_APP_BROWSER_MAX_PHOTO_DIMENSION,
+        }
+      : undefined;
+
+    compressPhotoForUpload(file, photoUploadOptions)
       .then(({ file: nextFile, wasCompressed, wasConverted, originalSize, preparedSize }) => {
         setFormValues((current) => ({ ...current, photo: nextFile }));
         const nextNotice = wasConverted
@@ -1185,7 +1521,11 @@ export default function LoveBuddiesApplyFlow({
             ? buildPhotoCompressedMessage(originalSize, preparedSize)
             : "";
 
-        setPhotoNotice(nextNotice);
+        setPhotoNotice(
+          inAppBrowserName && nextNotice
+            ? `${nextNotice} ${getInAppBrowserLabel(inAppBrowserName)} 앱 내 브라우저에서도 업로드가 되도록 조금 더 가볍게 준비했어요.`
+            : nextNotice
+        );
       })
       .catch((error) => {
         setFormValues((current) => ({ ...current, photo: null }));
@@ -1439,9 +1779,10 @@ export default function LoveBuddiesApplyFlow({
         }
 
         submitStage = "client:fetch:start";
-        const response = await fetch("/api/offline/day-nammae/apply", {
-          method: "POST",
-          body: requestBody,
+        const response = await submitDayNammeApplyRequest({
+          requestBody,
+          clientRequestId,
+          inAppBrowserName,
         });
 
         submitStage = "client:response:received";
@@ -1535,6 +1876,7 @@ export default function LoveBuddiesApplyFlow({
         responseUrl,
         parseError,
         stage,
+        transportContext,
       } = getHandledSubmitErrorState(error);
       const supportCode = requestId || capturedClientRequestId || clientRequestId;
 
@@ -1554,6 +1896,18 @@ export default function LoveBuddiesApplyFlow({
           if (responseStatus) {
             scope.setTag("response_status", String(responseStatus));
           }
+          if (transportContext?.failureKind) {
+            scope.setTag("submit_failure_kind", transportContext.failureKind);
+          }
+          if (transportContext?.errorName) {
+            scope.setTag("submit_error_name", transportContext.errorName);
+          }
+          if (typeof transportContext?.retryAttempted === "boolean") {
+            scope.setTag(
+              "submit_retry_attempted",
+              String(transportContext.retryAttempted)
+            );
+          }
           scope.setFingerprint([
             "day-nammae-submit",
             stage || submitStage || "unknown",
@@ -1570,6 +1924,11 @@ export default function LoveBuddiesApplyFlow({
             responseUrl,
             parseError,
           });
+          if (transportContext) {
+            scope.setContext("submit_transport_context", {
+              ...transportContext,
+            });
+          }
           Sentry.captureException(
             error instanceof Error ? error : new Error("Unknown client submit error")
           );
@@ -1587,6 +1946,7 @@ export default function LoveBuddiesApplyFlow({
         responseUrl,
         parseError,
         applicationSubmitted,
+        transportContext,
       });
 
       const errorMessage =
@@ -1843,6 +2203,17 @@ export default function LoveBuddiesApplyFlow({
       onNext={handleNext}
       onBack={handleBack}
     >
+      {inAppBrowserName && (
+        <div className="mb-4 rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-4 text-sm text-amber-100">
+          <p className="font-semibold text-amber-200">
+            {getInAppBrowserLabel(inAppBrowserName)} 앱 안 브라우저를 사용 중입니다.
+          </p>
+          <p className="mt-2 leading-relaxed text-amber-50/90">
+            사진 업로드가 중간에 끊길 수 있어요. 가능하면 우측 상단 메뉴에서 외부 브라우저로 열어 진행해주세요.
+          </p>
+        </div>
+      )}
+
       {formError && (
         <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {formError}
