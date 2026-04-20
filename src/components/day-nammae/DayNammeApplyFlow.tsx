@@ -59,6 +59,21 @@ function formatPhoneNumber(value: string) {
   return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
 
+function getCookieValue(name: string) {
+  if (typeof document === "undefined") {
+    return "";
+  }
+
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+
+  if (parts.length !== 2) {
+    return "";
+  }
+
+  return parts.pop()?.split(";").shift()?.trim() || "";
+}
+
 function getScheduleHelperText(schedule: ScheduleItem, gender: "남" | "여" | "") {
   if (schedule.status === "전체마감") {
     return "전체 마감";
@@ -247,6 +262,7 @@ export default function DayNammeApplyFlow({
           ? getSafeSearchParams(window.location.search)
           : new URLSearchParams();
       const requestBody = new FormData();
+      const fbp = getCookieValue("_fbp");
       requestBody.append("gender", formValues.gender);
       requestBody.append("schedule", formValues.schedule);
       requestBody.append("name", formValues.name.trim());
@@ -261,6 +277,9 @@ export default function DayNammeApplyFlow({
         "utm_content",
         urlSearchParams.get("utm_content") || ""
       );
+      if (fbp) {
+        requestBody.append("fbp", fbp);
+      }
 
       const response = await fetch("/api/offline/day-nammae/apply", {
         method: "POST",
