@@ -20,6 +20,7 @@ type SentryLikeEvent = {
   message?: string;
   tags?: Record<string, unknown>;
   extra?: Record<string, unknown>;
+  contexts?: Record<string, unknown>;
   request?: {
     url?: string;
   };
@@ -29,10 +30,14 @@ const KNOWN_META_WEBVIEW_ERROR_PATTERNS = [
   /enableDidUserTypeOnKeyboardLogging/i,
   /Java object is gone/i,
 ];
+const KNOWN_META_WEBKIT_BRIDGE_ERROR_PATTERNS = [
+  /window\.webkit\.messageHandlers/i,
+];
 const KNOWN_META_WEBVIEW_NAMES = new Set(["facebook", "instagram"]);
 const KNOWN_PATHNAME_REDIRECTS: Record<string, string> = {
   "/offline/11namme에": "/offline/11namme",
 };
+const IOS_WEBKIT_USER_AGENT_PATTERN = /(iPhone|iPad|iPod).*AppleWebKit/i;
 
 function normalizeKnownSsobigPathname(pathname: string): string | undefined {
   return KNOWN_PATHNAME_REDIRECTS[pathname];
@@ -58,6 +63,18 @@ function getInAppBrowserName(userAgent: string): string | undefined {
   }
 
   return undefined;
+}
+
+function getBrowserContextUserAgent(event: SentryLikeEvent): string | undefined {
+  const browserContext = event.contexts?.browserContext;
+
+  if (!browserContext || typeof browserContext !== "object") {
+    return undefined;
+  }
+
+  const userAgent = (browserContext as { userAgent?: unknown }).userAgent;
+
+  return typeof userAgent === "string" ? userAgent : undefined;
 }
 
 export function getClientSentryDebugContext() {
@@ -145,8 +162,23 @@ export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
     ]),
   ].filter((value): value is string => Boolean(value));
 
-  return errorTexts.some((text) =>
-    KNOWN_META_WEBVIEW_ERROR_PATTERNS.some((pattern) => pattern.test(text))
+  const userAgent = getBrowserContextUserAgent(event);
+  // Meta iOS IAB can emit WKWebView bridge noise for messageHandlers even when
+  // our app code never touches that API; keep this filter narrow to that case.
+  const isIosMetaWebkitBridgeNoise =
+    typeof userAgent === "string" &&
+    IOS_WEBKIT_USER_AGENT_PATTERN.test(userAgent) &&
+    errorTexts.some((text) =>
+      KNOWN_META_WEBKIT_BRIDGE_ERROR_PATTERNS.some((pattern) =>
+        pattern.test(text)
+      )
+    );
+
+  return (
+    isIosMetaWebkitBridgeNoise ||
+    errorTexts.some((text) =>
+      KNOWN_META_WEBVIEW_ERROR_PATTERNS.some((pattern) => pattern.test(text))
+    )
   );
 }
 

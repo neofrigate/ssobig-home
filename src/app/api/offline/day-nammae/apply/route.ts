@@ -186,6 +186,90 @@ function parseDebugClientContext(rawValue: FormDataEntryValue | null) {
   return { rawValue };
 }
 
+function toObjectRecord(value: unknown) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function summarizeUnknownError(error: unknown) {
+  const record = toObjectRecord(error);
+  const summary: Record<string, unknown> = {};
+
+  if (error instanceof Error) {
+    summary.name = error.name;
+    summary.message = error.message;
+  } else if (typeof error === "string") {
+    summary.message = error;
+  }
+
+  const fields = [
+    "code",
+    "status",
+    "statusCode",
+    "details",
+    "hint",
+    "error",
+  ] as const;
+
+  for (const field of fields) {
+    const value = record?.[field];
+    if (value !== undefined && value !== null && value !== "") {
+      summary[field] = value;
+    }
+  }
+
+  return summary;
+}
+
+function summarizeStorageUploadData(data: unknown) {
+  const record = toObjectRecord(data);
+  if (!record) {
+    return null;
+  }
+
+  const summary: Record<string, unknown> = {};
+  const fields = ["id", "path", "fullPath"] as const;
+
+  for (const field of fields) {
+    const value = record[field];
+    if (typeof value === "string" && value) {
+      summary[field] = value;
+    }
+  }
+
+  return Object.keys(summary).length > 0 ? summary : null;
+}
+
+function buildStorageUploadFailureMessage(errorSummary: Record<string, unknown>) {
+  const message =
+    typeof errorSummary.message === "string" && errorSummary.message.trim()
+      ? errorSummary.message
+      : "unknown storage error";
+  const annotations: string[] = [];
+
+  if (typeof errorSummary.code === "string" && errorSummary.code) {
+    annotations.push(`code=${errorSummary.code}`);
+  }
+
+  const status =
+    typeof errorSummary.status === "number" ||
+    typeof errorSummary.status === "string"
+      ? errorSummary.status
+      : typeof errorSummary.statusCode === "number" ||
+          typeof errorSummary.statusCode === "string"
+        ? errorSummary.statusCode
+        : null;
+
+  if (status !== null) {
+    annotations.push(`status=${status}`);
+  }
+
+  return annotations.length > 0
+    ? `사진 업로드 실패: ${message} (${annotations.join(", ")})`
+    : `사진 업로드 실패: ${message}`;
+}
+
 async function cleanupUploadedFile(params: {
   requestId: string;
   storageBucket: string;
@@ -276,6 +360,9 @@ export async function POST(request: Request) {
   let clientRequestId = "";
   let photoContext: Record<string, unknown> = {};
   let debugClientContext: Record<string, unknown> | null = null;
+  let storageUploadContext: Record<string, unknown> = {};
+  let storageUploadErrorContext: Record<string, unknown> | null = null;
+  let storageUploadErrorSummary: Record<string, unknown> | null = null;
 
   try {
     currentStage = "submit:parse";
@@ -431,19 +518,24 @@ export async function POST(request: Request) {
     );
 
     uploadedPath = `day-nammae/${uuid}/${sanitizedFileName || "profile"}${fileExtension}`;
+    storageUploadContext = {
+      requestId,
+      clientRequestId,
+      uuid,
+      storageBucket,
+      uploadedPath,
+      ...photoContext,
+      debugClientContext,
+    };
 
     currentStage = "storage:prepare";
     logSubmitEvent(requestId, "storage:prepare", {
-      uuid,
-      uploadedPath,
-      storageBucket,
-      ...photoContext,
+      ...storageUploadContext,
     });
 
     currentStage = "storage:upload:start";
     logSubmitEvent(requestId, "storage:upload:start", {
-      uploadedPath,
-      storageBucket,
+      ...storageUploadContext,
     });
 
     const uploadResult = await supabase.storage
@@ -454,22 +546,33 @@ export async function POST(request: Request) {
       });
 
     if (uploadResult.error) {
+      currentStage = "storage:upload:error";
+      storageUploadErrorSummary = summarizeUnknownError(uploadResult.error);
+      const storageUploadDataSummary = summarizeStorageUploadData(uploadResult.data);
+      storageUploadErrorContext = {
+        ...storageUploadContext,
+        storageError: storageUploadErrorSummary,
+        ...(storageUploadDataSummary
+          ? { storageUploadResult: storageUploadDataSummary }
+          : {}),
+      };
+
       logSubmitEvent(
         requestId,
         "storage:upload:error",
-        {
-          uploadedPath,
-          storageBucket,
-          error: uploadResult.error.message,
-        },
+        storageUploadErrorContext,
         "error"
       );
-      throw new Error(`사진 업로드 실패: ${uploadResult.error.message}`);
+      const uploadError = new Error(
+        buildStorageUploadFailureMessage(storageUploadErrorSummary)
+      );
+      uploadError.name = "DayNammaeStorageUploadError";
+      throw uploadError;
     }
 
     logSubmitEvent(requestId, "storage:upload:success", {
-      uploadedPath,
-      storageBucket,
+      ...storageUploadContext,
+      storageUploadResult: summarizeStorageUploadData(uploadResult.data),
     });
 
     const { data: publicUrlData } = supabase.storage
@@ -601,6 +704,7 @@ export async function POST(request: Request) {
         ...photoContext,
         debugClientContext,
         error: errorMessage,
+        storageUploadErrorContext,
       },
       "error"
     );
@@ -613,6 +717,38 @@ export async function POST(request: Request) {
           scope.setTag("client_request_id", clientRequestId);
         }
         scope.setTag("submit_stage", currentStage);
+        if (storageUploadErrorSummary) {
+          const storageUploadStatus =
+            storageUploadErrorSummary.status ??
+            storageUploadErrorSummary.statusCode;
+
+          if (
+            typeof storageUploadStatus === "string" ||
+            typeof storageUploadStatus === "number"
+          ) {
+            scope.setTag(
+              "storage_upload_status",
+              String(storageUploadStatus)
+            );
+          }
+
+          if (
+            typeof storageUploadErrorSummary.code === "string" ||
+            typeof storageUploadErrorSummary.code === "number"
+          ) {
+            scope.setTag(
+              "storage_upload_code",
+              String(storageUploadErrorSummary.code)
+            );
+          }
+
+          if (typeof storageUploadErrorSummary.name === "string") {
+            scope.setTag(
+              "storage_upload_error_name",
+              storageUploadErrorSummary.name
+            );
+          }
+        }
         scope.setContext("day_nammae_submit", {
           clientRequestId,
           uuid,
@@ -621,6 +757,9 @@ export async function POST(request: Request) {
           ...photoContext,
           debugClientContext,
         });
+        if (storageUploadErrorContext) {
+          scope.setContext("storage_upload", storageUploadErrorContext);
+        }
         Sentry.captureException(
           error instanceof Error ? error : new Error(errorMessage)
         );
