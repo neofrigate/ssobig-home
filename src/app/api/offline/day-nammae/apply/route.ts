@@ -318,6 +318,7 @@ async function cleanupUploadedFile(params: {
 
 export async function POST(request: Request) {
   const requestId = createRequestId();
+  const apiStartedAt = Date.now();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const storageBucket =
     process.env.SUPABASE_STORAGE_BUCKET_DAY_NAMMAE ||
@@ -363,6 +364,8 @@ export async function POST(request: Request) {
   let storageUploadContext: Record<string, unknown> = {};
   let storageUploadErrorContext: Record<string, unknown> | null = null;
   let storageUploadErrorSummary: Record<string, unknown> | null = null;
+  let storageUploadMs: number | null = null;
+  let edgeRequestMs: number | null = null;
 
   try {
     currentStage = "submit:parse";
@@ -471,6 +474,7 @@ export async function POST(request: Request) {
     const traits = getRequiredString(formData, "traits");
     const photo = formData.get("photo");
     const usedCouponId = getOptionalPositiveInt(formData, "usedCouponId");
+    const couponCode = getOptionalString(formData, "couponCode");
 
     if (!(photo instanceof File) || photo.size === 0) {
       throw new Error("업로드할 사진 파일이 필요합니다.");
@@ -538,12 +542,14 @@ export async function POST(request: Request) {
       ...storageUploadContext,
     });
 
+    const storageUploadStartedAt = Date.now();
     const uploadResult = await supabase.storage
       .from(storageBucket)
       .upload(uploadedPath, Buffer.from(await photo.arrayBuffer()), {
         contentType: photo.type,
         upsert: false,
       });
+    storageUploadMs = Date.now() - storageUploadStartedAt;
 
     if (uploadResult.error) {
       currentStage = "storage:upload:error";
@@ -551,6 +557,7 @@ export async function POST(request: Request) {
       const storageUploadDataSummary = summarizeStorageUploadData(uploadResult.data);
       storageUploadErrorContext = {
         ...storageUploadContext,
+        storage_upload_ms: storageUploadMs,
         storageError: storageUploadErrorSummary,
         ...(storageUploadDataSummary
           ? { storageUploadResult: storageUploadDataSummary }
@@ -572,6 +579,7 @@ export async function POST(request: Request) {
 
     logSubmitEvent(requestId, "storage:upload:success", {
       ...storageUploadContext,
+      storage_upload_ms: storageUploadMs,
       storageUploadResult: summarizeStorageUploadData(uploadResult.data),
     });
 
@@ -611,6 +619,7 @@ export async function POST(request: Request) {
       "Q. 기대되는점": "",
       "[일일남매] 일정 선택": schedule,
       usedCouponId,
+      couponCode,
       applicationMode,
     };
 
@@ -622,6 +631,7 @@ export async function POST(request: Request) {
       uploadedPath,
     });
 
+    const edgeRequestStartedAt = Date.now();
     const edgeResponse = await fetch(
       `${DAY_NAMMAE_SUPABASE_URL}/functions/v1/ssobig-offline/day-nammae`,
       {
@@ -632,14 +642,17 @@ export async function POST(request: Request) {
         body: JSON.stringify(payload),
       }
     );
+    edgeRequestMs = Date.now() - edgeRequestStartedAt;
 
     const edgeBody = await parseEdgeFunctionResponse(edgeResponse);
+    const edgeBodyRecord = toObjectRecord(edgeBody);
 
     logSubmitEvent(requestId, "edge:request:complete", {
       clientRequestId,
       uuid,
       edgeStatus: edgeResponse.status,
       edgeSuccess: edgeResponse.ok,
+      edge_request_ms: edgeRequestMs,
     });
 
     if (!edgeResponse.ok) {
@@ -652,9 +665,33 @@ export async function POST(request: Request) {
           uuid,
           edgeStatus: edgeResponse.status,
           edgeBody,
+          storage_upload_ms: storageUploadMs,
+          edge_request_ms: edgeRequestMs,
+          total_api_ms: Date.now() - apiStartedAt,
         },
         "error"
       );
+
+      if (edgeBodyRecord?.applicationSubmitted === true) {
+        return NextResponse.json(
+          {
+            success: false,
+            requestId,
+            clientRequestId,
+            applicationSubmitted: true,
+            edgeBody,
+            userMessage:
+              typeof edgeBodyRecord.reason === "string" && edgeBodyRecord.reason
+                ? edgeBodyRecord.reason
+                : "신청은 접수되었지만 쿠폰 사용 처리에 실패했습니다. 다시 시도해주세요.",
+          },
+          {
+            status: edgeResponse.status,
+            headers: buildResponseHeaders(requestId, clientRequestId),
+          }
+        );
+      }
+
       await cleanupUploadedFile({
         requestId,
         storageBucket,
@@ -674,6 +711,9 @@ export async function POST(request: Request) {
     logSubmitEvent(requestId, "submit:success", {
       uuid,
       uploadedPath,
+      storage_upload_ms: storageUploadMs,
+      edge_request_ms: edgeRequestMs,
+      total_api_ms: Date.now() - apiStartedAt,
     });
 
     return NextResponse.json({
@@ -704,6 +744,9 @@ export async function POST(request: Request) {
         ...photoContext,
         debugClientContext,
         error: errorMessage,
+        storage_upload_ms: storageUploadMs,
+        edge_request_ms: edgeRequestMs,
+        total_api_ms: Date.now() - apiStartedAt,
         storageUploadErrorContext,
       },
       "error"

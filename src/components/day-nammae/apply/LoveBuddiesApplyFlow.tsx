@@ -843,6 +843,31 @@ function getResponseUserMessage(result: unknown) {
   return typeof userMessage === "string" ? userMessage : "";
 }
 
+function getRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function getEdgeBody(result: unknown) {
+  return getRecord(getRecord(result)?.edgeBody);
+}
+
+function getEdgeCouponUse(result: unknown) {
+  const couponUse = getRecord(getEdgeBody(result)?.couponUse);
+
+  if (couponUse?.success !== true || typeof couponUse.id !== "number") {
+    return null;
+  }
+
+  return couponUse as unknown as CouponUseResult;
+}
+
+function getResponseApplicationSubmitted(result: unknown) {
+  return getRecord(result)?.applicationSubmitted === true ||
+    getEdgeBody(result)?.applicationSubmitted === true;
+}
+
 function summarizeResponseText(text: string) {
   const normalizedText = text.replace(/\s+/g, " ").trim();
 
@@ -1740,6 +1765,7 @@ export default function LoveBuddiesApplyFlow({
       ? "client:coupon-use:retry"
       : "client:prepare";
     let applicationSubmitted = submitState.applicationSubmitted;
+    let submitResult: unknown = null;
 
     try {
       if (!applicationSubmitted) {
@@ -1773,6 +1799,7 @@ export default function LoveBuddiesApplyFlow({
         requestBody.append("client_request_id", clientRequestId);
         if (wantsCoupon && validatedCoupon) {
           requestBody.append("usedCouponId", String(validatedCoupon.id));
+          requestBody.append("couponCode", validatedCoupon.code);
         }
         if (clientDebugContext) {
           requestBody.append("debug_client_context", JSON.stringify(clientDebugContext));
@@ -1787,6 +1814,7 @@ export default function LoveBuddiesApplyFlow({
 
         submitStage = "client:response:received";
         const { result, meta } = await parseSubmitResponse(response);
+        submitResult = result;
         submitStage = meta.parseError
           ? "client:response:parse_error"
           : "client:response:parsed";
@@ -1795,6 +1823,9 @@ export default function LoveBuddiesApplyFlow({
           submitStage = "client:response:not_ok";
           const requestId = meta.requestId;
           const userMessage = buildResponseFailureMessage(meta, formValues.photo);
+          if (getResponseApplicationSubmitted(result)) {
+            applicationSubmitted = true;
+          }
 
           console.error("[day-nammae submit failed]", {
             clientRequestId,
@@ -1835,13 +1866,16 @@ export default function LoveBuddiesApplyFlow({
       let checkoutSource: Partial<CouponValidationResult & CouponUseResult> | null = null;
 
       if (!isWaitlistApplication && wantsCoupon && validatedCoupon) {
-        submitStage = "client:coupon-use:start";
-        const usedCoupon = await requestCouponUse(validatedCoupon.code);
-        submitStage = "client:coupon-use:success";
-        checkoutSource = usedCoupon;
+        checkoutSource = getEdgeCouponUse(submitResult);
+
+        if (!checkoutSource) {
+          submitStage = "client:coupon-use:start";
+          checkoutSource = await requestCouponUse(validatedCoupon.code);
+          submitStage = "client:coupon-use:success";
+        }
         trackEvent("DN_UseCoupon", {
-          code: usedCoupon.code,
-          discount_label: usedCoupon.discount_label || "",
+          code: checkoutSource.code || validatedCoupon.code,
+          discount_label: checkoutSource.discount_label || "",
         });
       }
 
