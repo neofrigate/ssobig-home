@@ -17,6 +17,7 @@ const HEIC_HEIF_MIME_TYPES = new Set([
   "image/heif-sequence",
 ]);
 const HEIC_HEIF_FILE_PATTERN = /\.(heic|heif)$/i;
+const STORAGE_ERROR_BODY_PREVIEW_LIMIT = 2000;
 
 function getRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -192,6 +193,116 @@ function toObjectRecord(value: unknown) {
     : null;
 }
 
+function getFetchInputUrl(input: Parameters<typeof fetch>[0]) {
+  if (typeof input === "string") {
+    return input;
+  }
+
+  if (input instanceof URL) {
+    return input.toString();
+  }
+
+  return input.url;
+}
+
+function getFetchInputMethod(
+  input: Parameters<typeof fetch>[0],
+  init?: Parameters<typeof fetch>[1]
+) {
+  if (init?.method) {
+    return init.method;
+  }
+
+  if (typeof Request !== "undefined" && input instanceof Request) {
+    return input.method;
+  }
+
+  return "GET";
+}
+
+function summarizeStorageFetchUrl(rawUrl: string) {
+  try {
+    const url = new URL(rawUrl);
+
+    return {
+      storageHost: url.host,
+      storagePath: url.pathname,
+    };
+  } catch (error) {
+    return {
+      storageUrlParseError: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+function summarizeStorageResponseBody(bodyText: string) {
+  const summary: Record<string, unknown> = {
+    storageResponseBodyLength: bodyText.length,
+  };
+  const trimmedBody = bodyText.trim();
+
+  if (!trimmedBody) {
+    return summary;
+  }
+
+  summary.storageResponseBodyPreview =
+    trimmedBody.length > STORAGE_ERROR_BODY_PREVIEW_LIMIT
+      ? `${trimmedBody.slice(0, STORAGE_ERROR_BODY_PREVIEW_LIMIT)}...[truncated]`
+      : trimmedBody;
+
+  try {
+    const parsedBody = JSON.parse(trimmedBody);
+    const parsedSummary = summarizeUnknownError(parsedBody);
+
+    if (Object.keys(parsedSummary).length > 0) {
+      summary.storageResponseBody = parsedSummary;
+    }
+  } catch (error) {
+    summary.storageResponseBodyParseError =
+      error instanceof Error ? error.message : String(error);
+  }
+
+  return summary;
+}
+
+function createStorageDebugFetch(
+  onStorageHttpError: (context: Record<string, unknown>) => void
+): typeof fetch {
+  return async (input, init) => {
+    const startedAt = Date.now();
+    const response = await fetch(input, init);
+
+    if (!response.ok) {
+      let responseBodyContext: Record<string, unknown>;
+
+      try {
+        responseBodyContext = summarizeStorageResponseBody(
+          await response.clone().text()
+        );
+      } catch (error) {
+        responseBodyContext = {
+          storageResponseBodyReadError:
+            error instanceof Error ? error.message : String(error),
+        };
+      }
+
+      onStorageHttpError({
+        storageHttpMethod: getFetchInputMethod(input, init),
+        ...summarizeStorageFetchUrl(getFetchInputUrl(input)),
+        storageHttpStatus: response.status,
+        storageHttpStatusText: response.statusText,
+        storageResponseContentType: response.headers.get("content-type") || "",
+        storageResponseContentLength:
+          response.headers.get("content-length") || "",
+        storage_fetch_ms: Date.now() - startedAt,
+        ...responseBodyContext,
+      });
+    }
+
+    return response;
+  };
+}
+
 function summarizeUnknownError(error: unknown) {
   const record = toObjectRecord(error);
   const summary: Record<string, unknown> = {};
@@ -364,6 +475,7 @@ export async function POST(request: Request) {
   let storageUploadContext: Record<string, unknown> = {};
   let storageUploadErrorContext: Record<string, unknown> | null = null;
   let storageUploadErrorSummary: Record<string, unknown> | null = null;
+  let storageHttpErrorContext: Record<string, unknown> | null = null;
   let storageUploadMs: number | null = null;
   let edgeRequestMs: number | null = null;
 
@@ -511,6 +623,11 @@ export async function POST(request: Request) {
         persistSession: false,
         autoRefreshToken: false,
       },
+      global: {
+        fetch: createStorageDebugFetch((context) => {
+          storageHttpErrorContext = context;
+        }),
+      },
     });
 
     uuid = generateUuid();
@@ -559,6 +676,9 @@ export async function POST(request: Request) {
         ...storageUploadContext,
         storage_upload_ms: storageUploadMs,
         storageError: storageUploadErrorSummary,
+        ...(storageHttpErrorContext
+          ? { storageHttpError: storageHttpErrorContext }
+          : {}),
         ...(storageUploadDataSummary
           ? { storageUploadResult: storageUploadDataSummary }
           : {}),
@@ -789,6 +909,31 @@ export async function POST(request: Request) {
             scope.setTag(
               "storage_upload_error_name",
               storageUploadErrorSummary.name
+            );
+          }
+        }
+        if (storageHttpErrorContext) {
+          const storageHttpStatus = storageHttpErrorContext.storageHttpStatus;
+          if (
+            typeof storageHttpStatus === "string" ||
+            typeof storageHttpStatus === "number"
+          ) {
+            scope.setTag("storage_http_status", String(storageHttpStatus));
+          }
+
+          const storageResponseBody = toObjectRecord(
+            storageHttpErrorContext.storageResponseBody
+          );
+          const storageResponseBodyCode =
+            storageResponseBody?.code ?? storageResponseBody?.statusCode;
+
+          if (
+            typeof storageResponseBodyCode === "string" ||
+            typeof storageResponseBodyCode === "number"
+          ) {
+            scope.setTag(
+              "storage_response_body_code",
+              String(storageResponseBodyCode)
             );
           }
         }
