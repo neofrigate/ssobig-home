@@ -4,6 +4,8 @@ import { DayNammeApplicationMode, ScheduleItem } from "./types";
 const DAY_NAMMAE_WAITLIST_UI_ENABLED = true;
 
 interface RawScheduleItem {
+  staffScheduleId?: string | null;
+  staff_schedule_id?: string | null;
   schedule: string;
   closeStatus?: string;
   maxCapacity: number;
@@ -36,6 +38,9 @@ export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
       const cleanTitle = timeStr ? `${timeStr} ${gameTitle}` : gameTitle;
 
       return {
+        staffScheduleId: String(
+          item.staffScheduleId || item.staff_schedule_id || ""
+        ).trim(),
         date: dateStr,
         title: cleanTitle,
         fullLabel: title,

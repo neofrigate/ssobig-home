@@ -185,6 +185,7 @@ const COUPON_VALIDATE_DELAY_MS = 700;
 const INITIAL_FORM_VALUES: DayNammeFormValues = {
   gender: "",
   schedule: "",
+  staffScheduleId: "",
   name: "",
   birthYear: "",
   height: "",
@@ -1428,7 +1429,10 @@ export default function LoveBuddiesApplyFlow({
 
   const selectedScheduleItem =
     scheduleData.find(
-      (schedule) => getDayNammeScheduleLabel(schedule) === formValues.schedule
+      (schedule) =>
+        formValues.staffScheduleId
+          ? schedule.staffScheduleId === formValues.staffScheduleId
+          : getDayNammeScheduleLabel(schedule) === formValues.schedule
     ) || null;
   const selectedApplicationMode: DayNammeApplicationMode = selectedScheduleItem
     ? getDayNammeScheduleApplicationMode(selectedScheduleItem, formValues.gender)
@@ -1570,13 +1574,22 @@ export default function LoveBuddiesApplyFlow({
   const handleGenderSelect = (gender: "남" | "여") => {
     setFormValues((current) => {
       const currentSchedule = scheduleData.find(
-        (schedule) => getDayNammeScheduleLabel(schedule) === current.schedule
+        (schedule) =>
+          current.staffScheduleId
+            ? schedule.staffScheduleId === current.staffScheduleId
+            : getDayNammeScheduleLabel(schedule) === current.schedule
       );
       const nextSchedule =
         currentSchedule && !isDayNammeScheduleSelectable(currentSchedule, gender)
           ? ""
           : current.schedule;
-      return { ...current, gender, schedule: nextSchedule };
+      const nextStaffScheduleId = nextSchedule ? current.staffScheduleId : "";
+      return {
+        ...current,
+        gender,
+        schedule: nextSchedule,
+        staffScheduleId: nextStaffScheduleId,
+      };
     });
     setFormError("");
     setShowFieldErrors(false);
@@ -1588,7 +1601,11 @@ export default function LoveBuddiesApplyFlow({
   const handleScheduleSelect = (schedule: ScheduleItem) => {
     const scheduleLabel = getDayNammeScheduleLabel(schedule);
 
-    setFormValues((current) => ({ ...current, schedule: scheduleLabel }));
+    setFormValues((current) => ({
+      ...current,
+      schedule: scheduleLabel,
+      staffScheduleId: schedule.staffScheduleId,
+    }));
     setFormError("");
     setShowFieldErrors(false);
     setConfirmedWaitlistSchedule("");
@@ -1778,6 +1795,9 @@ export default function LoveBuddiesApplyFlow({
         const fbc = getCookieValue("_fbc");
         requestBody.append("gender", formValues.gender);
         requestBody.append("schedule", formValues.schedule);
+        if (formValues.staffScheduleId) {
+          requestBody.append("staffScheduleId", formValues.staffScheduleId);
+        }
         requestBody.append("name", formValues.name.trim());
         requestBody.append("phone", formValues.phone.trim());
         requestBody.append("utm_source", urlSearchParams.get("utm_source") || "");

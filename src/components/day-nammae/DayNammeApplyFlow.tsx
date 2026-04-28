@@ -35,6 +35,7 @@ interface SubmitState {
 const INITIAL_FORM_VALUES: DayNammeFormValues = {
   gender: "",
   schedule: "",
+  staffScheduleId: "",
   name: "",
   birthYear: "",
   height: "",
@@ -183,7 +184,10 @@ export default function DayNammeApplyFlow({
   const handleGenderSelect = (gender: "남" | "여") => {
     setFormValues((current) => {
       const currentSchedule = scheduleData.find(
-        (schedule) => getDayNammeScheduleLabel(schedule) === current.schedule
+        (schedule) =>
+          current.staffScheduleId
+            ? schedule.staffScheduleId === current.staffScheduleId
+            : getDayNammeScheduleLabel(schedule) === current.schedule
       );
 
       const nextSchedule =
@@ -191,20 +195,24 @@ export default function DayNammeApplyFlow({
         !isDayNammeScheduleSelectable(currentSchedule, gender)
           ? ""
           : current.schedule;
+      const nextStaffScheduleId = nextSchedule ? current.staffScheduleId : "";
 
       return {
         ...current,
         gender,
         schedule: nextSchedule,
+        staffScheduleId: nextStaffScheduleId,
       };
     });
     setFormError("");
   };
 
-  const handleScheduleSelect = (scheduleLabel: string) => {
+  const handleScheduleSelect = (schedule: ScheduleItem) => {
+    const scheduleLabel = getDayNammeScheduleLabel(schedule);
     setFormValues((current) => ({
       ...current,
       schedule: scheduleLabel,
+      staffScheduleId: schedule.staffScheduleId,
     }));
     setFormError("");
   };
@@ -265,6 +273,9 @@ export default function DayNammeApplyFlow({
       const fbp = getCookieValue("_fbp");
       requestBody.append("gender", formValues.gender);
       requestBody.append("schedule", formValues.schedule);
+      if (formValues.staffScheduleId) {
+        requestBody.append("staffScheduleId", formValues.staffScheduleId);
+      }
       requestBody.append("name", formValues.name.trim());
       requestBody.append("birthYear", formValues.birthYear);
       requestBody.append("height", formValues.height.trim());
@@ -532,14 +543,16 @@ export default function DayNammeApplyFlow({
                         schedule,
                         formValues.gender
                       );
-                      const selected = formValues.schedule === label;
+                      const selected = formValues.staffScheduleId
+                        ? formValues.staffScheduleId === schedule.staffScheduleId
+                        : formValues.schedule === label;
 
                       return (
                         <button
                           key={label}
                           type="button"
                           disabled={!selectable}
-                          onClick={() => handleScheduleSelect(label)}
+                          onClick={() => handleScheduleSelect(schedule)}
                           className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
                             selected
                               ? "border-[#ff6b9f] bg-[#fff0f7] shadow-sm"

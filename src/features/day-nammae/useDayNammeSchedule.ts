@@ -8,6 +8,8 @@ import { getPublicDayNammeSchedulesUrl } from "./upstream";
 interface PublicDayNammeSchedulesResponse {
   generatedAt?: string;
   schedules?: {
+    staffScheduleId?: string | null;
+    staff_schedule_id?: string | null;
     schedule: string;
     closeStatus: string;
     maxCapacity: number;

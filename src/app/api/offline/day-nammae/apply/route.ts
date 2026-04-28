@@ -484,6 +484,8 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const gender = getRequiredString(formData, "gender");
     const schedule = getRequiredString(formData, "schedule");
+    const staffScheduleId = getOptionalString(formData, "staffScheduleId") ||
+      getOptionalString(formData, "staff_schedule_id");
     const name = getRequiredString(formData, "name");
     const phone = getRequiredString(formData, "phone");
     const applicationMode = getApplicationMode(formData);
@@ -502,6 +504,7 @@ export async function POST(request: Request) {
       name,
       phoneMasked: maskedPhone,
       schedule,
+      staffScheduleId,
       applicationMode,
       hasFbp: Boolean(fbp),
       hasFbc: Boolean(fbc),
@@ -519,6 +522,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           requestId,
           schedule,
+          staffScheduleId,
           name,
           phone,
           gender,
@@ -738,6 +742,7 @@ export async function POST(request: Request) {
       "Q. 전화번호": phone,
       "Q. 기대되는점": "",
       "[일일남매] 일정 선택": schedule,
+      staffScheduleId,
       usedCouponId,
       couponCode,
       applicationMode,

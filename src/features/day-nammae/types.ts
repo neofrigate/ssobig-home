@@ -1,6 +1,7 @@
 export type DayNammeApplicationMode = "normal" | "waitlist_alert";
 
 export interface ScheduleItem {
+  staffScheduleId: string;
   date: string;
   title: string;
   fullLabel: string;
@@ -25,6 +26,7 @@ export interface ScheduleItem {
 export interface DayNammeFormValues {
   gender: "남" | "여" | "";
   schedule: string;
+  staffScheduleId: string;
   name: string;
   birthYear: string;
   height: string;
