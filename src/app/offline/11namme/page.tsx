@@ -314,19 +314,12 @@ const ElevenNammePage = () => {
         candidate.getMonth() + 1
       ).padStart(2, "0")}-${String(candidate.getDate()).padStart(2, "0")}`;
 
-      const isTodaySchedule =
-        candidate.getFullYear() === start.getFullYear() &&
-        candidate.getMonth() === start.getMonth() &&
-        candidate.getDate() === start.getDate();
-
       const stateLabel =
-        isTodaySchedule
+        schedule.status === "전체마감"
           ? "전체마감"
-          : schedule.status === "전체마감"
-            ? "전체마감"
-            : schedule.status === "여자마감" || schedule.status === "남자마감"
-              ? "일부마감"
-              : "신청가능";
+          : schedule.status === "여자마감" || schedule.status === "남자마감"
+            ? "일부마감"
+            : "신청가능";
 
       const bucket = itemsByDay.get(dayKey) || [];
       bucket.push({ schedule, date: candidate, stateLabel });
