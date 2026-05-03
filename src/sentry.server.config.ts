@@ -7,6 +7,41 @@ const SENTRY_DSN =
 const SENTRY_ENVIRONMENT =
   process.env.VERCEL_ENV || process.env.NODE_ENV || "development";
 
+function getHeaderValue(
+  headers: NonNullable<Sentry.Event["request"]>["headers"],
+  name: string
+) {
+  if (!headers) {
+    return undefined;
+  }
+
+  if (Array.isArray(headers)) {
+    return headers.find(
+      ([key]) => key.toLowerCase() === name.toLowerCase()
+    )?.[1];
+  }
+
+  return headers[name] ?? headers[name.toLowerCase()];
+}
+
+function isMalformedRootServerActionProbe(event: Sentry.Event) {
+  const exceptionValue = event.exception?.values?.some(
+    (value) => value.value === "Unexpected end of form"
+  );
+  const requestUrl = event.request?.url;
+  const nextAction = getHeaderValue(event.request?.headers, "next-action");
+
+  if (!exceptionValue || !requestUrl || !nextAction) {
+    return false;
+  }
+
+  try {
+    return new URL(requestUrl).pathname === "/";
+  } catch {
+    return requestUrl === "/";
+  }
+}
+
 Sentry.init({
   dsn: SENTRY_DSN,
   environment: SENTRY_ENVIRONMENT,
@@ -17,5 +52,12 @@ Sentry.init({
   initialScope: (scope) => {
     scope.setTag("runtime", "server");
     return scope;
+  },
+  beforeSend: (event) => {
+    if (isMalformedRootServerActionProbe(event)) {
+      return null;
+    }
+
+    return event;
   },
 });
