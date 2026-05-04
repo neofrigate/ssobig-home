@@ -3,38 +3,90 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
+const CHANNEL_TALK_PLUGIN_KEY = "07bb5b7d-3d34-4ee8-96bf-09b6d662f6ed";
+
+type ChannelLanguage = "ko" | "en";
+
 declare global {
   interface Window {
-    ChannelIO: (method: string, options?: Record<string, unknown>) => void;
+    ChannelIO?: (method: string, options?: Record<string, unknown>) => void;
     ChannelIOInitialized?: boolean;
   }
 }
 
+function loadChannelTalkScript() {
+  if (window.ChannelIO) return;
+
+  const channel = function (...args: unknown[]) {
+    channel.c(args);
+  };
+  channel.q = [] as unknown[][];
+  channel.c = (args: unknown[]) => {
+    channel.q.push(args);
+  };
+  window.ChannelIO = channel as NonNullable<Window["ChannelIO"]>;
+
+  const load = () => {
+    if (window.ChannelIOInitialized) return;
+    window.ChannelIOInitialized = true;
+
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.async = true;
+    script.src = "https://cdn.channel.io/plugin/ch-plugin-web.js";
+
+    const firstScript = document.getElementsByTagName("script")[0];
+    firstScript?.parentNode?.insertBefore(script, firstScript);
+  };
+
+  if (document.readyState === "complete") {
+    load();
+  } else {
+    window.addEventListener("DOMContentLoaded", load, { once: true });
+    window.addEventListener("load", load, { once: true });
+  }
+}
+
 export default function ChannelTalk() {
-  const initialized = useRef(false);
+  const bootedLanguage = useRef<ChannelLanguage | null>(null);
   const pathname = usePathname() ?? "/";
+  const channelLanguage: ChannelLanguage = pathname.startsWith(
+    "/playroom/form/playtest/en",
+  )
+    ? "en"
+    : "ko";
   const isDayNammeFocusedPage =
     pathname === "/offline/11namme/apply" ||
     pathname?.startsWith("/offline/11namme/survey/");
 
   useEffect(() => {
-    if (isDayNammeFocusedPage) return;
-    if (initialized.current) return;
-    initialized.current = true;
+    if (isDayNammeFocusedPage) {
+      if (bootedLanguage.current && window.ChannelIO) {
+        window.ChannelIO("shutdown");
+        bootedLanguage.current = null;
+      }
+      return;
+    }
 
-    // ChannelTalk 스크립트 로드
-    const script = `
-      (function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
+    if (bootedLanguage.current === channelLanguage) return;
 
-      ChannelIO('boot', {
-        "pluginKey": "07bb5b7d-3d34-4ee8-96bf-09b6d662f6ed"
-      });
-    `;
+    loadChannelTalkScript();
 
-    const scriptElement = document.createElement("script");
-    scriptElement.innerHTML = script;
-    document.head.appendChild(scriptElement);
+    if (bootedLanguage.current && window.ChannelIO) {
+      window.ChannelIO("shutdown");
+    }
 
+    window.ChannelIO?.("boot", {
+      pluginKey: CHANNEL_TALK_PLUGIN_KEY,
+      language: channelLanguage,
+    });
+    window.ChannelIO?.("updateUser", {
+      language: channelLanguage,
+    });
+    bootedLanguage.current = channelLanguage;
+  }, [channelLanguage, isDayNammeFocusedPage]);
+
+  useEffect(() => {
     // 채널톡 버튼 숨김 (플로팅 버튼 비활성화)
     const style = document.createElement("style");
     style.innerHTML = `
@@ -45,12 +97,13 @@ export default function ChannelTalk() {
     document.head.appendChild(style);
 
     return () => {
-      // 정리 작업 (필요한 경우)
+      style.remove();
       if (window.ChannelIO) {
         window.ChannelIO("shutdown");
       }
+      bootedLanguage.current = null;
     };
-  }, [isDayNammeFocusedPage]);
+  }, []);
 
   return null;
 }
