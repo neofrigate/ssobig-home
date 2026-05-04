@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { PlaytestLocale } from "../locales";
 
@@ -69,16 +69,19 @@ const COUNTRY_CODES = [
 const content = {
   en: {
     eyebrow: "SSOBIG PLAYROOM",
-    title: "Overseas playtest signup",
+    title: "Early Access Playtest",
     intro:
-      "Help us test English-first story mystery games before the overseas launch. Selected testers will receive a free play coupon by email.",
+      "Try SsoBig's English-first story mystery games before launch and share your feedback. Selected testers will receive a free play coupon by email.",
     sourcePattern: "Playtest form",
-    rewardLabel: "Reward",
-    rewardValue: "Free play coupon",
-    formatLabel: "Format",
-    formatValue: "Web · Android · iOS",
-    estimateLabel: "Time",
-    estimateValue: "3-5 minutes",
+    howItWorks: {
+      title: "How it works",
+      items: [
+        "Submit this form.",
+        "We review applications and email selected testers within 3-5 business days.",
+        "Selected testers receive a free play coupon and access instructions by email.",
+        "Play on web, Android, or iOS, then share brief feedback after playing.",
+      ],
+    },
     sections: {
       profile: {
         step: "Q1",
@@ -116,6 +119,7 @@ const content = {
         "I agree to receive playtest access, coupons, and follow-up emails from SsoBig.",
       submit: "Apply for playtest",
       submitting: "Submitting...",
+      languageSwitch: "EN",
     },
     placeholders: {
       name: "Alex",
@@ -153,19 +157,29 @@ const content = {
       "Thanks. If you are selected, we will send play access and coupon instructions by email.",
     dryRunNote:
       "Preview mode: the form UI is working, but the production collection endpoint is not connected yet.",
+    languageSwitch: {
+      title: "View this form in Korean?",
+      body:
+        "Your current answers will be lost when you switch languages. You can continue in Korean on the next page.",
+      cancel: "Stay here",
+      confirm: "View Korean form",
+    },
   },
   ko: {
     eyebrow: "SSOBIG PLAYROOM",
-    title: "해외 플레이테스트 신청",
+    title: "얼리 액세스 사전 체험 신청",
     intro:
-      "쏘빅의 영어권 스토리 추리게임 출시 전에 먼저 플레이해보고 의견을 남겨주세요. 선정된 테스터에게는 무료 플레이 쿠폰을 이메일로 보내드립니다.",
+      "쏘빅의 영어권 스토리 추리게임을 정식 출시 전에 먼저 체험하고 의견을 남겨주세요. 선정된 테스터에게는 무료 플레이 쿠폰을 이메일로 보내드립니다.",
     sourcePattern: "Playtest form",
-    rewardLabel: "리워드",
-    rewardValue: "무료 플레이 쿠폰",
-    formatLabel: "형태",
-    formatValue: "웹 · Android · iOS",
-    estimateLabel: "소요 시간",
-    estimateValue: "3-5분",
+    howItWorks: {
+      title: "진행 방식",
+      items: [
+        "신청서를 제출해주세요.",
+        "신청 내용을 확인한 뒤 선정된 분께 3-5영업일 내 이메일로 안내드립니다.",
+        "선정된 테스터에게 무료 플레이 쿠폰과 접속 방법을 보내드립니다.",
+        "웹, Android, iOS에서 플레이한 뒤 간단한 피드백을 남겨주세요.",
+      ],
+    },
     sections: {
       profile: {
         step: "Q1",
@@ -203,6 +217,7 @@ const content = {
         "쏘빅의 플레이테스트 권한, 쿠폰, 후속 안내 이메일 수신에 동의합니다.",
       submit: "플레이테스트 신청하기",
       submitting: "신청 제출 중...",
+      languageSwitch: "KO",
     },
     placeholders: {
       name: "Alex",
@@ -240,6 +255,13 @@ const content = {
       "감사합니다. 선정되면 플레이 권한과 쿠폰 안내를 이메일로 보내드리겠습니다.",
     dryRunNote:
       "미리보기 모드: 폼 UI는 동작하지만 운영 수집 엔드포인트는 아직 연결되지 않았습니다.",
+    languageSwitch: {
+      title: "영어로 보시겠어요?",
+      body:
+        "언어를 바꾸면 현재 작성 중인 내용은 사라집니다. 다음 페이지에서 영어로 신청서를 볼 수 있습니다.",
+      cancel: "계속 작성하기",
+      confirm: "영어 신청서 보기",
+    },
   },
 } as const;
 
@@ -366,10 +388,13 @@ export default function PlaytestSignupForm({
 }: {
   locale: PlaytestLocale;
 }) {
+  const router = useRouter();
   const copy = content[locale];
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [submitState, setSubmitState] = useState<SubmitState>({ status: "idle" });
   const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
+  const [showLanguagePrompt, setShowLanguagePrompt] = useState(false);
+  const targetLocale = locale === "ko" ? "en" : "ko";
 
   useEffect(() => {
     const displayLocale = locale === "ko" ? "ko" : "en";
@@ -470,6 +495,10 @@ export default function PlaytestSignupForm({
     }
   };
 
+  const handleLanguageSwitch = () => {
+    router.push(`/playroom/form/playtest/${targetLocale}`);
+  };
+
   if (submitState.status === "success") {
     return (
       <div className="min-h-screen bg-[#050505] px-5 py-16 text-white md:py-24">
@@ -505,22 +534,17 @@ export default function PlaytestSignupForm({
       <div className="relative mx-auto max-w-3xl px-5 py-14 md:py-20">
         <header className="mb-8 rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] md:p-8">
           <div className="mb-5 flex items-center justify-between gap-4">
-            <Image
-              src="/ssobig_assets/Logo/logo=ssobig, color=white.png"
-              alt="SsoBig"
-              width={96}
-              height={35}
-              className="h-auto w-24"
-              unoptimized
-            />
-            <div className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-medium text-white/60">
-              {locale === "ko" ? "KO" : "EN"}
-            </div>
+            <p className="text-lg font-semibold uppercase tracking-[0.28em] text-[#FFB38A] md:text-xl">
+              {copy.eyebrow}
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowLanguagePrompt(true)}
+              className="rounded-full border border-white/10 bg-black/30 px-4 py-2 text-sm font-medium text-white/60 transition hover:border-white/25 hover:text-white"
+            >
+              {copy.labels.languageSwitch}
+            </button>
           </div>
-
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#FFB38A]">
-            {copy.eyebrow}
-          </p>
           <h1 className="mt-4 break-keep text-3xl font-semibold tracking-tight text-white md:text-5xl">
             {copy.title}
           </h1>
@@ -528,26 +552,22 @@ export default function PlaytestSignupForm({
             {copy.intro}
           </p>
 
-          <div className="mt-6 grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <p className="text-xs text-white/45">{copy.rewardLabel}</p>
-              <p className="mt-2 text-sm font-medium text-white">
-                {copy.rewardValue}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <p className="text-xs text-white/45">{copy.formatLabel}</p>
-              <p className="mt-2 text-sm font-medium text-white">
-                {copy.formatValue}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <p className="text-xs text-white/45">{copy.estimateLabel}</p>
-              <p className="mt-2 text-sm font-medium text-white">
-                {copy.estimateValue}
-              </p>
-            </div>
+          <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4">
+            <p className="text-sm font-semibold text-white">
+              {copy.howItWorks.title}
+            </p>
+            <ol className="mt-3 space-y-2 text-sm leading-6 text-white/65">
+              {copy.howItWorks.items.map((item, index) => (
+                <li key={item} className="flex gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-[#FFB38A]">
+                    {index + 1}
+                  </span>
+                  <span className="break-keep">{item}</span>
+                </li>
+              ))}
+            </ol>
           </div>
+
         </header>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
@@ -690,6 +710,35 @@ export default function PlaytestSignupForm({
           </button>
         </form>
       </div>
+
+      {showLanguagePrompt ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-5">
+          <div className="w-full max-w-md rounded-[28px] border border-white/12 bg-[#111111] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+            <h2 className="break-keep text-xl font-semibold text-white">
+              {copy.languageSwitch.title}
+            </h2>
+            <p className="mt-3 break-keep text-sm leading-6 text-white/65">
+              {copy.languageSwitch.body}
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setShowLanguagePrompt(false)}
+                className="min-h-12 rounded-2xl border border-white/12 px-4 text-sm font-semibold text-white/75 transition hover:border-white/25 hover:text-white"
+              >
+                {copy.languageSwitch.cancel}
+              </button>
+              <button
+                type="button"
+                onClick={handleLanguageSwitch}
+                className="min-h-12 rounded-2xl bg-[#FF7A59] px-4 text-sm font-semibold text-[#050505] transition hover:brightness-105"
+              >
+                {copy.languageSwitch.confirm}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
