@@ -47,6 +47,10 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const isHomePage = pathname === "/";
   // 프로젝트 페이지 (화이트 배경 고정)
   const isProjectPage = pathname.startsWith("/project");
+  // 디자인 시스템 페이지 (다크 배경 고정)
+  const isDesignSystemPage = pathname === "/design-system";
+  // 플레이룸 폼 페이지 (다크 배경 고정)
+  const isPlayroomFormPage = pathname.startsWith("/playroom/form/");
 
   // 초기 상태를 false로 설정하여 서버/클라이언트 hydration 일치
   const [isScrolled, setIsScrolled] = useState(false);
@@ -82,7 +86,12 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     } else if (isPlayroomPage) {
       // 플레이룸 페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
       setIsScrolled(true);
-    } else if (!isPlayroomHidePage && !isSocialingPage) {
+    } else if (
+      !isPlayroomHidePage &&
+      !isSocialingPage &&
+      !isDesignSystemPage &&
+      !isPlayroomFormPage
+    ) {
       // 다른 페이지는 초기 상태를 false로
       setIsScrolled(false);
     }
@@ -99,6 +108,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     isSocialingPage,
     isHomePage,
     isProjectPage,
+    isDesignSystemPage,
+    isPlayroomFormPage,
     isMounted,
   ]);
 
@@ -228,13 +239,15 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
 
   // 쏘빅 오프라인 페이지 체크 (항상 다크 모드)
   const isOfflinePage = pathname?.startsWith("/offline");
+  const isDarkStaticPage =
+    isOfflinePage || isDesignSystemPage || isPlayroomFormPage;
 
   // 페이지 유형에 따른 네비게이션 모드 결정
   const navMode: "overlay" | "light" | "dark" = (() => {
     // 클라이언트가 마운트되기 전에는 안전한 기본 상태 사용
     if (!isMounted) {
       // 오프라인, 플레이룸 하이드, 소셜링 상세 페이지는 어두운 배경이므로 overlay로 시작
-      if (isOfflinePage || isPlayroomHidePage || isSocialingPage) {
+      if (isDarkStaticPage || isPlayroomHidePage || isSocialingPage) {
         return "overlay";
       }
       // 플레이룸 페이지는 항상 light 모드
@@ -251,8 +264,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     if (isPlayroomPage) {
       return "light";
     }
-    // 오프라인 페이지는 항상 dark 모드 또는 overlay (스크롤 시 dark)
-    if (isOfflinePage) {
+    // 오프라인/디자인 시스템 페이지는 항상 dark 모드 또는 overlay (스크롤 시 dark)
+    if (isDarkStaticPage) {
       return isScrolled ? "dark" : "overlay";
     }
     if (isSocialingPage || isPlayroomHidePage) {
