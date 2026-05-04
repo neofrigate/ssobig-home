@@ -83,9 +83,12 @@ export async function POST(request: Request) {
     submittedAt: optionalString(body.submittedAt) || new Date().toISOString(),
   };
 
-  const webhookUrl = process.env.PLAYTEST_SIGNUP_WEBHOOK_URL?.trim();
+  const signupApiUrl =
+    process.env.PLAYTEST_SIGNUP_API_URL?.trim() ||
+    process.env.PLAYTEST_SIGNUP_WEBHOOK_URL?.trim();
+  const signupApiSecret = process.env.PLAYTEST_SIGNUP_API_SECRET?.trim();
 
-  if (!webhookUrl) {
+  if (!signupApiUrl) {
     if (process.env.NODE_ENV === "production") {
       return jsonResponse(
         {
@@ -100,26 +103,49 @@ export async function POST(request: Request) {
     return jsonResponse({ success: true, dryRun: true });
   }
 
+  if (!signupApiSecret) {
+    return jsonResponse(
+      {
+        success: false,
+        error: "Playtest signup endpoint secret is not configured",
+      },
+      503
+    );
+  }
+
   try {
-    const upstreamResponse = await fetch(webhookUrl, {
+    const upstreamResponse = await fetch(signupApiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-SSOBIG-PLAYTEST-SECRET": signupApiSecret,
       },
       body: JSON.stringify(payload),
     });
+    const upstreamPayload = (await upstreamResponse.json().catch(() => null)) as
+      | {
+        success?: boolean;
+        id?: unknown;
+        emailDeliveryStatus?: unknown;
+        error?: string;
+      }
+      | null;
 
-    if (!upstreamResponse.ok) {
+    if (!upstreamResponse.ok || !upstreamPayload?.success) {
       return jsonResponse(
         {
           success: false,
-          error: "Failed to forward playtest signup",
+          error: upstreamPayload?.error || "Failed to forward playtest signup",
         },
         502
       );
     }
 
-    return jsonResponse({ success: true });
+    return jsonResponse({
+      success: true,
+      id: upstreamPayload.id,
+      emailDeliveryStatus: upstreamPayload.emailDeliveryStatus,
+    });
   } catch (error) {
     return jsonResponse(
       {
