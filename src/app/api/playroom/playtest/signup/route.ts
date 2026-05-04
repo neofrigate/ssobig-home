@@ -36,7 +36,9 @@ export async function POST(request: Request) {
   const name = optionalString(body.name);
   const country = optionalString(body.country);
   const languages = stringArray(body.languages);
-  const platform = optionalString(body.platform);
+  const inferredLanguages =
+    languages.length > 0 ? languages : [locale === "ko" ? "ko-KR" : "en-US"];
+  const platform = optionalString(body.platform) || "not_collected";
   const groupSize = optionalString(body.groupSize);
   const experience = optionalString(body.experience);
   const source = stringArray(body.source);
@@ -47,8 +49,6 @@ export async function POST(request: Request) {
     !name ||
     !email ||
     !country ||
-    languages.length === 0 ||
-    !platform ||
     !groupSize ||
     !experience ||
     source.length === 0
@@ -69,10 +69,10 @@ export async function POST(request: Request) {
     name,
     email,
     country,
-    timezone: optionalString(body.timezone),
-    languages,
+    timezone: "",
+    languages: inferredLanguages,
     platform,
-    device: optionalString(body.device),
+    device: "",
     groupSize,
     experience,
     source,

@@ -1,22 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PlaytestLocale } from "../locales";
 
 type FormState = {
   name: string;
   email: string;
   country: string;
-  timezone: string;
-  languages: string[];
-  platform: string;
-  device: string;
   groupSize: string;
   experience: string;
   source: string[];
   sourceOther: string;
-  motivation: string;
+  motivation: string[];
+  motivationOther: string;
   consent: boolean;
 };
 
@@ -26,23 +23,48 @@ type SubmitState =
   | { status: "success"; dryRun?: boolean }
   | { status: "error"; message: string };
 
+type CountryOption = {
+  code: string;
+  label: string;
+  value: string;
+};
+
 const INITIAL_FORM: FormState = {
   name: "",
   email: "",
   country: "",
-  timezone: "",
-  languages: ["en-US"],
-  platform: "",
-  device: "",
   groupSize: "",
   experience: "",
   source: [],
   sourceOther: "",
-  motivation: "",
+  motivation: [],
+  motivationOther: "",
   consent: false,
 };
 
-const LANGUAGE_OPTIONS = ["en-US", "es-ES", "ja-JP", "zh-CN", "ko-KR"];
+const COUNTRY_CODES = [
+  "AF", "AX", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM",
+  "AW", "AU", "AT", "AZ", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ",
+  "BM", "BT", "BO", "BQ", "BA", "BW", "BV", "BR", "IO", "BN", "BG", "BF",
+  "BI", "CV", "KH", "CM", "CA", "KY", "CF", "TD", "CL", "CN", "CX", "CC",
+  "CO", "KM", "CG", "CD", "CK", "CR", "CI", "HR", "CU", "CW", "CY", "CZ",
+  "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "GQ", "ER", "EE", "SZ", "ET",
+  "FK", "FO", "FJ", "FI", "FR", "GF", "PF", "TF", "GA", "GM", "GE", "DE",
+  "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GG", "GN", "GW", "GY",
+  "HT", "HM", "VA", "HN", "HK", "HU", "IS", "IN", "ID", "IR", "IQ", "IE",
+  "IM", "IL", "IT", "JM", "JP", "JE", "JO", "KZ", "KE", "KI", "KP", "KR",
+  "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU", "MO",
+  "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX",
+  "FM", "MD", "MC", "MN", "ME", "MS", "MA", "MZ", "MM", "NA", "NR", "NP",
+  "NL", "NC", "NZ", "NI", "NE", "NG", "NU", "NF", "MK", "MP", "NO", "OM",
+  "PK", "PW", "PS", "PA", "PG", "PY", "PE", "PH", "PN", "PL", "PT", "PR",
+  "QA", "RE", "RO", "RU", "RW", "BL", "SH", "KN", "LC", "MF", "PM", "VC",
+  "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SX", "SK", "SI",
+  "SB", "SO", "ZA", "GS", "SS", "ES", "LK", "SD", "SR", "SJ", "SE", "CH",
+  "SY", "TW", "TJ", "TZ", "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR",
+  "TM", "TC", "TV", "UG", "UA", "AE", "GB", "US", "UM", "UY", "UZ", "VU",
+  "VE", "VN", "VG", "VI", "WF", "EH", "YE", "ZM", "ZW",
+] as const;
 
 const content = {
   en: {
@@ -63,28 +85,23 @@ const content = {
         title: "How can we contact you?",
         description: "We will only use this email for playtest access and follow-up.",
       },
-      languages: {
+      group: {
         step: "Q2",
-        title: "Which language versions would you like to test?",
-        description: "Pick every language you can comfortably evaluate.",
-      },
-      access: {
-        step: "Q3",
-        title: "Where will you play?",
-        description: "This helps us prepare platform-specific instructions.",
+        title: "How many people will play together?",
+        description: "Choose the closest group size.",
       },
       experience: {
-        step: "Q4",
+        step: "Q3",
         title: "What kind of mystery-game player are you?",
         description: "Choose the closest option.",
       },
       source: {
-        step: "Q5",
+        step: "Q4",
         title: "Where did you hear about this playtest?",
         description: "Select every channel that applies.",
       },
       motivation: {
-        step: "Q6",
+        step: "Q5",
         title: "What would you like to help us evaluate?",
         description: "Short notes are enough.",
       },
@@ -93,10 +110,8 @@ const content = {
       name: "Name or nickname",
       email: "Email",
       country: "Country or region",
-      timezone: "Timezone",
-      device: "Device / browser",
       sourceOther: "Other channel",
-      motivation: "Notes",
+      motivationOther: "Other note",
       consent:
         "I agree to receive playtest access, coupons, and follow-up emails from SsoBig.",
       submit: "Apply for playtest",
@@ -105,15 +120,11 @@ const content = {
     placeholders: {
       name: "Alex",
       email: "alex@example.com",
-      country: "United States",
-      timezone: "Pacific Time, CET, JST...",
-      device: "iPhone 15, Pixel 8, Chrome on Windows...",
+      country: "Select country or region",
       sourceOther: "Tell us where",
-      motivation:
-        "Example: translation clarity, pacing, onboarding, group play, payment flow...",
+      motivationOther: "Tell us what else you want to evaluate",
     },
-    platformOptions: ["Web", "Android app", "iOS app", "Not sure yet"],
-    groupOptions: ["Solo check", "2-3 people", "4-6 people", "7+ people"],
+    groupOptions: ["2-3 people", "4-6 people", "7+ people"],
     experienceOptions: [
       "New to murder mystery",
       "Played digital mystery games",
@@ -121,11 +132,20 @@ const content = {
       "Hosted games before",
     ],
     sourceOptions: ["Reddit", "Discord", "Facebook group", "BoardGameGeek", "Friend", "Other"],
+    motivationOptions: [
+      "Translation clarity",
+      "Story pacing",
+      "Onboarding",
+      "Group play",
+      "Payment flow",
+      "Other",
+    ],
     validation: {
       required: "Please fill in the required fields.",
       email: "Please enter a valid email address.",
       consent: "Please agree to receive playtest access emails.",
       sourceOther: "Please tell us the other channel.",
+      motivationOther: "Please tell us the other note.",
       generic: "We could not submit your signup. Please try again later.",
     },
     successTitle: "Signup received",
@@ -152,28 +172,23 @@ const content = {
         title: "연락받을 정보를 알려주세요.",
         description: "플레이 권한과 후속 안내 이메일 발송에만 사용합니다.",
       },
-      languages: {
+      group: {
         step: "Q2",
-        title: "어떤 언어 버전을 테스트할 수 있나요?",
-        description: "평가 가능한 언어를 모두 선택해주세요.",
-      },
-      access: {
-        step: "Q3",
-        title: "어떤 환경에서 플레이할 예정인가요?",
-        description: "플랫폼별 안내를 준비하기 위한 질문입니다.",
+        title: "몇 명이 함께 플레이할 예정인가요?",
+        description: "가장 가까운 인원 구간을 선택해주세요.",
       },
       experience: {
-        step: "Q4",
+        step: "Q3",
         title: "추리게임 경험은 어느 쪽에 가까운가요?",
         description: "가장 가까운 항목을 선택해주세요.",
       },
       source: {
-        step: "Q5",
+        step: "Q4",
         title: "이 플레이테스트를 어디에서 알게 되었나요?",
         description: "해당되는 채널을 모두 선택해주세요.",
       },
       motivation: {
-        step: "Q6",
+        step: "Q5",
         title: "어떤 부분을 중점적으로 봐주고 싶나요?",
         description: "짧게 적어주셔도 충분합니다.",
       },
@@ -182,10 +197,8 @@ const content = {
       name: "이름 또는 닉네임",
       email: "이메일",
       country: "국가 또는 지역",
-      timezone: "시간대",
-      device: "기기 / 브라우저",
       sourceOther: "기타 채널",
-      motivation: "메모",
+      motivationOther: "기타 메모",
       consent:
         "쏘빅의 플레이테스트 권한, 쿠폰, 후속 안내 이메일 수신에 동의합니다.",
       submit: "플레이테스트 신청하기",
@@ -194,15 +207,11 @@ const content = {
     placeholders: {
       name: "Alex",
       email: "alex@example.com",
-      country: "United States",
-      timezone: "Pacific Time, CET, JST...",
-      device: "iPhone 15, Pixel 8, Windows Chrome...",
+      country: "국가 또는 지역 선택",
       sourceOther: "알게 된 경로를 적어주세요",
-      motivation:
-        "예: 번역 자연스러움, 진행 흐름, 첫 진입 경험, 그룹 플레이, 결제 흐름 등",
+      motivationOther: "추가로 확인하고 싶은 내용을 적어주세요",
     },
-    platformOptions: ["Web", "Android 앱", "iOS 앱", "아직 모르겠음"],
-    groupOptions: ["혼자 확인", "2-3명", "4-6명", "7명 이상"],
+    groupOptions: ["2-3명", "4-6명", "7명 이상"],
     experienceOptions: [
       "머더미스터리는 처음",
       "디지털 추리게임 경험 있음",
@@ -210,11 +219,20 @@ const content = {
       "게임 진행/호스트 경험 있음",
     ],
     sourceOptions: ["Reddit", "Discord", "Facebook 그룹", "BoardGameGeek", "지인 추천", "기타"],
+    motivationOptions: [
+      "번역 자연스러움",
+      "스토리 진행 흐름",
+      "첫 진입 경험",
+      "그룹 플레이",
+      "결제 흐름",
+      "기타",
+    ],
     validation: {
       required: "필수 항목을 입력해주세요.",
       email: "올바른 이메일 주소를 입력해주세요.",
       consent: "플레이테스트 안내 이메일 수신에 동의해주세요.",
       sourceOther: "기타 채널을 입력해주세요.",
+      motivationOther: "기타 메모를 입력해주세요.",
       generic: "신청을 제출하지 못했습니다. 잠시 후 다시 시도해주세요.",
     },
     successTitle: "신청이 접수되었습니다",
@@ -261,6 +279,31 @@ function TextInput({
       placeholder={placeholder}
       className="mt-2 h-12 w-full rounded-2xl border border-white/12 bg-black/30 px-4 text-sm text-white outline-none transition placeholder:text-white/45 focus:border-[#FF7A59]"
     />
+  );
+}
+
+function SelectInput({
+  value,
+  onChange,
+  placeholder,
+  children,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className="mt-2 h-12 w-full rounded-2xl border border-white/12 bg-black/30 px-4 text-sm text-white outline-none transition focus:border-[#FF7A59]"
+    >
+      <option value="" disabled>
+        {placeholder}
+      </option>
+      {children}
+    </select>
   );
 }
 
@@ -326,16 +369,33 @@ export default function PlaytestSignupForm({
   const copy = content[locale];
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [submitState, setSubmitState] = useState<SubmitState>({ status: "idle" });
+  const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
+
+  useEffect(() => {
+    const displayLocale = locale === "ko" ? "ko" : "en";
+    const displayNames = new Intl.DisplayNames([displayLocale], {
+      type: "region",
+    });
+    const englishNames = new Intl.DisplayNames(["en"], {
+      type: "region",
+    });
+
+    setCountryOptions(COUNTRY_CODES.map((code) => ({
+      code,
+      label: displayNames.of(code) ?? code,
+      value: englishNames.of(code) ?? code,
+    })).sort((a, b) => a.label.localeCompare(b.label, displayLocale)));
+  }, [locale]);
 
   const requiresSourceOther = form.source.includes("Other") || form.source.includes("기타");
+  const requiresMotivationOther =
+    form.motivation.includes("Other") || form.motivation.includes("기타");
 
   const validationError = useMemo(() => {
     if (
       !form.name.trim() ||
       !form.email.trim() ||
       !form.country.trim() ||
-      form.languages.length === 0 ||
-      !form.platform ||
       !form.groupSize ||
       !form.experience ||
       form.source.length === 0
@@ -346,9 +406,12 @@ export default function PlaytestSignupForm({
     if (requiresSourceOther && !form.sourceOther.trim()) {
       return copy.validation.sourceOther;
     }
+    if (requiresMotivationOther && !form.motivationOther.trim()) {
+      return copy.validation.motivationOther;
+    }
     if (!form.consent) return copy.validation.consent;
     return "";
-  }, [copy, form, requiresSourceOther]);
+  }, [copy, form, requiresMotivationOther, requiresSourceOther]);
 
   const canSubmit = !validationError && submitState.status !== "submitting";
 
@@ -369,6 +432,13 @@ export default function PlaytestSignupForm({
     setSubmitState({ status: "submitting" });
 
     try {
+      const motivation = [
+        ...form.motivation.filter((value) => value !== "Other" && value !== "기타"),
+        form.motivationOther.trim(),
+      ]
+        .filter(Boolean)
+        .join(", ");
+
       const response = await fetch("/api/playroom/playtest/signup", {
         method: "POST",
         headers: {
@@ -377,6 +447,7 @@ export default function PlaytestSignupForm({
         body: JSON.stringify({
           locale,
           ...form,
+          motivation,
           pageUrl: window.location.href,
           submittedAt: new Date().toISOString(),
         }),
@@ -503,59 +574,23 @@ export default function PlaytestSignupForm({
               </div>
               <div>
                 <FieldLabel>{copy.labels.country}</FieldLabel>
-                <TextInput
+                <SelectInput
                   value={form.country}
                   onChange={(value) => update("country", value)}
                   placeholder={copy.placeholders.country}
-                  autoComplete="country-name"
-                />
-              </div>
-              <div>
-                <FieldLabel>{copy.labels.timezone}</FieldLabel>
-                <TextInput
-                  value={form.timezone}
-                  onChange={(value) => update("timezone", value)}
-                  placeholder={copy.placeholders.timezone}
-                />
+                >
+                  {countryOptions.map((option) => (
+                    <option key={option.code} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </SelectInput>
               </div>
             </div>
           </Section>
 
-          <Section {...copy.sections.languages}>
-            <div className="grid gap-3 md:grid-cols-2">
-              {LANGUAGE_OPTIONS.map((option) => (
-                <ChoiceChip
-                  key={option}
-                  label={option}
-                  selected={form.languages.includes(option)}
-                  onClick={() =>
-                    update("languages", toggleOption(form.languages, option))
-                  }
-                />
-              ))}
-            </div>
-          </Section>
-
-          <Section {...copy.sections.access}>
-            <div className="grid gap-3 md:grid-cols-2">
-              {copy.platformOptions.map((option) => (
-                <ChoiceChip
-                  key={option}
-                  label={option}
-                  selected={form.platform === option}
-                  onClick={() => update("platform", option)}
-                />
-              ))}
-            </div>
-            <div className="mt-4">
-              <FieldLabel>{copy.labels.device}</FieldLabel>
-              <TextInput
-                value={form.device}
-                onChange={(value) => update("device", value)}
-                placeholder={copy.placeholders.device}
-              />
-            </div>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <Section {...copy.sections.group}>
+            <div className="grid gap-3 md:grid-cols-3">
               {copy.groupOptions.map((option) => (
                 <ChoiceChip
                   key={option}
@@ -604,12 +639,28 @@ export default function PlaytestSignupForm({
           </Section>
 
           <Section {...copy.sections.motivation}>
-            <textarea
-              value={form.motivation}
-              onChange={(event) => update("motivation", event.target.value)}
-              placeholder={copy.placeholders.motivation}
-              className="h-44 w-full rounded-2xl border border-white/12 bg-black/30 px-4 py-4 text-sm leading-6 text-white outline-none transition placeholder:text-white/45 focus:border-[#FF7A59]"
-            />
+            <div className="grid gap-3 md:grid-cols-2">
+              {copy.motivationOptions.map((option) => (
+                <ChoiceChip
+                  key={option}
+                  label={option}
+                  selected={form.motivation.includes(option)}
+                  onClick={() =>
+                    update("motivation", toggleOption(form.motivation, option))
+                  }
+                />
+              ))}
+            </div>
+            {requiresMotivationOther ? (
+              <div className="mt-4">
+                <FieldLabel>{copy.labels.motivationOther}</FieldLabel>
+                <TextInput
+                  value={form.motivationOther}
+                  onChange={(value) => update("motivationOther", value)}
+                  placeholder={copy.placeholders.motivationOther}
+                />
+              </div>
+            ) : null}
           </Section>
 
           <label className="flex gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm leading-6 text-white/72">

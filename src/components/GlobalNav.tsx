@@ -51,6 +51,10 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const isDesignSystemPage = pathname === "/design-system";
   // 플레이룸 폼 페이지 (다크 배경 고정)
   const isPlayroomFormPage = pathname.startsWith("/playroom/form/");
+  const isEnglishPlaytestFormPage = pathname.startsWith(
+    "/playroom/form/playtest/en"
+  );
+  const toolLinkLabel = isEnglishPlaytestFormPage ? "ssobig tool" : "쏘빅툴";
 
   // 초기 상태를 false로 설정하여 서버/클라이언트 hydration 일치
   const [isScrolled, setIsScrolled] = useState(false);
@@ -488,7 +492,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 : "bg-white text-gray-900 hover:bg-gray-200"
             }`}
           >
-            쏘빅툴
+            {toolLinkLabel}
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
@@ -616,7 +620,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 : "bg-white text-gray-900 hover:bg-gray-200"
             }`}
           >
-            쏘빅툴
+            {toolLinkLabel}
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
