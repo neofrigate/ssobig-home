@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "tlyioijsopxeegzfjlqe.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/playroom-campaign-assets/**",
+      },
     ],
     unoptimized: false,
   },

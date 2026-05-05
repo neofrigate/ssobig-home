@@ -18,6 +18,8 @@ const PLAYROOM_TRACKING_QUERY_KEYS = [
   "utm_name",
   "fbclid",
 ];
+const PLAYROOM_CAMPAIGN_API_URL =
+  "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-campaign-banners";
 
 function appendPlayroomTrackingParams(url: string): string {
   if (typeof window === "undefined") {
@@ -411,52 +413,109 @@ interface BannerData {
   link: string;
 }
 
+interface PlayroomCampaignBannerApiItem {
+  title_line_1: string;
+  title_line_2: string;
+  subtitle: string;
+  destination_url: string;
+  desktop_image_url: string;
+  mobile_image_url?: string | null;
+}
+
+const FALLBACK_BANNERS: BannerData[] = [
+  {
+    title1: "한강에서 폭탄이 터졌다.",
+    title2: "다리 위엔 현수막, 섬 안엔 용의자.",
+    subtitle: "4인용 서사 미스터리 [밤 아일랜드]",
+    bgImage: "/ssobig_assets/playroom/히어로_밤아일랜드_데스크톱.jpg",
+    mobileImage: "/ssobig_assets/playroom/히어로_밤아일랜드_모바일.jpg",
+    bgGradient: "from-green-600 to-emerald-600",
+    link: "https://relay.ssobig.com/mlsami",
+  },
+  {
+    title1: "황후마마의 죽음,",
+    title2: "그 원인은 궁 안에 있다.",
+    subtitle:
+      "사전예약 얼리버드 매진! 7인용 머더 미스터리 [황후마마 살인사건]",
+    bgImage: "/ssobig_assets/playroom/히어로_황후마마_데스크톱.jpg",
+    mobileImage: "/ssobig_assets/playroom/히어로_황후마마_모바일.jpg",
+    bgGradient: "from-red-600 to-pink-600",
+    link: "https://tool.ssobig.com/templates/d20f00fd",
+  },
+  {
+    title1: "당신의 선택으로 완성되는",
+    title2: "커플 전용 미스터리 게임",
+    subtitle: "텀블벅 165% 달성! 기억 속의 너 펀딩 진행중",
+    bgImage: "/ssobig_assets/playroom/히어로_기억 속의 너_데스크톱.jpg",
+    mobileImage: "/ssobig_assets/playroom/히어로_기억 속의 너_모바일.jpg",
+    bgGradient: "from-blue-600 to-cyan-600",
+    link: "https://tool.ssobig.com/templates/0bb6fcf7",
+  },
+  {
+    title1: "우주선에 선장이 죽었다",
+    title2: "똑같이 생긴 당신은 누구?",
+    subtitle: "323% 달성! 4인용 머더 미스터리 도플갱어",
+    bgImage: "/ssobig_assets/playroom/히어로_도플갱어_데스크톱.jpg",
+    mobileImage: "/ssobig_assets/playroom/히어로_도플갱어_모바일.jpg",
+    bgGradient: "from-indigo-600 to-purple-600",
+    link: "https://tool.ssobig.com/templates/3e7a2f6e",
+  },
+];
+
+function mapCampaignBanner(item: PlayroomCampaignBannerApiItem): BannerData {
+  return {
+    title1: item.title_line_1,
+    title2: item.title_line_2,
+    subtitle: item.subtitle,
+    bgImage: item.desktop_image_url,
+    mobileImage: item.mobile_image_url || undefined,
+    bgGradient: "from-gray-700 to-gray-900",
+    link: item.destination_url,
+  };
+}
+
 export default function PlayroomPage() {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [isFooterOpen, setIsFooterOpen] = useState(false);
+  const [banners, setBanners] = useState<BannerData[]>(FALLBACK_BANNERS);
 
-  // 배너 데이터
-  const banners: BannerData[] = [
-    {
-      title1: "한강에서 폭탄이 터졌다.",
-      title2: "다리 위엔 현수막, 섬 안엔 용의자.",
-      subtitle: "4인용 서사 미스터리 [밤 아일랜드]",
-      bgImage: "/ssobig_assets/playroom/히어로_밤아일랜드_데스크톱.jpg",
-      mobileImage: "/ssobig_assets/playroom/히어로_밤아일랜드_모바일.jpg",
-      bgGradient: "from-green-600 to-emerald-600",
-      link: "https://relay.ssobig.com/mlsami",
-    },
-    {
-      title1: "황후마마의 죽음,",
-      title2: "그 원인은 궁 안에 있다.",
-      subtitle:
-        "사전예약 얼리버드 매진! 7인용 머더 미스터리 [황후마마 살인사건]",
-      bgImage: "/ssobig_assets/playroom/히어로_황후마마_데스크톱.jpg",
-      mobileImage: "/ssobig_assets/playroom/히어로_황후마마_모바일.jpg",
-      bgGradient: "from-red-600 to-pink-600",
-      link: "https://tool.ssobig.com/templates/d20f00fd",
-    },
-    {
-      title1: "당신의 선택으로 완성되는",
-      title2: "커플 전용 미스터리 게임",
-      subtitle: "텀블벅 165% 달성! 기억 속의 너 펀딩 진행중",
-      bgImage: "/ssobig_assets/playroom/히어로_기억 속의 너_데스크톱.jpg",
-      mobileImage: "/ssobig_assets/playroom/히어로_기억 속의 너_모바일.jpg",
-      bgGradient: "from-blue-600 to-cyan-600",
-      link: "https://tool.ssobig.com/templates/0bb6fcf7",
-    },
-    {
-      title1: "우주선에 선장이 죽었다",
-      title2: "똑같이 생긴 당신은 누구?",
-      subtitle: "323% 달성! 4인용 머더 미스터리 도플갱어",
-      bgImage: "/ssobig_assets/playroom/히어로_도플갱어_데스크톱.jpg",
-      mobileImage: "/ssobig_assets/playroom/히어로_도플갱어_모바일.jpg",
-      bgGradient: "from-indigo-600 to-purple-600",
-      link: "https://tool.ssobig.com/templates/3e7a2f6e",
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCampaignBanners() {
+      try {
+        const response = await fetch(PLAYROOM_CAMPAIGN_API_URL, {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          throw new Error(`Playroom campaign API failed: ${response.status}`);
+        }
+        const data = (await response.json()) as {
+          items?: PlayroomCampaignBannerApiItem[];
+        };
+        const nextBanners = (data.items || []).map(mapCampaignBanner);
+        if (isMounted && nextBanners.length > 0) {
+          setBanners(nextBanners);
+          setCurrentBannerIndex(0);
+        }
+      } catch (error) {
+        console.error("플레이룸 캠페인 배너 로드 실패:", error);
+      }
+    }
+
+    loadCampaignBanners();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (currentBannerIndex >= banners.length) {
+      setCurrentBannerIndex(0);
+    }
+  }, [banners.length, currentBannerIndex]);
 
   // 스와이프 핸들러
   const handleTouchStart = (e: React.TouchEvent) => {
