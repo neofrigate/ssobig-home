@@ -20,6 +20,8 @@ const PLAYROOM_TRACKING_QUERY_KEYS = [
 ];
 const PLAYROOM_CAMPAIGN_API_URL =
   "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-campaign-banners";
+const PLAYROOM_TEMPLATE_API_URL =
+  "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-templates";
 
 function appendPlayroomTrackingParams(url: string): string {
   if (typeof window === "undefined") {
@@ -67,16 +69,18 @@ function buildTemplateClickPayload({
   title,
   price,
   sourceArea,
+  templateId,
 }: {
   href: string;
   title: string;
   price?: string;
   sourceArea: string;
+  templateId?: string;
 }) {
   try {
     const parsedUrl = new URL(href, "https://www.ssobig.com");
     return {
-      template_id: extractTemplateId(parsedUrl.pathname) ?? undefined,
+      template_id: templateId ?? extractTemplateId(parsedUrl.pathname) ?? undefined,
       template_name: title,
       price_label: price,
       source_area: sourceArea,
@@ -96,17 +100,19 @@ function buildTemplateClickPayload({
 function buildViewContentPayload({
   href,
   title,
+  templateId,
 }: {
   href: string;
   title: string;
+  templateId?: string;
 }) {
-  const templateId = extractTemplateId(href);
-  if (!templateId) {
+  const resolvedTemplateId = templateId ?? extractTemplateId(href);
+  if (!resolvedTemplateId) {
     return null;
   }
 
   return {
-    content_ids: [templateId],
+    content_ids: [resolvedTemplateId],
     content_name: title,
     content_type: "product",
   };
@@ -117,6 +123,7 @@ interface TrackedLinkProps {
   title: string;
   sourceArea: string;
   price?: string;
+  templateId?: string;
   className?: string;
   children: React.ReactNode;
 }
@@ -126,6 +133,7 @@ function TrackedLink({
   title,
   sourceArea,
   price,
+  templateId,
   className,
   children,
 }: TrackedLinkProps) {
@@ -141,6 +149,7 @@ function TrackedLink({
       title,
       price,
       sourceArea,
+      templateId,
     });
 
     trackLinkClick({
@@ -155,6 +164,7 @@ function TrackedLink({
     const viewContentPayload = buildViewContentPayload({
       href: trackedHref,
       title,
+      templateId,
     });
     if (viewContentPayload) {
       safeFbq("track", "ViewContent", viewContentPayload);
@@ -182,6 +192,7 @@ interface ContentCardProps {
   players?: string;
   price?: string;
   link: string;
+  templateId?: string;
   cardSize?: "large" | "small";
   imageFit?: "cover" | "contain";
 }
@@ -193,6 +204,7 @@ function ContentCard({
   players,
   price,
   link,
+  templateId,
   cardSize = "large",
   imageFit = "cover",
 }: ContentCardProps) {
@@ -219,6 +231,7 @@ function ContentCard({
         href={link}
         title={title}
         price={price}
+        templateId={templateId}
         sourceArea="card"
         className={`md:hidden flex flex-col items-center flex-shrink-0 group ${mobileClass}`}
       >
@@ -270,6 +283,7 @@ function ContentCard({
         href={link}
         title={title}
         price={price}
+        templateId={templateId}
         sourceArea="card"
         className={`hidden md:block group flex-shrink-0 cursor-pointer ${desktopClass}`}
       >
@@ -367,6 +381,7 @@ function ContentRow({
                 players={item.players}
                 price={item.price}
                 link={item.link}
+                templateId={item.templateId}
                 cardSize={cardSize}
                 imageFit={imageFit}
               />
@@ -391,6 +406,7 @@ function ContentRow({
                 players={item.players}
                 price={item.price}
                 link={item.link}
+                templateId={item.templateId}
                 cardSize={cardSize}
                 imageFit={imageFit}
               />
@@ -474,12 +490,133 @@ function mapCampaignBanner(item: PlayroomCampaignBannerApiItem): BannerData {
   };
 }
 
+type PlayroomTemplateCategory = "story_mystery" | "friends";
+
+interface PlayroomTemplateApiItem {
+  category: PlayroomTemplateCategory;
+  ssobig_tool_template_id: string;
+  title: string;
+  description: string;
+  players_label: string;
+  price_label: string;
+  card_image_url: string;
+  destination_url: string;
+}
+
+type PlayroomTemplateGroups = Record<PlayroomTemplateCategory, ContentCardProps[]>;
+
+const FALLBACK_TEMPLATE_GROUPS: PlayroomTemplateGroups = {
+  story_mystery: [
+    {
+      image: "/ssobig_assets/playroom/황후마마살인사건.png",
+      title: "황후마마 살인사건",
+      description: "황후마마의 죽음,\n그 원인은 궁 안에 있다.",
+      players: "7인, 120분",
+      price: "사전예약 진행중",
+      link: "https://tool.ssobig.com/templates/d20f00fd",
+      templateId: "d20f00fd",
+    },
+    {
+      image: "/ssobig_assets/playroom/백설공주와독사과.jpg",
+      title: "백설공주와 독사과",
+      description: "백설공주에게 독사과를 건넨자는?\n동화 다시 읽기",
+      players: "2인, 60분",
+      price: "무료",
+      link: "https://tool.ssobig.com/templates/c2439b65",
+      templateId: "c2439b65",
+    },
+    {
+      image: "/ssobig_assets/playroom/기억 속의 너.jpg",
+      title: "기억 속의 너",
+      description: "커플 전용 선택형 스토리 게임",
+      players: "2인, 90분",
+      price: "240토큰",
+      link: "https://tool.ssobig.com/templates/0bb6fcf7",
+      templateId: "0bb6fcf7",
+    },
+    {
+      image: "/ssobig_assets/playroom/도플갱어.jpg",
+      title: "도플갱어",
+      description:
+        "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야?",
+      players: "4인, 120분",
+      price: "300토큰",
+      link: "https://tool.ssobig.com/templates/3e7a2f6e",
+      templateId: "3e7a2f6e",
+    },
+  ],
+  friends: [
+    {
+      image: "/ssobig_assets/playroom/퀴즈메이커.jpg",
+      title: "퀴즈메이커",
+      description: "나만의 퀴즈를 만들어\n친구들과 함께 즐기기",
+      players: "2~100인",
+      price: "무료",
+      link: "https://tool.ssobig.com/templates/b2e1cf64",
+      templateId: "b2e1cf64",
+    },
+    {
+      image: "/ssobig_assets/playroom/나몰라퀴즈.jpg",
+      title: "나몰라퀴즈",
+      description: "서로에 대해 얼마나\n알고 있는지 확인하기",
+      players: "2~20인",
+      price: "무료",
+      link: "https://tool.ssobig.com/templates/3f97c82b",
+      templateId: "3f97c82b",
+    },
+    {
+      image: "/ssobig_assets/playroom/사랑의 징검다리.jpg",
+      title: "사랑의 징검다리",
+      description: "커플을 위한\n관계 테스트 게임",
+      players: "2인",
+      price: "무료",
+      link: "https://tool.ssobig.com/templates/3df2320f",
+      templateId: "3df2320f",
+    },
+    {
+      image: "/ssobig_assets/playroom/우정의 징검다리.jpg",
+      title: "우정의 징검다리",
+      description: "친구들과의 우정을\n테스트하는 게임",
+      players: "2~10인",
+      price: "무료",
+      link: "https://tool.ssobig.com/templates/93fa153c",
+      templateId: "93fa153c",
+    },
+  ],
+};
+
+function mapPlayroomTemplate(item: PlayroomTemplateApiItem): ContentCardProps {
+  return {
+    image: item.card_image_url,
+    title: item.title,
+    description: item.description,
+    players: item.players_label,
+    price: item.price_label,
+    link: item.destination_url,
+    templateId: item.ssobig_tool_template_id,
+  };
+}
+
+function groupPlayroomTemplates(items: PlayroomTemplateApiItem[]): PlayroomTemplateGroups {
+  return items.reduce<PlayroomTemplateGroups>(
+    (groups, item) => {
+      if (item.category === "story_mystery" || item.category === "friends") {
+        groups[item.category].push(mapPlayroomTemplate(item));
+      }
+      return groups;
+    },
+    { story_mystery: [], friends: [] }
+  );
+}
+
 export default function PlayroomPage() {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [isFooterOpen, setIsFooterOpen] = useState(false);
   const [banners, setBanners] = useState<BannerData[]>(FALLBACK_BANNERS);
+  const [templateGroups, setTemplateGroups] =
+    useState<PlayroomTemplateGroups>(FALLBACK_TEMPLATE_GROUPS);
 
   useEffect(() => {
     let isMounted = true;
@@ -505,7 +642,32 @@ export default function PlayroomPage() {
       }
     }
 
+    async function loadPlayroomTemplates() {
+      try {
+        const response = await fetch(PLAYROOM_TEMPLATE_API_URL, {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          throw new Error(`Playroom template API failed: ${response.status}`);
+        }
+        const data = (await response.json()) as {
+          items?: PlayroomTemplateApiItem[];
+        };
+        const nextGroups = groupPlayroomTemplates(data.items || []);
+        if (
+          isMounted &&
+          nextGroups.story_mystery.length > 0 &&
+          nextGroups.friends.length > 0
+        ) {
+          setTemplateGroups(nextGroups);
+        }
+      } catch (error) {
+        console.error("플레이룸 노출 템플릿 로드 실패:", error);
+      }
+    }
+
     loadCampaignBanners();
+    loadPlayroomTemplates();
     return () => {
       isMounted = false;
     };
@@ -648,41 +810,7 @@ export default function PlayroomPage() {
       {/* 스토리 추리게임 */}
       <ContentRow
         title="스토리 추리게임"
-        items={[
-          {
-            image: "/ssobig_assets/playroom/황후마마살인사건.png",
-            title: "황후마마 살인사건",
-            description: "황후마마의 죽음,\n그 원인은 궁 안에 있다.",
-            players: "7인, 120분",
-            price: "사전예약 진행중",
-            link: "https://tool.ssobig.com/templates/d20f00fd",
-          },
-          {
-            image: "/ssobig_assets/playroom/백설공주와독사과.jpg",
-            title: "백설공주와 독사과",
-            description: "백설공주에게 독사과를 건넨자는?\n동화 다시 읽기",
-            players: "2인, 60분",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/c2439b65",
-          },
-          {
-            image: "/ssobig_assets/playroom/기억 속의 너.jpg",
-            title: "기억 속의 너",
-            description: "커플 전용 선택형 스토리 게임",
-            players: "2인, 90분",
-            price: "240토큰",
-            link: "https://relay.ssobig.com/ssobig-b44",
-          },
-          {
-            image: "/ssobig_assets/playroom/도플갱어.jpg",
-            title: "도플갱어",
-            description:
-              "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야?",
-            players: "4인, 120분",
-            price: "300토큰",
-            link: "https://relay.ssobig.com/ssobig-qju",
-          },
-        ]}
+        items={templateGroups.story_mystery}
       />
 
       {/* 친구들과 함께 즐기기 */}
@@ -691,40 +819,7 @@ export default function PlayroomPage() {
         cardSize="small"
         mobileGap={12}
         imageFit="contain"
-        items={[
-          {
-            image: "/ssobig_assets/playroom/퀴즈메이커.jpg",
-            title: "퀴즈메이커",
-            description: "나만의 퀴즈를 만들어\n친구들과 함께 즐기기",
-            players: "2~100인",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/b2e1cf64",
-          },
-          {
-            image: "/ssobig_assets/playroom/나몰라퀴즈.jpg",
-            title: "나몰라퀴즈",
-            description: "서로에 대해 얼마나\n알고 있는지 확인하기",
-            players: "2~20인",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/3f97c82b",
-          },
-          {
-            image: "/ssobig_assets/playroom/사랑의 징검다리.jpg",
-            title: "사랑의 징검다리",
-            description: "커플을 위한\n관계 테스트 게임",
-            players: "2인",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/3df2320f",
-          },
-          {
-            image: "/ssobig_assets/playroom/우정의 징검다리.jpg",
-            title: "우정의 징검다리",
-            description: "친구들과의 우정을\n테스트하는 게임",
-            players: "2~10인",
-            price: "무료",
-            link: "https://tool.ssobig.com/templates/93fa153c",
-          },
-        ]}
+        items={templateGroups.friends}
       />
 
       {/* 푸터 */}
