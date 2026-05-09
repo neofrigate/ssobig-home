@@ -103,11 +103,13 @@ function generateRollingCount() {
   return value.toLocaleString("ko-KR");
 }
 
+const INITIAL_ROLLING_COUNT = "10,000";
+
 export default function OfflinePage() {
   const [totalParticipants, setTotalParticipants] = useState<number | null>(
     null
   );
-  const [rollingCount, setRollingCount] = useState(generateRollingCount);
+  const [rollingCount, setRollingCount] = useState(INITIAL_ROLLING_COUNT);
 
   // Supabase 승인 누계를 서버 API를 통해 가져오기
   useEffect(() => {
@@ -138,6 +140,8 @@ export default function OfflinePage() {
     if (totalParticipants !== null) {
       return;
     }
+
+    setRollingCount(generateRollingCount());
 
     const intervalId = window.setInterval(() => {
       setRollingCount(generateRollingCount());
