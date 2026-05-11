@@ -8,8 +8,17 @@ import {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { code?: string };
+    const body = (await request.json()) as {
+      code?: string;
+      staffScheduleId?: string;
+      staff_schedule_id?: string;
+    };
     const code = typeof body.code === "string" ? body.code.trim() : "";
+    const staffScheduleId = typeof body.staffScheduleId === "string"
+      ? body.staffScheduleId.trim()
+      : typeof body.staff_schedule_id === "string"
+      ? body.staff_schedule_id.trim()
+      : "";
 
     if (!code) {
       return jsonResponse({ valid: false, reason: "쿠폰코드를 입력해주세요." }, 400);
@@ -22,7 +31,7 @@ export async function POST(request: Request) {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, staffScheduleId }),
     });
 
     const payload = await readJsonResponse(upstreamResponse);

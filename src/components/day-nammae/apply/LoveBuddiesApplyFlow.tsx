@@ -1075,13 +1075,13 @@ async function parseJsonResponse<T>(response: Response) {
   }
 }
 
-async function requestCouponValidation(code: string) {
+async function requestCouponValidation(code: string, staffScheduleId: string) {
   const response = await fetch(`${getDayNammeCouponApiBaseUrl()}/validate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ code, staffScheduleId }),
   });
 
   const payload = await parseJsonResponse<CouponValidationResult | Record<string, unknown>>(
@@ -1109,13 +1109,13 @@ async function requestCouponValidation(code: string) {
   return payload as CouponValidationResult;
 }
 
-async function requestCouponUse(code: string) {
+async function requestCouponUse(code: string, staffScheduleId: string) {
   const response = await fetch(`${getDayNammeCouponApiBaseUrl()}/use`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ code, staffScheduleId }),
   });
 
   const payload = await parseJsonResponse<CouponUseResult | Record<string, unknown>>(
@@ -1234,6 +1234,10 @@ function getCouponDiscountRate(
   }
 
   const label = typeof coupon.discount_label === "string" ? coupon.discount_label : "";
+  if (label.includes("100%") || label.includes("전액")) {
+    return 100;
+  }
+
   if (label.includes("반값") || label.includes("50%")) {
     return 50;
   }
@@ -1266,6 +1270,14 @@ function getMappedBookingUrl(
   }
 
   return normalLink || DEFAULT_NORMAL_BOOKING_URL;
+}
+
+function couponRequiresPayment(
+  coupon?: Partial<CouponValidationResult & CouponUseResult> | null
+) {
+  if (!coupon) return true;
+  if (coupon.requires_payment === false) return false;
+  return getCouponDiscountRate(coupon) < 100;
 }
 
 function formatPrice(value: number) {
@@ -1589,8 +1601,13 @@ export default function LoveBuddiesApplyFlow({
         gender,
         schedule: nextSchedule,
         staffScheduleId: nextStaffScheduleId,
+        couponCode: nextSchedule ? current.couponCode : "",
       };
     });
+    if (validatedCoupon) {
+      setValidatedCoupon(null);
+      setCouponValidationStatus("idle");
+    }
     setFormError("");
     setShowFieldErrors(false);
     setWaitlistModalSchedule(null);
@@ -1606,6 +1623,8 @@ export default function LoveBuddiesApplyFlow({
       schedule: scheduleLabel,
       staffScheduleId: schedule.staffScheduleId,
     }));
+    setValidatedCoupon(null);
+    setCouponValidationStatus(formValues.couponCode ? "idle" : "invalid");
     setFormError("");
     setShowFieldErrors(false);
     setConfirmedWaitlistSchedule("");
@@ -1674,6 +1693,13 @@ export default function LoveBuddiesApplyFlow({
       return;
     }
 
+    if (!formValues.staffScheduleId) {
+      setCouponValidationStatus("invalid");
+      setValidatedCoupon(null);
+      setFormError("먼저 신청할 회차를 선택해주세요.");
+      return;
+    }
+
     setCouponValidationStatus("validating");
     setValidatedCoupon(null);
     setFormError("");
@@ -1681,7 +1707,8 @@ export default function LoveBuddiesApplyFlow({
     try {
       await delay(COUPON_VALIDATE_DELAY_MS);
       const result = await requestCouponValidation(
-        buildDayNammeCouponCode(couponCodeSuffix)
+        buildDayNammeCouponCode(couponCodeSuffix),
+        formValues.staffScheduleId
       );
       setCouponValidationStatus("valid");
       setValidatedCoupon(result);
@@ -1890,7 +1917,10 @@ export default function LoveBuddiesApplyFlow({
 
         if (!checkoutSource) {
           submitStage = "client:coupon-use:start";
-          checkoutSource = await requestCouponUse(validatedCoupon.code);
+          checkoutSource = await requestCouponUse(
+            validatedCoupon.code,
+            formValues.staffScheduleId
+          );
           submitStage = "client:coupon-use:success";
         }
         trackEvent("DN_UseCoupon", {
@@ -1903,6 +1933,17 @@ export default function LoveBuddiesApplyFlow({
         setSubmitState({
           status: "success",
           message: DEFAULT_WAITLIST_SUBMIT_SUCCESS_MESSAGE,
+          checkout: null,
+          applicationSubmitted,
+          applicationMode: selectedApplicationMode,
+        });
+        return;
+      }
+
+      if (!couponRequiresPayment(checkoutSource)) {
+        setSubmitState({
+          status: "success",
+          message: "100% 쿠폰으로 참가 신청이 확정되었습니다. 별도 결제는 필요하지 않습니다.",
           checkout: null,
           applicationSubmitted,
           applicationMode: selectedApplicationMode,
@@ -2137,6 +2178,52 @@ export default function LoveBuddiesApplyFlow({
           </p>
           <p className="mt-2">
             신청 가능한 자리가 생기면 링크를 다시 보내드리고, 그때 기존 신청 절차를 진행하시면 됩니다.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={resetFlow}
+          className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full border border-white/20 text-sm font-medium text-white/70 transition active:scale-[0.98]"
+        >
+          다른 일정도 보기
+        </button>
+      </ApplyStepShell>
+    );
+  }
+
+  if (submitState.status === "success" && !submitState.checkout) {
+    return (
+      <ApplyStepShell
+        mode={mode}
+        currentStep={totalSteps}
+        totalSteps={totalSteps}
+        title="참가 신청이 확정되었어요"
+        description="100% 쿠폰이 적용되어 결제가 필요하지 않습니다."
+        canProceed={true}
+        hideNav
+        onNext={() => {}}
+        onBack={() => {}}
+      >
+        <div className="rounded-2xl border border-emerald-300/25 bg-emerald-400/10 px-5 py-5 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-100/70">
+            CONFIRMED
+          </p>
+          <p className="mt-3 text-base font-bold text-white">{formValues.schedule}</p>
+          <p className="mt-1 text-sm text-white/70">
+            {formValues.name} · {formValues.phone}
+          </p>
+          {validatedCoupon?.discount_label && (
+            <div className="mt-4 inline-flex rounded-full border border-emerald-300/35 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+              {validatedCoupon.discount_label}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-5 py-5 text-left text-sm leading-relaxed text-white/68">
+          <p>{submitState.message}</p>
+          <p className="mt-3">
+            모임 입장에 필요한 티켓과 웹앱 링크는 모임일 하루 전 알림톡으로 안내됩니다.
           </p>
         </div>
 

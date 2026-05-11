@@ -87,6 +87,16 @@ export default function StepCouponCode({
           {validatedCoupon.discount_label && (
             <p className="mt-2">혜택: {validatedCoupon.discount_label}</p>
           )}
+          {validatedCoupon.target_schedule_label && (
+            <p className="mt-1 text-emerald-100/80">
+              사용 가능 회차: {validatedCoupon.target_schedule_label}
+            </p>
+          )}
+          {validatedCoupon.requires_payment === false && (
+            <p className="mt-1 text-emerald-100/80">
+              별도 결제 없이 신청이 확정됩니다.
+            </p>
+          )}
           {expiryLabel && <p className="mt-1 text-emerald-100/80">만료: {expiryLabel}</p>}
         </div>
       )}
