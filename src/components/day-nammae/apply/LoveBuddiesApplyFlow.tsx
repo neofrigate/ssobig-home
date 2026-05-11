@@ -120,6 +120,11 @@ type FlowStepKey =
   | "marketing"
   | "notice";
 
+type CouponScheduleLookupResult = Partial<CouponValidationResult> & {
+  valid?: boolean;
+  reason?: string;
+};
+
 const WAITLIST_ALERT_FLOW_STEPS: FlowStepKey[] = [
   "gender",
   "schedule",
@@ -1109,6 +1114,32 @@ async function requestCouponValidation(code: string, staffScheduleId: string) {
   return payload as CouponValidationResult;
 }
 
+async function requestCouponScheduleLookup(code: string) {
+  const response = await fetch(`${getDayNammeCouponApiBaseUrl()}/validate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  });
+
+  const payload = await parseJsonResponse<
+    CouponScheduleLookupResult | Record<string, unknown>
+  >(response);
+
+  if (!response.ok) {
+    throw new Error(
+      getCouponReason(payload, DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE)
+    );
+  }
+
+  if (!payload || typeof payload !== "object") {
+    throw new Error(DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE);
+  }
+
+  return payload as CouponScheduleLookupResult;
+}
+
 async function requestCouponUse(code: string, staffScheduleId: string) {
   const response = await fetch(`${getDayNammeCouponApiBaseUrl()}/use`, {
     method: "POST",
@@ -1434,6 +1465,7 @@ export default function LoveBuddiesApplyFlow({
     useState<CouponValidationStatus>("idle");
   const [validatedCoupon, setValidatedCoupon] =
     useState<CouponValidationResult | null>(null);
+  const [couponScheduleLookupCode, setCouponScheduleLookupCode] = useState("");
   const [submitState, setSubmitState] = useState<SubmitState>(INITIAL_SUBMIT_STATE);
   const [waitlistModalSchedule, setWaitlistModalSchedule] =
     useState<ScheduleItem | null>(null);
@@ -1490,6 +1522,68 @@ export default function LoveBuddiesApplyFlow({
       };
     });
   }, [normalizedInitialCouponCode]);
+
+  useEffect(() => {
+    if (
+      !normalizedInitialCouponCode ||
+      couponScheduleLookupCode === normalizedInitialCouponCode ||
+      isLoadingSchedules ||
+      scheduleData.length === 0
+    ) {
+      return;
+    }
+
+    setCouponScheduleLookupCode(normalizedInitialCouponCode);
+
+    requestCouponScheduleLookup(buildDayNammeCouponCode(normalizedInitialCouponCode))
+      .then((result) => {
+        const targetStaffScheduleId =
+          typeof result.target_staff_schedule_id === "string"
+            ? result.target_staff_schedule_id.trim()
+            : "";
+
+        if (!targetStaffScheduleId) {
+          return;
+        }
+
+        const targetSchedule = scheduleData.find(
+          (schedule) => schedule.staffScheduleId === targetStaffScheduleId
+        );
+
+        if (!targetSchedule) {
+          return;
+        }
+
+        const targetScheduleLabel = getDayNammeScheduleLabel(targetSchedule);
+
+        setFormValues((current) => {
+          if (
+            current.staffScheduleId &&
+            current.staffScheduleId !== targetStaffScheduleId
+          ) {
+            return current;
+          }
+
+          return {
+            ...current,
+            hasCoupon: true,
+            couponCode: normalizedInitialCouponCode,
+            schedule: targetScheduleLabel,
+            staffScheduleId: targetStaffScheduleId,
+          };
+        });
+        setValidatedCoupon(null);
+        setCouponValidationStatus("idle");
+      })
+      .catch((error) => {
+        console.warn("[day-nammae coupon schedule lookup failed]", error);
+      });
+  }, [
+    couponScheduleLookupCode,
+    isLoadingSchedules,
+    normalizedInitialCouponCode,
+    scheduleData,
+  ]);
 
   const closeFlow = () => {
     if (mode === "page") {
