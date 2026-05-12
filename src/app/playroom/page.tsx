@@ -654,11 +654,7 @@ export default function PlayroomPage() {
           items?: PlayroomTemplateApiItem[];
         };
         const nextGroups = groupPlayroomTemplates(data.items || []);
-        if (
-          isMounted &&
-          nextGroups.story_mystery.length > 0 &&
-          nextGroups.friends.length > 0
-        ) {
+        if (isMounted) {
           setTemplateGroups(nextGroups);
         }
       } catch (error) {
@@ -807,20 +803,22 @@ export default function PlayroomPage() {
         </div>
       </section>
 
-      {/* 스토리 추리게임 */}
-      <ContentRow
-        title="스토리 추리게임"
-        items={templateGroups.story_mystery}
-      />
+      {templateGroups.story_mystery.length > 0 && (
+        <ContentRow
+          title="스토리 추리게임"
+          items={templateGroups.story_mystery}
+        />
+      )}
 
-      {/* 친구들과 함께 즐기기 */}
-      <ContentRow
-        title="친구들과 함께 즐기기"
-        cardSize="small"
-        mobileGap={12}
-        imageFit="contain"
-        items={templateGroups.friends}
-      />
+      {templateGroups.friends.length > 0 && (
+        <ContentRow
+          title="친구들과 함께 즐기기"
+          cardSize="small"
+          mobileGap={12}
+          imageFit="contain"
+          items={templateGroups.friends}
+        />
+      )}
 
       {/* 푸터 */}
       <footer className="bg-gray-50 border-t border-gray-200">
