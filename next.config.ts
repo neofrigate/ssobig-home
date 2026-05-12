@@ -34,6 +34,18 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/storage/v1/object/public/playroom-campaign-assets/**",
       },
+      {
+        protocol: "https",
+        hostname: "tlyioijsopxeegzfjlqe.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/playroom-template-card-assets/**",
+      },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+        port: "",
+        pathname: "/v0/b/**",
+      },
     ],
     unoptimized: false,
   },
