@@ -591,6 +591,8 @@ export async function POST(request: Request) {
     const photo = formData.get("photo");
     const usedCouponId = getOptionalPositiveInt(formData, "usedCouponId");
     const couponCode = getOptionalString(formData, "couponCode");
+    const freeCouponNoShowAgreement =
+      getOptionalString(formData, "freeCouponNoShowAgreement") === "true";
 
     if (!(photo instanceof File) || photo.size === 0) {
       throw new Error("업로드할 사진 파일이 필요합니다.");
@@ -745,6 +747,7 @@ export async function POST(request: Request) {
       staffScheduleId,
       usedCouponId,
       couponCode,
+      freeCouponNoShowAgreement,
       applicationMode,
     };
 

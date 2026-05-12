@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { useState, useEffect, useMemo } from "react";
 import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
+import { getDayNammeCouponSuffixFromSearchParam } from "@/features/day-nammae/coupon";
 import { useDayNammeSchedule } from "@/features/day-nammae/useDayNammeSchedule";
 import { ScheduleItem } from "@/features/day-nammae/types";
 import {
   buildMetaPixelPageViewScript,
   LOVE_BUDDIES_PIXEL_ID,
 } from "@/utils/metaPixel";
+import { getSafeSearchParams } from "@/utils/utm";
 
 // 한국 공휴일 (2025-2027)
 const KOREAN_HOLIDAYS: Record<string, string> = {
@@ -124,6 +126,7 @@ const ElevenNammePage = () => {
   const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
   const [isApplyOpen, setIsApplyOpen] = useState(false);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
+  const [initialCouponCode, setInitialCouponCode] = useState("");
 
   // 참가자 차트 컴포넌트 - 중앙 기준
   const ApplicantChart = ({
@@ -184,6 +187,14 @@ const ElevenNammePage = () => {
   };
 
   // 스케줄 아이템 컴포넌트
+  useEffect(() => {
+    setInitialCouponCode(
+      getDayNammeCouponSuffixFromSearchParam(
+        getSafeSearchParams(window.location.search).get("coupon")
+      )
+    );
+  }, []);
+
   useEffect(() => {
     if (!isApplyOpen) {
       return;
@@ -913,6 +924,7 @@ const ElevenNammePage = () => {
               mode="modal"
               scheduleData={scheduleData}
               isLoadingSchedules={isLoading}
+              initialCouponCode={initialCouponCode}
               onClose={() => setIsApplyOpen(false)}
             />
           </div>

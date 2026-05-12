@@ -94,7 +94,7 @@ export default function StepCouponCode({
           )}
           {validatedCoupon.requires_payment === false && (
             <p className="mt-1 text-emerald-100/80">
-              별도 결제 없이 신청이 확정됩니다.
+              별도 결제 없이 무료초대 신청으로 접수됩니다.
             </p>
           )}
           {expiryLabel && <p className="mt-1 text-emerald-100/80">만료: {expiryLabel}</p>}

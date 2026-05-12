@@ -8,7 +8,10 @@ import {
   DAY_NAMMAE_COUPON_CODE_SUFFIX_LENGTH,
   normalizeDayNammeCouponCode,
 } from "@/features/day-nammae/coupon";
-import { DAY_NAMMAE_NOTICE_SECTIONS } from "@/features/day-nammae/constants";
+import {
+  DAY_NAMMAE_FREE_COUPON_NOTICE_SECTION,
+  DAY_NAMMAE_NOTICE_SECTIONS,
+} from "@/features/day-nammae/constants";
 import {
   getDayNammeScheduleApplicationMode,
   getDayNammeScheduleLabel,
@@ -114,6 +117,7 @@ type FlowStepKey =
   | "waitlist_contact"
   | "coupon_choice"
   | "coupon_code"
+  | "free_coupon_notice"
   | "profile"
   | "photo"
   | "approval"
@@ -131,12 +135,18 @@ const WAITLIST_ALERT_FLOW_STEPS: FlowStepKey[] = [
   "waitlist_contact",
 ];
 
-function getNormalFlowSteps(hasCoupon: boolean | null): FlowStepKey[] {
+function getNormalFlowSteps(
+  hasCoupon: boolean | null,
+  isFreeCoupon: boolean
+): FlowStepKey[] {
   return [
     "gender",
     "schedule",
     "coupon_choice",
     ...(hasCoupon === true ? ["coupon_code" as const] : []),
+    ...(hasCoupon === true && isFreeCoupon
+      ? ["free_coupon_notice" as const]
+      : []),
     "profile",
     "photo",
     "approval",
@@ -308,6 +318,10 @@ const STEP_CONFIG: Record<
   coupon_code: {
     title: "쿠폰 번호를 입력해주세요",
     description: "쿠폰 확인이 완료되면 할인 결제 링크로 안내됩니다.",
+  },
+  free_coupon_notice: {
+    title: "무료초대 안내를 확인해주세요",
+    description: "무료 초대권 신청 전 노쇼 및 불참 고지 기준을 확인합니다.",
   },
   profile: {
     title: "신청서를 작성해주세요",
@@ -1461,6 +1475,7 @@ export default function LoveBuddiesApplyFlow({
   const [formError, setFormError] = useState("");
   const [showFieldErrors, setShowFieldErrors] = useState(false);
   const [agreements, setAgreements] = useState([false, false, false]);
+  const [freeCouponNoticeAgreed, setFreeCouponNoticeAgreed] = useState(false);
   const [couponValidationStatus, setCouponValidationStatus] =
     useState<CouponValidationStatus>("idle");
   const [validatedCoupon, setValidatedCoupon] =
@@ -1482,9 +1497,13 @@ export default function LoveBuddiesApplyFlow({
     ? getDayNammeScheduleApplicationMode(selectedScheduleItem, formValues.gender)
     : "normal";
   const isWaitlistApplication = selectedApplicationMode === "waitlist_alert";
+  const isValidatedFreeCoupon =
+    couponValidationStatus === "valid" &&
+    Boolean(validatedCoupon) &&
+    !couponRequiresPayment(validatedCoupon);
   const flowSteps = isWaitlistApplication
     ? WAITLIST_ALERT_FLOW_STEPS
-    : getNormalFlowSteps(formValues.hasCoupon);
+    : getNormalFlowSteps(formValues.hasCoupon, isValidatedFreeCoupon);
   const currentStepKey = flowSteps[currentStepIndex] || flowSteps[0];
   const totalSteps = flowSteps.length;
   const displayStep = currentStepIndex + 1;
@@ -1501,6 +1520,12 @@ export default function LoveBuddiesApplyFlow({
     setPhotoPreviewUrl(previewUrl);
     return () => URL.revokeObjectURL(previewUrl);
   }, [formValues.photo]);
+
+  useEffect(() => {
+    if (!isValidatedFreeCoupon) {
+      setFreeCouponNoticeAgreed(false);
+    }
+  }, [isValidatedFreeCoupon]);
 
   useEffect(() => {
     if (!normalizedInitialCouponCode) {
@@ -1599,6 +1624,7 @@ export default function LoveBuddiesApplyFlow({
     setCurrentStepIndex(0);
     setFormValues(initialFormValues);
     setAgreements([false, false, false]);
+    setFreeCouponNoticeAgreed(false);
     setShowFieldErrors(false);
     setFormError("");
     setPhotoNotice("");
@@ -1690,17 +1716,19 @@ export default function LoveBuddiesApplyFlow({
           ? ""
           : current.schedule;
       const nextStaffScheduleId = nextSchedule ? current.staffScheduleId : "";
+      const shouldClearCoupon = Boolean(current.schedule) && !nextSchedule;
       return {
         ...current,
         gender,
         schedule: nextSchedule,
         staffScheduleId: nextStaffScheduleId,
-        couponCode: nextSchedule ? current.couponCode : "",
+        couponCode: shouldClearCoupon ? "" : current.couponCode,
       };
     });
     if (validatedCoupon) {
       setValidatedCoupon(null);
       setCouponValidationStatus("idle");
+      setFreeCouponNoticeAgreed(false);
     }
     setFormError("");
     setShowFieldErrors(false);
@@ -1719,6 +1747,7 @@ export default function LoveBuddiesApplyFlow({
     }));
     setValidatedCoupon(null);
     setCouponValidationStatus(formValues.couponCode ? "idle" : "invalid");
+    setFreeCouponNoticeAgreed(false);
     setFormError("");
     setShowFieldErrors(false);
     setConfirmedWaitlistSchedule("");
@@ -1765,6 +1794,7 @@ export default function LoveBuddiesApplyFlow({
     if (!nextValue) {
       setValidatedCoupon(null);
       setCouponValidationStatus("idle");
+      setFreeCouponNoticeAgreed(false);
     }
     setFormError("");
   };
@@ -1774,6 +1804,7 @@ export default function LoveBuddiesApplyFlow({
     setFormValues((current) => ({ ...current, couponCode }));
     setValidatedCoupon(null);
     setCouponValidationStatus(couponCode ? "idle" : "invalid");
+    setFreeCouponNoticeAgreed(false);
     setFormError("");
   };
 
@@ -1849,6 +1880,8 @@ export default function LoveBuddiesApplyFlow({
               normalizeDayNammeCouponCode(formValues.couponCode)
             )
         );
+      case "free_coupon_notice":
+        return freeCouponNoticeAgreed;
       case "profile":
         return (
           formValues.name.trim() !== "" &&
@@ -1884,6 +1917,11 @@ export default function LoveBuddiesApplyFlow({
         validatedCoupon.code !== normalizedCouponCode
       ) {
         setFormError("쿠폰 확인을 완료해주세요.");
+        return;
+      }
+
+      if (isValidatedFreeCoupon && !freeCouponNoticeAgreed) {
+        setFormError("무료초대 노쇼 안내를 확인하고 동의해주세요.");
         return;
       }
     }
@@ -1941,6 +1979,9 @@ export default function LoveBuddiesApplyFlow({
         if (wantsCoupon && validatedCoupon) {
           requestBody.append("usedCouponId", String(validatedCoupon.id));
           requestBody.append("couponCode", validatedCoupon.code);
+          if (isValidatedFreeCoupon) {
+            requestBody.append("freeCouponNoShowAgreement", "true");
+          }
         }
         if (clientDebugContext) {
           requestBody.append("debug_client_context", JSON.stringify(clientDebugContext));
@@ -2037,7 +2078,8 @@ export default function LoveBuddiesApplyFlow({
       if (!couponRequiresPayment(checkoutSource)) {
         setSubmitState({
           status: "success",
-          message: "100% 쿠폰으로 참가 신청이 확정되었습니다. 별도 결제는 필요하지 않습니다.",
+          message:
+            "무료 초대권 신청이 접수되었습니다. 운영진 확인 후 참가확정 알림톡을 보내드릴게요.",
           checkout: null,
           applicationSubmitted,
           applicationMode: selectedApplicationMode,
@@ -2170,6 +2212,9 @@ export default function LoveBuddiesApplyFlow({
       if (currentStepKey === "notice") {
         trackEvent("DN_Step8_AcceptNotice");
       }
+      if (currentStepKey === "free_coupon_notice") {
+        trackEvent("DN_AcceptFreeCouponNotice");
+      }
       if (currentStepKey === "waitlist_contact") {
         trackEvent("DN_WaitlistAlertSubmit", {
           schedule: formValues.schedule,
@@ -2199,6 +2244,13 @@ export default function LoveBuddiesApplyFlow({
         code: validatedCoupon?.code || "",
         discount_label: validatedCoupon?.discount_label || "",
       });
+      setCurrentStepIndex((step) => step + 1);
+      setFormError("");
+      return;
+    }
+
+    if (currentStepKey === "free_coupon_notice") {
+      trackEvent("DN_AcceptFreeCouponNotice");
       setCurrentStepIndex((step) => step + 1);
       setFormError("");
       return;
@@ -2292,8 +2344,8 @@ export default function LoveBuddiesApplyFlow({
         mode={mode}
         currentStep={totalSteps}
         totalSteps={totalSteps}
-        title="참가 신청이 확정되었어요"
-        description="100% 쿠폰이 적용되어 결제가 필요하지 않습니다."
+        title="무료초대 신청이 접수되었어요"
+        description="운영진 확인 후 참가확정 알림톡을 보내드립니다."
         canProceed={true}
         hideNav
         onNext={() => {}}
@@ -2301,7 +2353,7 @@ export default function LoveBuddiesApplyFlow({
       >
         <div className="rounded-2xl border border-emerald-300/25 bg-emerald-400/10 px-5 py-5 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider text-emerald-100/70">
-            CONFIRMED
+            RECEIVED
           </p>
           <p className="mt-3 text-base font-bold text-white">{formValues.schedule}</p>
           <p className="mt-1 text-sm text-white/70">
@@ -2317,7 +2369,10 @@ export default function LoveBuddiesApplyFlow({
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-5 py-5 text-left text-sm leading-relaxed text-white/68">
           <p>{submitState.message}</p>
           <p className="mt-3">
-            모임 입장에 필요한 티켓과 웹앱 링크는 모임일 하루 전 알림톡으로 안내됩니다.
+            최종 확정 후 모임 입장에 필요한 티켓과 웹앱 링크는 모임일 하루 전 알림톡으로 안내됩니다.
+          </p>
+          <p className="mt-2">
+            불참이 필요하신 경우 반드시 모임 1일 전까지 우측 하단 상담 버튼으로 알려주세요.
           </p>
         </div>
 
@@ -2482,7 +2537,9 @@ export default function LoveBuddiesApplyFlow({
               <p className="mt-1 text-xs text-white/65">
                 {isWaitlistApplication
                   ? "완료되면 알림신청 완료 화면으로 이동합니다."
-                  : "완료되면 바로 결제 단계로 넘어갑니다."}
+                  : isValidatedFreeCoupon
+                    ? "완료되면 무료초대 신청 접수 화면으로 이동합니다."
+                    : "완료되면 바로 결제 단계로 넘어갑니다."}
               </p>
             </div>
           </div>
@@ -2518,6 +2575,14 @@ export default function LoveBuddiesApplyFlow({
             </div>
           )}
         </>
+      )}
+
+      {currentStepKey === "free_coupon_notice" && (
+        <StepAgreement
+          section={DAY_NAMMAE_FREE_COUPON_NOTICE_SECTION}
+          agreed={freeCouponNoticeAgreed}
+          onAgreeChange={setFreeCouponNoticeAgreed}
+        />
       )}
 
       {currentStepKey === "gender" && (

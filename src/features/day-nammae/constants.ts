@@ -24,6 +24,15 @@ export const DAY_NAMMAE_NOTICE_SECTIONS = [
   },
 ];
 
+export const DAY_NAMMAE_FREE_COUPON_NOTICE_SECTION = {
+  title: "무료초대 노쇼 안내",
+  body: [
+    "무료 초대권은 다른 참가자와 운영진이 함께 준비하는 자리입니다.",
+    "무료 초대권을 사용하시고 노쇼하시는 경우 이후 쏘빅 프로그램 참여가 제한되거나 블랙리스트에 등록될 수 있습니다.",
+    "불참이 필요하신 경우 반드시 모임 1일 전까지 우측 하단 상담 버튼 또는 문의하기로 알려주세요.",
+  ],
+};
+
 export const DAY_NAMMAE_BIRTH_YEARS = Array.from(
   { length: 16 },
   (_, index) => String(1992 + index)
