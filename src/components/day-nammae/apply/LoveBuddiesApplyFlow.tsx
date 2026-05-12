@@ -137,8 +137,23 @@ const WAITLIST_ALERT_FLOW_STEPS: FlowStepKey[] = [
 
 function getNormalFlowSteps(
   hasCoupon: boolean | null,
-  isFreeCoupon: boolean
+  isFreeCoupon: boolean,
+  isScheduleLimitedCouponMode: boolean
 ): FlowStepKey[] {
+  if (hasCoupon === true && isScheduleLimitedCouponMode) {
+    return [
+      "gender",
+      "coupon_code",
+      "schedule",
+      ...(isFreeCoupon ? ["free_coupon_notice" as const] : []),
+      "profile",
+      "photo",
+      "approval",
+      "marketing",
+      "notice",
+    ];
+  }
+
   return [
     "gender",
     "schedule",
@@ -153,6 +168,51 @@ function getNormalFlowSteps(
     "marketing",
     "notice",
   ];
+}
+
+function getCouponTargetScheduleIds(
+  coupon?: Partial<CouponValidationResult> | null
+) {
+  const ids = new Set<string>();
+
+  if (typeof coupon?.target_staff_schedule_id === "string") {
+    const id = coupon.target_staff_schedule_id.trim();
+    if (id) ids.add(id);
+  }
+
+  if (Array.isArray(coupon?.target_staff_schedule_ids)) {
+    coupon.target_staff_schedule_ids.forEach((rawId) => {
+      const id = typeof rawId === "string" ? rawId.trim() : "";
+      if (id) ids.add(id);
+    });
+  }
+
+  if (Array.isArray(coupon?.target_schedules)) {
+    coupon.target_schedules.forEach((schedule) => {
+      const id = String(schedule?.staff_schedule_id || schedule?.id || "").trim();
+      if (id) ids.add(id);
+    });
+  }
+
+  return [...ids];
+}
+
+function getCouponTargetScheduleLabel(
+  coupon?: Partial<CouponValidationResult> | null
+) {
+  if (typeof coupon?.target_schedule_label === "string") {
+    const label = coupon.target_schedule_label.trim();
+    if (label) return label;
+  }
+
+  if (Array.isArray(coupon?.target_schedules)) {
+    return coupon.target_schedules
+      .map((schedule) => String(schedule?.label || "").trim())
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  return "";
 }
 const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
 const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
@@ -1094,6 +1154,16 @@ async function parseJsonResponse<T>(response: Response) {
   }
 }
 
+class CouponValidationError extends Error {
+  payload: CouponScheduleLookupResult | null;
+
+  constructor(message: string, payload: CouponScheduleLookupResult | null) {
+    super(message);
+    this.name = "CouponValidationError";
+    this.payload = payload;
+  }
+}
+
 async function requestCouponValidation(code: string, staffScheduleId: string) {
   const response = await fetch(`${getDayNammeCouponApiBaseUrl()}/validate`, {
     method: "POST",
@@ -1108,8 +1178,11 @@ async function requestCouponValidation(code: string, staffScheduleId: string) {
   );
 
   if (!response.ok) {
-    throw new Error(
-      getCouponReason(payload, DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE)
+    throw new CouponValidationError(
+      getCouponReason(payload, DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE),
+      payload && typeof payload === "object"
+        ? (payload as CouponScheduleLookupResult)
+        : null
     );
   }
 
@@ -1118,7 +1191,10 @@ async function requestCouponValidation(code: string, staffScheduleId: string) {
   }
 
   if (!("valid" in payload) || payload.valid !== true) {
-    throw new Error(getCouponReason(payload, "사용할 수 없는 쿠폰입니다."));
+    throw new CouponValidationError(
+      getCouponReason(payload, "사용할 수 없는 쿠폰입니다."),
+      payload as CouponScheduleLookupResult
+    );
   }
 
   if (!("id" in payload) || typeof payload.id !== "number") {
@@ -1480,6 +1556,8 @@ export default function LoveBuddiesApplyFlow({
     useState<CouponValidationStatus>("idle");
   const [validatedCoupon, setValidatedCoupon] =
     useState<CouponValidationResult | null>(null);
+  const [scheduleLimitedCoupon, setScheduleLimitedCoupon] =
+    useState<CouponScheduleLookupResult | null>(null);
   const [couponScheduleLookupCode, setCouponScheduleLookupCode] = useState("");
   const [submitState, setSubmitState] = useState<SubmitState>(INITIAL_SUBMIT_STATE);
   const [waitlistModalSchedule, setWaitlistModalSchedule] =
@@ -1499,11 +1577,23 @@ export default function LoveBuddiesApplyFlow({
   const isWaitlistApplication = selectedApplicationMode === "waitlist_alert";
   const isValidatedFreeCoupon =
     couponValidationStatus === "valid" &&
-    Boolean(validatedCoupon) &&
-    !couponRequiresPayment(validatedCoupon);
+    Boolean(validatedCoupon || scheduleLimitedCoupon) &&
+    !couponRequiresPayment(validatedCoupon || scheduleLimitedCoupon);
+  const scheduleLimitedTargetIds = getCouponTargetScheduleIds(
+    scheduleLimitedCoupon || validatedCoupon
+  );
+  const isScheduleLimitedCouponMode =
+    formValues.hasCoupon === true && scheduleLimitedTargetIds.length > 0;
+  const scheduleLimitedTargetLabel = getCouponTargetScheduleLabel(
+    scheduleLimitedCoupon || validatedCoupon
+  );
   const flowSteps = isWaitlistApplication
     ? WAITLIST_ALERT_FLOW_STEPS
-    : getNormalFlowSteps(formValues.hasCoupon, isValidatedFreeCoupon);
+    : getNormalFlowSteps(
+        formValues.hasCoupon,
+        isValidatedFreeCoupon,
+        isScheduleLimitedCouponMode
+      );
   const currentStepKey = flowSteps[currentStepIndex] || flowSteps[0];
   const totalSteps = flowSteps.length;
   const displayStep = currentStepIndex + 1;
@@ -1562,17 +1652,15 @@ export default function LoveBuddiesApplyFlow({
 
     requestCouponScheduleLookup(buildDayNammeCouponCode(normalizedInitialCouponCode))
       .then((result) => {
-        const targetStaffScheduleId =
-          typeof result.target_staff_schedule_id === "string"
-            ? result.target_staff_schedule_id.trim()
-            : "";
+        const targetStaffScheduleIds = getCouponTargetScheduleIds(result);
 
-        if (!targetStaffScheduleId) {
+        if (targetStaffScheduleIds.length === 0) {
           return;
         }
 
+        setScheduleLimitedCoupon(result);
         const targetSchedule = scheduleData.find(
-          (schedule) => schedule.staffScheduleId === targetStaffScheduleId
+          (schedule) => targetStaffScheduleIds.includes(schedule.staffScheduleId)
         );
 
         if (!targetSchedule) {
@@ -1584,7 +1672,7 @@ export default function LoveBuddiesApplyFlow({
         setFormValues((current) => {
           if (
             current.staffScheduleId &&
-            current.staffScheduleId !== targetStaffScheduleId
+            !targetStaffScheduleIds.includes(current.staffScheduleId)
           ) {
             return current;
           }
@@ -1594,7 +1682,7 @@ export default function LoveBuddiesApplyFlow({
             hasCoupon: true,
             couponCode: normalizedInitialCouponCode,
             schedule: targetScheduleLabel,
-            staffScheduleId: targetStaffScheduleId,
+            staffScheduleId: targetSchedule.staffScheduleId,
           };
         });
         setValidatedCoupon(null);
@@ -1630,6 +1718,7 @@ export default function LoveBuddiesApplyFlow({
     setPhotoNotice("");
     setCouponValidationStatus("idle");
     setValidatedCoupon(null);
+    setScheduleLimitedCoupon(null);
     setWaitlistModalSchedule(null);
     setConfirmedWaitlistSchedule("");
   };
@@ -1716,7 +1805,8 @@ export default function LoveBuddiesApplyFlow({
           ? ""
           : current.schedule;
       const nextStaffScheduleId = nextSchedule ? current.staffScheduleId : "";
-      const shouldClearCoupon = Boolean(current.schedule) && !nextSchedule;
+      const shouldClearCoupon =
+        Boolean(current.schedule) && !nextSchedule && !isScheduleLimitedCouponMode;
       return {
         ...current,
         gender,
@@ -1730,14 +1820,68 @@ export default function LoveBuddiesApplyFlow({
       setCouponValidationStatus("idle");
       setFreeCouponNoticeAgreed(false);
     }
-    setFormError("");
+    setFormError(
+      isScheduleLimitedCouponMode &&
+        scheduleLimitedTargetIds.length > 0 &&
+        !scheduleData.some(
+          (schedule) =>
+            scheduleLimitedTargetIds.includes(schedule.staffScheduleId) &&
+            isDayNammeScheduleSelectable(schedule, gender)
+        )
+        ? "선택한 성별로 신청 가능한 쿠폰 대상 회차가 없습니다."
+        : ""
+    );
     setShowFieldErrors(false);
     setWaitlistModalSchedule(null);
     setConfirmedWaitlistSchedule("");
     setCurrentStepIndex(1);
   };
 
-  const handleScheduleSelect = (schedule: ScheduleItem) => {
+  const validateCouponForSchedule = async (schedule: ScheduleItem) => {
+    const couponCodeSuffix = normalizeDayNammeCouponCode(formValues.couponCode);
+    if (couponCodeSuffix.length !== DAY_NAMMAE_COUPON_CODE_SUFFIX_LENGTH) {
+      setCouponValidationStatus("invalid");
+      setValidatedCoupon(null);
+      setFormError("쿠폰 번호 8자리를 입력해주세요.");
+      return false;
+    }
+
+    setCouponValidationStatus("validating");
+    setValidatedCoupon(null);
+    setFormError("");
+
+    try {
+      const result = await requestCouponValidation(
+        buildDayNammeCouponCode(couponCodeSuffix),
+        schedule.staffScheduleId
+      );
+      setCouponValidationStatus("valid");
+      setValidatedCoupon(result);
+      setScheduleLimitedCoupon(result);
+      setFormValues((current) => ({
+        ...current,
+        couponCode: normalizeDayNammeCouponCode(result.code),
+      }));
+      trackEvent("DN_ValidateCoupon", {
+        code: result.code,
+        discount_label: result.discount_label || "",
+      });
+      return true;
+    } catch (error) {
+      const payload = error instanceof CouponValidationError ? error.payload : null;
+      if (payload && getCouponTargetScheduleIds(payload).length > 0) {
+        setScheduleLimitedCoupon(payload);
+      }
+      setCouponValidationStatus("invalid");
+      setValidatedCoupon(null);
+      setFormError(
+        error instanceof Error ? error.message : DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE
+      );
+      return false;
+    }
+  };
+
+  const handleScheduleSelect = async (schedule: ScheduleItem) => {
     const scheduleLabel = getDayNammeScheduleLabel(schedule);
 
     setFormValues((current) => ({
@@ -1757,6 +1901,13 @@ export default function LoveBuddiesApplyFlow({
       "waitlist_alert"
     ) {
       setWaitlistModalSchedule(schedule);
+      return;
+    }
+
+    if (isScheduleLimitedCouponMode) {
+      const isValidForSchedule = await validateCouponForSchedule(schedule);
+      if (!isValidForSchedule) return;
+      setCurrentStepIndex((currentIndex) => Math.max(currentIndex + 1, 3));
       return;
     }
 
@@ -1793,6 +1944,7 @@ export default function LoveBuddiesApplyFlow({
     }));
     if (!nextValue) {
       setValidatedCoupon(null);
+      setScheduleLimitedCoupon(null);
       setCouponValidationStatus("idle");
       setFreeCouponNoticeAgreed(false);
     }
@@ -1803,6 +1955,7 @@ export default function LoveBuddiesApplyFlow({
     const couponCode = normalizeDayNammeCouponCode(event.target.value);
     setFormValues((current) => ({ ...current, couponCode }));
     setValidatedCoupon(null);
+    setScheduleLimitedCoupon(null);
     setCouponValidationStatus(couponCode ? "idle" : "invalid");
     setFreeCouponNoticeAgreed(false);
     setFormError("");
@@ -1819,9 +1972,36 @@ export default function LoveBuddiesApplyFlow({
     }
 
     if (!formValues.staffScheduleId) {
-      setCouponValidationStatus("invalid");
+      setCouponValidationStatus("validating");
       setValidatedCoupon(null);
-      setFormError("먼저 신청할 회차를 선택해주세요.");
+      setFormError("");
+
+      try {
+        const result = await requestCouponScheduleLookup(
+          buildDayNammeCouponCode(couponCodeSuffix)
+        );
+        const targetIds = getCouponTargetScheduleIds(result);
+        if (targetIds.length === 0) {
+          setCouponValidationStatus("invalid");
+          setFormError("먼저 신청할 회차를 선택해주세요.");
+          return;
+        }
+
+        setScheduleLimitedCoupon(result);
+        setCouponValidationStatus("valid");
+        setCurrentStepIndex(1);
+        setFormValues((current) => ({
+          ...current,
+          hasCoupon: true,
+          couponCode: normalizeDayNammeCouponCode(result.code || couponCodeSuffix),
+        }));
+      } catch (error) {
+        setCouponValidationStatus("invalid");
+        setScheduleLimitedCoupon(null);
+        setFormError(
+          error instanceof Error ? error.message : DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE
+        );
+      }
       return;
     }
 
@@ -1837,6 +2017,9 @@ export default function LoveBuddiesApplyFlow({
       );
       setCouponValidationStatus("valid");
       setValidatedCoupon(result);
+      setScheduleLimitedCoupon(
+        getCouponTargetScheduleIds(result).length > 0 ? result : null
+      );
       setFormValues((current) => ({
         ...current,
         couponCode: normalizeDayNammeCouponCode(result.code),
@@ -1846,11 +2029,41 @@ export default function LoveBuddiesApplyFlow({
         discount_label: result.discount_label || "",
       });
     } catch (error) {
+      const payload = error instanceof CouponValidationError ? error.payload : null;
+      if (payload && getCouponTargetScheduleIds(payload).length > 0) {
+        setScheduleLimitedCoupon(payload);
+        setCurrentStepIndex(1);
+      }
       setCouponValidationStatus("invalid");
       setValidatedCoupon(null);
       setFormError(
         error instanceof Error ? error.message : DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE
       );
+    }
+  };
+
+  const handleMoveToCouponTargetSchedule = async () => {
+    const targetSchedule = scheduleData.find(
+      (schedule) =>
+        scheduleLimitedTargetIds.includes(schedule.staffScheduleId) &&
+        isDayNammeScheduleSelectable(schedule, formValues.gender)
+    );
+
+    if (!targetSchedule) {
+      setFormError("현재 선택 가능한 쿠폰 대상 회차가 없습니다.");
+      return;
+    }
+
+    const scheduleLabel = getDayNammeScheduleLabel(targetSchedule);
+    setFormValues((current) => ({
+      ...current,
+      schedule: scheduleLabel,
+      staffScheduleId: targetSchedule.staffScheduleId,
+    }));
+
+    const isValidForSchedule = await validateCouponForSchedule(targetSchedule);
+    if (isValidForSchedule) {
+      setFormError("");
     }
   };
 
@@ -1872,6 +2085,14 @@ export default function LoveBuddiesApplyFlow({
       case "coupon_choice":
         return formValues.hasCoupon !== null;
       case "coupon_code":
+        if (isScheduleLimitedCouponMode && !formValues.staffScheduleId) {
+          return (
+            couponValidationStatus === "valid" &&
+            scheduleLimitedTargetIds.length > 0 &&
+            normalizeDayNammeCouponCode(formValues.couponCode).length ===
+              DAY_NAMMAE_COUPON_CODE_SUFFIX_LENGTH
+          );
+        }
         return (
           couponValidationStatus === "valid" &&
           Boolean(validatedCoupon) &&
@@ -2559,6 +2780,15 @@ export default function LoveBuddiesApplyFlow({
             couponCode={formValues.couponCode}
             validationStatus={couponValidationStatus}
             validatedCoupon={validatedCoupon}
+            scheduleLimitedCoupon={scheduleLimitedCoupon}
+            targetScheduleAction={
+              scheduleLimitedCoupon && scheduleLimitedTargetIds.length > 0
+                ? {
+                    label: "쿠폰 대상 회차로 이동",
+                    onClick: handleMoveToCouponTargetSchedule,
+                  }
+                : null
+            }
             onCodeChange={handleCouponCodeChange}
             onValidate={handleValidateCoupon}
           />
@@ -2595,6 +2825,10 @@ export default function LoveBuddiesApplyFlow({
           isLoading={isLoadingSchedules}
           gender={formValues.gender}
           selectedSchedule={formValues.schedule}
+          allowedScheduleIds={
+            isScheduleLimitedCouponMode ? scheduleLimitedTargetIds : []
+          }
+          targetScheduleLabel={scheduleLimitedTargetLabel}
           onSelect={handleScheduleSelect}
         />
       )}

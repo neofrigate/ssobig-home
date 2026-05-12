@@ -12,7 +12,9 @@ interface StepScheduleProps {
   isLoading: boolean;
   gender: "남" | "여" | "";
   selectedSchedule: string;
-  onSelect: (schedule: ScheduleItem) => void;
+  allowedScheduleIds?: string[];
+  targetScheduleLabel?: string;
+  onSelect: (schedule: ScheduleItem) => void | Promise<void>;
 }
 
 export default function StepSchedule({
@@ -20,8 +22,12 @@ export default function StepSchedule({
   isLoading,
   gender,
   selectedSchedule,
+  allowedScheduleIds = [],
+  targetScheduleLabel = "",
   onSelect,
 }: StepScheduleProps) {
+  const hasAllowedSchedules = allowedScheduleIds.length > 0;
+
   return (
     <div className="space-y-3">
       {isLoading && (
@@ -34,9 +40,20 @@ export default function StepSchedule({
         </p>
       )}
 
+      {hasAllowedSchedules && (
+        <div className="rounded-2xl border border-[#FF6B9F]/30 bg-[#FF6B9F]/10 px-4 py-3 text-xs leading-relaxed text-[#FFD0E2]">
+          이 쿠폰은 회차 전용 쿠폰입니다. {targetScheduleLabel || "쿠폰 대상 회차"}만
+          선택할 수 있습니다.
+        </div>
+      )}
+
       {scheduleData.map((schedule) => {
         const label = getDayNammeScheduleLabel(schedule);
-        const selectable = isDayNammeScheduleSelectable(schedule, gender);
+        const isCouponTarget =
+          !hasAllowedSchedules ||
+          allowedScheduleIds.includes(schedule.staffScheduleId);
+        const selectable =
+          isCouponTarget && isDayNammeScheduleSelectable(schedule, gender);
         const selected = selectedSchedule === label;
         const waitlistSelectable = isDayNammeScheduleWaitlistSelectable(
           schedule,
@@ -86,7 +103,9 @@ export default function StepSchedule({
                 <p
                   className={`mt-1 text-xs ${descriptionClassName}`}
                 >
-                  {getDayNammeScheduleHelperDescription(schedule, gender)}
+                {isCouponTarget
+                  ? getDayNammeScheduleHelperDescription(schedule, gender)
+                  : "쿠폰 대상 회차가 아닙니다."}
                 </p>
               </div>
               <span

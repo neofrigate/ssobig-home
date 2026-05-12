@@ -5,6 +5,11 @@ interface StepCouponCodeProps {
   couponCode: string;
   validationStatus: "idle" | "validating" | "valid" | "invalid";
   validatedCoupon: CouponValidationResult | null;
+  scheduleLimitedCoupon?: Partial<CouponValidationResult> | null;
+  targetScheduleAction?: {
+    label: string;
+    onClick: () => void;
+  } | null;
   onCodeChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onValidate: () => void;
 }
@@ -36,11 +41,14 @@ export default function StepCouponCode({
   couponCode,
   validationStatus,
   validatedCoupon,
+  scheduleLimitedCoupon = null,
+  targetScheduleAction = null,
   onCodeChange,
   onValidate,
 }: StepCouponCodeProps) {
-  const hasSuccess = validationStatus === "valid" && Boolean(validatedCoupon);
-  const expiryLabel = formatExpiry(validatedCoupon?.expires_at);
+  const displayCoupon = validatedCoupon || scheduleLimitedCoupon;
+  const hasSuccess = validationStatus === "valid" && Boolean(displayCoupon);
+  const expiryLabel = formatExpiry(displayCoupon?.expires_at);
 
   return (
     <div className="space-y-4 rounded-2xl border border-[#2c2024] bg-[#1b1416] p-4">
@@ -81,23 +89,46 @@ export default function StepCouponCode({
         {validationStatus === "validating" ? "쿠폰 확인 중..." : "쿠폰 확인"}
       </button>
 
-      {hasSuccess && validatedCoupon && (
+      {hasSuccess && displayCoupon && (
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-4 text-sm text-emerald-100">
-          <p className="font-semibold">사용 가능한 쿠폰입니다.</p>
-          {validatedCoupon.discount_label && (
-            <p className="mt-2">혜택: {validatedCoupon.discount_label}</p>
+          <p className="font-semibold">
+            {validatedCoupon ? "사용 가능한 쿠폰입니다." : "회차 전용 쿠폰입니다."}
+          </p>
+          {displayCoupon.discount_label && (
+            <p className="mt-2">혜택: {displayCoupon.discount_label}</p>
           )}
-          {validatedCoupon.target_schedule_label && (
+          {displayCoupon.target_schedule_label && (
             <p className="mt-1 text-emerald-100/80">
-              사용 가능 회차: {validatedCoupon.target_schedule_label}
+              사용 가능 회차: {displayCoupon.target_schedule_label}
             </p>
           )}
-          {validatedCoupon.requires_payment === false && (
+          {!validatedCoupon && (
+            <p className="mt-1 text-emerald-100/80">
+              다음 단계에서 쿠폰 대상 회차를 선택하면 쿠폰 적용이 완료됩니다.
+            </p>
+          )}
+          {displayCoupon.requires_payment === false && (
             <p className="mt-1 text-emerald-100/80">
               별도 결제 없이 무료초대 신청으로 접수됩니다.
             </p>
           )}
           {expiryLabel && <p className="mt-1 text-emerald-100/80">만료: {expiryLabel}</p>}
+        </div>
+      )}
+
+      {validationStatus === "invalid" && scheduleLimitedCoupon?.target_schedule_label && (
+        <div className="rounded-2xl border border-amber-400/35 bg-amber-500/10 px-4 py-4 text-sm leading-relaxed text-amber-100">
+          <p className="font-semibold">이 쿠폰은 대상 회차에서만 사용할 수 있습니다.</p>
+          <p className="mt-2">사용 가능 회차: {scheduleLimitedCoupon.target_schedule_label}</p>
+          {targetScheduleAction && (
+            <button
+              type="button"
+              onClick={targetScheduleAction.onClick}
+              className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-full border border-amber-300/60 bg-amber-300/10 px-4 text-sm font-semibold text-amber-100"
+            >
+              {targetScheduleAction.label}
+            </button>
+          )}
         </div>
       )}
     </div>

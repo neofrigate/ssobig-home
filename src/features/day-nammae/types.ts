@@ -49,9 +49,11 @@ export interface CouponValidationResult {
   expires_at?: string;
   requires_payment?: boolean;
   target_staff_schedule_id?: string | null;
+  target_staff_schedule_ids?: string[] | null;
   target_schedule_label?: string | null;
   target_schedule_date?: string | null;
   target_schedule_time_slot?: string | null;
+  target_schedules?: CouponTargetSchedule[] | null;
 }
 
 export interface CouponUseResult {
@@ -65,7 +67,17 @@ export interface CouponUseResult {
   normal_link?: string | null;
   requires_payment?: boolean;
   target_staff_schedule_id?: string | null;
+  target_staff_schedule_ids?: string[] | null;
   target_schedule_label?: string | null;
   target_schedule_date?: string | null;
   target_schedule_time_slot?: string | null;
+  target_schedules?: CouponTargetSchedule[] | null;
+}
+
+export interface CouponTargetSchedule {
+  id?: string | null;
+  staff_schedule_id?: string | null;
+  label?: string | null;
+  schedule_date?: string | null;
+  time_slot?: string | null;
 }
