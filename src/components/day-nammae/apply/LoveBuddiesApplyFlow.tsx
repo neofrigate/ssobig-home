@@ -1907,7 +1907,7 @@ export default function LoveBuddiesApplyFlow({
     if (isScheduleLimitedCouponMode) {
       const isValidForSchedule = await validateCouponForSchedule(schedule);
       if (!isValidForSchedule) return;
-      setCurrentStepIndex((currentIndex) => Math.max(currentIndex + 1, 3));
+      setCurrentStepIndex(3);
       return;
     }
 
@@ -2124,11 +2124,91 @@ export default function LoveBuddiesApplyFlow({
     }
   })();
 
+  const goToStep = (stepKey: FlowStepKey) => {
+    const nextIndex = flowSteps.indexOf(stepKey);
+    if (nextIndex >= 0) {
+      setCurrentStepIndex(nextIndex);
+    }
+  };
+
+  const getSubmitBlockingStep = (wantsCoupon: boolean): FlowStepKey | null => {
+    if (!formValues.gender) return "gender";
+    if (
+      !formValues.schedule ||
+      !formValues.staffScheduleId ||
+      (isWaitlistApplication &&
+        confirmedWaitlistSchedule !== formValues.schedule)
+    ) {
+      return "schedule";
+    }
+
+    if (isWaitlistApplication) {
+      if (
+        !formValues.name.trim() ||
+        formValues.phone.replace(/\D/g, "").length !== 11
+      ) {
+        return "waitlist_contact";
+      }
+      return null;
+    }
+
+    if (formValues.hasCoupon === null) return "coupon_choice";
+    if (wantsCoupon) {
+      const normalizedCouponCode = buildDayNammeCouponCode(
+        normalizeDayNammeCouponCode(formValues.couponCode)
+      );
+      if (
+        couponValidationStatus !== "valid" ||
+        !validatedCoupon ||
+        typeof validatedCoupon.id !== "number" ||
+        validatedCoupon.code !== normalizedCouponCode
+      ) {
+        return "coupon_code";
+      }
+      if (isValidatedFreeCoupon && !freeCouponNoticeAgreed) {
+        return "free_coupon_notice";
+      }
+    }
+
+    if (
+      !formValues.name.trim() ||
+      !formValues.birthYear ||
+      !formValues.height.trim() ||
+      formValues.phone.replace(/\D/g, "").length !== 11 ||
+      !formValues.traits.trim()
+    ) {
+      return "profile";
+    }
+    if (!formValues.photo || isOptimizingPhoto) return "photo";
+    if (!agreements[0]) return "approval";
+    if (!agreements[1]) return "marketing";
+    if (!agreements[2]) return "notice";
+    return null;
+  };
+
   const handleSubmit = async () => {
     const wantsCoupon = !isWaitlistApplication && formValues.hasCoupon === true;
     const normalizedCouponCode = buildDayNammeCouponCode(
       normalizeDayNammeCouponCode(formValues.couponCode)
     );
+    const blockingStep = getSubmitBlockingStep(wantsCoupon);
+
+    if (blockingStep) {
+      if (blockingStep === "profile" || blockingStep === "waitlist_contact") {
+        setShowFieldErrors(true);
+      }
+      goToStep(blockingStep);
+      setFormError(
+        blockingStep === "coupon_code"
+          ? "쿠폰 확인을 완료해주세요."
+          : blockingStep === "free_coupon_notice"
+            ? "무료초대 노쇼 안내를 확인하고 동의해주세요."
+            : blockingStep === "photo"
+              ? "프로필 사진을 업로드해주세요."
+              : "필수 정보를 입력해주세요."
+      );
+      return;
+    }
 
     if (wantsCoupon) {
       if (
@@ -2449,13 +2529,13 @@ export default function LoveBuddiesApplyFlow({
     if (currentStepKey === "coupon_choice") {
       if (formValues.hasCoupon === true) {
         trackEvent("DN_SelectCoupon", { has_coupon: true });
-        setCurrentStepIndex((step) => step + 1);
+        setCurrentStepIndex(currentStepIndex + 1);
         setFormError("");
         return;
       }
 
       trackEvent("DN_SelectCoupon", { has_coupon: false });
-      setCurrentStepIndex((step) => step + 1);
+      setCurrentStepIndex(currentStepIndex + 1);
       setFormError("");
       return;
     }
@@ -2465,14 +2545,14 @@ export default function LoveBuddiesApplyFlow({
         code: validatedCoupon?.code || "",
         discount_label: validatedCoupon?.discount_label || "",
       });
-      setCurrentStepIndex((step) => step + 1);
+      setCurrentStepIndex(currentStepIndex + 1);
       setFormError("");
       return;
     }
 
     if (currentStepKey === "free_coupon_notice") {
       trackEvent("DN_AcceptFreeCouponNotice");
-      setCurrentStepIndex((step) => step + 1);
+      setCurrentStepIndex(currentStepIndex + 1);
       setFormError("");
       return;
     }
@@ -2498,7 +2578,7 @@ export default function LoveBuddiesApplyFlow({
     }
 
     setShowFieldErrors(false);
-    setCurrentStepIndex((step) => step + 1);
+    setCurrentStepIndex(currentStepIndex + 1);
     setFormError("");
   };
 
@@ -2508,7 +2588,7 @@ export default function LoveBuddiesApplyFlow({
       return;
     }
 
-    setCurrentStepIndex((step) => Math.max(0, step - 1));
+    setCurrentStepIndex(Math.max(0, currentStepIndex - 1));
     setFormError("");
   };
 
