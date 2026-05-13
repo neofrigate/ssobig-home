@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 const SUPPORTED_LOCALES = new Set(["ko", "en"]);
+const SOURCE_TYPES = new Set(["organic", "influencer", "overseas_beta"]);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function jsonResponse(body: unknown, status = 200) {
@@ -20,6 +21,18 @@ function stringArray(value: unknown) {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
     : [];
+}
+
+function normalizedSourceType(value: unknown) {
+  const sourceType = optionalString(value) || "organic";
+  return SOURCE_TYPES.has(sourceType) ? sourceType : "organic";
+}
+
+function optionalPositiveInteger(value: unknown) {
+  const text = optionalString(value);
+  if (!text) return null;
+  const parsed = Number.parseInt(text, 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
 export async function POST(request: Request) {
@@ -68,6 +81,7 @@ export async function POST(request: Request) {
     locale,
     name,
     email,
+    phone: optionalString(body.phone),
     country,
     timezone: "",
     languages: inferredLanguages,
@@ -81,6 +95,14 @@ export async function POST(request: Request) {
     consent,
     pageUrl: optionalString(body.pageUrl),
     submittedAt: optionalString(body.submittedAt) || new Date().toISOString(),
+    sourceType: normalizedSourceType(body.sourceType),
+    campaignSlug: optionalString(body.campaignSlug),
+    sourcePlatform: optionalString(body.sourcePlatform),
+    influencerId: optionalPositiveInteger(body.influencerId),
+    influencerSlug: optionalString(body.influencerSlug),
+    selectedTemplateId: optionalString(body.selectedTemplateId),
+    selectedTemplateTitle: optionalString(body.selectedTemplateTitle),
+    requestedCouponStatus: optionalString(body.requestedCouponStatus),
   };
 
   const signupApiUrl =
