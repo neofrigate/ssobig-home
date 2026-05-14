@@ -369,9 +369,9 @@ function ContentRow({
             {description}
           </p>
         )}
-        {/* 모바일: 가로 확장된 뷰 */}
-        <div className="md:hidden overflow-x-auto -mx-4 px-4 hide-scrollbar pb-4">
-          <div className="flex w-max" style={{ gap: `${mobileGap}px` }}>
+        {/* 모바일: 항목이 많으면 다음 줄로 내려가는 wrap 뷰 */}
+        <div className="md:hidden pb-4">
+          <div className="flex flex-wrap" style={{ gap: `${mobileGap}px` }}>
             {items.map((item, index) => (
               <ContentCard
                 key={index}
@@ -388,10 +388,10 @@ function ContentRow({
             ))}
           </div>
         </div>
-        {/* 태블릿/데스크톱: 기존 스타일 - 스크롤 가능 표시 */}
-        <div className="hidden md:block overflow-x-auto -mx-5 md:-mx-8 px-5 md:px-8 pb-4 hide-scrollbar">
+        {/* 태블릿/데스크톱: 항목이 많으면 다음 줄로 내려가는 wrap 뷰 */}
+        <div className="hidden md:block pb-4">
           <div
-            className={`flex w-full ${
+            className={`flex flex-wrap w-full ${
               cardSize === "small"
                 ? "gap-[18px] lg:gap-[22px]"
                 : "gap-5 lg:gap-6"
@@ -430,8 +430,8 @@ function TemplateRowLoading() {
             템플릿을 불러오는 중입니다
           </h2>
         </div>
-        <div className="md:hidden overflow-x-auto -mx-4 px-4 hide-scrollbar pb-4">
-          <div className="flex w-max gap-4">
+        <div className="md:hidden pb-4">
+          <div className="flex flex-wrap gap-4">
             {mobileSkeletons.map((_, index) => (
               <div
                 key={index}
@@ -448,8 +448,8 @@ function TemplateRowLoading() {
             ))}
           </div>
         </div>
-        <div className="hidden md:block overflow-x-auto -mx-5 md:-mx-8 px-5 md:px-8 pb-4 hide-scrollbar">
-          <div className="flex w-full gap-5 lg:gap-6">
+        <div className="hidden md:block pb-4">
+          <div className="flex flex-wrap w-full gap-5 lg:gap-6">
             {desktopSkeletons.map((_, index) => (
               <div
                 key={index}
