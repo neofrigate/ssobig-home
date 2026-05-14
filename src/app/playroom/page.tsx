@@ -418,6 +418,59 @@ function ContentRow({
   );
 }
 
+function TemplateRowLoading() {
+  const mobileSkeletons = Array.from({ length: 3 });
+  const desktopSkeletons = Array.from({ length: 4 });
+
+  return (
+    <section className="py-6 md:py-8" aria-busy="true">
+      <div className="max-w-[1200px] mx-auto px-5 md:px-8">
+        <div className="mb-4 md:mb-6">
+          <h2 className="text-gray-900 text-[18px] sm:text-[22px] md:text-[26px] lg:text-[28px] font-bold">
+            템플릿을 불러오는 중입니다
+          </h2>
+        </div>
+        <div className="md:hidden overflow-x-auto -mx-4 px-4 hide-scrollbar pb-4">
+          <div className="flex w-max gap-4">
+            {mobileSkeletons.map((_, index) => (
+              <div
+                key={index}
+                className="w-[calc(40vw-22px)] sm:w-[calc(32vw-14px)] flex-shrink-0 animate-pulse"
+              >
+                <div className="w-full aspect-[3/4] mb-4 rounded-lg bg-gray-100" />
+                <div className="flex gap-1 mb-2">
+                  <div className="h-5 w-14 rounded-full bg-gray-100" />
+                  <div className="h-5 w-16 rounded-full bg-gray-100" />
+                </div>
+                <div className="h-5 w-4/5 rounded bg-gray-100 mb-2" />
+                <div className="h-4 w-full rounded bg-gray-100" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hidden md:block overflow-x-auto -mx-5 md:-mx-8 px-5 md:px-8 pb-4 hide-scrollbar">
+          <div className="flex w-full gap-5 lg:gap-6">
+            {desktopSkeletons.map((_, index) => (
+              <div
+                key={index}
+                className="md:w-[calc(25%-15px)] lg:w-[calc(25%-18px)] flex-shrink-0 animate-pulse"
+              >
+                <div className="aspect-[3/4] rounded-lg bg-gray-100 mb-3" />
+                <div className="flex gap-1 mb-2">
+                  <div className="h-6 w-16 rounded-full bg-gray-100" />
+                  <div className="h-6 w-20 rounded-full bg-gray-100" />
+                </div>
+                <div className="h-6 w-4/5 rounded bg-gray-100 mb-2" />
+                <div className="h-5 w-full rounded bg-gray-100" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // 배너 데이터 타입
 interface BannerData {
   title1: string;
@@ -505,85 +558,9 @@ interface PlayroomTemplateApiItem {
 
 type PlayroomTemplateGroups = Record<PlayroomTemplateCategory, ContentCardProps[]>;
 
-const FALLBACK_TEMPLATE_GROUPS: PlayroomTemplateGroups = {
-  story_mystery: [
-    {
-      image: "/ssobig_assets/playroom/황후마마살인사건.png",
-      title: "황후마마 살인사건",
-      description: "황후마마의 죽음,\n그 원인은 궁 안에 있다.",
-      players: "7인, 120분",
-      price: "사전예약 진행중",
-      link: "https://tool.ssobig.com/templates/d20f00fd",
-      templateId: "d20f00fd",
-    },
-    {
-      image: "/ssobig_assets/playroom/백설공주와독사과.jpg",
-      title: "백설공주와 독사과",
-      description: "백설공주에게 독사과를 건넨자는?\n동화 다시 읽기",
-      players: "2인, 60분",
-      price: "무료",
-      link: "https://tool.ssobig.com/templates/c2439b65",
-      templateId: "c2439b65",
-    },
-    {
-      image: "/ssobig_assets/playroom/기억 속의 너.jpg",
-      title: "기억 속의 너",
-      description: "커플 전용 선택형 스토리 게임",
-      players: "2인, 90분",
-      price: "240토큰",
-      link: "https://tool.ssobig.com/templates/0bb6fcf7",
-      templateId: "0bb6fcf7",
-    },
-    {
-      image: "/ssobig_assets/playroom/도플갱어.jpg",
-      title: "도플갱어",
-      description:
-        "우주선에 선장이 죽었다.\n그런데 나와 똑같이 생긴 넌 누구야?",
-      players: "4인, 120분",
-      price: "300토큰",
-      link: "https://tool.ssobig.com/templates/3e7a2f6e",
-      templateId: "3e7a2f6e",
-    },
-  ],
-  friends: [
-    {
-      image: "/ssobig_assets/playroom/퀴즈메이커.jpg",
-      title: "퀴즈메이커",
-      description: "나만의 퀴즈를 만들어\n친구들과 함께 즐기기",
-      players: "2~100인",
-      price: "무료",
-      link: "https://tool.ssobig.com/templates/b2e1cf64",
-      templateId: "b2e1cf64",
-    },
-    {
-      image: "/ssobig_assets/playroom/나몰라퀴즈.jpg",
-      title: "나몰라퀴즈",
-      description: "서로에 대해 얼마나\n알고 있는지 확인하기",
-      players: "2~20인",
-      price: "무료",
-      link: "https://tool.ssobig.com/templates/3f97c82b",
-      templateId: "3f97c82b",
-    },
-    {
-      image: "/ssobig_assets/playroom/사랑의 징검다리.jpg",
-      title: "사랑의 징검다리",
-      description: "커플을 위한\n관계 테스트 게임",
-      players: "2인",
-      price: "무료",
-      link: "https://tool.ssobig.com/templates/3df2320f",
-      templateId: "3df2320f",
-    },
-    {
-      image: "/ssobig_assets/playroom/우정의 징검다리.jpg",
-      title: "우정의 징검다리",
-      description: "친구들과의 우정을\n테스트하는 게임",
-      players: "2~10인",
-      price: "무료",
-      link: "https://tool.ssobig.com/templates/93fa153c",
-      templateId: "93fa153c",
-    },
-  ],
-};
+function emptyTemplateGroups(): PlayroomTemplateGroups {
+  return { story_mystery: [], friends: [] };
+}
 
 function mapPlayroomTemplate(item: PlayroomTemplateApiItem): ContentCardProps {
   return {
@@ -616,7 +593,8 @@ export default function PlayroomPage() {
   const [isFooterOpen, setIsFooterOpen] = useState(false);
   const [banners, setBanners] = useState<BannerData[]>(FALLBACK_BANNERS);
   const [templateGroups, setTemplateGroups] =
-    useState<PlayroomTemplateGroups>(FALLBACK_TEMPLATE_GROUPS);
+    useState<PlayroomTemplateGroups>(emptyTemplateGroups);
+  const [isTemplateLoading, setIsTemplateLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -656,9 +634,14 @@ export default function PlayroomPage() {
         const nextGroups = groupPlayroomTemplates(data.items || []);
         if (isMounted) {
           setTemplateGroups(nextGroups);
+          setIsTemplateLoading(false);
         }
       } catch (error) {
         console.error("플레이룸 노출 템플릿 로드 실패:", error);
+        if (isMounted) {
+          setTemplateGroups(emptyTemplateGroups());
+          setIsTemplateLoading(false);
+        }
       }
     }
 
@@ -803,14 +786,16 @@ export default function PlayroomPage() {
         </div>
       </section>
 
-      {templateGroups.story_mystery.length > 0 && (
+      {isTemplateLoading && <TemplateRowLoading />}
+
+      {!isTemplateLoading && templateGroups.story_mystery.length > 0 && (
         <ContentRow
           title="스토리 추리게임"
           items={templateGroups.story_mystery}
         />
       )}
 
-      {templateGroups.friends.length > 0 && (
+      {!isTemplateLoading && templateGroups.friends.length > 0 && (
         <ContentRow
           title="친구들과 함께 즐기기"
           cardSize="small"
