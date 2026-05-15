@@ -61,9 +61,15 @@ export default function StepSchedule({
         );
         const helperText = getDayNammeScheduleHelperText(schedule, gender);
         const isImminent = helperText === "임박";
+        const isOppositeGenderClosedSelectable =
+          selectable &&
+          !waitlistSelectable &&
+          ((gender === "여" && schedule.status === "남자마감") ||
+            (gender === "남" && schedule.status === "여자마감"));
+        const shouldEmphasize = isImminent || isOppositeGenderClosedSelectable;
         const badgeClassName = waitlistSelectable
           ? "bg-white/10 text-white/65"
-          : isImminent
+          : shouldEmphasize
             ? "bg-[#F6C66A]/22 text-[#FFE2A4]"
             : helperText === "여유"
               ? "bg-[#C8F1D7]/12 text-[#C8F1D7]"
@@ -71,15 +77,15 @@ export default function StepSchedule({
                 ? "bg-[#FF6B9F]/20 text-[#FFB1D4]"
                 : "bg-white/5 text-white/30";
         const cardClassName = selected
-          ? isImminent
+          ? shouldEmphasize
             ? "border-[#F6C66A] bg-[#F6C66A]/14"
             : "border-[#FF6B9F] bg-[#FF6B9F]/15"
           : selectable
-            ? isImminent
+            ? shouldEmphasize
               ? "border-[#F6C66A]/35 bg-[#F6C66A]/8"
               : "border-white/10 bg-white/5"
             : "border-white/5 bg-white/[0.02] opacity-40";
-        const descriptionClassName = isImminent
+        const descriptionClassName = shouldEmphasize
           ? selectable
             ? "text-[#F8D999]"
             : "text-white/30"
