@@ -105,6 +105,19 @@ export const trackButtonClick = (buttonName: string) => {
   });
 };
 
+export const trackGAEvent = (
+  eventName: string,
+  params?: Record<string, unknown>
+) => {
+  if (typeof window !== "undefined" && window.gtag && GA_MEASUREMENT_ID) {
+    window.gtag("event", eventName, {
+      ...params,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  }
+};
+
 // 개선된 링크 클릭 추적 함수 (UTM 파라미터 제거, 사용자 속성으로 자동 연결됨)
 export const trackLinkClick = ({
   linkUrl,

@@ -2,7 +2,14 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   buildDayNammeCouponCode,
   DAY_NAMMAE_COUPON_CODE_SUFFIX_LENGTH,
@@ -26,6 +33,7 @@ import {
   ScheduleItem,
 } from "@/features/day-nammae/types";
 import { safeFbq } from "@/utils/metaPixel";
+import { trackGAEvent } from "@/utils/gtag";
 import { getSafeSearchParams } from "@/utils/utm";
 import ApplyStepShell from "./ApplyStepShell";
 import StepAgreement from "./steps/StepAgreement";
@@ -49,6 +57,47 @@ function trackCompleteRegistration() {
   safeFbq("track", "CompleteRegistration", {
     content_name: "일일남매",
   });
+}
+
+function toAnalyticsBoolean(value: boolean | null) {
+  if (value === null) {
+    return "unset";
+  }
+
+  return value ? "true" : "false";
+}
+
+function getAgreementStepKey(index: number): FlowStepKey {
+  return index === 0 ? "approval" : index === 1 ? "marketing" : "notice";
+}
+
+function getBlockingReason(stepKey: FlowStepKey) {
+  switch (stepKey) {
+    case "gender":
+      return "missing_gender";
+    case "schedule":
+      return "missing_or_unconfirmed_schedule";
+    case "waitlist_contact":
+      return "missing_waitlist_contact";
+    case "coupon_choice":
+      return "missing_coupon_choice";
+    case "coupon_code":
+      return "coupon_not_validated";
+    case "free_coupon_notice":
+      return "free_coupon_notice_required";
+    case "profile":
+      return "missing_profile_fields";
+    case "photo":
+      return "missing_or_processing_photo";
+    case "approval":
+      return "approval_required";
+    case "marketing":
+      return "marketing_required";
+    case "notice":
+      return "notice_required";
+    default:
+      return "unknown";
+  }
 }
 
 type ApplyFlowMode = "modal" | "page";
@@ -1599,6 +1648,104 @@ export default function LoveBuddiesApplyFlow({
   const displayStep = currentStepIndex + 1;
   const isLastStep = currentStepIndex === totalSteps - 1;
   const inAppBrowserName = getCurrentInAppBrowserName();
+  const flowOpenTrackedRef = useRef(false);
+  const lastStepViewSignatureRef = useRef("");
+  const applyAnalyticsBaseParams = useMemo(() => {
+    const flowType = isWaitlistApplication
+      ? "waitlist"
+      : isValidatedFreeCoupon
+        ? "free_coupon"
+        : formValues.hasCoupon === true
+          ? "coupon"
+          : formValues.hasCoupon === false
+            ? "standard"
+            : "undecided";
+    const couponState =
+      formValues.hasCoupon !== true
+        ? "none"
+        : couponValidationStatus === "valid"
+          ? isValidatedFreeCoupon
+            ? "valid_free"
+            : "valid_paid"
+          : couponValidationStatus;
+
+    return {
+      event_category: "day_nammae_apply",
+      apply_mode: mode,
+      entry_surface: mode === "modal" ? "desktop_modal" : "mobile_apply_page",
+      application_mode: selectedApplicationMode,
+      flow_type: flowType,
+      gender: formValues.gender || "unset",
+      has_coupon: toAnalyticsBoolean(formValues.hasCoupon),
+      coupon_state: couponState,
+      schedule_status: selectedScheduleItem?.status || "unselected",
+    };
+  }, [
+    couponValidationStatus,
+    formValues.gender,
+    formValues.hasCoupon,
+    isValidatedFreeCoupon,
+    isWaitlistApplication,
+    mode,
+    selectedApplicationMode,
+    selectedScheduleItem?.status,
+  ]);
+
+  const buildStepAnalyticsParams = useCallback(
+    (stepKey = currentStepKey, stepIndex = displayStep) => ({
+      ...applyAnalyticsBaseParams,
+      step_key: stepKey,
+      step_index: stepIndex,
+      step_total: totalSteps,
+    }),
+    [applyAnalyticsBaseParams, currentStepKey, displayStep, totalSteps]
+  );
+
+  const trackApplyAnalyticsEvent = useCallback((
+    eventName: string,
+    params?: Record<string, unknown>
+  ) => {
+    trackGAEvent(eventName, {
+      ...applyAnalyticsBaseParams,
+      ...params,
+    });
+  }, [applyAnalyticsBaseParams]);
+
+  useEffect(() => {
+    if (flowOpenTrackedRef.current) {
+      return;
+    }
+
+    flowOpenTrackedRef.current = true;
+    trackApplyAnalyticsEvent("dn_apply_flow_open", {
+      step_key: currentStepKey,
+      step_index: displayStep,
+      step_total: totalSteps,
+    });
+  }, [currentStepKey, displayStep, totalSteps, trackApplyAnalyticsEvent]);
+
+  useEffect(() => {
+    const signature = [
+      currentStepKey,
+      displayStep,
+      totalSteps,
+      applyAnalyticsBaseParams.flow_type,
+      applyAnalyticsBaseParams.application_mode,
+    ].join(":");
+
+    if (lastStepViewSignatureRef.current === signature) {
+      return;
+    }
+
+    lastStepViewSignatureRef.current = signature;
+    trackGAEvent("dn_apply_step_view", buildStepAnalyticsParams());
+  }, [
+    applyAnalyticsBaseParams,
+    buildStepAnalyticsParams,
+    currentStepKey,
+    displayStep,
+    totalSteps,
+  ]);
 
   useEffect(() => {
     if (!formValues.photo) {
@@ -1934,6 +2081,10 @@ export default function LoveBuddiesApplyFlow({
       next[index] = agreed;
       return next;
     });
+    trackApplyAnalyticsEvent("dn_apply_agreement_toggle", {
+      ...buildStepAnalyticsParams(getAgreementStepKey(index)),
+      agreement_checked: agreed ? "true" : "false",
+    });
   };
 
   const handleCouponChoice = (nextValue: boolean) => {
@@ -2194,6 +2345,15 @@ export default function LoveBuddiesApplyFlow({
     const blockingStep = getSubmitBlockingStep(wantsCoupon);
 
     if (blockingStep) {
+      const blockingStepIndex = flowSteps.indexOf(blockingStep);
+      trackApplyAnalyticsEvent("dn_apply_step_blocked", {
+        ...buildStepAnalyticsParams(
+          blockingStep,
+          blockingStepIndex >= 0 ? blockingStepIndex + 1 : displayStep
+        ),
+        error_reason: getBlockingReason(blockingStep),
+        result: "blocked",
+      });
       if (blockingStep === "profile" || blockingStep === "waitlist_contact") {
         setShowFieldErrors(true);
       }
@@ -2217,15 +2377,31 @@ export default function LoveBuddiesApplyFlow({
         typeof validatedCoupon.id !== "number" ||
         validatedCoupon.code !== normalizedCouponCode
       ) {
+        trackApplyAnalyticsEvent("dn_apply_step_blocked", {
+          ...buildStepAnalyticsParams("coupon_code"),
+          error_reason: "coupon_not_validated",
+          result: "blocked",
+        });
         setFormError("쿠폰 확인을 완료해주세요.");
         return;
       }
 
       if (isValidatedFreeCoupon && !freeCouponNoticeAgreed) {
+        trackApplyAnalyticsEvent("dn_apply_step_blocked", {
+          ...buildStepAnalyticsParams("free_coupon_notice"),
+          error_reason: "free_coupon_notice_required",
+          result: "blocked",
+        });
         setFormError("무료초대 노쇼 안내를 확인하고 동의해주세요.");
         return;
       }
     }
+
+    trackApplyAnalyticsEvent("dn_apply_submit_start", {
+      step_key: currentStepKey,
+      step_index: displayStep,
+      step_total: totalSteps,
+    });
 
     setSubmitState((current) => ({
       ...current,
@@ -2343,6 +2519,10 @@ export default function LoveBuddiesApplyFlow({
           has_coupon: wantsCoupon,
           application_mode: selectedApplicationMode,
         });
+        trackApplyAnalyticsEvent("dn_apply_submit_success", {
+          result: "success",
+          application_submitted: "true",
+        });
         trackCompleteRegistration();
       }
 
@@ -2366,6 +2546,9 @@ export default function LoveBuddiesApplyFlow({
       }
 
       if (isWaitlistApplication) {
+        trackApplyAnalyticsEvent("dn_waitlist_submit_success", {
+          result: "success",
+        });
         setSubmitState({
           status: "success",
           message: DEFAULT_WAITLIST_SUBMIT_SUCCESS_MESSAGE,
@@ -2377,6 +2560,10 @@ export default function LoveBuddiesApplyFlow({
       }
 
       if (!couponRequiresPayment(checkoutSource)) {
+        trackApplyAnalyticsEvent("dn_apply_complete_without_payment", {
+          result: "success",
+          payment_required: "false",
+        });
         setSubmitState({
           status: "success",
           message:
@@ -2389,6 +2576,12 @@ export default function LoveBuddiesApplyFlow({
       }
 
       const checkout = buildCheckoutState(formValues.schedule, checkoutSource);
+      trackApplyAnalyticsEvent("dn_checkout_ready", {
+        result: "success",
+        payment_required: "true",
+        coupon_applied: checkout.isDiscounted ? "true" : "false",
+        checkout_value: checkout.value,
+      });
 
       setSubmitState({
         status: "success",
@@ -2490,6 +2683,13 @@ export default function LoveBuddiesApplyFlow({
             ? error.message
             : buildSubmitErrorMessage(supportCode);
 
+      trackApplyAnalyticsEvent("dn_apply_submit_error", {
+        result: "error",
+        error_reason: stage || submitStage || "unknown",
+        response_status: responseStatus || 0,
+        application_submitted: applicationSubmitted ? "true" : "false",
+      });
+
       setSubmitState({
         status: "error",
         message: errorMessage,
@@ -2505,7 +2705,21 @@ export default function LoveBuddiesApplyFlow({
       (currentStepKey === "profile" || currentStepKey === "waitlist_contact") &&
       !canProceed
     ) {
+      trackApplyAnalyticsEvent("dn_apply_step_blocked", {
+        ...buildStepAnalyticsParams(),
+        error_reason: getBlockingReason(currentStepKey),
+        result: "blocked",
+      });
       setShowFieldErrors(true);
+      return;
+    }
+
+    if (!canProceed) {
+      trackApplyAnalyticsEvent("dn_apply_step_blocked", {
+        ...buildStepAnalyticsParams(),
+        error_reason: getBlockingReason(currentStepKey),
+        result: "blocked",
+      });
       return;
     }
 
@@ -2522,6 +2736,10 @@ export default function LoveBuddiesApplyFlow({
           gender: formValues.gender,
         });
       }
+      trackApplyAnalyticsEvent("dn_apply_step_complete", {
+        ...buildStepAnalyticsParams(),
+        result: "success",
+      });
       void handleSubmit();
       return;
     }
@@ -2529,12 +2747,20 @@ export default function LoveBuddiesApplyFlow({
     if (currentStepKey === "coupon_choice") {
       if (formValues.hasCoupon === true) {
         trackEvent("DN_SelectCoupon", { has_coupon: true });
+        trackApplyAnalyticsEvent("dn_apply_step_complete", {
+          ...buildStepAnalyticsParams(),
+          result: "success",
+        });
         setCurrentStepIndex(currentStepIndex + 1);
         setFormError("");
         return;
       }
 
       trackEvent("DN_SelectCoupon", { has_coupon: false });
+      trackApplyAnalyticsEvent("dn_apply_step_complete", {
+        ...buildStepAnalyticsParams(),
+        result: "success",
+      });
       setCurrentStepIndex(currentStepIndex + 1);
       setFormError("");
       return;
@@ -2545,6 +2771,12 @@ export default function LoveBuddiesApplyFlow({
         code: validatedCoupon?.code || "",
         discount_label: validatedCoupon?.discount_label || "",
       });
+      trackApplyAnalyticsEvent("dn_apply_step_complete", {
+        ...buildStepAnalyticsParams(),
+        result: "success",
+        coupon_valid: "true",
+        discount_label: validatedCoupon?.discount_label || "",
+      });
       setCurrentStepIndex(currentStepIndex + 1);
       setFormError("");
       return;
@@ -2552,6 +2784,10 @@ export default function LoveBuddiesApplyFlow({
 
     if (currentStepKey === "free_coupon_notice") {
       trackEvent("DN_AcceptFreeCouponNotice");
+      trackApplyAnalyticsEvent("dn_apply_step_complete", {
+        ...buildStepAnalyticsParams(),
+        result: "success",
+      });
       setCurrentStepIndex(currentStepIndex + 1);
       setFormError("");
       return;
@@ -2573,10 +2809,19 @@ export default function LoveBuddiesApplyFlow({
       isWaitlistApplication &&
       confirmedWaitlistSchedule !== formValues.schedule
     ) {
+      trackApplyAnalyticsEvent("dn_apply_step_blocked", {
+        ...buildStepAnalyticsParams(),
+        error_reason: "waitlist_confirmation_required",
+        result: "blocked",
+      });
       setWaitlistModalSchedule(selectedScheduleItem);
       return;
     }
 
+    trackApplyAnalyticsEvent("dn_apply_step_complete", {
+      ...buildStepAnalyticsParams(),
+      result: "success",
+    });
     setShowFieldErrors(false);
     setCurrentStepIndex(currentStepIndex + 1);
     setFormError("");
@@ -2748,6 +2993,12 @@ export default function LoveBuddiesApplyFlow({
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => {
+            trackApplyAnalyticsEvent("dn_checkout_click", {
+              result: "success",
+              payment_required: "true",
+              coupon_applied: checkout.isDiscounted ? "true" : "false",
+              checkout_value: checkout.value,
+            });
             trackEvent("DN_InitiateCheckout", {
               schedule: formValues.schedule,
               coupon_applied: checkout.isDiscounted,
@@ -2891,7 +3142,13 @@ export default function LoveBuddiesApplyFlow({
         <StepAgreement
           section={DAY_NAMMAE_FREE_COUPON_NOTICE_SECTION}
           agreed={freeCouponNoticeAgreed}
-          onAgreeChange={setFreeCouponNoticeAgreed}
+          onAgreeChange={(agreed) => {
+            setFreeCouponNoticeAgreed(agreed);
+            trackApplyAnalyticsEvent("dn_apply_agreement_toggle", {
+              ...buildStepAnalyticsParams("free_coupon_notice"),
+              agreement_checked: agreed ? "true" : "false",
+            });
+          }}
         />
       )}
 

@@ -12,6 +12,7 @@ import {
   buildMetaPixelPageViewScript,
   LOVE_BUDDIES_PIXEL_ID,
 } from "@/utils/metaPixel";
+import { trackGAEvent } from "@/utils/gtag";
 import { getSafeSearchParams } from "@/utils/utm";
 
 // 한국 공휴일 (2025-2027)
@@ -218,7 +219,18 @@ const ElevenNammePage = () => {
   }, [isApplyOpen]);
 
   const handleApplyClick = () => {
-    if (window.matchMedia("(min-width: 768px)").matches) {
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+
+    trackGAEvent("dn_apply_cta_click", {
+      event_category: "day_nammae_apply",
+      page_path: "/offline/11namme",
+      entry_surface: isDesktop
+        ? "desktop_detail_fixed_bottom"
+        : "mobile_detail_fixed_bottom",
+      apply_mode: isDesktop ? "modal" : "page",
+    });
+
+    if (isDesktop) {
       setIsApplyOpen(true);
       return;
     }
