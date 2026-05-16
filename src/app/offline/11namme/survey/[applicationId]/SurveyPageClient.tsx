@@ -61,6 +61,25 @@ const INITIAL_FORM_STATE: FormState = {
   freeText: "",
 };
 
+const DUMMY_SURVEY_TOKENS = new Set([
+  "dummyapplication",
+  "dummy-application",
+  "dummy-application-id",
+]);
+
+const DUMMY_SURVEY_CONTEXT: SurveyContext = {
+  customerName: "테스트 참여자",
+  phoneMasked: "010-****-0000",
+  schedule: "일일남매 테스트 회차",
+  scheduleDateTime: null,
+  alreadySubmitted: false,
+  submittedAt: null,
+};
+
+function isDummySurveyToken(token: string) {
+  return DUMMY_SURVEY_TOKENS.has(token.trim().toLowerCase());
+}
+
 function formatSubmittedAt(value?: string | null) {
   if (!value) return "";
 
@@ -183,6 +202,7 @@ function Section({
 export default function SurveyPageClient({
   surveyToken,
 }: SurveyPageClientProps) {
+  const isDummySurvey = isDummySurveyToken(surveyToken);
   const [context, setContext] = useState<SurveyContext | null>(null);
   const [form, setForm] = useState<FormState>(INITIAL_FORM_STATE);
   const [isLoading, setIsLoading] = useState(true);
@@ -197,6 +217,13 @@ export default function SurveyPageClient({
     async function fetchContext() {
       setIsLoading(true);
       setLoadError("");
+
+      if (isDummySurvey) {
+        setContext(DUMMY_SURVEY_CONTEXT);
+        setSubmittedAt(null);
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const response = await fetch(
@@ -237,7 +264,7 @@ export default function SurveyPageClient({
     return () => {
       cancelled = true;
     };
-  }, [surveyToken]);
+  }, [isDummySurvey, surveyToken]);
 
   const scheduleLabel = formatSchedule(
     context?.schedule,
@@ -291,6 +318,22 @@ export default function SurveyPageClient({
 
     setIsSubmitting(true);
     setSubmitError("");
+
+    if (isDummySurvey) {
+      const now = new Date().toISOString();
+      setContext((current) =>
+        current
+          ? {
+              ...current,
+              alreadySubmitted: true,
+              submittedAt: now,
+            }
+          : current
+      );
+      setSubmittedAt(now);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/offline/day-nammae/survey", {
