@@ -448,8 +448,8 @@ export default function SurveyPageClient({
 
       <div className="relative mx-auto max-w-3xl px-5 py-14 md:py-20">
         <div className="mb-8 rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#FFB38A]">
-            SSOBIG OFFLINE
+          <p className="text-xs font-semibold tracking-[0.28em] text-[#FFB38A]">
+            ssobig OFFLINE
           </p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
             일일남매 설문조사

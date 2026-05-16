@@ -190,8 +190,8 @@ export default function DesignSystemPage() {
       <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
         <header className="grid gap-6 border-b border-white/10 pb-10 md:grid-cols-[1fr_340px] md:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#FFB38A]">
-              SSOBIG Form Design System
+            <p className="text-xs font-semibold tracking-[0.28em] text-[#FFB38A]">
+              ssobig Form Design System
             </p>
             <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-white md:text-6xl">
               설문 폼에서 시작하는 따뜻한 다크 인터페이스

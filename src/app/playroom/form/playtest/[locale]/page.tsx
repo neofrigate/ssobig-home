@@ -25,10 +25,10 @@ export async function generateMetadata({
   const isKorean = normalizedLocale === "ko";
   const title = isKorean
     ? "쏘빅 얼리 액세스 사전 체험 신청"
-    : "SsoBig Early Access Playtest";
+    : "ssobig Early Access Playtest";
   const description = isKorean
     ? "쏘빅의 영어권 스토리 추리게임을 정식 출시 전에 먼저 체험하고 의견을 남겨주세요."
-    : "Try SsoBig's English-first story mystery games before launch and share your feedback.";
+    : "Try ssobig's English-first story mystery games before launch and share your feedback.";
   const canonicalUrl =
     `https://www.ssobig.com/playroom/form/playtest/${normalizedLocale}`;
 
@@ -45,7 +45,7 @@ export async function generateMetadata({
       title,
       description,
       url: canonicalUrl,
-      siteName: isKorean ? "쏘빅 SSOBIG" : "SsoBig",
+      siteName: isKorean ? "쏘빅 ssobig" : "ssobig",
       locale: isKorean ? "ko_KR" : "en_US",
       type: "website",
       images: [
@@ -53,7 +53,7 @@ export async function generateMetadata({
           url: "/ssobig_assets/og-image.png",
           width: 1200,
           height: 630,
-          alt: isKorean ? "쏘빅 SSOBIG" : "SsoBig",
+          alt: isKorean ? "쏘빅 ssobig" : "ssobig",
         },
       ],
     },

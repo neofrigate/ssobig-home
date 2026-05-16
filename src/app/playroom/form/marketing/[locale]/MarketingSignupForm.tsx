@@ -166,7 +166,7 @@ const PRODUCTS: Record<PlaytestLocale, Product[]> = {
 
 const COPY = {
   en: {
-    eyebrow: "SSOBIG REVIEWER ACCESS",
+    eyebrow: "ssobig REVIEWER ACCESS",
     title: "Choose a scenario for your beta access",
     intro:
       "We will check your request and send the play coupon within 1 business day. Everyone in your group can join for free.",
@@ -175,7 +175,7 @@ const COPY = {
     experience: "Mystery-game experience",
     product: "Scenario",
     note: "Anything we should know?",
-    consent: "I agree to receive beta access, coupons, and follow-up emails from SsoBig.",
+    consent: "I agree to receive beta access, coupons, and follow-up emails from ssobig.",
     submit: "Submit request",
     submitting: "Submitting...",
     successTitle: "Request received",
@@ -203,7 +203,7 @@ const COPY = {
     },
   },
   ko: {
-    eyebrow: "SSOBIG REVIEWER ACCESS",
+    eyebrow: "ssobig REVIEWER ACCESS",
     title: "체험할 시나리오를 선택해주세요",
     intro:
       "신청 내용을 확인한 뒤 1영업일 내에 플레이 쿠폰을 보내드립니다. 함께 플레이하실 분들도 전원 무료로 입장할 수 있습니다.",
@@ -391,8 +391,8 @@ export default function MarketingSignupForm({
       <div className="min-h-screen bg-[#050505] px-5 py-16 text-white md:py-24">
         <div className="mx-auto flex min-h-[70vh] max-w-3xl items-center">
           <div className="w-full rounded-[32px] border border-[#FF7A59]/20 bg-[#120C0A] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
-              SSOBIG
+            <p className="text-xs font-semibold tracking-[0.24em] text-[#FFB38A]">
+              ssobig
             </p>
             <h1 className="mt-4 break-keep text-3xl font-semibold text-white md:text-5xl">
               {copy.successTitle}
@@ -415,7 +415,7 @@ export default function MarketingSignupForm({
 
       <div className="relative mx-auto max-w-3xl px-5 py-14 md:py-20">
         <header className="mb-8 rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] md:p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#FFB38A]">
+          <p className="text-sm font-semibold tracking-[0.28em] text-[#FFB38A]">
             {copy.eyebrow}
           </p>
           <h1 className="mt-4 break-keep text-3xl font-semibold tracking-tight text-white md:text-5xl">

@@ -1,7 +1,7 @@
 ---
 version: "alpha"
-name: "SsoBig Warm Dark Form"
-description: "A focused warm-dark form design system derived from SsoBig's 11namme survey flow."
+name: "ssobig Warm Dark Form"
+description: "A focused warm-dark form design system derived from ssobig's 11namme survey flow."
 colors:
   primary: "#FF7A59"
   on-primary: "#050505"
@@ -138,11 +138,11 @@ components:
 
 ## Overview
 
-SsoBig Warm Dark Form is a focused form interface for surveys, playtest recruitment, coupon registration, and permission-request flows. It uses a near-black canvas, translucent layered surfaces, and a warm coral accent to keep the experience concentrated without feeling cold.
+ssobig Warm Dark Form is a focused form interface for surveys, playtest recruitment, coupon registration, and permission-request flows. It uses a near-black canvas, translucent layered surfaces, and a warm coral accent to keep the experience concentrated without feeling cold.
 
 Use this design system when the user needs to complete a single, deliberate task: answer a survey, apply for a tester group, register a coupon, or confirm a personal event link.
 
-Do not use it as the default style for broad marketing pages, portfolio pages, or image-heavy brand landing pages. Those pages should follow the existing SsoBig site structure unless the task is explicitly form-centered.
+Do not use it as the default style for broad marketing pages, portfolio pages, or image-heavy brand landing pages. Those pages should follow the existing ssobig site structure unless the task is explicitly form-centered.
 
 Primary implementation references:
 

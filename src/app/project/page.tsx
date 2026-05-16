@@ -65,14 +65,14 @@ export default function ProjectPage() {
           <div className="mb-16 md:mb-20">
             <h1 className="text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] xl:text-[40px] font-bold text-gray-900 mb-4 sm:mb-5 md:mb-6 leading-tight max-w-4xl">
               <span className="md:hidden">
-                쏘빅 SSOBIG은
+                쏘빅 ssobig은
                 <br />
                 {`'`}인터랙티브한 경험(IX){`'`}을 설계하고
                 <br />
                 실행하는 솔루션 기업입니다.
               </span>
               <span className="hidden md:inline">
-                쏘빅 SSOBIG은 {`'`}인터랙티브한 경험{`'`}을
+                쏘빅 ssobig은 {`'`}인터랙티브한 경험{`'`}을
                 <br /> 설계하고 실행하는 솔루션 기업입니다.
               </span>
             </h1>

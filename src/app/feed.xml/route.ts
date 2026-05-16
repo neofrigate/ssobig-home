@@ -24,7 +24,7 @@ export async function GET() {
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>쏘빅 SSOBIG</title>
+    <title>쏘빅 ssobig</title>
     <link>https://www.ssobig.com</link>
     <description>술 없이도 즐거운 소셜 플랫폼 쏘빅! 머더미스터리, 추리게임, 보드게임, 소셜링 등 다양한 콘텐츠를 만나보세요.</description>
     <language>ko</language>

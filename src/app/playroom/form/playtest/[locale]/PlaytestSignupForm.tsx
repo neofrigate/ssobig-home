@@ -68,10 +68,10 @@ const COUNTRY_CODES = [
 
 const content = {
   en: {
-    eyebrow: "SSOBIG PLAYROOM",
+    eyebrow: "ssobig PLAYROOM",
     title: "Early Access Playtest",
     intro:
-      "Try SsoBig's English-first story mystery games before launch and share your feedback. Selected testers will receive a free play coupon by email.",
+      "Try ssobig's English-first story mystery games before launch and share your feedback. Selected testers will receive a free play coupon by email.",
     sourcePattern: "Playtest form",
     howItWorks: {
       title: "How it works",
@@ -116,7 +116,7 @@ const content = {
       sourceOther: "Other channel",
       motivationOther: "Other note",
       consent:
-        "I agree to receive playtest access, coupons, and follow-up emails from SsoBig.",
+        "I agree to receive playtest access, coupons, and follow-up emails from ssobig.",
       submit: "Apply for playtest",
       submitting: "Submitting...",
       languageSwitch: "EN",
@@ -166,7 +166,7 @@ const content = {
     },
   },
   ko: {
-    eyebrow: "SSOBIG PLAYROOM",
+    eyebrow: "ssobig PLAYROOM",
     title: "얼리 액세스 사전 체험 신청",
     intro:
       "쏘빅의 영어권 스토리 추리게임을 정식 출시 전에 먼저 체험하고 의견을 남겨주세요. 선정된 테스터에게는 무료 플레이 쿠폰을 이메일로 보내드립니다.",
@@ -534,7 +534,7 @@ export default function PlaytestSignupForm({
       <div className="relative mx-auto max-w-3xl px-5 py-14 md:py-20">
         <header className="mb-8 rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] md:p-8">
           <div className="mb-5 flex items-center justify-between gap-4">
-            <p className="text-lg font-semibold uppercase tracking-[0.28em] text-[#FFB38A] md:text-xl">
+            <p className="text-lg font-semibold tracking-[0.28em] text-[#FFB38A] md:text-xl">
               {copy.eyebrow}
             </p>
             <button

@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.ssobig.com"),
   title: {
-    default: "쏘빅 SSOBIG | 머더미스터리 · 추리게임 · 소셜링 플랫폼",
-    template: "%s | 쏘빅 SSOBIG",
+    default: "쏘빅 ssobig | 머더미스터리 · 추리게임 · 소셜링 플랫폼",
+    template: "%s | 쏘빅 ssobig",
   },
   icons: {
     icon: "/icon.png",
@@ -35,11 +35,11 @@ export const metadata: Metadata = {
     "술 없는 모임",
   ],
   openGraph: {
-    title: "쏘빅 SSOBIG | 머더미스터리 · 추리게임 · 소셜링 플랫폼",
+    title: "쏘빅 ssobig | 머더미스터리 · 추리게임 · 소셜링 플랫폼",
     description:
       "술 없이도 즐거운 소셜 플랫폼 쏘빅! 머더미스터리, 추리게임, 보드게임, 소셜링 등 다양한 콘텐츠를 만나보세요.",
     url: "https://www.ssobig.com",
-    siteName: "쏘빅 SSOBIG",
+    siteName: "쏘빅 ssobig",
     locale: "ko_KR",
     type: "website",
     images: [
@@ -47,13 +47,13 @@ export const metadata: Metadata = {
         url: "/ssobig_assets/og-image.png",
         width: 1200,
         height: 630,
-        alt: "쏘빅 SSOBIG",
+        alt: "쏘빅 ssobig",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "쏘빅 SSOBIG | 머더미스터리 · 추리게임 · 소셜링 플랫폼",
+    title: "쏘빅 ssobig | 머더미스터리 · 추리게임 · 소셜링 플랫폼",
     description:
       "술 없이도 즐거운 소셜 플랫폼 쏘빅! 머더미스터리, 추리게임, 보드게임, 소셜링 등 다양한 콘텐츠를 만나보세요.",
     images: ["/ssobig_assets/og-image.png"],

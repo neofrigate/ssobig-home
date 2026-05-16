@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description:
     "대규모 마피아게임 불면증마피아! 쏘빅에서 진행하는 술 없이 즐기는 대규모 마피아 소셜링.",
   openGraph: {
-    title: "불면증마피아 | 쏘빅 SSOBIG",
+    title: "불면증마피아 | 쏘빅 ssobig",
     description: "대규모 마피아게임 불면증마피아! 술 없이 즐기는 마피아 소셜링.",
     url: "https://www.ssobig.com/offline/mafia",
   },

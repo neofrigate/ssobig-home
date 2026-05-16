@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description:
     "쏘빅의 오프라인 소셜링 프로그램. 일일남매, 불면증마피아, 알파마니또 등 술 없이 즐기는 다양한 오프라인 모임을 만나보세요.",
   openGraph: {
-    title: "오프라인 소셜링 | 쏘빅 SSOBIG",
+    title: "오프라인 소셜링 | 쏘빅 ssobig",
     description:
       "일일남매, 불면증마피아, 알파마니또 등 술 없이 즐기는 다양한 오프라인 모임.",
     url: "https://www.ssobig.com/offline",
