@@ -9,7 +9,7 @@ type ChannelLanguage = "ko" | "en";
 
 declare global {
   interface Window {
-    ChannelIO?: (method: string, options?: Record<string, unknown>) => void;
+    ChannelIO?: (method: string, ...args: unknown[]) => void;
     ChannelIOInitialized?: boolean;
   }
 }
@@ -56,8 +56,7 @@ export default function ChannelTalk() {
     ? "en"
     : "ko";
   const isDayNammeFocusedPage =
-    pathname === "/offline/11namme/apply" ||
-    pathname?.startsWith("/offline/11namme/survey/");
+    pathname === "/offline/11namme/apply";
 
   useEffect(() => {
     if (isDayNammeFocusedPage) {
@@ -79,6 +78,7 @@ export default function ChannelTalk() {
     window.ChannelIO?.("boot", {
       pluginKey: CHANNEL_TALK_PLUGIN_KEY,
       language: channelLanguage,
+      hideChannelButtonOnBoot: true,
     });
     window.ChannelIO?.("updateUser", {
       language: channelLanguage,
@@ -87,17 +87,7 @@ export default function ChannelTalk() {
   }, [channelLanguage, isDayNammeFocusedPage]);
 
   useEffect(() => {
-    // 채널톡 버튼 숨김 (플로팅 버튼 비활성화)
-    const style = document.createElement("style");
-    style.innerHTML = `
-      #ch-plugin {
-        display: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-
     return () => {
-      style.remove();
       if (window.ChannelIO) {
         window.ChannelIO("shutdown");
       }

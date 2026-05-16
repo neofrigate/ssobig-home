@@ -55,6 +55,11 @@ const TEN_POINT_SCORE_VALUES = Array.from(
   (_, index) => index + 1
 );
 
+const NAVER_REVIEW_URL = "https://m.place.naver.com/my/timeline";
+const REVIEW_INCENTIVE_THRESHOLD = 7;
+const REVIEW_SCREENSHOT_MESSAGE =
+  "[일일남매] 네이버 리뷰 작성 인증샷을 보냅니다. 커피 쿠폰 안내 부탁드려요.";
+
 const INITIAL_FORM_STATE: FormState = {
   overallSatisfaction: null,
   acquisitionChannels: [],
@@ -127,6 +132,28 @@ function toggleOption(currentValues: string[], option: string) {
   return currentValues.includes(option)
     ? currentValues.filter((value) => value !== option)
     : [...currentValues, option];
+}
+
+function getReviewScoreAverage(form: FormState) {
+  const scores = [
+    form.overallSatisfaction,
+    form.contentFlowScore,
+    form.recommendationScore,
+  ];
+  const validScores = scores.filter((score): score is number => score !== null);
+
+  if (validScores.length !== scores.length) {
+    return null;
+  }
+
+  return (
+    validScores.reduce((total, score) => total + score, 0) / validScores.length
+  );
+}
+
+function isReviewIncentiveEligible(form: FormState) {
+  const average = getReviewScoreAverage(form);
+  return average !== null && average >= REVIEW_INCENTIVE_THRESHOLD;
 }
 
 function ChoiceChip({
@@ -215,6 +242,7 @@ export default function SurveyPageClient({
   const [loadError, setLoadError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
+  const [showReviewIncentive, setShowReviewIncentive] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -323,6 +351,7 @@ export default function SurveyPageClient({
 
     setIsSubmitting(true);
     setSubmitError("");
+    const shouldShowReviewIncentive = isReviewIncentiveEligible(form);
 
     if (isDummySurvey) {
       const now = new Date().toISOString();
@@ -336,6 +365,7 @@ export default function SurveyPageClient({
           : current
       );
       setSubmittedAt(now);
+      setShowReviewIncentive(shouldShowReviewIncentive);
       setIsSubmitting(false);
       return;
     }
@@ -375,6 +405,7 @@ export default function SurveyPageClient({
             : current
         );
         setSubmittedAt(payload?.submittedAt ?? submittedAt);
+        setShowReviewIncentive(false);
         return;
       }
 
@@ -392,6 +423,7 @@ export default function SurveyPageClient({
           : current
       );
       setSubmittedAt(payload.submittedAt ?? null);
+      setShowReviewIncentive(shouldShowReviewIncentive);
     } catch (error) {
       setSubmitError(
         error instanceof Error ? error.message : "설문 제출에 실패했습니다."
@@ -438,6 +470,9 @@ export default function SurveyPageClient({
   }
 
   const isCompleted = context.alreadySubmitted;
+  const openChannelTalkForReviewScreenshot = () => {
+    window.ChannelIO?.("openChat", undefined, REVIEW_SCREENSHOT_MESSAGE);
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
@@ -494,6 +529,38 @@ export default function SurveyPageClient({
               <p className="mt-5 text-sm text-white/50">
                 제출 시각: {formatSubmittedAt(submittedAt || context.submittedAt)}
               </p>
+            ) : null}
+            {showReviewIncentive ? (
+              <div className="mt-7 rounded-[28px] border border-[#FF7A59]/25 bg-black/25 p-5 md:p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#FFB38A]">
+                  Review Gift
+                </p>
+                <h3 className="mt-3 text-2xl font-semibold text-white">
+                  네이버 리뷰를 남기고 커피 쿠폰을 받아가세요
+                </h3>
+                <p className="mt-3 break-keep text-sm leading-6 text-white/68">
+                  네이버에 일일남매 리뷰를 작성한 뒤, 리뷰 작성 화면
+                  스크린샷을 채널톡으로 보내주시면 확인 후 커피 쿠폰을
+                  안내드릴게요.
+                </p>
+                <div className="mt-5 grid gap-3 md:grid-cols-2">
+                  <a
+                    href={NAVER_REVIEW_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-14 items-center justify-center rounded-2xl bg-[#FF7A59] px-5 text-center text-sm font-semibold text-white transition hover:brightness-105"
+                  >
+                    네이버 리뷰 작성하기
+                  </a>
+                  <button
+                    type="button"
+                    onClick={openChannelTalkForReviewScreenshot}
+                    className="flex min-h-14 items-center justify-center rounded-2xl border border-white/14 bg-white/[0.05] px-5 text-sm font-semibold text-white transition hover:border-white/28 hover:bg-white/[0.08]"
+                  >
+                    리뷰 인증샷 보내기
+                  </button>
+                </div>
+              </div>
             ) : null}
           </div>
         ) : (
