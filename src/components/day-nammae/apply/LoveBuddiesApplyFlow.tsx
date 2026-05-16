@@ -187,7 +187,8 @@ const WAITLIST_ALERT_FLOW_STEPS: FlowStepKey[] = [
 function getNormalFlowSteps(
   hasCoupon: boolean | null,
   isFreeCoupon: boolean,
-  isScheduleLimitedCouponMode: boolean
+  isScheduleLimitedCouponMode: boolean,
+  shouldShowCouponChoiceStep: boolean
 ): FlowStepKey[] {
   if (hasCoupon === true && isScheduleLimitedCouponMode) {
     return [
@@ -206,7 +207,7 @@ function getNormalFlowSteps(
   return [
     "gender",
     "schedule",
-    "coupon_choice",
+    ...(shouldShowCouponChoiceStep ? ["coupon_choice" as const] : []),
     ...(hasCoupon === true ? ["coupon_code" as const] : []),
     ...(hasCoupon === true && isFreeCoupon
       ? ["free_coupon_notice" as const]
@@ -322,7 +323,7 @@ const INITIAL_FORM_VALUES: DayNammeFormValues = {
 
 function createInitialFormValues(initialCouponCode = ""): DayNammeFormValues {
   if (!initialCouponCode) {
-    return { ...INITIAL_FORM_VALUES };
+    return { ...INITIAL_FORM_VALUES, hasCoupon: false };
   }
 
   return {
@@ -1615,7 +1616,12 @@ export default function LoveBuddiesApplyFlow({
   const normalizedInitialCouponCode = normalizeDayNammeCouponCode(
     initialCouponCode || ""
   );
-  const initialFormValues = createInitialFormValues(normalizedInitialCouponCode);
+  const initialCouponCodeSuffix =
+    normalizedInitialCouponCode.length === DAY_NAMMAE_COUPON_CODE_SUFFIX_LENGTH
+      ? normalizedInitialCouponCode
+      : "";
+  const shouldShowCouponChoiceStep = Boolean(initialCouponCodeSuffix);
+  const initialFormValues = createInitialFormValues(initialCouponCodeSuffix);
   const [formValues, setFormValues] = useState(initialFormValues);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
   const [photoNotice, setPhotoNotice] = useState("");
@@ -1664,7 +1670,8 @@ export default function LoveBuddiesApplyFlow({
     : getNormalFlowSteps(
         formValues.hasCoupon,
         isValidatedFreeCoupon,
-        isScheduleLimitedCouponMode
+        isScheduleLimitedCouponMode,
+        shouldShowCouponChoiceStep
       );
   const currentStepKey = flowSteps[currentStepIndex] || flowSteps[0];
   const totalSteps = flowSteps.length;
@@ -1713,6 +1720,26 @@ export default function LoveBuddiesApplyFlow({
     selectedApplicationMode,
     selectedScheduleItem?.status,
   ]);
+
+  const goToStep = useCallback(
+    (stepKey: FlowStepKey) => {
+      const nextIndex = flowSteps.indexOf(stepKey);
+      if (nextIndex >= 0) {
+        setCurrentStepIndex(nextIndex);
+      }
+    },
+    [flowSteps]
+  );
+
+  const goToStepAfter = useCallback(
+    (stepKey: FlowStepKey) => {
+      const currentIndex = flowSteps.indexOf(stepKey);
+      if (currentIndex >= 0) {
+        setCurrentStepIndex(Math.min(currentIndex + 1, flowSteps.length - 1));
+      }
+    },
+    [flowSteps]
+  );
 
   const buildStepAnalyticsParams = useCallback(
     (stepKey = currentStepKey, stepIndex = displayStep) => ({
@@ -1788,13 +1815,13 @@ export default function LoveBuddiesApplyFlow({
   }, [isValidatedFreeCoupon]);
 
   useEffect(() => {
-    if (!normalizedInitialCouponCode) {
+    if (!initialCouponCodeSuffix) {
       return;
     }
 
     setFormValues((current) => {
       if (
-        current.couponCode === normalizedInitialCouponCode &&
+        current.couponCode === initialCouponCodeSuffix &&
         current.hasCoupon === true
       ) {
         return current;
@@ -1803,24 +1830,24 @@ export default function LoveBuddiesApplyFlow({
       return {
         ...current,
         hasCoupon: true,
-        couponCode: normalizedInitialCouponCode,
+        couponCode: initialCouponCodeSuffix,
       };
     });
-  }, [normalizedInitialCouponCode]);
+  }, [initialCouponCodeSuffix]);
 
   useEffect(() => {
     if (
-      !normalizedInitialCouponCode ||
-      couponScheduleLookupCode === normalizedInitialCouponCode ||
+      !initialCouponCodeSuffix ||
+      couponScheduleLookupCode === initialCouponCodeSuffix ||
       isLoadingSchedules ||
       scheduleData.length === 0
     ) {
       return;
     }
 
-    setCouponScheduleLookupCode(normalizedInitialCouponCode);
+    setCouponScheduleLookupCode(initialCouponCodeSuffix);
 
-    requestCouponScheduleLookup(buildDayNammeCouponCode(normalizedInitialCouponCode))
+    requestCouponScheduleLookup(buildDayNammeCouponCode(initialCouponCodeSuffix))
       .then((result) => {
         const targetStaffScheduleIds = getCouponTargetScheduleIds(result);
 
@@ -1850,7 +1877,7 @@ export default function LoveBuddiesApplyFlow({
           return {
             ...current,
             hasCoupon: true,
-            couponCode: normalizedInitialCouponCode,
+            couponCode: initialCouponCodeSuffix,
             schedule: targetScheduleLabel,
             staffScheduleId: targetSchedule.staffScheduleId,
           };
@@ -1863,8 +1890,8 @@ export default function LoveBuddiesApplyFlow({
       });
   }, [
     couponScheduleLookupCode,
+    initialCouponCodeSuffix,
     isLoadingSchedules,
-    normalizedInitialCouponCode,
     scheduleData,
   ]);
 
@@ -2004,7 +2031,7 @@ export default function LoveBuddiesApplyFlow({
     setShowFieldErrors(false);
     setWaitlistModalSchedule(null);
     setConfirmedWaitlistSchedule("");
-    setCurrentStepIndex(1);
+    goToStep(isScheduleLimitedCouponMode ? "coupon_code" : "schedule");
   };
 
   const validateCouponForSchedule = async (schedule: ScheduleItem) => {
@@ -2077,11 +2104,11 @@ export default function LoveBuddiesApplyFlow({
     if (isScheduleLimitedCouponMode) {
       const isValidForSchedule = await validateCouponForSchedule(schedule);
       if (!isValidForSchedule) return;
-      setCurrentStepIndex(3);
+      goToStepAfter("schedule");
       return;
     }
 
-    setCurrentStepIndex(2);
+    goToStep(shouldShowCouponChoiceStep ? "coupon_choice" : "profile");
   };
 
   const handleWaitlistConfirm = () => {
@@ -2091,7 +2118,7 @@ export default function LoveBuddiesApplyFlow({
       );
     }
     setWaitlistModalSchedule(null);
-    setCurrentStepIndex(2);
+    goToStep("waitlist_contact");
   };
 
   const handleBirthYearSelect = (year: string) => {
@@ -2297,13 +2324,6 @@ export default function LoveBuddiesApplyFlow({
         return false;
     }
   })();
-
-  const goToStep = (stepKey: FlowStepKey) => {
-    const nextIndex = flowSteps.indexOf(stepKey);
-    if (nextIndex >= 0) {
-      setCurrentStepIndex(nextIndex);
-    }
-  };
 
   const getSubmitBlockingStep = (wantsCoupon: boolean): FlowStepKey | null => {
     if (!formValues.gender) return "gender";
