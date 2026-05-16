@@ -58,7 +58,7 @@ const TEN_POINT_SCORE_VALUES = Array.from(
 const NAVER_REVIEW_URL = "https://m.place.naver.com/my/timeline";
 const REVIEW_INCENTIVE_THRESHOLD = 7;
 const REVIEW_SCREENSHOT_MESSAGE =
-  "[일일남매] 네이버 리뷰 작성 인증샷을 보냅니다. 커피 쿠폰 안내 부탁드려요.";
+  "[일일남매] 네이버 리뷰 작성 화면을 보냅니다. 커피 쿠폰 확인 부탁드려요.";
 
 const INITIAL_FORM_STATE: FormState = {
   overallSatisfaction: null,
@@ -77,6 +77,11 @@ const DUMMY_SURVEY_TOKENS = new Set([
   "dummy-application-id",
 ]);
 
+const DUMMY_SURVEY_TOKEN_PATTERNS = [
+  /^dummy-application-id-\d+$/,
+  /^dummy-applcation-id-\d+$/,
+];
+
 const DUMMY_SURVEY_CONTEXT: SurveyContext = {
   customerName: "테스트 참여자",
   phoneMasked: "010-****-0000",
@@ -87,7 +92,13 @@ const DUMMY_SURVEY_CONTEXT: SurveyContext = {
 };
 
 function isDummySurveyToken(token: string) {
-  return DUMMY_SURVEY_TOKENS.has(token.trim().toLowerCase());
+  const normalizedToken = token.trim().toLowerCase();
+  return (
+    DUMMY_SURVEY_TOKENS.has(normalizedToken) ||
+    DUMMY_SURVEY_TOKEN_PATTERNS.some((pattern) =>
+      pattern.test(normalizedToken)
+    )
+  );
 }
 
 function formatSubmittedAt(value?: string | null) {
@@ -515,52 +526,81 @@ export default function SurveyPageClient({
         </div>
 
         {isCompleted ? (
-          <div className="rounded-[32px] border border-[#FF7A59]/20 bg-[#120C0A] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
-              Already Submitted
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold text-white">
-              설문이 이미 제출되었습니다
-            </h2>
-            <p className="mt-4 break-keep text-base leading-7 text-white/72">
-              응답해 주셔서 감사합니다. 같은 신청 건으로는 한 번만 제출할 수 있어요.
-            </p>
-            {formatSubmittedAt(submittedAt || context.submittedAt) ? (
-              <p className="mt-5 text-sm text-white/50">
-                제출 시각: {formatSubmittedAt(submittedAt || context.submittedAt)}
+          <div className="space-y-5">
+            <section className="rounded-[32px] border border-[#FF7A59]/20 bg-[#120C0A] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.28)] md:p-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+                Submitted
               </p>
-            ) : null}
+              <h2 className="mt-3 text-3xl font-semibold text-white">
+                설문이 제출되었습니다
+              </h2>
+              <p className="mt-4 break-keep text-base leading-7 text-white/72">
+                응답해 주셔서 감사합니다. 같은 신청 건으로는 한 번만 제출할 수 있어요.
+              </p>
+              {formatSubmittedAt(submittedAt || context.submittedAt) ? (
+                <p className="mt-5 text-sm text-white/50">
+                  제출 시각: {formatSubmittedAt(submittedAt || context.submittedAt)}
+                </p>
+              ) : null}
+            </section>
+
             {showReviewIncentive ? (
-              <div className="mt-7 rounded-[28px] border border-[#FF7A59]/25 bg-black/25 p-5 md:p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#FFB38A]">
-                  Review Gift
-                </p>
-                <h3 className="mt-3 text-2xl font-semibold text-white">
-                  네이버 리뷰를 남기고 커피 쿠폰을 받아가세요
-                </h3>
-                <p className="mt-3 break-keep text-sm leading-6 text-white/68">
-                  네이버에 일일남매 리뷰를 작성한 뒤, 리뷰 작성 화면
-                  스크린샷을 채널톡으로 보내주시면 확인 후 커피 쿠폰을
-                  안내드릴게요.
-                </p>
-                <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <section className="rounded-[32px] border border-[#FF7A59]/24 bg-[#100A08] p-7 shadow-[0_24px_80px_rgba(255,122,89,0.08)] md:p-8">
+                <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+                      Review Gift
+                    </p>
+                    <h3 className="mt-3 break-keep text-2xl font-semibold text-white md:text-3xl">
+                      리뷰 인증하고 커피 쿠폰 받기
+                    </h3>
+                    <p className="mt-3 break-keep text-sm leading-6 text-white/68 md:text-base md:leading-7">
+                      일일남매가 좋았다면 네이버에 짧은 후기를 남겨주세요.
+                      작성 화면을 캡처해 채널톡으로 보내주시면 확인 후
+                      커피 쿠폰을 보내드립니다.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-[#FFD8CA] md:min-w-28 md:text-center">
+                    평균 7점 이상
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-3 text-sm text-white/72 md:grid-cols-3">
+                  {[
+                    "네이버 리뷰 작성",
+                    "작성 화면 캡처",
+                    "채널톡으로 전송",
+                  ].map((step, index) => (
+                    <div
+                      key={step}
+                      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/25 px-4 py-3"
+                    >
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FF7A59] text-xs font-bold text-white">
+                        {index + 1}
+                      </span>
+                      <span>{step}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 grid gap-3 md:grid-cols-2">
                   <a
                     href={NAVER_REVIEW_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex min-h-14 items-center justify-center rounded-2xl bg-[#FF7A59] px-5 text-center text-sm font-semibold text-white transition hover:brightness-105"
                   >
-                    네이버 리뷰 작성하기
+                    네이버 리뷰 쓰기
                   </a>
                   <button
                     type="button"
                     onClick={openChannelTalkForReviewScreenshot}
                     className="flex min-h-14 items-center justify-center rounded-2xl border border-white/14 bg-white/[0.05] px-5 text-sm font-semibold text-white transition hover:border-white/28 hover:bg-white/[0.08]"
                   >
-                    리뷰 인증샷 보내기
+                    인증샷 보내고 쿠폰 받기
                   </button>
                 </div>
-              </div>
+              </section>
             ) : null}
           </div>
         ) : (
