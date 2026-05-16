@@ -50,6 +50,11 @@ const RECOMMENDED_TARGET_OPTIONS = [
   "기타",
 ] as const;
 
+const TEN_POINT_SCORE_VALUES = Array.from(
+  { length: 10 },
+  (_, index) => index + 1
+);
+
 const INITIAL_FORM_STATE: FormState = {
   overallSatisfaction: null,
   acquisitionChannels: [],
@@ -343,6 +348,7 @@ export default function SurveyPageClient({
         },
         body: JSON.stringify({
           token: surveyToken,
+          surveyScaleVersion: 2,
           overallSatisfaction: form.overallSatisfaction,
           acquisitionChannels: form.acquisitionChannels,
           acquisitionChannelEtc: form.acquisitionChannelEtc.trim() || null,
@@ -495,10 +501,10 @@ export default function SurveyPageClient({
             <Section
               step="Q1"
               title="일일남매 경험에 전반적으로 얼마나 만족하셨나요?"
-              description="1점은 매우 불만족, 5점은 매우 만족입니다."
+              description="1점은 매우 불만족, 10점은 매우 만족입니다."
             >
-              <div className="grid grid-cols-5 gap-3">
-                {[1, 2, 3, 4, 5].map((value) => (
+              <div className="grid grid-cols-5 gap-3 md:grid-cols-10">
+                {TEN_POINT_SCORE_VALUES.map((value) => (
                   <ScoreButton
                     key={value}
                     value={value}
@@ -551,10 +557,10 @@ export default function SurveyPageClient({
             <Section
               step="Q3"
               title="콘텐츠의 전반적 흐름은 어떠셨했나요?"
-              description="1점은 매우 지루, 5점은 매우 흥미로움입니다."
+              description="1점은 매우 지루, 10점은 매우 흥미로움입니다."
             >
-              <div className="grid grid-cols-5 gap-3">
-                {[1, 2, 3, 4, 5].map((value) => (
+              <div className="grid grid-cols-5 gap-3 md:grid-cols-10">
+                {TEN_POINT_SCORE_VALUES.map((value) => (
                   <ScoreButton
                     key={value}
                     value={value}

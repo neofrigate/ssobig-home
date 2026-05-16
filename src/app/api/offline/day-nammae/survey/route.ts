@@ -31,6 +31,7 @@ function jsonResponse(body: unknown, status = 200) {
 function normalizeSurveyPayload(body: Record<string, unknown>) {
   return {
     token: body.token,
+    surveyScaleVersion: body.surveyScaleVersion,
     overallSatisfaction: body.overallSatisfaction,
     discoveryChannels: body.discoveryChannels ?? body.acquisitionChannels,
     discoveryChannelOther:
