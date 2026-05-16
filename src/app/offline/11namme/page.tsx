@@ -15,65 +15,61 @@ import {
 import { trackGAEvent } from "@/utils/gtag";
 import { getSafeSearchParams } from "@/utils/utm";
 
-// 한국 공휴일 (2025-2027)
-const KOREAN_HOLIDAYS: Record<string, string> = {
-  // 2025
-  "2025-01-01": "신정",
-  "2025-01-28": "설날",
-  "2025-01-29": "설날",
-  "2025-01-30": "설날",
-  "2025-03-01": "삼일절",
-  "2025-03-03": "대체공휴일",
-  "2025-05-05": "어린이날",
-  "2025-05-06": "대체공휴일",
-  "2025-06-06": "현충일",
-  "2025-08-15": "광복절",
-  "2025-10-03": "개천절",
-  "2025-10-05": "추석",
-  "2025-10-06": "추석",
-  "2025-10-07": "추석",
-  "2025-10-08": "대체공휴일",
-  "2025-10-09": "한글날",
-  "2025-12-25": "크리스마스",
-  // 2026
-  "2026-01-01": "신정",
-  "2026-02-16": "설날",
-  "2026-02-17": "설날",
-  "2026-02-18": "설날",
-  "2026-03-01": "삼일절",
-  "2026-03-02": "대체공휴일",
-  "2026-05-05": "어린이날",
-  "2026-05-24": "부처님오신날",
-  "2026-05-25": "대체공휴일",
-  "2026-06-06": "현충일",
-  "2026-08-15": "광복절",
-  "2026-09-24": "추석",
-  "2026-09-25": "추석",
-  "2026-09-26": "추석",
-  "2026-10-03": "개천절",
-  "2026-10-09": "한글날",
-  "2026-12-25": "크리스마스",
-  // 2027
-  "2027-01-01": "신정",
-  "2027-02-06": "설날",
-  "2027-02-07": "설날",
-  "2027-02-08": "설날",
-  "2027-02-09": "대체공휴일",
-  "2027-03-01": "삼일절",
-  "2027-05-05": "어린이날",
-  "2027-05-13": "부처님오신날",
-  "2027-06-06": "현충일",
-  "2027-06-07": "대체공휴일",
-  "2027-08-15": "광복절",
-  "2027-08-16": "대체공휴일",
-  "2027-09-15": "추석",
-  "2027-09-16": "추석",
-  "2027-09-17": "추석",
-  "2027-10-03": "개천절",
-  "2027-10-04": "대체공휴일",
-  "2027-10-09": "한글날",
-  "2027-12-25": "크리스마스",
+const SCHEDULE_BADGE_STYLE: Record<
+  string,
+  { label: string; bg: string; text: string }
+> = {
+  전체마감: { label: "전체마감", bg: "bg-black/10", text: "text-black/45" },
+  여자마감: { label: "여자마감", bg: "bg-[#FFE1EE]", text: "text-[#D94D90]" },
+  남자마감: { label: "남자마감", bg: "bg-[#FFE1EE]", text: "text-[#D94D90]" },
+  임박: { label: "마감임박", bg: "bg-[#DDF3D8]", text: "text-[#2E7D32]" },
+  여유: { label: "신청가능", bg: "bg-[#DFF1FF]", text: "text-[#1A6BAF]" },
 };
+
+function getScheduleBadgeStyle(status: string) {
+  return (
+    SCHEDULE_BADGE_STYLE[status] || {
+      label: status || "신청가능",
+      bg: "bg-[#DFF1FF]",
+      text: "text-[#1A6BAF]",
+    }
+  );
+}
+
+function parseScheduleMeta(schedule: ScheduleItem) {
+  const source = `${schedule.date} ${schedule.title}`.trim();
+  const match = source.match(
+    /(\d+)\/(\d+)\s*\(([^)]+)\)\s*(\d{1,2}):(\d{2})(?:\s+(.+))?/
+  );
+
+  if (!match) {
+    return null;
+  }
+
+  const now = new Date();
+  const month = Number(match[1]);
+  const day = Number(match[2]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const year = now.getFullYear();
+  const date = new Date(year, month - 1, day, hour, minute);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return {
+    date,
+    dateLabel: `${month}/${day} (${match[3]})`,
+    dateKey: `${month}-${day}`,
+    timeLabel: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
+    titleLabel: (match[6] || "").trim(),
+  };
+}
+
+function getGenderCapacity(maxCapacity: number) {
+  return Math.max(1, Math.floor(maxCapacity / 2));
+}
 
 // FAQ 아이템 컴포넌트
 const FAQItem = ({
@@ -126,66 +122,8 @@ const ElevenNammePage = () => {
   const router = useRouter();
   const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
   const [isApplyOpen, setIsApplyOpen] = useState(false);
-  const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
   const [initialCouponCode, setInitialCouponCode] = useState("");
-
-  // 참가자 차트 컴포넌트 - 중앙 기준
-  const ApplicantChart = ({
-    applicants,
-    maxCapacity,
-    status = "",
-  }: {
-    applicants: { total: number; female: number; male: number };
-    maxCapacity: number;
-    status?: string;
-  }) => {
-    const halfCapacity = maxCapacity / 2;
-    const femaleClosed = status === "전체마감" || status === "여자마감";
-    const maleClosed = status === "전체마감" || status === "남자마감";
-    const femalePercentage = femaleClosed
-      ? 100
-      : halfCapacity > 0
-        ? (applicants.female / halfCapacity) * 100
-        : 0;
-    const malePercentage = maleClosed
-      ? 100
-      : halfCapacity > 0
-        ? (applicants.male / halfCapacity) * 100
-        : 0;
-    const femaleEmpty = Math.max(0, 100 - femalePercentage);
-    const maleEmpty = Math.max(0, 100 - malePercentage);
-
-    const femaleFaded = femaleClosed;
-    const maleFaded = maleClosed;
-
-    return (
-      <div className="flex h-2 md:h-3 bg-black/10 rounded-full overflow-hidden">
-        {/* 왼쪽 절반 - 여자 */}
-        <div className="flex w-1/2 flex-row-reverse">
-          <div
-            className={`transition-all duration-700 ease-out rounded-l-full ${
-              femaleFaded ? "bg-[#FF69B4]/30" : "bg-[#FF69B4]"
-            }`}
-            style={{ width: `${femalePercentage}%` }}
-          />
-          <div
-            className="bg-transparent"
-            style={{ width: `${femaleEmpty}%` }}
-          />
-        </div>
-        {/* 오른쪽 절반 - 남자 */}
-        <div className="flex w-1/2">
-          <div
-            className={`transition-all duration-700 ease-out rounded-r-full ${
-              maleFaded ? "bg-[#4A90E2]/30" : "bg-[#4A90E2]"
-            }`}
-            style={{ width: `${malePercentage}%` }}
-          />
-          <div className="bg-transparent" style={{ width: `${maleEmpty}%` }} />
-        </div>
-      </div>
-    );
-  };
+  const [showAllSchedules, setShowAllSchedules] = useState(false);
 
   // 스케줄 아이템 컴포넌트
   useEffect(() => {
@@ -239,408 +177,224 @@ const ElevenNammePage = () => {
   };
 
   const ScheduleRow = ({ schedule }: { schedule: ScheduleItem }) => {
+    const meta = parseScheduleMeta(schedule);
+    const badgeStyle = getScheduleBadgeStyle(schedule.status);
     const isCompleted = schedule.status === "전체마감";
-    const timeMatch = schedule.title.match(/^(\d+:\d+)\s+(.+)$/);
-    const time = timeMatch ? timeMatch[1] : "";
-    const gameName = timeMatch ? timeMatch[2] : schedule.title;
+    const showStatusBadge =
+      schedule.status !== "임박" && schedule.status !== "여유";
+    const textOpacity = isCompleted ? "opacity-45" : "";
+    const label = meta
+      ? `일일남매 ${meta.dateLabel} ${meta.timeLabel}`
+      : `일일남매 ${schedule.date} ${schedule.title}`;
+    const genderCapacity = getGenderCapacity(schedule.maxCapacity);
 
-    const textOpacity = isCompleted ? "opacity-30" : "";
+    const renderGenderBar = ({
+      gender,
+      count,
+      color,
+      closed,
+    }: {
+      gender: "여자" | "남자";
+      count: number;
+      color: string;
+      closed: boolean;
+    }) => {
+      const remaining = Math.max(0, genderCapacity - count);
+      const fillPercentage = closed
+        ? 100
+        : Math.min(100, (count / genderCapacity) * 100);
+      const labelText = closed ? `${gender} 마감` : `${gender} ${count}명`;
+      const remainingText = closed ? null : `잔여 ${remaining}`;
+      const labelClass = closed
+        ? "text-black/25"
+        : gender === "여자"
+          ? "text-[#FF5A8F]"
+          : "text-[#6498ED]";
+      const fillClass = closed ? "bg-[#BDBDBD]" : color;
+      const trackClass = closed ? "bg-transparent" : "bg-[#ECECEC]";
+      const remainClass = closed
+        ? "text-black/25"
+        : gender === "여자"
+          ? "text-[#C6A9B5]"
+          : "text-[#A9BFE9]";
 
-    const statusConfig: Record<string, { bg: string; text: string }> = {
-      전체마감: { bg: "bg-black/10", text: "text-black/40" },
-      여자마감: { bg: "bg-[#FF69B4]/15", text: "text-[#FF69B4]" },
-      남자마감: { bg: "bg-[#4A90E2]/15", text: "text-[#4A90E2]" },
-      임박: { bg: "bg-orange-100", text: "text-orange-500" },
-      여유: { bg: "bg-green-100", text: "text-green-600" },
+      return (
+        <div className="grid grid-cols-[68px_minmax(0,1fr)] items-center gap-3 md:grid-cols-[82px_minmax(0,1fr)] md:gap-4">
+          <div className={`text-[13px] font-medium md:text-[16px] ${labelClass}`}>
+            {labelText}
+          </div>
+          <div className="relative">
+            <div className={`h-3 overflow-hidden rounded-r-full ${trackClass}`}>
+              <div
+                className={`h-full rounded-r-full transition-all duration-700 ease-out ${fillClass}`}
+                style={{ width: `${fillPercentage}%` }}
+              />
+            </div>
+            {remainingText ? (
+              <div
+                className={`pointer-events-none absolute inset-y-0 right-3 flex items-center text-[11px] font-bold md:text-[13px] ${remainClass}`}
+              >
+                {remainingText}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      );
     };
-    const statusStyle = statusConfig[schedule.status];
 
     return (
-      <div className="mb-4 md:mb-6">
-        <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-4">
-          <div className="flex items-center space-x-2 md:space-x-3 flex-grow flex-wrap">
-            <span
-              className={`font-medium md:font-semibold text-sm md:text-base text-black whitespace-nowrap ${textOpacity}`}
-            >
-              {schedule.date} {time}
-            </span>
-            <span
-              className={`font-bold text-sm md:text-base text-black ${textOpacity}`}
-            >
-              {gameName}
-            </span>
-            {statusStyle && schedule.status !== "여유" && schedule.status !== "임박" && (
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${statusStyle.bg} ${statusStyle.text}`}
-              >
-                {schedule.status === "전체마감" ? `🔒 ${schedule.status}` : schedule.status}
-              </span>
-            )}
-          </div>
-          <span
-            className={`font-light text-xs md:text-sm text-black/70 ml-3 whitespace-nowrap ${textOpacity}`}
+      <div className={`py-5 md:py-6 ${isCompleted ? "opacity-70" : ""}`}>
+        <div className="flex items-start justify-between gap-4">
+          <h4
+            className={`pr-4 text-[17px] font-extrabold leading-[1.15] tracking-[-0.03em] text-black md:text-[22px] ${textOpacity}`}
           >
-            {schedule.applicants.total}/{schedule.maxCapacity}명
-          </span>
+            {label}
+          </h4>
+          {showStatusBadge ? (
+            <span
+              className={`shrink-0 rounded-[10px] px-2 py-0.5 text-[12px] font-extrabold md:px-2.5 md:text-[13px] ${badgeStyle.bg} ${badgeStyle.text}`}
+            >
+              {badgeStyle.label}
+            </span>
+          ) : null}
         </div>
-        <div className="px-3 md:px-4">
-          <ApplicantChart
-            applicants={schedule.applicants}
-            maxCapacity={schedule.maxCapacity}
-            status={schedule.status}
-          />
+        <div className="mt-4 space-y-1 md:mt-4 md:space-y-[6px]">
+          {renderGenderBar({
+            gender: "여자",
+            count: schedule.applicants.female,
+            color: "bg-[#FF5A8F]",
+            closed: schedule.status === "전체마감" || schedule.status === "여자마감",
+          })}
+          {renderGenderBar({
+            gender: "남자",
+            count: schedule.applicants.male,
+            color: "bg-[#6498ED]",
+            closed: schedule.status === "전체마감" || schedule.status === "남자마감",
+          })}
+        </div>
+        {meta?.titleLabel ? (
+          <p className="mt-2 text-[11px] font-medium text-black/35 md:text-xs">
+            {meta.titleLabel}
+          </p>
+        ) : null}
+      </div>
+    );
+  };
+
+  const ScheduleRowSkeleton = () => {
+    return (
+      <div className="py-5 md:py-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="h-6 w-[220px] animate-pulse bg-black/8 md:h-7 md:w-[280px]" />
+          <div className="h-6 w-14 animate-pulse rounded-[10px] bg-black/8 md:h-7 md:w-16" />
+        </div>
+        <div className="mt-4 space-y-1 md:mt-4 md:space-y-[6px]">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div
+              key={`gender-skeleton-${index}`}
+              className="grid grid-cols-[68px_minmax(0,1fr)] items-center gap-3 md:grid-cols-[82px_minmax(0,1fr)] md:gap-4"
+            >
+              <div className="h-4 w-12 animate-pulse bg-black/8 md:h-5 md:w-14" />
+              <div className="h-3 animate-pulse rounded-full bg-black/8" />
+            </div>
+          ))}
         </div>
       </div>
     );
   };
 
-  const upcomingCalendar = useMemo(() => {
+  const upcomingSchedules = useMemo(() => {
     const today = new Date();
     const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const searchEnd = new Date(start);
-    searchEnd.setMonth(searchEnd.getMonth() + 1);
-    searchEnd.setHours(23, 59, 59, 999);
 
-    const itemsByDay = new Map<
-      string,
-      {
-        schedule: ScheduleItem;
-        date: Date;
-        stateLabel: string;
-      }[]
-    >();
-    scheduleData.forEach((schedule) => {
-      const source = `${schedule.date} ${schedule.title}`;
-      const match = source.match(/(\d+)\/(\d+)\s*\([^)]+\)\s*(\d+):(\d+)/);
-
-      if (!match) {
-        return;
-      }
-
-      const candidate = new Date(
-        start.getFullYear(),
-        Number(match[1]) - 1,
-        Number(match[2]),
-        Number(match[3]),
-        Number(match[4])
-      );
-
-      if (
-        Number.isNaN(candidate.getTime()) ||
-        candidate < start ||
-        candidate > searchEnd
-      ) {
-        return;
-      }
-
-      const dayKey = `${candidate.getFullYear()}-${String(
-        candidate.getMonth() + 1
-      ).padStart(2, "0")}-${String(candidate.getDate()).padStart(2, "0")}`;
-
-      const stateLabel =
-        schedule.status === "전체마감"
-          ? "전체마감"
-          : schedule.status === "여자마감" || schedule.status === "남자마감"
-            ? "일부마감"
-            : "신청가능";
-
-      const bucket = itemsByDay.get(dayKey) || [];
-      bucket.push({ schedule, date: candidate, stateLabel });
-      bucket.sort((a, b) => a.date.getTime() - b.date.getTime());
-      itemsByDay.set(dayKey, bucket);
-    });
-
-    const gridStart = new Date(start);
-    gridStart.setDate(gridStart.getDate() - ((gridStart.getDay() + 6) % 7));
-    const gridEnd = new Date(gridStart);
-    gridEnd.setDate(gridEnd.getDate() + 27);
-    gridEnd.setHours(23, 59, 59, 999);
-
-    const days = [];
-    for (
-      const cursor = new Date(gridStart);
-      cursor <= gridEnd;
-      cursor.setDate(cursor.getDate() + 1)
-    ) {
-      const current = new Date(cursor);
-      const dayKey = `${current.getFullYear()}-${String(
-        current.getMonth() + 1
-      ).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`;
-
-      days.push({
-        key: dayKey,
-        date: current,
-        isToday: current.getTime() === start.getTime(),
-        inRange: current >= gridStart && current <= gridEnd,
-        items: itemsByDay.get(dayKey) || [],
-      });
-    }
-
-    return {
-      label: `${start.getFullYear()}.${String(start.getMonth() + 1).padStart(
-        2,
-        "0"
-      )} - ${String(gridEnd.getMonth() + 1).padStart(2, "0")}`,
-      days,
-    };
+    return scheduleData
+      .map((schedule) => {
+        const meta = parseScheduleMeta(schedule);
+        return meta ? { schedule, meta } : null;
+      })
+      .filter(
+        (
+          item
+        ): item is {
+          schedule: ScheduleItem;
+          meta: NonNullable<ReturnType<typeof parseScheduleMeta>>;
+        } => item !== null && item.meta.date >= start
+      )
+      .slice(0, 10);
   }, [scheduleData]);
 
-  const CalendarSection = () => {
-    const weekLabels = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+  const ScheduleSummarySection = () => {
+    const visibleSchedules = showAllSchedules
+      ? upcomingSchedules
+      : upcomingSchedules.slice(0, 6);
+    const hasMoreSchedules = upcomingSchedules.length > 6;
 
     return (
-      <div className="mt-6">
-        <p className="text-center text-sm font-semibold text-black/80 md:text-base">일정을 클릭하면 참가현황을 볼 수 있어요</p>
-        <div className="mt-3 flex items-center justify-between gap-3">
+      <div className="mt-6 space-y-5">
+        <div className="text-center">
+          <p className="text-sm font-semibold text-black/80 md:text-base">
+            지금 신청 가능한 회차를 먼저 확인해보세요
+          </p>
+          <p className="mt-1 text-xs font-medium text-black/45 md:text-sm">
+            자세한 신청은 페이지 하단 참여하기 버튼에서 이어집니다
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
           <span className="text-sm font-bold text-black/55 md:text-base">참가비 35,000원</span>
-          <div className="flex items-center gap-1.5">
-            <span className="rounded-full bg-[#D6ECFA] px-2 py-0.5 text-[10px] font-semibold text-[#1A6BAF] md:text-xs">신청가능</span>
-            <span className="rounded-full bg-[#FFF3CD] px-2 py-0.5 text-[10px] font-semibold text-[#8A6D00] md:text-xs">일부마감</span>
-            <span className="rounded-full bg-black/10 px-2 py-0.5 text-[10px] font-semibold text-black/40 md:text-xs">전체마감</span>
-          </div>
         </div>
 
-        {/* 달력 본체 - 상단 굵은 선 / 하단 얇은 선 */}
-        <div className="mt-4 border-t-2 border-t-black/80 border-b border-b-black/80">
-        {/* 요일 헤더 - 볼드 중앙정렬 */}
-        <div className="border-b border-black/80">
-          <div className="grid grid-cols-7">
-            {weekLabels.map((label) => {
-              const labelColor =
-                label === "SAT"
-                  ? "text-[#4A90E2]"
-                  : label === "SUN"
-                  ? "text-[#FF69B4]"
-                  : "text-black/70";
-              return (
-                <div
-                  key={label}
-                  className={`py-2 text-center text-xs font-bold md:text-sm ${labelColor}`}
-                >
-                  {label}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 날짜 그리드 - 선 없이 깔끔하게 */}
-        <div className="grid grid-cols-7">
-          {upcomingCalendar.days.map((day) => {
-            const hasItems = day.items.length > 0;
-            const isSelected = selectedCalendarDate === day.key;
-            const isSunday = day.date.getDay() === 0;
-            const holidayName = KOREAN_HOLIDAYS[day.key];
-            const isHoliday = Boolean(holidayName);
-            const isRedDay = isSunday || isHoliday;
-            return (
-            <div
-              key={day.key}
-              className={`min-h-[80px] px-1 py-2 md:min-h-[110px] md:px-2 md:py-3 text-center transition-all ${hasItems ? "cursor-pointer" : ""} ${isSelected ? "bg-white rounded-lg md:rounded-xl" : day.isToday ? "bg-white/50 rounded-lg md:rounded-xl" : ""}`}
-              onClick={() => hasItems && setSelectedCalendarDate(isSelected ? null : day.key)}
-            >
-              {/* 날짜 숫자 - 볼드 중앙정렬 */}
-              <div className="flex items-center justify-center gap-1">
-                <span
-                  className={`text-base font-bold md:text-lg ${
-                    isRedDay
-                      ? day.inRange
-                        ? "text-[#FF69B4]"
-                        : "text-[#FF69B4]/40"
-                      : hasItems
-                        ? "text-black/85"
-                        : day.inRange
-                          ? "text-black/35"
-                          : "text-black/15"
-                  }`}
-                >
-                  {day.date.getMonth() + 1}.{day.date.getDate()}
-                </span>
+        <div className="mt-4 border-t border-black/8">
+            {visibleSchedules.map(({ schedule }, index) => (
+              <div
+                key={`${schedule.staffScheduleId || schedule.fullLabel}`}
+                className={index > 0 ? "border-t border-black/8" : ""}
+              >
+                <ScheduleRow schedule={schedule} />
               </div>
-              {day.isToday && (
-                <p
-                  className={`text-[9px] font-bold md:text-[10px] ${
-                    isRedDay ? "text-[#FF69B4]" : "text-black/60"
-                  }`}
-                >
-                  오늘
-                </p>
-              )}
-              {!day.isToday && holidayName && (
-                <p
-                  className={`text-[9px] font-semibold md:text-[10px] ${
-                    day.inRange ? "text-[#FF69B4]" : "text-[#FF69B4]/40"
-                  }`}
-                >
-                  {holidayName}
-                </p>
-              )}
-
-              {/* 이벤트 칩 - 작은 라운드 */}
-              <div className="mt-1 space-y-0.5 md:mt-1.5 md:space-y-1">
-                {day.items.slice(0, 2).map((item) => {
-                  const chipClass =
-                    item.stateLabel === "전체마감"
-                      ? "bg-black/5 text-black/30"
-                      : item.stateLabel === "일부마감"
-                      ? "bg-[#FFF3CD] text-[#8A6D00]"
-                      : "bg-[#D6ECFA] text-[#1A6BAF]";
-
-                  return (
-                    <div
-                      key={`${item.schedule.date}-${item.date.getTime()}`}
-                      className={`rounded-sm px-0.5 py-0.5 md:rounded md:px-1 md:py-0.5 ${chipClass}`}
-                    >
-                      <p className="text-[10px] font-bold leading-tight md:text-xs">
-                        {String(item.date.getHours()).padStart(2, "0")}:
-                        {String(item.date.getMinutes()).padStart(2, "0")}
-                      </p>
-                      <p className="whitespace-pre-line text-[8px] font-semibold leading-tight md:text-[10px]">
-                        {item.stateLabel}
-                      </p>
-                      {(item.stateLabel === "신청가능" || item.stateLabel === "일부마감") && (
-                        <p className="text-[7px] font-medium leading-tight md:text-[9px] opacity-70">
-                          {item.schedule.status === "남자마감"
-                            ? `남마감 / 여${item.schedule.applicants.female}`
-                            : item.schedule.status === "여자마감"
-                            ? `남${item.schedule.applicants.male} / 여마감`
-                            : `남${item.schedule.applicants.male} / 여${item.schedule.applicants.female}`}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-                {day.items.length > 2 && (
-                  <p className="text-[8px] font-semibold text-black/40 md:text-[9px]">
-                    +{day.items.length - 2}
-                  </p>
-                )}
-              </div>
-            </div>
-            );
-          })}
+            ))}
         </div>
 
-        {/* 선택된 날짜 상세 - 라인 사이에서 펼쳐지는 애니메이션 */}
-        {(() => {
-          const selectedDay = selectedCalendarDate
-            ? upcomingCalendar.days.find((d) => d.key === selectedCalendarDate)
-            : null;
-          const isOpen = Boolean(selectedDay && selectedDay.items.length);
-          const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-          const dateLabel = selectedDay
-            ? `${selectedDay.date.getMonth() + 1}/${selectedDay.date.getDate()} (${dayNames[selectedDay.date.getDay()]})`
-            : "";
-          return (
-            <div
-              className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-in-out ${
-                isOpen ? "max-h-[3000px] opacity-100" : "max-h-0 opacity-0"
-              }`}
+        {hasMoreSchedules ? (
+          <div className="flex justify-center pt-1">
+            <button
+              type="button"
+              onClick={() => setShowAllSchedules((prev) => !prev)}
+              className="rounded-full border border-black/15 bg-white px-4 py-2 text-sm font-extrabold text-black/75"
             >
-              {selectedDay && (
-                <div className="border-t border-black/10 pt-5 pb-5">
-                  {/* 날짜 타이틀 + 범례 + 닫기 (한 줄) */}
-                  <div className="flex items-center justify-between gap-3 mb-4 px-3 md:px-4">
-                    <h3 className="text-lg md:text-xl font-extrabold text-black">
-                      {dateLabel}
-                    </h3>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full bg-[#FF69B4]" />
-                        <span className="text-xs text-black/60">여</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full bg-[#4A90E2]" />
-                        <span className="text-xs text-black/60">남</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedCalendarDate(null)}
-                        className="text-xs text-black/35 hover:text-black/60"
-                      >
-                        닫기
-                      </button>
-                    </div>
-                  </div>
-                  {selectedDay.items.map((item) => (
-                    <ScheduleRow
-                      key={`${item.schedule.date}-${item.date.getTime()}`}
-                      schedule={item.schedule}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })()}
-        </div>
+              {showAllSchedules ? "일정 접기" : "일정 전체 보기"}
+            </button>
+          </div>
+        ) : null}
       </div>
     );
   };
 
   const ScheduleLoadingSkeleton = () => {
-    const weekLabels = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
-
     return (
-      <div className="mt-6">
-        {/* 안내 문구 */}
-        <p className="text-center text-sm font-semibold text-black/80 md:text-base">
-          일정을 클릭하면 참가현황을 볼 수 있어요
-        </p>
-
-        {/* 참가비 + 범례 */}
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <span className="text-sm font-bold text-black/55 md:text-base">참가비 35,000원</span>
-          <div className="flex items-center gap-1.5">
-            <span className="rounded-full bg-[#D6ECFA] px-2 py-0.5 text-[10px] font-semibold text-[#1A6BAF] md:text-xs">신청가능</span>
-            <span className="rounded-full bg-[#FFF3CD] px-2 py-0.5 text-[10px] font-semibold text-[#8A6D00] md:text-xs">일부마감</span>
-            <span className="rounded-full bg-black/10 px-2 py-0.5 text-[10px] font-semibold text-black/40 md:text-xs">전체마감</span>
-          </div>
+      <div className="mt-6 space-y-5">
+        <div className="text-center">
+          <p className="text-center text-sm font-semibold text-black/80 md:text-base">
+            지금 신청 가능한 회차를 먼저 확인해보세요
+          </p>
+          <p className="mt-1 text-xs font-medium text-black/45 md:text-sm">
+            자세한 신청은 페이지 하단 참여하기 버튼에서 이어집니다
+          </p>
         </div>
 
-        {/* 달력 본체 */}
-        <div className="mt-4 border-t-2 border-t-black/80 border-b border-b-black/80">
-          {/* 요일 헤더 */}
-          <div className="border-b border-black/80">
-            <div className="grid grid-cols-7">
-              {weekLabels.map((label) => {
-                const labelColor =
-                  label === "SAT"
-                    ? "text-[#4A90E2]"
-                    : label === "SUN"
-                    ? "text-[#FF69B4]"
-                    : "text-black/70";
-                return (
-                  <div
-                    key={`calendar-label-skeleton-${label}`}
-                    className={`py-2 text-center text-xs font-bold md:text-sm ${labelColor}`}
-                  >
-                    {label}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm font-bold text-black/55 md:text-base">참가비 35,000원</span>
+        </div>
 
-          {/* 날짜 그리드 스켈레톤 */}
-          <div className="grid grid-cols-7">
-            {Array.from({ length: 28 }).map((_, index) => (
-              <div
-                key={`calendar-skeleton-${index}`}
-                className="min-h-[80px] px-1 py-2 md:min-h-[110px] md:px-2 md:py-3 text-center"
-              >
-                <div className="flex items-center justify-center">
-                  <div className="h-4 w-8 animate-pulse rounded bg-black/10 md:h-5 md:w-10" />
-                </div>
-                <div className="mt-2 space-y-1 md:mt-2.5 md:space-y-1.5">
-                  <div className="h-8 animate-pulse rounded-sm bg-black/8 md:h-10 md:rounded" />
-                  {index % 5 === 0 && (
-                    <div className="h-8 animate-pulse rounded-sm bg-black/8 md:h-10 md:rounded" />
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="mt-4 border-t border-black/8">
+          {Array.from({ length: 5 }).map((_, itemIndex) => (
+            <div
+              key={`schedule-skeleton-item-${itemIndex}`}
+              className={itemIndex > 0 ? "border-t border-black/8" : ""}
+            >
+              <ScheduleRowSkeleton />
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -705,7 +459,7 @@ const ElevenNammePage = () => {
                       📅 참여하기 버튼을 눌러주세요
                     </div>
                   ) : (
-                    <CalendarSection />
+                    <ScheduleSummarySection />
                   )}
                 </div>
 

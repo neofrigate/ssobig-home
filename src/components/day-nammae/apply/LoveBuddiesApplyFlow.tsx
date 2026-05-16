@@ -789,9 +789,32 @@ async function renderCompressedPhoto(
   return canvasToBlob(canvas, quality);
 }
 
+async function loadHeic2Any() {
+  const importModule = new Function(
+    "moduleName",
+    "return import(moduleName);"
+  ) as (
+    moduleName: string
+  ) => Promise<{
+    default?: (options: {
+      blob: Blob;
+      toType: string;
+      quality?: number;
+    }) => Promise<Blob | Blob[]>;
+  }>;
+
+  const imported = await importModule("heic2any");
+  return imported.default;
+}
+
 async function convertHeicToJpeg(file: File) {
   try {
-    const { default: heic2any } = await import("heic2any");
+    const heic2any = await loadHeic2Any();
+
+    if (!heic2any) {
+      throw new Error("Missing HEIC converter");
+    }
+
     const converted = await heic2any({
       blob: file,
       toType: "image/jpeg",
