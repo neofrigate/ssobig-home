@@ -319,8 +319,7 @@ const ElevenNammePage = () => {
           schedule: ScheduleItem;
           meta: NonNullable<ReturnType<typeof parseScheduleMeta>>;
         } => item !== null && item.meta.date >= start
-      )
-      .slice(0, 10);
+      );
   }, [scheduleData]);
 
   const ScheduleSummarySection = () => {
