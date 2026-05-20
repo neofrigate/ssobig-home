@@ -41,7 +41,8 @@ export async function generateMetadata({
         : "Try ssobig's English-first story mystery games before launch and share your feedback.";
   const canonicalUrl =
     `https://www.ssobig.com/playroom/form/playtest/${normalizedLocale}`;
-  const ogImageUrl = `${canonicalUrl}/opengraph-image`;
+  const ogImageUrl =
+    "https://www.ssobig.com/ssobig_assets/playroom/playtest-preview.png";
 
   return {
     title: {
@@ -62,9 +63,11 @@ export async function generateMetadata({
       images: [
         {
           url: ogImageUrl,
+          secureUrl: ogImageUrl,
           width: 1200,
           height: 630,
           alt: "ssobig PLAYROOM 얼리 액세스 사전 체험 신청",
+          type: "image/png",
         },
       ],
     },
