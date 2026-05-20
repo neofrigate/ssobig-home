@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import PlaytestSignupForm from "./PlaytestSignupForm";
+import PlaytestSignupForm from "./PlaytestSignupFormV2";
 import {
   normalizePlaytestLocale,
   type PlaytestLocale,
