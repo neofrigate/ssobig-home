@@ -371,6 +371,7 @@ const content = {
     storyOptionsLoading: "Loading available titles...",
     storyOptionsError:
       "We could not load the title list right now. Please refresh and try again.",
+    storyInfoLinkLabel: "(Click) See title details here",
     languageSwitch: {
       title: "View this form in Korean?",
       body:
@@ -473,6 +474,7 @@ const content = {
     storyOptionsLoading: "체험 가능한 작품을 불러오는 중입니다...",
     storyOptionsError:
       "작품 목록을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.",
+    storyInfoLinkLabel: "(클릭) 작품정보는 여기서 확인하세요",
     languageSwitch: {
       title: "영어로 보시겠어요?",
       body:
@@ -575,6 +577,7 @@ const content = {
     storyOptionsLoading: "体験可能な作品を読み込み中です...",
     storyOptionsError:
       "作品一覧を読み込めませんでした。ページを更新してもう一度お試しください。",
+    storyInfoLinkLabel: "（クリック）作品情報はこちらで確認してください",
     languageSwitch: {
       title: "英語版を表示しますか？",
       body:
@@ -677,6 +680,7 @@ const content = {
     storyOptionsLoading: "正在加载可体验作品...",
     storyOptionsError:
       "无法加载作品列表，请刷新页面后重试。",
+    storyInfoLinkLabel: "（点击）请在这里查看作品信息",
     languageSwitch: {
       title: "要切换到英文版吗？",
       body:
@@ -779,14 +783,12 @@ function ChoiceChip({
 function TemplateCardButton({
   locale,
   option,
-  detailLabel,
   ratingLabel,
   selected,
   onClick,
 }: {
   locale: PlaytestLocale;
   option: PlaytestTemplateOption;
-  detailLabel: string;
   ratingLabel: string;
   selected: boolean;
   onClick: () => void;
@@ -824,17 +826,6 @@ function TemplateCardButton({
           </p>
         </div>
       </button>
-      <div className="flex justify-start px-2.5 pb-2.5 md:px-3 md:pb-3">
-        <a
-          href={option.detailUrl[locale]}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(event) => event.stopPropagation()}
-          className="inline-flex text-[11px] font-medium text-white/52 transition hover:text-white md:text-xs"
-        >
-          {detailLabel}
-        </a>
-      </div>
     </div>
   );
 }
@@ -1249,18 +1240,26 @@ export default function PlaytestSignupForm({
               <div className="rounded-lg border border-[#FF7A59]/20 bg-[#120C0A] px-3 py-2.5 text-sm text-[#FFD3C4] md:rounded-xl md:px-4 md:py-3">
                 {storyOptionsError}
               </div>
-            ) : playtestOptions.length === 0 ? (
-              <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white/65 md:rounded-xl md:px-4 md:py-3">
-                {copy.storyOptionsLoading}
-              </div>
-            ) : (
+          ) : playtestOptions.length === 0 ? (
+            <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white/65 md:rounded-xl md:px-4 md:py-3">
+              {copy.storyOptionsLoading}
+            </div>
+          ) : (
+            <div>
+              <a
+                href="https://www.ssobig.com/playroom"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mb-3 inline-flex text-sm font-medium text-white/62 underline underline-offset-4 transition hover:text-white md:mb-4"
+              >
+                {copy.storyInfoLinkLabel}
+              </a>
               <div className="grid grid-cols-4 gap-2 md:gap-3">
                 {playtestOptions.map((option) => (
                   <TemplateCardButton
                     key={option.slug}
                     locale={locale}
                     option={option}
-                    detailLabel={copy.labels.detail}
                     ratingLabel={copy.labels.rating}
                     selected={form.selectedTemplateId === option.templateId[locale]}
                     onClick={() =>
@@ -1269,7 +1268,8 @@ export default function PlaytestSignupForm({
                   />
                 ))}
               </div>
-            )}
+            </div>
+          )}
           </Section>
 
           <Section {...copy.sections.experience}>
