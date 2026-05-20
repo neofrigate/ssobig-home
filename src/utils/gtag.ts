@@ -14,6 +14,54 @@ declare global {
 
 export const GA_MEASUREMENT_ID = "G-RN7MB0CJZS";
 
+const getDeviceCategory = () => {
+  if (typeof window === "undefined") return "unknown";
+  if (window.matchMedia("(min-width: 1024px)").matches) return "desktop";
+  if (window.matchMedia("(min-width: 768px)").matches) return "tablet";
+  return "mobile";
+};
+
+const getReferrerHost = () => {
+  if (typeof document === "undefined" || !document.referrer) return "direct";
+
+  try {
+    return new URL(document.referrer).hostname || "unknown";
+  } catch {
+    return "unknown";
+  }
+};
+
+const getCommonGAEventParams = (): Record<string, string> => {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return {};
+  }
+
+  const urlParams = getSafeSearchParams(window.location.search);
+  const params: Record<string, string> = {
+    page_path: window.location.pathname,
+    device_category: getDeviceCategory(),
+    referrer_host: getReferrerHost(),
+    viewport_size: `${window.innerWidth}x${window.innerHeight}`,
+    browser_language: navigator.language || "unknown",
+  };
+
+  [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_id",
+    "utm_term",
+    "utm_content",
+  ].forEach((key) => {
+    const value = urlParams.get(key);
+    if (value) {
+      params[key] = value.slice(0, 100);
+    }
+  });
+
+  return params;
+};
+
 // UTM 파라미터를 사용자 속성으로 설정하는 함수 (세션당 한 번만)
 const setUtmUserProperties = () => {
   if (typeof window === "undefined") return;
@@ -111,6 +159,7 @@ export const trackGAEvent = (
 ) => {
   if (typeof window !== "undefined" && window.gtag && GA_MEASUREMENT_ID) {
     window.gtag("event", eventName, {
+      ...getCommonGAEventParams(),
       ...params,
       page_location: window.location.href,
       page_title: document.title,
@@ -134,6 +183,7 @@ export const trackLinkClick = ({
 }) => {
   if (typeof window !== "undefined" && window.gtag && GA_MEASUREMENT_ID) {
     window.gtag("event", "cta_click", {
+      ...getCommonGAEventParams(),
       event_category: "engagement",
       event_label: linkText,
       brand_page: brandPage || "unknown",

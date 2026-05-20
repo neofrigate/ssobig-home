@@ -67,6 +67,79 @@ function toAnalyticsBoolean(value: boolean | null) {
   return value ? "true" : "false";
 }
 
+function getStepAnalyticsName(stepKey: FlowStepKey) {
+  switch (stepKey) {
+    case "gender":
+      return "성별 선택";
+    case "schedule":
+      return "일정 선택";
+    case "waitlist_contact":
+      return "알림 신청 연락처";
+    case "coupon_choice":
+      return "쿠폰 사용 여부";
+    case "coupon_code":
+      return "쿠폰 확인";
+    case "free_coupon_notice":
+      return "무료초대 안내 동의";
+    case "profile":
+      return "프로필 입력";
+    case "photo":
+      return "사진 업로드";
+    case "approval":
+      return "참가 승인 안내 동의";
+    case "marketing":
+      return "마케팅 정보 수신 동의";
+    case "notice":
+      return "유의사항 동의";
+    default:
+      return "알 수 없음";
+  }
+}
+
+function getScheduleAnalyticsParams(schedule: ScheduleItem | null) {
+  if (!schedule) {
+    return {
+      schedule_id: "unselected",
+      schedule_label: "unselected",
+      schedule_status: "unselected",
+      schedule_capacity_bucket: "unselected",
+      waitlist_available: "unset",
+      schedule_applicants_total: 0,
+      schedule_remaining_total: 0,
+    };
+  }
+
+  const remainingTotal = Math.max(
+    0,
+    schedule.maxCapacity - schedule.applicants.total
+  );
+  const capacityRatio =
+    schedule.maxCapacity > 0 ? schedule.applicants.total / schedule.maxCapacity : 0;
+  const scheduleCapacityBucket =
+    schedule.status === "전체마감"
+      ? "closed"
+      : capacityRatio >= 0.9
+        ? "90_100"
+        : capacityRatio >= 0.75
+          ? "75_90"
+          : capacityRatio >= 0.5
+            ? "50_75"
+            : "under_50";
+
+  return {
+    schedule_id: schedule.staffScheduleId || "unknown",
+    schedule_label: getDayNammeScheduleLabel(schedule),
+    schedule_status: schedule.status || "unknown",
+    schedule_capacity_bucket: scheduleCapacityBucket,
+    waitlist_available:
+      schedule.waitlistAvailable.female || schedule.waitlistAvailable.male
+        ? "true"
+        : "false",
+    schedule_applicants_total: schedule.applicants.total,
+    schedule_remaining_total: remainingTotal,
+  };
+}
+
 function getAgreementStepKey(index: number): FlowStepKey {
   return index === 0 ? "approval" : index === 1 ? "marketing" : "notice";
 }
@@ -1680,6 +1753,7 @@ export default function LoveBuddiesApplyFlow({
   const inAppBrowserName = getCurrentInAppBrowserName();
   const flowOpenTrackedRef = useRef(false);
   const lastStepViewSignatureRef = useRef("");
+  const flowStartedAtMsRef = useRef(Date.now());
   const applyAnalyticsBaseParams = useMemo(() => {
     const flowType = isWaitlistApplication
       ? "waitlist"
@@ -1708,17 +1782,21 @@ export default function LoveBuddiesApplyFlow({
       gender: formValues.gender || "unset",
       has_coupon: toAnalyticsBoolean(formValues.hasCoupon),
       coupon_state: couponState,
-      schedule_status: selectedScheduleItem?.status || "unselected",
+      in_app_browser: inAppBrowserName || "none",
+      coupon_code_present: formValues.couponCode.trim() ? "true" : "false",
+      ...getScheduleAnalyticsParams(selectedScheduleItem),
     };
   }, [
     couponValidationStatus,
+    formValues.couponCode,
     formValues.gender,
     formValues.hasCoupon,
+    inAppBrowserName,
     isValidatedFreeCoupon,
     isWaitlistApplication,
     mode,
     selectedApplicationMode,
-    selectedScheduleItem?.status,
+    selectedScheduleItem,
   ]);
 
   const goToStep = useCallback(
@@ -1745,8 +1823,11 @@ export default function LoveBuddiesApplyFlow({
     (stepKey = currentStepKey, stepIndex = displayStep) => ({
       ...applyAnalyticsBaseParams,
       step_key: stepKey,
+      step_name: getStepAnalyticsName(stepKey),
       step_index: stepIndex,
       step_total: totalSteps,
+      step_progress_percent: Math.round((stepIndex / totalSteps) * 100),
+      elapsed_seconds: Math.round((Date.now() - flowStartedAtMsRef.current) / 1000),
     }),
     [applyAnalyticsBaseParams, currentStepKey, displayStep, totalSteps]
   );
@@ -1905,6 +1986,9 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const resetFlow = () => {
+    flowStartedAtMsRef.current = Date.now();
+    flowOpenTrackedRef.current = false;
+    lastStepViewSignatureRef.current = "";
     setSubmitState(INITIAL_SUBMIT_STATE);
     setCurrentStepIndex(0);
     setFormValues(initialFormValues);
