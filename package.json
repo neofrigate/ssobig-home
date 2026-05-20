@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "ga4:register-day-nammae": "node scripts/register-ga4-day-nammae-custom-definitions.mjs",
     "optimize-images": "node scripts/optimize-images.js",
     "optimize-all-images": "node scripts/optimize-all-images.js"
   },
