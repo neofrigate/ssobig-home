@@ -1,8 +1,19 @@
+import { randomUUID } from "node:crypto";
+import { appendFile, mkdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { NextResponse } from "next/server";
 
-const SUPPORTED_LOCALES = new Set(["ko", "en"]);
+const SUPPORTED_LOCALES = new Set(["ko", "en", "ja", "zh"]);
 const SOURCE_TYPES = new Set(["organic", "influencer", "overseas_beta"]);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DEFAULT_SIGNUP_API_URL =
+  "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/playtest-signup-public";
+const PREVIEW_SIGNUP_DIR = join(tmpdir(), "ssobig-playtest-preview");
+const PREVIEW_SIGNUP_FILE = join(
+  PREVIEW_SIGNUP_DIR,
+  "playtest-signups.jsonl"
+);
 
 function jsonResponse(body: unknown, status = 200) {
   return NextResponse.json(body, {
@@ -35,6 +46,25 @@ function optionalPositiveInteger(value: unknown) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
+function inferPrimaryLanguage(locale: string) {
+  if (locale === "ko") return "ko-KR";
+  if (locale === "ja") return "ja-JP";
+  if (locale === "zh") return "zh-CN";
+  return "en-US";
+}
+
+async function storePreviewSignup(payload: Record<string, unknown>) {
+  await mkdir(PREVIEW_SIGNUP_DIR, { recursive: true });
+  const id = randomUUID();
+  const record = {
+    id,
+    savedAt: new Date().toISOString(),
+    payload,
+  };
+  await appendFile(PREVIEW_SIGNUP_FILE, `${JSON.stringify(record)}\n`, "utf8");
+  return id;
+}
+
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as
     | Record<string, unknown>
@@ -50,7 +80,7 @@ export async function POST(request: Request) {
   const country = optionalString(body.country);
   const languages = stringArray(body.languages);
   const inferredLanguages =
-    languages.length > 0 ? languages : [locale === "ko" ? "ko-KR" : "en-US"];
+    languages.length > 0 ? languages : [inferPrimaryLanguage(locale)];
   const platform = optionalString(body.platform) || "not_collected";
   const groupSize = optionalString(body.groupSize);
   const experience = optionalString(body.experience);
@@ -107,7 +137,8 @@ export async function POST(request: Request) {
 
   const signupApiUrl =
     process.env.PLAYTEST_SIGNUP_API_URL?.trim() ||
-    process.env.PLAYTEST_SIGNUP_WEBHOOK_URL?.trim();
+    process.env.PLAYTEST_SIGNUP_WEBHOOK_URL?.trim() ||
+    DEFAULT_SIGNUP_API_URL;
   const signupApiSecret = process.env.PLAYTEST_SIGNUP_API_SECRET?.trim();
 
   if (!signupApiUrl) {
@@ -121,18 +152,17 @@ export async function POST(request: Request) {
       );
     }
 
-    console.info("[playtest-signup:dry-run]", payload);
-    return jsonResponse({ success: true, dryRun: true });
-  }
-
-  if (!signupApiSecret) {
-    return jsonResponse(
-      {
-        success: false,
-        error: "Playtest signup endpoint secret is not configured",
-      },
-      503
-    );
+    const previewId = await storePreviewSignup(payload);
+    console.info("[playtest-signup:preview-stored]", {
+      id: previewId,
+      file: PREVIEW_SIGNUP_FILE,
+    });
+    return jsonResponse({
+      success: true,
+      dryRun: true,
+      previewStored: true,
+      id: previewId,
+    });
   }
 
   try {
@@ -140,7 +170,9 @@ export async function POST(request: Request) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-SSOBIG-PLAYTEST-SECRET": signupApiSecret,
+        ...(signupApiSecret
+          ? { "X-SSOBIG-PLAYTEST-SECRET": signupApiSecret }
+          : {}),
       },
       body: JSON.stringify(payload),
     });
