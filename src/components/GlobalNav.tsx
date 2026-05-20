@@ -51,10 +51,11 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const isDesignSystemPage = pathname === "/design-system";
   // 플레이룸 폼 페이지 (다크 배경 고정)
   const isPlayroomFormPage = pathname.startsWith("/playroom/form/");
-  const isEnglishPlaytestFormPage = pathname.startsWith(
-    "/playroom/form/playtest/en"
-  );
-  const toolLinkLabel = isEnglishPlaytestFormPage ? "ssobig tool" : "쏘빅툴";
+  const isNonKoreanPlaytestFormPage =
+    pathname.startsWith("/playroom/form/playtest/en") ||
+    pathname.startsWith("/playroom/form/playtest/ja") ||
+    pathname.startsWith("/playroom/form/playtest/zh");
+  const toolLinkLabel = isNonKoreanPlaytestFormPage ? "ssobig tool" : "쏘빅툴";
 
   // 초기 상태를 false로 설정하여 서버/클라이언트 hydration 일치
   const [isScrolled, setIsScrolled] = useState(false);
@@ -251,6 +252,9 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     // 클라이언트가 마운트되기 전에는 안전한 기본 상태 사용
     if (!isMounted) {
       // 오프라인, 플레이룸 하이드, 소셜링 상세 페이지는 어두운 배경이므로 overlay로 시작
+      if (isPlayroomFormPage) {
+        return "dark";
+      }
       if (isDarkStaticPage || isPlayroomHidePage || isSocialingPage) {
         return "overlay";
       }
@@ -269,6 +273,9 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
       return "light";
     }
     // 오프라인/디자인 시스템 페이지는 항상 dark 모드 또는 overlay (스크롤 시 dark)
+    if (isPlayroomFormPage) {
+      return "dark";
+    }
     if (isDarkStaticPage) {
       return isScrolled ? "dark" : "overlay";
     }

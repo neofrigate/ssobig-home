@@ -53,6 +53,8 @@ export default function ChannelTalk() {
   const channelLanguage: ChannelLanguage = pathname.startsWith(
     "/playroom/form/playtest/en",
   )
+    || pathname.startsWith("/playroom/form/playtest/ja")
+    || pathname.startsWith("/playroom/form/playtest/zh")
     ? "en"
     : "ko";
   const isDayNammeFocusedPage =
