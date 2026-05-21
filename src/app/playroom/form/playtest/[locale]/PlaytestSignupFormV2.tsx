@@ -487,7 +487,7 @@ const content = {
     eyebrow: "ssobig PLAYROOM",
     title: "先行体験テスター応募",
     intro:
-      "ssobigの英語圏向けストーリーミステリーゲームを正式リリース前に体験し、ご意見をお聞かせください。選ばれたテスターには無料プレイクーポンをメールでお送りします。",
+      "ssobigの日本語版ストーリーミステリーゲームを正式リリース前に体験し、ご意見をお聞かせください。選ばれたテスターには無料プレイクーポンをメールでお送りします。",
     sourcePattern: "Playtest form",
     howItWorks: {
       title: "参加の流れ",
@@ -590,7 +590,7 @@ const content = {
     eyebrow: "ssobig PLAYROOM",
     title: "抢先体验测试报名",
     intro:
-      "欢迎在正式上线前体验ssobig面向英语用户的剧情推理游戏，并向我们分享你的反馈。入选的测试者将通过电子邮件收到免费游玩优惠券。",
+      "欢迎在正式上线前体验ssobig中文版剧情推理游戏，并向我们分享你的反馈。入选的测试者将通过电子邮件收到免费游玩优惠券。",
     sourcePattern: "Playtest form",
     howItWorks: {
       title: "参与流程",

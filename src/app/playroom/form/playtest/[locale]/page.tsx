@@ -35,9 +35,9 @@ export async function generateMetadata({
   const description = isKorean
     ? "쏘빅의 영어권 스토리 추리게임을 정식 출시 전에 먼저 체험하고 의견을 남겨주세요."
     : isJapanese
-      ? "ssobigの英語圏向けストーリーミステリーゲームを正式リリース前に体験し、感想をお聞かせください。"
+      ? "ssobigの日本語版ストーリーミステリーゲームを正式リリース前に体験し、感想をお聞かせください。"
       : isChinese
-        ? "欢迎在正式上线前体验ssobig面向英语用户的剧情推理游戏，并向我们分享你的反馈。"
+        ? "欢迎在正式上线前体验ssobig中文版剧情推理游戏，并向我们分享你的反馈。"
         : "Try ssobig's English-first story mystery games before launch and share your feedback.";
   const canonicalUrl =
     `https://www.ssobig.com/playroom/form/playtest/${normalizedLocale}`;
