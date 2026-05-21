@@ -346,7 +346,7 @@ const IN_APP_BROWSER_MAX_PHOTO_DIMENSION = 1280;
 const INITIAL_PHOTO_JPEG_QUALITY = 0.82;
 const MIN_PHOTO_JPEG_QUALITY = 0.56;
 const SUBMIT_NETWORK_RETRY_DELAY_MS = 700;
-const SUBMIT_FAST_FAIL_RETRY_WINDOW_MS = 1500;
+const SUBMIT_IN_APP_BROWSER_NETWORK_RETRY_WINDOW_MS = 10000;
 const HEIC_HEIF_MIME_TYPES = new Set([
   "image/heic",
   "image/heif",
@@ -1628,7 +1628,7 @@ async function submitDayNammeApplyRequest(params: {
         Boolean(inAppBrowserName) &&
         failureKind === "network" &&
         attempt < maxAttempts &&
-        attemptDurationMs <= SUBMIT_FAST_FAIL_RETRY_WINDOW_MS;
+        attemptDurationMs <= SUBMIT_IN_APP_BROWSER_NETWORK_RETRY_WINDOW_MS;
       const transportContext = getSubmitTransportContext({
         attemptCount: attempt,
         attemptDurationMs,
