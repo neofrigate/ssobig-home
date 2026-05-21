@@ -30,6 +30,15 @@ function resolvePlatform(userAgent: string) {
     return "ios" as const;
   }
 
+  const isAppleDesktop =
+    normalized.includes("macintosh") ||
+    normalized.includes("mac os x") ||
+    normalized.includes("safari");
+
+  if (isAppleDesktop) {
+    return "apple-web" as const;
+  }
+
   return "other" as const;
 }
 
@@ -130,8 +139,12 @@ function resolveDownloadUrl(userAgent: string, countryCode: string) {
     return buildPlayStoreUrl(countryCode);
   }
 
-  // Desktop and unknown environments fall back to the web-friendly Play Store page.
-  return buildPlayStoreUrl(countryCode);
+  if (platform === "apple-web") {
+    return buildAppleStoreUrl(countryCode);
+  }
+
+  // Unknown desktop/webview environments fall back to the more browser-friendly App Store listing.
+  return buildAppleStoreUrl(countryCode);
 }
 
 export async function GET() {
