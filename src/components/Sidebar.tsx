@@ -207,11 +207,7 @@ const Sidebar: React.FC = () => {
             <button
               className="flex items-center justify-center gap-2 h-[48px] w-full rounded-lg bg-white/10 text-white font-bold text-base hover:bg-white/20 transition-colors"
               onClick={() => {
-                if (platform === "android") {
-                  window.open("https://play.google.com/store/apps/details?id=com.ssobig.ssobigtool&hl=ko", "_blank");
-                } else {
-                  window.open("https://apps.apple.com/kr/app/ssobig-tool/id6745536878", "_blank");
-                }
+                window.open("/app", "_blank");
                 toggleSidebar();
               }}
             >

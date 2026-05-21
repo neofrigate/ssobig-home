@@ -195,11 +195,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
                   : "bg-white/10 text-white/60 hover:bg-white/20"
               }`}
               onClick={() => {
-                if (platform === "android") {
-                  window.open("https://play.google.com/store/apps/details?id=com.ssobig.ssobigtool&hl=ko", "_blank");
-                } else {
-                  window.open("https://apps.apple.com/kr/app/ssobig-tool/id6745536878", "_blank");
-                }
+                window.open("/app", "_blank");
               }}
             >
               {platform === "android" ? (
