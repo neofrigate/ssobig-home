@@ -1032,7 +1032,7 @@ export default function MarketingSignupForm({
                 onChange={(event) => update("consent", event.target.checked)}
                 className="mt-1 h-5 w-5 shrink-0 accent-[#FF7A59]"
               />
-              <span>{copy.consent}</span>
+              <span>{copy.labels.consent}</span>
             </label>
 
             {submitState.status === "error" ? (
@@ -1047,8 +1047,8 @@ export default function MarketingSignupForm({
               className="mt-4 flex min-h-14 w-full items-center justify-center rounded-xl bg-[#FF7A59] px-6 text-base font-semibold text-[#050505] transition hover:brightness-105 disabled:cursor-not-allowed disabled:bg-[#7F4A3A] disabled:text-white/55"
             >
               {submitState.status === "submitting"
-                ? copy.submitting
-                : copy.submit}
+                ? copy.labels.submitting
+                : copy.labels.submit}
             </button>
           </div>
         </form>
