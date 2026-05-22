@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import type { PlaytestLocale } from "../../playtest/locales";
 
@@ -8,7 +9,6 @@ type FormState = {
   email: string;
   phone: string;
   country: string;
-  groupSize: string;
   experience: string;
   selectedTemplateId: string;
   motivation: string;
@@ -26,13 +26,25 @@ type Attribution = {
   customMessage: string;
 };
 
-type Product = {
-  id: string;
-  title: string;
-  players: string;
+type StoryOptionSourceItem = {
+  sourceTitle: string;
+  imageUrl: string;
+  playersLabel: string;
   rating: string;
-  genre: string;
-  href: string;
+  templateIds: string[];
+};
+
+type MarketingTemplateOption = {
+  slug: string;
+  templateId: Record<PlaytestLocale, string>;
+  titleKo: string;
+  titleEn: string;
+  titleJa: string;
+  titleZh: string;
+  sourceTitle: string;
+  playersLabel: string;
+  rating: string;
+  imageUrl: string;
 };
 
 const PUBLIC_INFLUENCER_API =
@@ -43,7 +55,6 @@ const INITIAL_FORM: FormState = {
   email: "",
   phone: "",
   country: "",
-  groupSize: "",
   experience: "",
   selectedTemplateId: "",
   motivation: "",
@@ -61,234 +72,166 @@ const DEFAULT_ATTRIBUTION: Attribution = {
   customMessage: "",
 };
 
-const PRODUCTS: Record<PlaytestLocale, Product[]> = {
-  en: [
-    {
-      id: "7d5476dd-776e-49eb-9722-f254a66c268b",
-      title: "Snow White and the Poisoned Apple",
-      players: "2 players",
-      rating: "4.7",
-      genre: "Mystery/Fantasy",
-      href: "https://tool.ssobig.com/templates/7d5476dd-776e-49eb-9722-f254a66c268b",
+const MARKETING_TEMPLATE_META: Array<
+  Pick<
+    MarketingTemplateOption,
+    "slug" | "templateId" | "titleKo" | "titleEn" | "titleJa" | "titleZh"
+  > & {
+    sourceAliases: string[];
+  }
+> = [
+  {
+    slug: "snow-white-poison-apple",
+    templateId: {
+      ko: "c2439b65-325a-4420-ad22-fa7e415b6cde",
+      en: "7d5476dd-776e-49eb-9722-f254a66c268b",
+      ja: "7d5476dd-776e-49eb-9722-f254a66c268b",
+      zh: "7d5476dd-776e-49eb-9722-f254a66c268b",
     },
-    {
-      id: "3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
-      title: "In Your Memory",
-      players: "2 players",
-      rating: "4.2",
-      genre: "Emotional/Narrative",
-      href: "https://tool.ssobig.com/templates/3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
+    titleKo: "백설공주의 독사과",
+    titleEn: "Snow White and the Poisoned Apple",
+    titleJa: "白雪姫と毒りんご",
+    titleZh: "白雪公主与毒苹果",
+    sourceAliases: ["백설공주의 독사과", "백설공주와 독사과"],
+  },
+  {
+    slug: "memory-of-you",
+    templateId: {
+      ko: "0bb6fcf7-20f8-4651-8652-fda5852657b0",
+      en: "3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
+      ja: "3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
+      zh: "3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
     },
-    {
-      id: "a116adab-50ae-47d4-b5af-f77fd803e2f5",
-      title: "Night Island",
-      players: "4 players",
-      rating: "4.2",
-      genre: "Immersive/Mystery",
-      href: "https://tool.ssobig.com/templates/a116adab-50ae-47d4-b5af-f77fd803e2f5",
+    titleKo: "기억 속의 너",
+    titleEn: "You in My Memory",
+    titleJa: "記憶の中の君",
+    titleZh: "记忆中的你",
+    sourceAliases: ["기억 속의 너"],
+  },
+  {
+    slug: "night-island",
+    templateId: {
+      ko: "1ac66ad7-014d-451b-b800-b4ca072f7737",
+      en: "a116adab-50ae-47d4-b5af-f77fd803e2f5",
+      ja: "a116adab-50ae-47d4-b5af-f77fd803e2f5",
+      zh: "a116adab-50ae-47d4-b5af-f77fd803e2f5",
     },
-    {
-      id: "de60e4a2-9a08-4327-9f08-d3abccc141f8",
-      title: "Sugar Village",
-      players: "5 players",
-      rating: "3.9",
-      genre: "Mystery/Thriller",
-      href: "https://tool.ssobig.com/templates/de60e4a2-9a08-4327-9f08-d3abccc141f8",
+    titleKo: "밤 아일랜드",
+    titleEn: "Night Island",
+    titleJa: "ナイトアイランド",
+    titleZh: "夜之岛",
+    sourceAliases: ["밤 아일랜드"],
+  },
+  {
+    slug: "sugar-village",
+    templateId: {
+      ko: "d9ffa689-f3fc-4b37-ac80-e2bfa8438c2c",
+      en: "de60e4a2-9a08-4327-9f08-d3abccc141f8",
+      ja: "de60e4a2-9a08-4327-9f08-d3abccc141f8",
+      zh: "de60e4a2-9a08-4327-9f08-d3abccc141f8",
     },
-    {
-      id: "fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
-      title: "The Empress Murder Case",
-      players: "7 players",
-      rating: "3.9",
-      genre: "Historical/Mystery",
-      href: "https://tool.ssobig.com/templates/fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
+    titleKo: "슈가빌리지",
+    titleEn: "Sugar Village",
+    titleJa: "シュガービレッジ",
+    titleZh: "糖果村",
+    sourceAliases: ["슈가빌리지"],
+  },
+  {
+    slug: "empress-murder",
+    templateId: {
+      ko: "d20f00fd-f9bf-4fff-8478-887fad5637f3",
+      en: "fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
+      ja: "fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
+      zh: "fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
     },
-    {
-      id: "3b231691-450e-11f1-95ac-b1113dae1ca1",
-      title: "Doppelganger",
-      players: "4 players",
-      rating: "3.6",
-      genre: "Sci-fi/Thriller",
-      href: "https://tool.ssobig.com/templates/3b231691-450e-11f1-95ac-b1113dae1ca1",
+    titleKo: "황후마마 살인사건",
+    titleEn: "Her Majesty the Empress Murder Case",
+    titleJa: "皇后様殺人事件",
+    titleZh: "皇后陛下杀人事件",
+    sourceAliases: ["황후마마 살인사건"],
+  },
+  {
+    slug: "my-happy-story",
+    templateId: {
+      ko: "c5770c78-9fd9-447a-b9a7-41eabe2a5adf",
+      en: "9162c042-2fe3-4835-a609-fe3495777bb5",
+      ja: "9162c042-2fe3-4835-a609-fe3495777bb5",
+      zh: "9162c042-2fe3-4835-a609-fe3495777bb5",
     },
-  ],
-  ko: [
-    {
-      id: "c2439b65-325a-4420-ad22-fa7e415b6cde",
-      title: "백설공주의 독사과",
-      players: "2인",
-      rating: "4.7",
-      genre: "미스터리/판타지",
-      href: "https://tool.ssobig.com/templates/c2439b65-325a-4420-ad22-fa7e415b6cde",
+    titleKo: "마이 해피 스토리",
+    titleEn: "My Happy Story",
+    titleJa: "マイ・ハッピーストーリー",
+    titleZh: "我的快乐故事",
+    sourceAliases: ["마이 해피 스토리"],
+  },
+  {
+    slug: "doppelganger",
+    templateId: {
+      ko: "3e7a2f6e-52a9-4f4d-9650-ab87f1e64172",
+      en: "3b231691-450e-11f1-95ac-b1113dae1ca1",
+      ja: "3b231691-450e-11f1-95ac-b1113dae1ca1",
+      zh: "3b231691-450e-11f1-95ac-b1113dae1ca1",
     },
-    {
-      id: "0bb6fcf7-20f8-4651-8652-fda5852657b0",
-      title: "기억 속의 너",
-      players: "2인",
-      rating: "4.2",
-      genre: "감성/서사",
-      href: "https://tool.ssobig.com/templates/0bb6fcf7-20f8-4651-8652-fda5852657b0",
-    },
-    {
-      id: "1ac66ad7-014d-451b-b800-b4ca072f7737",
-      title: "밤 아일랜드",
-      players: "4인",
-      rating: "4.2",
-      genre: "몰입형/미스터리",
-      href: "https://tool.ssobig.com/templates/1ac66ad7-014d-451b-b800-b4ca072f7737",
-    },
-    {
-      id: "d9ffa689-f3fc-4b37-ac80-e2bfa8438c2c",
-      title: "슈가빌리지",
-      players: "5인",
-      rating: "3.9",
-      genre: "미스터리/스릴러",
-      href: "https://tool.ssobig.com/templates/d9ffa689-f3fc-4b37-ac80-e2bfa8438c2c",
-    },
-    {
-      id: "d20f00fd-f9bf-4fff-8478-887fad5637f3",
-      title: "황후마마 살인사건",
-      players: "7인",
-      rating: "3.9",
-      genre: "역사/미스터리",
-      href: "https://tool.ssobig.com/templates/d20f00fd-f9bf-4fff-8478-887fad5637f3",
-    },
-    {
-      id: "3e7a2f6e-52a9-4f4d-9650-ab87f1e64172",
-      title: "도플갱어",
-      players: "4인",
-      rating: "3.6",
-      genre: "SF/스릴러",
-      href: "https://tool.ssobig.com/templates/3e7a2f6e-52a9-4f4d-9650-ab87f1e64172",
-    },
-  ],
-  ja: [
-    {
-      id: "7d5476dd-776e-49eb-9722-f254a66c268b",
-      title: "白雪姫と毒りんご",
-      players: "2人",
-      rating: "4.7",
-      genre: "ミステリー/ファンタジー",
-      href: "https://tool.ssobig.com/templates/7d5476dd-776e-49eb-9722-f254a66c268b",
-    },
-    {
-      id: "3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
-      title: "記憶の中の君",
-      players: "2人",
-      rating: "4.2",
-      genre: "感性/ストーリー",
-      href: "https://tool.ssobig.com/templates/3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
-    },
-    {
-      id: "a116adab-50ae-47d4-b5af-f77fd803e2f5",
-      title: "ナイトアイランド",
-      players: "4人",
-      rating: "4.2",
-      genre: "没入型/ミステリー",
-      href: "https://tool.ssobig.com/templates/a116adab-50ae-47d4-b5af-f77fd803e2f5",
-    },
-    {
-      id: "de60e4a2-9a08-4327-9f08-d3abccc141f8",
-      title: "シュガービレッジ",
-      players: "5人",
-      rating: "3.9",
-      genre: "ミステリー/スリラー",
-      href: "https://tool.ssobig.com/templates/de60e4a2-9a08-4327-9f08-d3abccc141f8",
-    },
-    {
-      id: "fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
-      title: "皇后様殺人事件",
-      players: "7人",
-      rating: "3.9",
-      genre: "歴史/ミステリー",
-      href: "https://tool.ssobig.com/templates/fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
-    },
-    {
-      id: "3b231691-450e-11f1-95ac-b1113dae1ca1",
-      title: "ドッペルゲンガー",
-      players: "4人",
-      rating: "3.6",
-      genre: "SF/スリラー",
-      href: "https://tool.ssobig.com/templates/3b231691-450e-11f1-95ac-b1113dae1ca1",
-    },
-  ],
-  zh: [
-    {
-      id: "7d5476dd-776e-49eb-9722-f254a66c268b",
-      title: "白雪公主与毒苹果",
-      players: "2人",
-      rating: "4.7",
-      genre: "悬疑/奇幻",
-      href: "https://tool.ssobig.com/templates/7d5476dd-776e-49eb-9722-f254a66c268b",
-    },
-    {
-      id: "3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
-      title: "记忆中的你",
-      players: "2人",
-      rating: "4.2",
-      genre: "情感/叙事",
-      href: "https://tool.ssobig.com/templates/3716e34f-69f3-4e0d-aa0a-9c5235ca0f44",
-    },
-    {
-      id: "a116adab-50ae-47d4-b5af-f77fd803e2f5",
-      title: "夜之岛",
-      players: "4人",
-      rating: "4.2",
-      genre: "沉浸式/悬疑",
-      href: "https://tool.ssobig.com/templates/a116adab-50ae-47d4-b5af-f77fd803e2f5",
-    },
-    {
-      id: "de60e4a2-9a08-4327-9f08-d3abccc141f8",
-      title: "糖果村",
-      players: "5人",
-      rating: "3.9",
-      genre: "悬疑/惊悚",
-      href: "https://tool.ssobig.com/templates/de60e4a2-9a08-4327-9f08-d3abccc141f8",
-    },
-    {
-      id: "fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
-      title: "皇后陛下杀人事件",
-      players: "7人",
-      rating: "3.9",
-      genre: "历史/悬疑",
-      href: "https://tool.ssobig.com/templates/fa858e0b-a33a-432c-aa67-2a80c5e4efb9",
-    },
-    {
-      id: "3b231691-450e-11f1-95ac-b1113dae1ca1",
-      title: "替身",
-      players: "4人",
-      rating: "3.6",
-      genre: "科幻/惊悚",
-      href: "https://tool.ssobig.com/templates/3b231691-450e-11f1-95ac-b1113dae1ca1",
-    },
-  ],
-};
+    titleKo: "도플갱어",
+    titleEn: "Doppelganger",
+    titleJa: "ドッペルゲンガー",
+    titleZh: "替身",
+    sourceAliases: ["도플갱어"],
+  },
+];
 
 const COPY = {
   en: {
     eyebrow: "ssobig REVIEWER ACCESS",
-    title: "Choose a scenario for your beta access",
+    title: "Reviewer access request",
     intro:
-      "We will check your request and send the play coupon within 1 business day. Everyone in your group can join for free.",
-    profile: "Contact",
-    group: "Group size",
-    experience: "Mystery-game experience",
-    product: "Scenario",
-    note: "Anything we should know?",
-    consent: "I agree to receive beta access, coupons, and follow-up emails from ssobig.",
-    submit: "Submit request",
-    submitting: "Submitting...",
-    successTitle: "Request received",
-    successBody:
-      "Thanks. We will review it and send coupon instructions within 1 business day.",
-    fields: {
+      "If this title looks like a good fit for your blog or channel, submit this form and we will review your request. Selected reviewers receive a free play coupon within 1 business day.",
+    howItWorks: {
+      title: "How it works",
+      items: [
+        "Submit this form.",
+        "We review requests and email selected players within 1 business day.",
+        "Selected reviewers receive a free play coupon and access instructions.",
+      ],
+    },
+    sections: {
+      profile: {
+        step: "Q1",
+        title: "How can we contact you?",
+        description:
+          "We only use this to deliver your access details and follow-up guidance. A mobile number helps us reach you quickly if coupon delivery needs confirmation.",
+      },
+      experience: {
+        step: "Q2",
+        title: "How much murder mystery experience do you have?",
+        description: "Choose the closest option.",
+      },
+      product: {
+        step: "Q3",
+        title: "Which ssobig title would you most like to try?",
+        description: "Choose one scenario you want to review first.",
+      },
+      note: {
+        step: "Q4",
+        title: "Anything we should know?",
+        description: "Preferred play date, review plan, or questions are helpful.",
+      },
+    },
+    labels: {
       name: "Name or nickname",
       email: "Email",
       phone: "Mobile phone",
       country: "Country or region",
+      note: "Notes",
+      rating: "Rating",
+      consent:
+        "I agree to receive beta access, coupons, and follow-up emails from ssobig.",
+      submit: "Submit request",
+      submitting: "Submitting...",
+    },
+    fields: {
       note: "Preferred play date, review plan, or questions",
     },
-    groupOptions: ["2-3 people", "4-6 people", "7+ people"],
     experienceOptions: [
       "New to murder mystery",
       "Played digital mystery games",
@@ -301,31 +244,64 @@ const COPY = {
       consent: "Please agree to receive access emails.",
       generic: "We could not submit your request. Please try again later.",
     },
+    successTitle: "Request received",
+    successBody:
+      "Thanks. We will review it and send coupon instructions within 1 business day.",
+    storyOptionsLoading: "Loading available titles...",
+    storyOptionsError:
+      "We could not load the title list right now. Please refresh and try again.",
+    storyInfoLinkLabel: "(Click) See title details here",
   },
   ko: {
     eyebrow: "ssobig REVIEWER ACCESS",
-    title: "체험할 시나리오를 선택해주세요",
+    title: "리뷰어 체험 신청",
     intro:
-      "신청 내용을 확인한 뒤 1영업일 내에 플레이 쿠폰을 보내드립니다. 함께 플레이하실 분들도 전원 무료로 입장할 수 있습니다.",
-    profile: "연락처",
-    group: "플레이 인원",
-    experience: "머더미스터리 경험",
-    product: "시나리오",
-    note: "추가 메모",
-    consent: "쏘빅의 체험권, 쿠폰, 후속 안내 이메일 수신에 동의합니다.",
-    submit: "체험 신청하기",
-    submitting: "제출 중...",
-    successTitle: "신청이 접수되었습니다",
-    successBody:
-      "감사합니다. 확인 후 1영업일 내에 쿠폰 안내를 보내드리겠습니다.",
-    fields: {
+      "블로그나 SNS에 소개해보고 싶은 작품이 있다면 편하게 신청해주세요. 신청 내용을 확인한 뒤, 선정된 분께는 1~3일 내로 바로 시작할 수 있는 무료 체험 쿠폰과 안내를 보내드립니다.",
+    howItWorks: {
+      title: "진행 방식",
+      items: [
+        "신청서를 제출해주세요.",
+        "신청 내용을 확인한 뒤 1~3일 내로 메일로 안내드립니다.",
+        "선정된 분께 바로 시작할 수 있는 무료 체험 쿠폰과 접속 안내를 보내드립니다.",
+      ],
+    },
+    sections: {
+      profile: {
+        step: "Q1",
+        title: "연락받을 정보를 알려주세요.",
+        description:
+          "체험권과 후속 안내를 보내드릴 때만 사용합니다. 휴대폰 번호는 쿠폰이나 접속 안내 전달이 필요한 경우 빠르게 확인드리기 위한 용도입니다.",
+      },
+      experience: {
+        step: "Q2",
+        title: "머더미스터리 경험은 어느 쪽에 가까운가요?",
+        description: "가장 가까운 항목을 선택해주세요.",
+      },
+      product: {
+        step: "Q3",
+        title: "어떤 쏘빅 작품을 체험하고 싶나요?",
+        description: "가장 먼저 리뷰해보고 싶은 작품 하나를 선택해주세요.",
+      },
+      note: {
+        step: "Q4",
+        title: "추가로 알려주실 내용이 있나요?",
+        description: "희망 플레이 일정이나 리뷰 계획이 있으면 함께 적어주세요.",
+      },
+    },
+    labels: {
       name: "이름 또는 닉네임",
       email: "이메일",
       phone: "휴대폰 번호",
       country: "국가 또는 지역",
+      note: "추가 메모",
+      rating: "평점",
+      consent: "쏘빅의 체험권, 쿠폰, 후속 안내 이메일 수신에 동의합니다.",
+      submit: "체험 신청하기",
+      submitting: "제출 중...",
+    },
+    fields: {
       note: "희망 플레이 일정, 리뷰 계획, 궁금한 점",
     },
-    groupOptions: ["2-3명", "4-6명", "7명 이상"],
     experienceOptions: [
       "머더미스터리는 처음",
       "디지털 추리게임 경험 있음",
@@ -338,31 +314,64 @@ const COPY = {
       consent: "체험 안내 이메일 수신에 동의해주세요.",
       generic: "신청을 제출하지 못했습니다. 잠시 후 다시 시도해주세요.",
     },
+    successTitle: "신청이 접수되었습니다",
+    successBody:
+      "감사합니다. 확인 후 1~3일 내로 바로 시작할 수 있는 무료 체험 쿠폰과 안내를 보내드리겠습니다.",
+    storyOptionsLoading: "체험 가능한 작품을 불러오는 중입니다...",
+    storyOptionsError:
+      "작품 목록을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.",
+    storyInfoLinkLabel: "(클릭) 작품정보는 여기서 확인하세요",
   },
   ja: {
     eyebrow: "ssobig REVIEWER ACCESS",
-    title: "体験するシナリオを選んでください",
+    title: "レビュアー体験申込み",
     intro:
-      "申込み内容を確認したうえで、1営業日以内にプレイクーポンをお送りします。同行するメンバーも全員無料で参加できます。",
-    profile: "連絡先",
-    group: "プレイ人数",
-    experience: "マーダーミステリー経験",
-    product: "シナリオ",
-    note: "追加メモ",
-    consent: "ssobigからの体験権、クーポン、後続案内メールの受信に同意します。",
-    submit: "体験を申し込む",
-    submitting: "送信中...",
-    successTitle: "申込みを受け付けました",
-    successBody:
-      "ありがとうございます。確認後、1営業日以内にクーポン案内をお送りします。",
-    fields: {
+      "ブログやSNSで紹介してみたい作品があれば、気軽に申込みしてください。内容を確認し、選ばれた方には1営業日以内に無料プレイクーポンと案内をお送りします。",
+    howItWorks: {
+      title: "進行方法",
+      items: [
+        "このフォームを送信してください。",
+        "内容を確認し、1営業日以内にメールでご案内します。",
+        "選ばれた方には無料プレイクーポンと案内をお送りします。",
+      ],
+    },
+    sections: {
+      profile: {
+        step: "Q1",
+        title: "連絡先を教えてください。",
+        description:
+          "体験案内とフォローアップの連絡にのみ使用します。携帯番号はクーポンやアクセス案内の確認が必要な際に、すばやくご連絡するためのものです。",
+      },
+      experience: {
+        step: "Q2",
+        title: "マーダーミステリー経験はどれに近いですか？",
+        description: "最も近い項目を選んでください。",
+      },
+      product: {
+        step: "Q3",
+        title: "どのssobig作品を体験してみたいですか？",
+        description: "最初にレビューしてみたい作品を1つ選んでください。",
+      },
+      note: {
+        step: "Q4",
+        title: "追加で伝えたいことはありますか？",
+        description: "希望プレイ日やレビュー予定があれば記入してください。",
+      },
+    },
+    labels: {
       name: "名前またはニックネーム",
       email: "メールアドレス",
       phone: "携帯電話番号",
       country: "国または地域",
+      note: "追加メモ",
+      rating: "評価",
+      consent: "ssobigからの体験権、クーポン、後続案内メールの受信に同意します。",
+      submit: "体験を申し込む",
+      submitting: "送信中...",
+    },
+    fields: {
       note: "希望プレイ日、レビュー予定、質問など",
     },
-    groupOptions: ["2-3人", "4-6人", "7人以上"],
     experienceOptions: [
       "マーダーミステリーは初めて",
       "デジタル推理ゲームの経験あり",
@@ -375,31 +384,64 @@ const COPY = {
       consent: "体験案内メールの受信に同意してください。",
       generic: "申込みを送信できませんでした。しばらくしてからもう一度お試しください。",
     },
+    successTitle: "申込みを受け付けました",
+    successBody:
+      "ありがとうございます。確認後、1営業日以内にクーポン案内をお送りします。",
+    storyOptionsLoading: "体験可能な作品を読み込み中です...",
+    storyOptionsError:
+      "作品一覧を読み込めませんでした。ページを更新してもう一度お試しください。",
+    storyInfoLinkLabel: "（クリック）作品情報はこちらで確認してください",
   },
   zh: {
     eyebrow: "ssobig REVIEWER ACCESS",
-    title: "请选择你想体验的剧本",
+    title: "评测体验申请",
     intro:
-      "我们会先审核你的申请，并在1个工作日内发送试玩优惠券。与你同行的成员也都可以免费参加。",
-    profile: "联系方式",
-    group: "游玩人数",
-    experience: "谋杀之谜经验",
-    product: "剧本",
-    note: "补充说明",
-    consent: "我同意接收 ssobig 发送的体验资格、优惠券及后续通知邮件。",
-    submit: "提交申请",
-    submitting: "提交中...",
-    successTitle: "申请已提交",
-    successBody:
-      "感谢你的申请。审核后，我们会在1个工作日内发送优惠券说明。",
-    fields: {
+      "如果你想在博客或社交平台上介绍这部作品，欢迎填写这份表单。我们会先审核申请，并在1个工作日内向入选者发送免费试玩优惠券和说明。",
+    howItWorks: {
+      title: "参与方式",
+      items: [
+        "请先提交这份表单。",
+        "我们会审核申请，并在1个工作日内通过邮件联系你。",
+        "入选者将收到免费游玩优惠券和访问说明。",
+      ],
+    },
+    sections: {
+      profile: {
+        step: "Q1",
+        title: "请填写联系方式。",
+        description:
+          "仅用于发送体验资格和后续通知。手机号主要用于在优惠券或访问说明需要确认时，能够更快联系到你。",
+      },
+      experience: {
+        step: "Q2",
+        title: "你的谋杀之谜经验更接近哪一项？",
+        description: "请选择最接近的一项。",
+      },
+      product: {
+        step: "Q3",
+        title: "你最想体验哪一部ssobig作品？",
+        description: "请选择你最想优先评测的一部作品。",
+      },
+      note: {
+        step: "Q4",
+        title: "还有什么想补充的吗？",
+        description: "如果有希望游玩的日期或评测计划，可以一起告诉我们。",
+      },
+    },
+    labels: {
       name: "姓名或昵称",
       email: "电子邮箱",
       phone: "手机号",
       country: "国家或地区",
+      note: "补充说明",
+      rating: "评分",
+      consent: "我同意接收ssobig发送的体验资格、优惠券及后续通知邮件。",
+      submit: "提交申请",
+      submitting: "提交中...",
+    },
+    fields: {
       note: "希望游玩的日期、评测计划或问题",
     },
-    groupOptions: ["2-3人", "4-6人", "7人以上"],
     experienceOptions: [
       "第一次接触谋杀之谜",
       "有数字推理游戏经验",
@@ -412,19 +454,157 @@ const COPY = {
       consent: "请同意接收体验通知邮件。",
       generic: "提交申请失败，请稍后再试。",
     },
+    successTitle: "申请已提交",
+    successBody:
+      "感谢你的申请。审核后，我们会在1个工作日内发送优惠券说明。",
+    storyOptionsLoading: "正在加载可体验作品...",
+    storyOptionsError:
+      "无法加载作品列表，请刷新页面后重试。",
+    storyInfoLinkLabel: "（点击）请在这里查看作品信息",
   },
 } as const;
+
+function normalizeTitle(value: string) {
+  return value.replace(/\s+/g, "").trim();
+}
+
+function getLocalizedTemplateTitle(
+  option: Pick<
+    MarketingTemplateOption,
+    "titleKo" | "titleEn" | "titleJa" | "titleZh"
+  >,
+  locale: PlaytestLocale,
+) {
+  if (locale === "ko") return option.titleKo;
+  if (locale === "ja") return option.titleJa;
+  if (locale === "zh") return option.titleZh;
+  return option.titleEn;
+}
+
+const MARKETING_TEMPLATE_META_BY_TITLE = new Map(
+  MARKETING_TEMPLATE_META.flatMap((item) =>
+    item.sourceAliases.map((alias) => [normalizeTitle(alias), item] as const),
+  ),
+);
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-function selectedProduct(locale: PlaytestLocale, id: string) {
-  return PRODUCTS[locale].find((product) => product.id === id) || null;
+function fieldClass() {
+  return "mt-2 h-11 w-full rounded-lg border border-white/12 bg-black/30 px-3 text-sm text-white outline-none transition placeholder:text-white/45 focus:border-[#FF7A59] md:h-12 md:rounded-xl md:px-4";
 }
 
-function fieldClass() {
-  return "mt-2 h-12 w-full rounded-2xl border border-white/12 bg-black/30 px-4 text-sm text-white outline-none transition placeholder:text-white/45 focus:border-[#FF7A59]";
+function ChoiceChip({
+  selected,
+  label,
+  onClick,
+}: {
+  selected: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onClick}
+      className={`inline-flex w-fit max-w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium transition md:rounded-xl md:px-4 md:py-3 ${
+        selected
+          ? "border-[#FF7A59] bg-[#FF7A59] text-[#050505] shadow-[0_12px_30px_rgba(255,122,89,0.25)]"
+          : "border-white/15 bg-white/[0.03] text-white/78 hover:border-white/30 hover:bg-white/[0.06]"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function TemplateCardButton({
+  locale,
+  option,
+  ratingLabel,
+  selected,
+  onClick,
+}: {
+  locale: PlaytestLocale;
+  option: MarketingTemplateOption;
+  ratingLabel: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      className={`overflow-hidden rounded-lg border text-left transition md:rounded-xl ${
+        selected
+          ? "border-[#FF7A59] bg-[#140E0B] shadow-[0_14px_32px_rgba(255,122,89,0.18)]"
+          : "border-white/12 bg-white/[0.03] hover:border-white/28 hover:bg-white/[0.05]"
+      }`}
+    >
+      <button
+        type="button"
+        aria-pressed={selected}
+        onClick={onClick}
+        className="block w-full text-left"
+      >
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-black/20">
+          <Image
+            src={option.imageUrl}
+            alt={getLocalizedTemplateTitle(option, locale)}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover"
+            unoptimized={option.imageUrl.startsWith("https://")}
+          />
+        </div>
+        <div className="border-t border-white/8 p-2.5 md:p-3">
+          <p className="text-[11px] font-semibold leading-5 text-white md:text-sm">
+            {getLocalizedTemplateTitle(option, locale)}
+          </p>
+          <p className="mt-1 text-[11px] text-white/52 md:text-xs">
+            {option.playersLabel} · {ratingLabel} {option.rating}
+          </p>
+        </div>
+      </button>
+    </div>
+  );
+}
+
+function Section({
+  step,
+  title,
+  description,
+  children,
+}: {
+  step: string;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="border-b border-white/10 py-6 last:border-b-0 md:py-8">
+      <div className="mb-4 md:mb-5">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+          {step}
+        </p>
+        <h2 className="break-keep text-xl font-semibold text-white md:text-2xl">
+          {title}
+        </h2>
+        <p className="mt-2 break-keep text-sm leading-6 text-white/60">
+          {description}
+        </p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function selectedTemplateOption(
+  options: MarketingTemplateOption[],
+  locale: PlaytestLocale,
+  id: string,
+) {
+  return options.find((option) => option.templateId[locale] === id) ?? null;
 }
 
 export default function MarketingSignupForm({
@@ -433,11 +613,13 @@ export default function MarketingSignupForm({
   locale: PlaytestLocale;
 }) {
   const copy = COPY[locale];
-  const [form, setForm] = useState<FormState>({
-    ...INITIAL_FORM,
-    selectedTemplateId: PRODUCTS[locale][0]?.id || "",
-  });
-  const [attribution, setAttribution] = useState<Attribution>(DEFAULT_ATTRIBUTION);
+  const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [attribution, setAttribution] =
+    useState<Attribution>(DEFAULT_ATTRIBUTION);
+  const [storySourceItems, setStorySourceItems] = useState<
+    StoryOptionSourceItem[]
+  >([]);
+  const [storyOptionsError, setStoryOptionsError] = useState("");
   const [submitState, setSubmitState] = useState<
     | { status: "idle" }
     | { status: "submitting" }
@@ -445,15 +627,66 @@ export default function MarketingSignupForm({
     | { status: "error"; message: string }
   >({ status: "idle" });
 
+  const marketingOptions = useMemo<MarketingTemplateOption[]>(() => {
+    const seenSlugs = new Set<string>();
+
+    return storySourceItems.flatMap((item) => {
+      const meta = MARKETING_TEMPLATE_META_BY_TITLE.get(
+        normalizeTitle(item.sourceTitle),
+      );
+      const fallbackTemplateId = item.templateIds.find(Boolean) ?? "";
+      const slug =
+        meta?.slug ||
+        normalizeTitle(item.sourceTitle).toLowerCase() ||
+        item.sourceTitle;
+
+      if (seenSlugs.has(slug)) {
+        return [];
+      }
+      seenSlugs.add(slug);
+
+      return [
+        {
+          slug,
+          templateId: {
+            ko: meta?.templateId.ko ?? fallbackTemplateId,
+            en: meta?.templateId.en ?? fallbackTemplateId,
+            ja:
+              meta?.templateId.ja ?? meta?.templateId.en ?? fallbackTemplateId,
+            zh:
+              meta?.templateId.zh ?? meta?.templateId.en ?? fallbackTemplateId,
+          },
+          titleKo: meta?.titleKo ?? item.sourceTitle,
+          titleEn: meta?.titleEn ?? item.sourceTitle,
+          titleJa: meta?.titleJa ?? meta?.titleEn ?? item.sourceTitle,
+          titleZh: meta?.titleZh ?? meta?.titleEn ?? item.sourceTitle,
+          sourceTitle: item.sourceTitle,
+          playersLabel: item.playersLabel,
+          rating: item.rating,
+          imageUrl: item.imageUrl,
+        },
+      ];
+    });
+  }, [storySourceItems]);
+
+  const product = useMemo(
+    () => selectedTemplateOption(marketingOptions, locale, form.selectedTemplateId),
+    [form.selectedTemplateId, locale, marketingOptions],
+  );
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const influencerSlug = params.get("influencer") || params.get("i") || "";
     const sourceType =
-      params.get("sourceType") === "influencer" ? "influencer" : "overseas_beta";
+      params.get("sourceType") === "influencer"
+        ? "influencer"
+        : "overseas_beta";
     const nextAttribution: Attribution = {
       sourceType,
-      campaignSlug: params.get("campaign") || params.get("campaignSlug") || "marketing-direct",
-      sourcePlatform: params.get("platform") || params.get("sourcePlatform") || "direct",
+      campaignSlug:
+        params.get("campaign") || params.get("campaignSlug") || "marketing-direct",
+      sourcePlatform:
+        params.get("platform") || params.get("sourcePlatform") || "direct",
       influencerId: params.get("influencerId") || "",
       influencerSlug,
       displayName: params.get("name") || "",
@@ -469,18 +702,71 @@ export default function MarketingSignupForm({
         const item = data?.item;
         if (!item) return;
         setAttribution({
-          sourceType: item.source_type === "influencer" ? "influencer" : "overseas_beta",
+          sourceType:
+            item.source_type === "influencer" ? "influencer" : "overseas_beta",
           campaignSlug: item.campaign_slug || nextAttribution.campaignSlug,
           sourcePlatform: item.platform || nextAttribution.sourcePlatform,
           influencerId: String(item.id || ""),
           influencerSlug: item.slug || influencerSlug,
           displayName: item.display_name || nextAttribution.displayName,
-          couponCampaignId: item.coupon_campaign_id || nextAttribution.couponCampaignId,
+          couponCampaignId:
+            item.coupon_campaign_id || nextAttribution.couponCampaignId,
           customMessage: item.custom_message || "",
         });
       })
       .catch(() => undefined);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadStoryOptions() {
+      try {
+        setStoryOptionsError("");
+        const response = await fetch("/api/playroom/playtest/story-options", {
+          cache: "no-store",
+        });
+        const payload = (await response.json().catch(() => null)) as
+          | { items?: StoryOptionSourceItem[]; error?: string }
+          | null;
+
+        if (!response.ok || !payload?.items) {
+          throw new Error(payload?.error || copy.storyOptionsError);
+        }
+
+        if (cancelled) return;
+        setStorySourceItems(payload.items);
+      } catch (error) {
+        if (cancelled) return;
+        setStorySourceItems([]);
+        setStoryOptionsError(
+          error instanceof Error ? error.message : copy.storyOptionsError,
+        );
+      }
+    }
+
+    loadStoryOptions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [copy.storyOptionsError]);
+
+  useEffect(() => {
+    if (!marketingOptions.length) return;
+
+    setForm((current) => {
+      const hasValidSelection = marketingOptions.some(
+        (option) => option.templateId[locale] === current.selectedTemplateId,
+      );
+      if (hasValidSelection) return current;
+
+      return {
+        ...current,
+        selectedTemplateId: marketingOptions[0].templateId[locale],
+      };
+    });
+  }, [locale, marketingOptions]);
 
   const validationError = useMemo(() => {
     if (
@@ -488,7 +774,6 @@ export default function MarketingSignupForm({
       !form.email.trim() ||
       (locale === "ko" && !form.phone.trim()) ||
       !form.country.trim() ||
-      !form.groupSize ||
       !form.experience ||
       !form.selectedTemplateId
     ) {
@@ -500,7 +785,6 @@ export default function MarketingSignupForm({
   }, [copy, form, locale]);
 
   const canSubmit = !validationError && submitState.status !== "submitting";
-  const product = selectedProduct(locale, form.selectedTemplateId);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -509,13 +793,17 @@ export default function MarketingSignupForm({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!canSubmit || !product) {
-      setSubmitState({ status: "error", message: validationError || copy.validation.generic });
+      setSubmitState({
+        status: "error",
+        message: validationError || copy.validation.generic,
+      });
       return;
     }
 
     setSubmitState({ status: "submitting" });
     try {
-      const sourceLabel = attribution.displayName ||
+      const sourceLabel =
+        attribution.displayName ||
         attribution.influencerSlug ||
         attribution.sourcePlatform;
       const response = await fetch("/api/playroom/playtest/signup", {
@@ -527,7 +815,6 @@ export default function MarketingSignupForm({
           email: form.email,
           phone: form.phone,
           country: form.country,
-          groupSize: form.groupSize,
           experience: form.experience,
           source: [sourceLabel],
           sourceOther: attribution.campaignSlug,
@@ -540,8 +827,8 @@ export default function MarketingSignupForm({
           sourcePlatform: attribution.sourcePlatform,
           influencerId: attribution.influencerId,
           influencerSlug: attribution.influencerSlug,
-          selectedTemplateId: product.id,
-          selectedTemplateTitle: product.title,
+          selectedTemplateId: product.templateId[locale],
+          selectedTemplateTitle: getLocalizedTemplateTitle(product, locale),
           requestedCouponStatus: "pending",
         }),
       });
@@ -555,7 +842,8 @@ export default function MarketingSignupForm({
     } catch (error) {
       setSubmitState({
         status: "error",
-        message: error instanceof Error ? error.message : copy.validation.generic,
+        message:
+          error instanceof Error ? error.message : copy.validation.generic,
       });
     }
   };
@@ -587,9 +875,9 @@ export default function MarketingSignupForm({
         <div className="absolute bottom-[-120px] right-[-10%] h-[360px] w-[360px] rounded-full bg-[#FFD15C]/10 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-3xl px-5 py-14 md:py-20">
-        <header className="mb-8 rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] md:p-8">
-          <p className="text-sm font-semibold tracking-[0.28em] text-[#FFB38A]">
+      <div className="relative mx-auto max-w-3xl px-4 py-10 md:px-5 md:py-20">
+        <header className="mb-2 border-b border-white/10 pb-7 md:pb-10">
+          <p className="text-lg font-semibold tracking-[0.28em] text-[#FFB38A] md:text-xl">
             {copy.eyebrow}
           </p>
           <h1 className="mt-4 break-keep text-3xl font-semibold tracking-tight text-white md:text-5xl">
@@ -598,27 +886,40 @@ export default function MarketingSignupForm({
           <p className="mt-4 break-keep text-base leading-7 text-white/72 md:text-lg">
             {attribution.customMessage || copy.intro}
           </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <span className="rounded-full border border-white/12 bg-black/30 px-3 py-1 text-xs font-semibold text-white/65">
-              {attribution.sourcePlatform}
-            </span>
-            <span className="rounded-full border border-white/12 bg-black/30 px-3 py-1 text-xs font-semibold text-white/65">
-              {attribution.campaignSlug}
-            </span>
-            {attribution.displayName ? (
+
+          {attribution.displayName ? (
+            <div className="mt-5 flex flex-wrap gap-2">
               <span className="rounded-full border border-[#FF7A59]/25 bg-[#FF7A59]/10 px-3 py-1 text-xs font-semibold text-[#FFD3C4]">
                 {attribution.displayName}
               </span>
-            ) : null}
+            </div>
+          ) : null}
+
+          <div className="mt-7 border-t border-white/10 pt-4 md:mt-8 md:pt-5">
+            <p className="text-sm font-semibold text-white">
+              {copy.howItWorks.title}
+            </p>
+            <ol className="mt-3 text-sm leading-6 text-white/65">
+              {copy.howItWorks.items.map((item, index) => (
+                <li
+                  key={item}
+                  className="flex gap-3 border-t border-white/8 py-3 first:border-t-0 first:pt-0 last:pb-0"
+                >
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-[#FFB38A]">
+                    {index + 1}
+                  </span>
+                  <span className="break-keep">{item}</span>
+                </li>
+              ))}
+            </ol>
           </div>
         </header>
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
-          <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 md:p-7">
-            <h2 className="text-xl font-semibold text-white">{copy.profile}</h2>
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <form onSubmit={handleSubmit}>
+          <Section {...copy.sections.profile}>
+            <div className="grid gap-4 md:grid-cols-2">
               <label className="text-sm font-medium text-white/80">
-                {copy.fields.name}
+                {copy.labels.name}
                 <input
                   value={form.name}
                   onChange={(event) => update("name", event.target.value)}
@@ -627,7 +928,7 @@ export default function MarketingSignupForm({
                 />
               </label>
               <label className="text-sm font-medium text-white/80">
-                {copy.fields.email}
+                {copy.labels.email}
                 <input
                   value={form.email}
                   onChange={(event) => update("email", event.target.value)}
@@ -638,7 +939,7 @@ export default function MarketingSignupForm({
               </label>
               {locale === "ko" ? (
                 <label className="text-sm font-medium text-white/80">
-                  {copy.fields.phone}
+                  {copy.labels.phone}
                   <input
                     value={form.phone}
                     onChange={(event) => update("phone", event.target.value)}
@@ -650,7 +951,7 @@ export default function MarketingSignupForm({
                 </label>
               ) : null}
               <label className="text-sm font-medium text-white/80">
-                {copy.fields.country}
+                {copy.labels.country}
                 <input
                   value={form.country}
                   onChange={(event) => update("country", event.target.value)}
@@ -659,125 +960,97 @@ export default function MarketingSignupForm({
                 />
               </label>
             </div>
-          </section>
+          </Section>
 
-          <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 md:p-7">
-            <h2 className="text-xl font-semibold text-white">{copy.group}</h2>
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              {copy.groupOptions.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => update("groupSize", option)}
-                  className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${
-                    form.groupSize === option
-                      ? "border-[#FF7A59] bg-[#FF7A59] text-[#050505]"
-                      : "border-white/15 bg-white/[0.03] text-white/78 hover:border-white/30"
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 md:p-7">
-            <h2 className="text-xl font-semibold text-white">{copy.experience}</h2>
-            <div className="mt-5 grid gap-3">
+          <Section {...copy.sections.experience}>
+            <div className="flex flex-wrap gap-3">
               {copy.experienceOptions.map((option) => (
-                <button
+                <ChoiceChip
                   key={option}
-                  type="button"
+                  label={option}
+                  selected={form.experience === option}
                   onClick={() => update("experience", option)}
-                  className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${
-                    form.experience === option
-                      ? "border-[#FF7A59] bg-[#FF7A59] text-[#050505]"
-                      : "border-white/15 bg-white/[0.03] text-white/78 hover:border-white/30"
-                  }`}
-                >
-                  {option}
-                </button>
+                />
               ))}
             </div>
-          </section>
+          </Section>
 
-          <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 md:p-7">
-            <h2 className="text-xl font-semibold text-white">{copy.product}</h2>
-            <div className="mt-5 grid gap-3">
-              {PRODUCTS[locale].map((item) => (
-                <label
-                  key={item.id}
-                  className={`grid cursor-pointer gap-2 rounded-2xl border p-4 transition ${
-                    form.selectedTemplateId === item.id
-                      ? "border-[#FF7A59] bg-[#FF7A59]/12"
-                      : "border-white/15 bg-white/[0.03] hover:border-white/30"
-                  }`}
+          <Section {...copy.sections.product}>
+            {storyOptionsError ? (
+              <div className="rounded-lg border border-[#FF7A59]/20 bg-[#120C0A] px-3 py-2.5 text-sm text-[#FFD3C4] md:rounded-xl md:px-4 md:py-3">
+                {storyOptionsError}
+              </div>
+            ) : marketingOptions.length === 0 ? (
+              <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white/65 md:rounded-xl md:px-4 md:py-3">
+                {copy.storyOptionsLoading}
+              </div>
+            ) : (
+              <div>
+                <a
+                  href="https://www.ssobig.com/playroom"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-3 inline-flex text-sm font-medium text-white/62 underline underline-offset-4 transition hover:text-white md:mb-4"
                 >
-                  <span className="flex items-start gap-3">
-                    <input
-                      type="radio"
-                      checked={form.selectedTemplateId === item.id}
-                      onChange={() => update("selectedTemplateId", item.id)}
-                      className="mt-1 h-4 w-4 accent-[#FF7A59]"
+                  {copy.storyInfoLinkLabel}
+                </a>
+                <div className="grid grid-cols-4 gap-2 md:gap-3">
+                  {marketingOptions.map((option) => (
+                    <TemplateCardButton
+                      key={option.slug}
+                      locale={locale}
+                      option={option}
+                      ratingLabel={copy.labels.rating}
+                      selected={form.selectedTemplateId === option.templateId[locale]}
+                      onClick={() =>
+                        update("selectedTemplateId", option.templateId[locale])
+                      }
                     />
-                    <span>
-                      <span className="block text-base font-semibold text-white">
-                        {item.title}
-                      </span>
-                      <span className="mt-1 block text-sm text-white/58">
-                        {item.players} · KR {item.rating}/5 · {item.genre}
-                      </span>
-                    </span>
-                  </span>
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={(event) => event.stopPropagation()}
-                    className="ml-7 text-sm font-semibold text-[#FFB38A] underline-offset-4 hover:underline"
-                  >
-                    tool template link
-                  </a>
-                </label>
-              ))}
-            </div>
-          </section>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Section>
 
-          <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 md:p-7">
+          <Section {...copy.sections.note}>
             <label className="text-sm font-medium text-white/80">
-              {copy.note}
+              {copy.labels.note}
               <textarea
                 value={form.motivation}
                 onChange={(event) => update("motivation", event.target.value)}
                 placeholder={copy.fields.note}
-                className="mt-2 min-h-28 w-full rounded-2xl border border-white/12 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/45 focus:border-[#FF7A59]"
+                className="mt-2 min-h-28 w-full rounded-lg border border-white/12 bg-black/30 px-3 py-3 text-sm text-white outline-none transition placeholder:text-white/45 focus:border-[#FF7A59] md:rounded-xl md:px-4"
               />
             </label>
-          </section>
+          </Section>
 
-          <label className="flex gap-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm leading-6 text-white/72">
-            <input
-              type="checkbox"
-              checked={form.consent}
-              onChange={(event) => update("consent", event.target.checked)}
-              className="mt-1 h-5 w-5 shrink-0 accent-[#FF7A59]"
-            />
-            <span>{copy.consent}</span>
-          </label>
+          <div className="pt-6 md:pt-8">
+            <label className="flex gap-3 rounded-xl border border-white/10 bg-black/30 p-4 text-sm leading-6 text-white/72">
+              <input
+                type="checkbox"
+                checked={form.consent}
+                onChange={(event) => update("consent", event.target.checked)}
+                className="mt-1 h-5 w-5 shrink-0 accent-[#FF7A59]"
+              />
+              <span>{copy.consent}</span>
+            </label>
 
-          {submitState.status === "error" ? (
-            <div className="rounded-2xl border border-[#FF7A59]/25 bg-[#120C0A] px-4 py-3 text-sm text-[#FFD3C4]">
-              {submitState.message}
-            </div>
-          ) : null}
+            {submitState.status === "error" ? (
+              <div className="mt-4 rounded-xl border border-[#FF7A59]/25 bg-[#120C0A] px-4 py-3 text-sm text-[#FFD3C4]">
+                {submitState.message}
+              </div>
+            ) : null}
 
-          <button
-            type="submit"
-            disabled={!canSubmit}
-            className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#FF7A59] px-6 text-base font-semibold text-[#050505] transition hover:brightness-105 disabled:cursor-not-allowed disabled:bg-[#7F4A3A] disabled:text-white/55"
-          >
-            {submitState.status === "submitting" ? copy.submitting : copy.submit}
-          </button>
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className="mt-4 flex min-h-14 w-full items-center justify-center rounded-xl bg-[#FF7A59] px-6 text-base font-semibold text-[#050505] transition hover:brightness-105 disabled:cursor-not-allowed disabled:bg-[#7F4A3A] disabled:text-white/55"
+            >
+              {submitState.status === "submitting"
+                ? copy.submitting
+                : copy.submit}
+            </button>
+          </div>
         </form>
       </div>
     </div>
