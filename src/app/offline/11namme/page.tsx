@@ -335,7 +335,7 @@ const ElevenNammePage = () => {
             지금 신청 가능한 회차를 먼저 확인해보세요
           </p>
           <p className="mt-1 text-xs font-medium text-black/45 md:text-sm">
-            자세한 신청은 페이지 하단 참여하기 버튼에서 이어집니다
+            담당자 승인 후 참여 현황에 반영되므로, 신청 직후에 인원 값이 바로 변경되지는 않습니다.
           </p>
         </div>
 
@@ -377,7 +377,7 @@ const ElevenNammePage = () => {
             지금 신청 가능한 회차를 먼저 확인해보세요
           </p>
           <p className="mt-1 text-xs font-medium text-black/45 md:text-sm">
-            자세한 신청은 페이지 하단 참여하기 버튼에서 이어집니다
+            담당자 승인 후 참여 현황에 반영되므로, 신청 직후에 인원 값이 바로 변경되지는 않습니다.
           </p>
         </div>
 
