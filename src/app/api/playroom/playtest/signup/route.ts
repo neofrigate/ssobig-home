@@ -181,8 +181,6 @@ export async function POST(request: Request) {
         success?: boolean;
         id?: unknown;
         emailDeliveryStatus?: unknown;
-        slackNotificationStatus?: unknown;
-        slackNotificationError?: unknown;
         error?: string;
       }
       | null;
@@ -201,8 +199,6 @@ export async function POST(request: Request) {
       success: true,
       id: upstreamPayload.id,
       emailDeliveryStatus: upstreamPayload.emailDeliveryStatus,
-      slackNotificationStatus: upstreamPayload.slackNotificationStatus,
-      slackNotificationError: upstreamPayload.slackNotificationError,
     });
   } catch (error) {
     return jsonResponse(
