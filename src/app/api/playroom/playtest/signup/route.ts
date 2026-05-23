@@ -182,6 +182,7 @@ export async function POST(request: Request) {
         id?: unknown;
         emailDeliveryStatus?: unknown;
         slackNotificationStatus?: unknown;
+        slackNotificationError?: unknown;
         error?: string;
       }
       | null;
@@ -201,6 +202,7 @@ export async function POST(request: Request) {
       id: upstreamPayload.id,
       emailDeliveryStatus: upstreamPayload.emailDeliveryStatus,
       slackNotificationStatus: upstreamPayload.slackNotificationStatus,
+      slackNotificationError: upstreamPayload.slackNotificationError,
     });
   } catch (error) {
     return jsonResponse(
