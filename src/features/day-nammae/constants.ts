@@ -33,10 +33,7 @@ export const DAY_NAMMAE_FREE_COUPON_NOTICE_SECTION = {
   ],
 };
 
-export const DAY_NAMMAE_BIRTH_YEARS = Array.from(
-  { length: 16 },
-  (_, index) => String(1992 + index)
-);
+export const DAY_NAMMAE_BIRTH_YEARS = getDefaultDayNammeBirthYears();
 
 export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
   {
@@ -112,3 +109,4 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "여유",
   },
 ];
+import { getDefaultDayNammeBirthYears } from "./age";

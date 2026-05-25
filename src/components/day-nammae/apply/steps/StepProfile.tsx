@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import { DAY_NAMMAE_BIRTH_YEARS } from "@/features/day-nammae/constants";
+import { getDefaultDayNammeBirthYears } from "@/features/day-nammae/age";
 import { DayNammeFormValues } from "@/features/day-nammae/types";
 
 interface StepProfileProps {
@@ -8,6 +8,8 @@ interface StepProfileProps {
     field: "name" | "birthYear" | "height" | "phone" | "traits"
   ) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onBirthYearSelect: (year: string) => void;
+  birthYears?: string[];
+  ageRangeLabel?: string;
   showErrors?: boolean;
 }
 
@@ -21,6 +23,8 @@ export default function StepProfile({
   formValues,
   onValueChange,
   onBirthYearSelect,
+  birthYears = getDefaultDayNammeBirthYears(),
+  ageRangeLabel = "",
   showErrors,
 }: StepProfileProps) {
   const errors = showErrors
@@ -54,9 +58,16 @@ export default function StepProfile({
       </div>
 
       <div>
-        <div className="text-sm font-semibold text-white/80">출생연도</div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-sm font-semibold text-white/80">출생연도</div>
+          {ageRangeLabel && (
+            <span className="rounded-full border border-[#8FD8FF]/25 bg-[#8FD8FF]/10 px-2.5 py-1 text-[11px] font-semibold text-[#BFEAFF]">
+              {ageRangeLabel}
+            </span>
+          )}
+        </div>
         <div className={`mt-2 grid grid-cols-4 gap-2 rounded-xl ${errors.birthYear ? "ring-1 ring-red-500 p-1" : ""}`}>
-          {DAY_NAMMAE_BIRTH_YEARS.map((year) => {
+          {birthYears.map((year) => {
             const selected = formValues.birthYear === year;
             return (
               <button

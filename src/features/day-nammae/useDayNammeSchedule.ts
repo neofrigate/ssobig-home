@@ -21,6 +21,13 @@ interface PublicDayNammeSchedulesResponse {
     waitlistAlertFemale?: number;
     waitlistAlertMale?: number;
     waitlistAlertTotal?: number;
+    ageRangeKey?: string | null;
+    age_range_key?: string | null;
+    ageMin?: number | null;
+    ageMax?: number | null;
+    birthYearMin?: number | null;
+    birthYearMax?: number | null;
+    ageRangeLabel?: string | null;
   }[];
 }
 

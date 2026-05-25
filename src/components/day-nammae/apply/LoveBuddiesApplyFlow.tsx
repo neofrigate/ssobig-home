@@ -20,6 +20,8 @@ import {
   DAY_NAMMAE_NOTICE_SECTIONS,
 } from "@/features/day-nammae/constants";
 import {
+  getDayNammeBirthYearsForSchedule,
+  isDayNammeBirthYearAllowed,
   getDayNammeScheduleApplicationMode,
   getDayNammeScheduleLabel,
   isDayNammeScheduleSelectable,
@@ -1725,6 +1727,11 @@ export default function LoveBuddiesApplyFlow({
   const selectedApplicationMode: DayNammeApplicationMode = selectedScheduleItem
     ? getDayNammeScheduleApplicationMode(selectedScheduleItem, formValues.gender)
     : "normal";
+  const selectedBirthYears = getDayNammeBirthYearsForSchedule(selectedScheduleItem);
+  const selectedAgeRangeLabel = selectedScheduleItem?.ageRange.label || "";
+  const isSelectedBirthYearAllowed =
+    !formValues.birthYear ||
+    isDayNammeBirthYearAllowed(formValues.birthYear, selectedScheduleItem);
   const isWaitlistApplication = selectedApplicationMode === "waitlist_alert";
   const isValidatedFreeCoupon =
     couponValidationStatus === "valid" &&
@@ -1961,6 +1968,9 @@ export default function LoveBuddiesApplyFlow({
             couponCode: initialCouponCodeSuffix,
             schedule: targetScheduleLabel,
             staffScheduleId: targetSchedule.staffScheduleId,
+            birthYear: isDayNammeBirthYearAllowed(current.birthYear, targetSchedule)
+              ? current.birthYear
+              : "",
           };
         });
         setValidatedCoupon(null);
@@ -2169,6 +2179,9 @@ export default function LoveBuddiesApplyFlow({
       ...current,
       schedule: scheduleLabel,
       staffScheduleId: schedule.staffScheduleId,
+      birthYear: isDayNammeBirthYearAllowed(current.birthYear, schedule)
+        ? current.birthYear
+        : "",
     }));
     setValidatedCoupon(null);
     setCouponValidationStatus(formValues.couponCode ? "idle" : "invalid");
@@ -2344,6 +2357,9 @@ export default function LoveBuddiesApplyFlow({
       ...current,
       schedule: scheduleLabel,
       staffScheduleId: targetSchedule.staffScheduleId,
+      birthYear: isDayNammeBirthYearAllowed(current.birthYear, targetSchedule)
+        ? current.birthYear
+        : "",
     }));
 
     const isValidForSchedule = await validateCouponForSchedule(targetSchedule);
@@ -2392,6 +2408,7 @@ export default function LoveBuddiesApplyFlow({
         return (
           formValues.name.trim() !== "" &&
           formValues.birthYear !== "" &&
+          isSelectedBirthYearAllowed &&
           formValues.height.trim() !== "" &&
           formValues.phone.replace(/\D/g, "").length === 11 &&
           formValues.traits.trim() !== ""
@@ -2451,6 +2468,7 @@ export default function LoveBuddiesApplyFlow({
     if (
       !formValues.name.trim() ||
       !formValues.birthYear ||
+      !isSelectedBirthYearAllowed ||
       !formValues.height.trim() ||
       formValues.phone.replace(/\D/g, "").length !== 11 ||
       !formValues.traits.trim()
@@ -3310,6 +3328,8 @@ export default function LoveBuddiesApplyFlow({
           formValues={formValues}
           onValueChange={handleValueChange}
           onBirthYearSelect={handleBirthYearSelect}
+          birthYears={selectedBirthYears}
+          ageRangeLabel={selectedAgeRangeLabel}
           showErrors={showFieldErrors}
         />
       )}

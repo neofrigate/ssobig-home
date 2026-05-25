@@ -1,4 +1,9 @@
 import { DAY_NAMMAE_FALLBACK_SCHEDULE } from "./constants";
+import {
+  buildDayNammeAgeRange,
+  getDayNammeBirthYearsForAgeRange,
+  isBirthYearAllowedForAgeRange,
+} from "./age";
 import { DayNammeApplicationMode, ScheduleItem } from "./types";
 
 const DAY_NAMMAE_WAITLIST_UI_ENABLED = true;
@@ -18,6 +23,22 @@ interface RawScheduleItem {
   waitlistAlertFemale?: number;
   waitlistAlertMale?: number;
   waitlistAlertTotal?: number;
+  ageRangeKey?: string | null;
+  age_range_key?: string | null;
+  ageMin?: number | null;
+  ageMax?: number | null;
+  birthYearMin?: number | null;
+  birthYearMax?: number | null;
+  ageRangeLabel?: string | null;
+}
+
+function getOptionalNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isInteger(parsed) ? parsed : null;
+  }
+  return null;
 }
 
 export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
@@ -36,6 +57,14 @@ export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
 
       const gameTitle = title.replace(/\d+\/\d+\s*\([^)]+\)\s*\d+:\d+\s*/, "").trim();
       const cleanTitle = timeStr ? `${timeStr} ${gameTitle}` : gameTitle;
+      const ageRange = buildDayNammeAgeRange(
+        item.ageRangeKey || item.age_range_key,
+        {
+          birthYearMin: getOptionalNumber(item.birthYearMin),
+          birthYearMax: getOptionalNumber(item.birthYearMax),
+          label: item.ageRangeLabel || null,
+        }
+      );
 
       return {
         staffScheduleId: String(
@@ -51,6 +80,7 @@ export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
         },
         maxCapacity: item.maxCapacity || 40,
         status: item.closeStatus || item.status || "",
+        ageRange,
         waitlistAvailable: {
           female: item.waitlistAvailableFemale === true,
           male: item.waitlistAvailableMale === true,
@@ -88,6 +118,21 @@ export function getDayNammeScheduleLabel(schedule: ScheduleItem) {
 
 export function getVisibleDayNammeSchedules(scheduleData: ScheduleItem[]) {
   return scheduleData;
+}
+
+export function getDayNammeBirthYearsForSchedule(
+  schedule: ScheduleItem | null | undefined
+) {
+  const ageRange = schedule?.ageRange || buildDayNammeAgeRange("20_35");
+  return getDayNammeBirthYearsForAgeRange(ageRange);
+}
+
+export function isDayNammeBirthYearAllowed(
+  birthYear: string,
+  schedule: ScheduleItem | null | undefined
+) {
+  const ageRange = schedule?.ageRange || buildDayNammeAgeRange("20_35");
+  return isBirthYearAllowedForAgeRange(birthYear, ageRange);
 }
 
 export function isDayNammeScheduleWaitlistSelectable(

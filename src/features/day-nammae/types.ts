@@ -1,3 +1,5 @@
+import type { DayNammeAgeRange } from "./age";
+
 export type DayNammeApplicationMode = "normal" | "waitlist_alert";
 
 export interface ScheduleItem {
@@ -12,6 +14,7 @@ export interface ScheduleItem {
   };
   maxCapacity: number;
   status: string;
+  ageRange: DayNammeAgeRange;
   waitlistAvailable: {
     female: boolean;
     male: boolean;

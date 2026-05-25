@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
@@ -18,6 +19,11 @@ const HEIC_HEIF_MIME_TYPES = new Set([
 ]);
 const HEIC_HEIF_FILE_PATTERN = /\.(heic|heif)$/i;
 const STORAGE_ERROR_BODY_PREVIEW_LIMIT = 2000;
+const DAY_NAMMAE_AGE_RANGES: Record<string, { min: number; max: number }> = {
+  "20_35": { min: 20, max: 35 },
+  "20_30": { min: 20, max: 30 },
+  "25_35": { min: 25, max: 35 },
+};
 
 function getRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -113,8 +119,80 @@ function isSafeClientErrorMessage(message: string) {
     message.endsWith("값이 비어 있습니다.") ||
     message === "업로드할 사진 파일이 필요합니다." ||
     message === "이미지 파일만 업로드할 수 있습니다." ||
+    message.startsWith("선택한 회차는 ") ||
     message === UNSUPPORTED_HEIC_PHOTO_ERROR_MESSAGE
   );
+}
+
+function getKstCurrentYear() {
+  const year = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+  }).format(new Date());
+
+  return Number.parseInt(year, 10);
+}
+
+function normalizeDayNammaeAgeRangeKey(value: unknown) {
+  const key = String(value || "").trim();
+  return DAY_NAMMAE_AGE_RANGES[key] ? key : "20_35";
+}
+
+function parseBirthYear(value: unknown) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!/^\d{4}$/.test(digits)) return null;
+  const year = Number.parseInt(digits, 10);
+  return Number.isInteger(year) ? year : null;
+}
+
+function getBirthYearBounds(ageRangeKey: string) {
+  const currentYear = getKstCurrentYear();
+  const range =
+    DAY_NAMMAE_AGE_RANGES[normalizeDayNammaeAgeRangeKey(ageRangeKey)] ||
+    DAY_NAMMAE_AGE_RANGES["20_35"];
+
+  return {
+    minBirthYear: currentYear - range.max + 1,
+    maxBirthYear: currentYear - range.min + 1,
+    ageMin: range.min,
+    ageMax: range.max,
+  };
+}
+
+function buildAgeRangeErrorMessage(bounds: ReturnType<typeof getBirthYearBounds>) {
+  return `선택한 회차는 ${bounds.ageMin}~${bounds.ageMax}세(${bounds.minBirthYear}년생~${bounds.maxBirthYear}년생)만 신청할 수 있습니다.`;
+}
+
+async function validateBirthYearForSchedule(params: {
+  supabase: SupabaseClient;
+  staffScheduleId: string;
+  birthYear: string;
+}) {
+  const { supabase, staffScheduleId, birthYear } = params;
+  if (!staffScheduleId) return;
+
+  const { data, error } = await supabase
+    .from("staff_schedules")
+    .select("age_range_key")
+    .eq("id", staffScheduleId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  const scheduleRow = data as { age_range_key?: unknown } | null;
+  const bounds = getBirthYearBounds(String(scheduleRow?.age_range_key || "20_35"));
+  const parsedBirthYear = parseBirthYear(birthYear);
+  if (
+    parsedBirthYear !== null &&
+    parsedBirthYear >= bounds.minBirthYear &&
+    parsedBirthYear <= bounds.maxBirthYear
+  ) {
+    return;
+  }
+
+  throw new Error(buildAgeRangeErrorMessage(bounds));
 }
 
 function isUnsupportedHeicLikeFile(file: File) {
@@ -606,6 +684,25 @@ export async function POST(request: Request) {
       throw new Error("이미지 파일만 업로드할 수 있습니다.");
     }
 
+    const supabase = createClient(DAY_NAMMAE_SUPABASE_URL, serviceRoleKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+      global: {
+        fetch: createStorageDebugFetch((context) => {
+          storageHttpErrorContext = context;
+        }),
+      },
+    });
+
+    currentStage = "submit:age_range:validate";
+    await validateBirthYearForSchedule({
+      supabase,
+      staffScheduleId,
+      birthYear,
+    });
+
     photoContext = {
       photoName: photo.name,
       photoType: photo.type,
@@ -622,18 +719,6 @@ export async function POST(request: Request) {
       hasFbc: Boolean(fbc),
       ...photoContext,
       debugClientContext,
-    });
-
-    const supabase = createClient(DAY_NAMMAE_SUPABASE_URL, serviceRoleKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-      global: {
-        fetch: createStorageDebugFetch((context) => {
-          storageHttpErrorContext = context;
-        }),
-      },
     });
 
     uuid = generateUuid();

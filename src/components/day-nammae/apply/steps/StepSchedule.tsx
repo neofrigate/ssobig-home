@@ -5,6 +5,7 @@ import {
   isDayNammeScheduleWaitlistSelectable,
   isDayNammeScheduleSelectable,
 } from "@/features/day-nammae/schedule";
+import { shouldShowDayNammeAgeRangeChip } from "@/features/day-nammae/age";
 import { ScheduleItem } from "@/features/day-nammae/types";
 
 interface StepScheduleProps {
@@ -60,6 +61,7 @@ export default function StepSchedule({
           gender
         );
         const helperText = getDayNammeScheduleHelperText(schedule, gender);
+        const showAgeChip = shouldShowDayNammeAgeRangeChip(schedule.ageRange);
         const isImminent = helperText === "임박";
         const isOppositeGenderClosedSelectable =
           selectable &&
@@ -114,11 +116,18 @@ export default function StepSchedule({
                   : "쿠폰 대상 회차가 아닙니다."}
                 </p>
               </div>
-              <span
-                className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${badgeClassName}`}
-              >
-                {helperText}
-              </span>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                {showAgeChip && (
+                  <span className="rounded-full border border-[#8FD8FF]/25 bg-[#8FD8FF]/10 px-2.5 py-1 text-[11px] font-semibold text-[#BFEAFF]">
+                    {schedule.ageRange.label}
+                  </span>
+                )}
+                <span
+                  className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${badgeClassName}`}
+                >
+                  {helperText}
+                </span>
+              </div>
             </div>
           </button>
         );
