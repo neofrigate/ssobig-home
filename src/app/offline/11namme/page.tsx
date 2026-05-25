@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo } from "react";
 import LoveBuddiesApplyFlow from "@/components/day-nammae/apply/LoveBuddiesApplyFlow";
 import { getDayNammeCouponSuffixFromSearchParam } from "@/features/day-nammae/coupon";
 import { useDayNammeSchedule } from "@/features/day-nammae/useDayNammeSchedule";
+import { shouldShowDayNammeAgeRangeChip } from "@/features/day-nammae/age";
 import { ScheduleItem } from "@/features/day-nammae/types";
 import {
   buildMetaPixelPageViewScript,
@@ -182,10 +183,14 @@ const ElevenNammePage = () => {
     const isCompleted = schedule.status === "전체마감";
     const showStatusBadge =
       schedule.status !== "임박" && schedule.status !== "여유";
+    const showAgeRangeChip = shouldShowDayNammeAgeRangeChip(schedule.ageRange);
     const textOpacity = isCompleted ? "opacity-45" : "";
     const label = meta
       ? `일일남매 ${meta.dateLabel} ${meta.timeLabel}`
       : `일일남매 ${schedule.date} ${schedule.title}`;
+    const ageRangeChipLabel = schedule.ageRange.label.endsWith("세")
+      ? `${schedule.ageRange.label} 한정`
+      : schedule.ageRange.label;
     const genderCapacity = getGenderCapacity(schedule.maxCapacity);
 
     const renderGenderBar = ({
@@ -244,11 +249,16 @@ const ElevenNammePage = () => {
 
     return (
       <div className={`py-5 md:py-6 ${isCompleted ? "opacity-70" : ""}`}>
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-3">
           <h4
-            className={`pr-4 text-[17px] font-extrabold leading-[1.15] tracking-[-0.03em] text-black md:text-[22px] ${textOpacity}`}
+            className={`min-w-0 flex-1 text-[17px] font-extrabold leading-[1.15] tracking-[-0.03em] text-black md:text-[22px] ${textOpacity}`}
           >
-            {label}
+            <span>{label}</span>
+            {showAgeRangeChip ? (
+              <span className="ml-2 inline-block rounded-[8px] bg-[#FFF1C8] px-1.5 py-0.5 text-black md:px-2">
+                {ageRangeChipLabel}
+              </span>
+            ) : null}
           </h4>
           {showStatusBadge ? (
             <span
