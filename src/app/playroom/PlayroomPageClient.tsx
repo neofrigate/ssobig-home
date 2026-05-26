@@ -139,6 +139,12 @@ const PLAYROOM_UI_COPY: Record<
   },
 };
 
+const PROMO_VIDEO_ID: Partial<Record<PlayroomSiteLocale, string>> = {
+  kr: "7hXV32lXd9s",
+  en: "pqz6kgT7xTg",
+  ja: "UTWic-wLc18",
+};
+
 const PLAYROOM_TRACKING_QUERY_KEYS = [
   "utm_source",
   "utm_medium",
@@ -972,6 +978,23 @@ export default function PlayroomPage({
           items={templateGroups.friends}
           locale={locale}
         />
+      )}
+
+      {/* 소개 영상 */}
+      {PROMO_VIDEO_ID[locale] && (
+        <section className="py-8 md:py-12">
+          <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8">
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
+              <iframe
+                src={`https://www.youtube.com/embed/${PROMO_VIDEO_ID[locale]}`}
+                title="SSOBIG PLAYROOM"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
+          </div>
+        </section>
       )}
 
       {/* 푸터 */}
