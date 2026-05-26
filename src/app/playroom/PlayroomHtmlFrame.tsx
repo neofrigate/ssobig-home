@@ -92,7 +92,7 @@ export default function PlayroomHtmlFrame({
       title={title}
       srcDoc={srcDoc}
       sandbox="allow-scripts"
-      className="block w-full overflow-hidden rounded-[20px] border-0 bg-transparent"
+      className="block w-full overflow-hidden border-0 bg-transparent"
       style={{ height }}
     />
   );

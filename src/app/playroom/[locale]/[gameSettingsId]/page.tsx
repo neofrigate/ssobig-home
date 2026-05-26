@@ -108,8 +108,8 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
           {dt.backToList}
         </Link>
 
-        <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white/95 p-5 shadow-[0_18px_48px_rgba(15,23,42,0.08)] md:p-8">
-          <div className="flex flex-col gap-5 md:flex-row md:items-start">
+        <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white/95 shadow-[0_18px_48px_rgba(15,23,42,0.08)]">
+          <div className="flex flex-col gap-5 p-5 md:flex-row md:items-start md:p-8">
             <div className="relative mx-auto aspect-[3/4] w-[180px] overflow-hidden rounded-[22px] bg-slate-100 md:mx-0 md:w-[220px]">
               <Image
                 src={item.card_image_url}
@@ -154,18 +154,18 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
               </div>
             </div>
           </div>
-        </section>
 
-        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_12px_36px_rgba(15,23,42,0.05)] md:p-8">
-          {shouldRenderHtml ? (
-            <PlayroomHtmlFrame
-              html={detailHtml}
-              messageKey={`${normalizedLocale}:${gameSettingsId}`}
-              title={`${item.title} ${dt.detailSuffix}`}
-            />
-          ) : (
-            renderTextDescription(detailText)
-          )}
+          <div className="border-t border-slate-100 p-5 md:p-8">
+            {shouldRenderHtml ? (
+              <PlayroomHtmlFrame
+                html={detailHtml}
+                messageKey={`${normalizedLocale}:${gameSettingsId}`}
+                title={`${item.title} ${dt.detailSuffix}`}
+              />
+            ) : (
+              renderTextDescription(detailText)
+            )}
+          </div>
         </section>
       </div>
     </main>
