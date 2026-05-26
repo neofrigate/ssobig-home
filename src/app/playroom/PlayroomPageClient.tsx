@@ -610,9 +610,10 @@ export default function PlayroomPage({
 
     async function loadCampaignBanners() {
       try {
-        const response = await fetch(PLAYROOM_CAMPAIGN_API_URL, {
-          cache: "no-store",
-        });
+        const response = await fetch(
+          `${PLAYROOM_CAMPAIGN_API_URL}?locale=${encodeURIComponent(locale)}`,
+          { cache: "no-store" },
+        );
         if (!response.ok) {
           throw new Error(`Playroom campaign API failed: ${response.status}`);
         }
