@@ -25,7 +25,6 @@ export function buildPlayroomTemplatesApiUrl(locale?: string) {
   if (locale) {
     url.searchParams.set("locale", locale);
   }
-  url.searchParams.set("_ts", Date.now().toString());
   return url;
 }
 
@@ -36,6 +35,5 @@ export function buildPlayroomTemplateDetailApiUrl(
   const url = new URL(`${PLAYROOM_PUBLIC_API_BASE}/playroom-template-detail`);
   url.searchParams.set("locale", locale);
   url.searchParams.set("gameSettingsId", gameSettingsId);
-  url.searchParams.set("_ts", Date.now().toString());
   return url;
 }

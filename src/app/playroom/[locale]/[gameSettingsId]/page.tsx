@@ -27,7 +27,7 @@ async function fetchPlayroomTemplateDetail(
   const response = await fetch(
     buildPlayroomTemplateDetailApiUrl(locale, gameSettingsId).toString(),
     {
-      cache: "no-store",
+      next: { revalidate: 30 },
     },
   );
 

@@ -25,7 +25,8 @@ const PLAYROOM_TRACKING_QUERY_KEYS = [
 ];
 const PLAYROOM_CAMPAIGN_API_URL =
   "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-campaign-banners";
-const PLAYROOM_TEMPLATE_API_URL = "/api/playroom/public-templates";
+const PLAYROOM_TEMPLATE_API_URL =
+  "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-templates";
 
 function appendPlayroomTrackingParams(url: string): string {
   if (typeof window === "undefined") {
