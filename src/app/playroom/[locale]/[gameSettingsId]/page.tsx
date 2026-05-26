@@ -13,6 +13,16 @@ import {
   type PlayroomSiteLocale,
 } from "@/app/playroom/playroomSiteLocale";
 
+const DETAIL_UI_COPY: Record<
+  PlayroomSiteLocale,
+  { backToList: string; playNow: string; detailSuffix: string }
+> = {
+  kr: { backToList: "목록으로 돌아가기", playNow: "플레이하러 가기", detailSuffix: "상세 설명" },
+  en: { backToList: "Back to List", playNow: "Play Now", detailSuffix: "Details" },
+  ja: { backToList: "一覧に戻る", playNow: "プレイする", detailSuffix: "詳細説明" },
+  zh: { backToList: "返回列表", playNow: "开始游戏", detailSuffix: "详细说明" },
+};
+
 type PageProps = {
   params: Promise<{
     locale: string;
@@ -86,6 +96,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
     .toLowerCase();
   const shouldRenderHtml = detailFormat === "html" && detailHtml;
   const backHref = localeToCanonicalPath(normalizedLocale);
+  const dt = DETAIL_UI_COPY[normalizedLocale];
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#ffffff_26%,#f8fafc_100%)]">
@@ -94,7 +105,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
           href={backHref}
           className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
         >
-          목록으로 돌아가기
+          {dt.backToList}
         </Link>
 
         <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white/95 p-5 shadow-[0_18px_48px_rgba(15,23,42,0.08)] md:p-8">
@@ -138,7 +149,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
                 >
-                  플레이하러 가기
+                  {dt.playNow}
                 </a>
               </div>
             </div>
@@ -150,7 +161,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
             <PlayroomHtmlFrame
               html={detailHtml}
               messageKey={`${normalizedLocale}:${gameSettingsId}`}
-              title={`${item.title} 상세 설명`}
+              title={`${item.title} ${dt.detailSuffix}`}
             />
           ) : (
             renderTextDescription(detailText)

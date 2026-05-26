@@ -11,6 +11,134 @@ import {
   type PlayroomSiteLocale,
 } from "./playroomSiteLocale";
 
+const PLAYROOM_UI_COPY: Record<
+  PlayroomSiteLocale,
+  {
+    free: string;
+    inquiry: string;
+    fundingInProgress: string;
+    fundingEnded: string;
+    preRegistration: string;
+    tokenSuffix: string;
+    loadingTemplates: string;
+    storyMystery: string;
+    playWithFriends: string;
+    companyName: string;
+    businessInfo: string;
+    ceo: string;
+    businessNumber: string;
+    phone: string;
+    salesRegistration: string;
+    address: string;
+    privacyPolicy: string;
+    termsOfService: string;
+    refundPolicy: string;
+    bannerIndicator: (n: number) => string;
+    instagram: string;
+    youtube: string;
+  }
+> = {
+  kr: {
+    free: "무료",
+    inquiry: "문의",
+    fundingInProgress: "펀딩 진행중",
+    fundingEnded: "펀딩 종료",
+    preRegistration: "사전예약 진행중",
+    tokenSuffix: "토큰",
+    loadingTemplates: "템플릿을 불러오는 중입니다",
+    storyMystery: "스토리 추리게임",
+    playWithFriends: "친구들과 함께 즐기기",
+    companyName: "주식회사 쏘빅",
+    businessInfo: "사업자 정보",
+    ceo: "대표자 : 조원철",
+    businessNumber: "사업자등록번호 : 140-87-03096",
+    phone: "전화번호 : 02-2635-7942",
+    salesRegistration: "통신판매업신고번호 : 제2024-서울영등포-0816호",
+    address:
+      "주소 : 서울특별시 서초구 사평대로55길 37, (실란트로타워)지하2층 (반포동)",
+    privacyPolicy: "개인정보 처리방침",
+    termsOfService: "이용약관",
+    refundPolicy: "환불 정책",
+    bannerIndicator: (n) => `${n}번 배너로 이동`,
+    instagram: "인스타그램",
+    youtube: "유튜브",
+  },
+  en: {
+    free: "Free",
+    inquiry: "Inquiry",
+    fundingInProgress: "Funding",
+    fundingEnded: "Funding Ended",
+    preRegistration: "Pre-registration",
+    tokenSuffix: "Tokens",
+    loadingTemplates: "Loading templates",
+    storyMystery: "Story Mystery Games",
+    playWithFriends: "Play with Friends",
+    companyName: "SSOBIG Inc.",
+    businessInfo: "Business Info",
+    ceo: "CEO: Wonchul Cho",
+    businessNumber: "Business Reg. No.: 140-87-03096",
+    phone: "Phone: 02-2635-7942",
+    salesRegistration: "E-commerce Reg. No.: 2024-Seoul Yeongdeungpo-0816",
+    address:
+      "Address: B2, Cilantro Tower, 37, Sapyeong-daero 55-gil, Seocho-gu, Seoul",
+    privacyPolicy: "Privacy Policy",
+    termsOfService: "Terms of Service",
+    refundPolicy: "Refund Policy",
+    bannerIndicator: (n) => `Go to banner ${n}`,
+    instagram: "Instagram",
+    youtube: "YouTube",
+  },
+  ja: {
+    free: "無料",
+    inquiry: "お問い合わせ",
+    fundingInProgress: "ファンディング中",
+    fundingEnded: "ファンディング終了",
+    preRegistration: "事前予約受付中",
+    tokenSuffix: "トークン",
+    loadingTemplates: "テンプレートを読み込んでいます",
+    storyMystery: "ストーリー推理ゲーム",
+    playWithFriends: "友達と一緒に楽しむ",
+    companyName: "株式会社 SSOBIG",
+    businessInfo: "事業者情報",
+    ceo: "代表者：チョ・ウォンチョル",
+    businessNumber: "事業者登録番号：140-87-03096",
+    phone: "電話番号：02-2635-7942",
+    salesRegistration: "通信販売業届出番号：第2024-ソウル永登浦-0816号",
+    address:
+      "住所：ソウル特別市瑞草区サピョンデロ55ギル37、(シラントロタワー)地下2階",
+    privacyPolicy: "プライバシーポリシー",
+    termsOfService: "利用規約",
+    refundPolicy: "返金ポリシー",
+    bannerIndicator: (n) => `バナー${n}へ移動`,
+    instagram: "Instagram",
+    youtube: "YouTube",
+  },
+  zh: {
+    free: "免费",
+    inquiry: "咨询",
+    fundingInProgress: "众筹进行中",
+    fundingEnded: "众筹结束",
+    preRegistration: "预约进行中",
+    tokenSuffix: "代币",
+    loadingTemplates: "正在加载模板",
+    storyMystery: "剧情推理游戏",
+    playWithFriends: "和朋友一起玩",
+    companyName: "SSOBIG 株式会社",
+    businessInfo: "企业信息",
+    ceo: "代表人：赵元哲",
+    businessNumber: "营业执照号：140-87-03096",
+    phone: "电话：02-2635-7942",
+    salesRegistration: "通信销售业申报号：第2024-首尔永登浦-0816号",
+    address: "地址：首尔特别市瑞草区沙坪大路55街37号，(Cilantro Tower)地下2层",
+    privacyPolicy: "隐私政策",
+    termsOfService: "使用条款",
+    refundPolicy: "退款政策",
+    bannerIndicator: (n) => `前往第${n}个横幅`,
+    instagram: "Instagram",
+    youtube: "YouTube",
+  },
+};
+
 const PLAYROOM_TRACKING_QUERY_KEYS = [
   "utm_source",
   "utm_medium",
@@ -190,6 +318,43 @@ function TrackedLink({
   );
 }
 
+type PlayroomUICopy = (typeof PLAYROOM_UI_COPY)[PlayroomSiteLocale];
+
+const PRICE_LABEL_KEYS: Record<string, keyof PlayroomUICopy> = {
+  "무료": "free",
+  Free: "free",
+  "無料": "free",
+  "免费": "free",
+  "문의": "inquiry",
+  Inquiry: "inquiry",
+  "お問い合わせ": "inquiry",
+  "咨询": "inquiry",
+  "펀딩 진행중": "fundingInProgress",
+  Funding: "fundingInProgress",
+  "ファンディング中": "fundingInProgress",
+  "众筹进行中": "fundingInProgress",
+  "펀딩 종료": "fundingEnded",
+  "Funding Ended": "fundingEnded",
+  "ファンディング終了": "fundingEnded",
+  "众筹结束": "fundingEnded",
+  "사전예약 진행중": "preRegistration",
+  "Pre-registration": "preRegistration",
+  "事前予約受付中": "preRegistration",
+  "预约进行中": "preRegistration",
+};
+
+function formatPriceLabel(price: string, t: PlayroomUICopy): string {
+  const key = PRICE_LABEL_KEYS[price];
+  if (key) {
+    return t[key] as string;
+  }
+  const tokenMatch = price.match(/^(\d+)\s*(?:토큰|Tokens?|トークン|代币)$/i);
+  if (tokenMatch) {
+    return `${tokenMatch[1]} ${t.tokenSuffix}`;
+  }
+  return price;
+}
+
 // 컨텐츠 카드 컴포넌트
 interface ContentCardProps {
   image: string;
@@ -201,6 +366,7 @@ interface ContentCardProps {
   templateId?: string;
   cardSize?: "large" | "small";
   imageFit?: "cover" | "contain";
+  locale?: PlayroomSiteLocale;
 }
 
 function ContentCard({
@@ -213,7 +379,9 @@ function ContentCard({
   templateId,
   cardSize = "large",
   imageFit = "cover",
+  locale = "kr",
 }: ContentCardProps) {
+  const t = PLAYROOM_UI_COPY[locale];
   // 모바일/태블릿 너비 계산 (< md)
   // Large: 2.5개 (gap 16px 기준) -> 모바일: calc(40vw - 22px), 태블릿: calc(32vw - 14px)
   // Small: 3.2개 (gap 12px 기준) -> 모바일: calc(31.25vw - 18px), 태블릿: calc(24vw - 10px)
@@ -262,17 +430,7 @@ function ContentCard({
               </span>
             ))}
             <span className="inline-block px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] sm:text-xs font-medium">
-              {price === "무료"
-                ? "무료"
-                : price === "문의"
-                ? "문의"
-                : price === "펀딩 진행중"
-                ? "펀딩 진행중"
-                : price === "펀딩 종료"
-                ? "펀딩 종료"
-                : price === "사전예약 진행중"
-                ? "사전예약 진행중"
-                : price.replace("토큰", "") + "토큰"}
+              {formatPriceLabel(price, t)}
             </span>
           </div>
         )}
@@ -319,17 +477,7 @@ function ContentCard({
               </span>
             ))}
             <span className="inline-block px-2 md:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] md:text-xs font-medium">
-              {price === "무료"
-                ? "무료"
-                : price === "문의"
-                ? "문의"
-                : price === "펀딩 진행중"
-                ? "펀딩 진행중"
-                : price === "펀딩 종료"
-                ? "펀딩 종료"
-                : price === "사전예약 진행중"
-                ? "사전예약 진행중"
-                : price.replace("토큰", "") + "토큰"}
+              {formatPriceLabel(price, t)}
             </span>
           </div>
         )}
@@ -352,8 +500,9 @@ interface ContentRowProps {
   description?: string;
   items: ContentCardProps[];
   cardSize?: "large" | "small";
-  mobileGap?: number; // 모바일 gap (px)
+  mobileGap?: number;
   imageFit?: "cover" | "contain";
+  locale?: PlayroomSiteLocale;
 }
 
 function ContentRow({
@@ -363,6 +512,7 @@ function ContentRow({
   cardSize = "large",
   mobileGap = 16,
   imageFit = "cover",
+  locale = "kr",
 }: ContentRowProps) {
   return (
     <section className="py-6 md:py-8">
@@ -390,6 +540,7 @@ function ContentRow({
                 templateId={item.templateId}
                 cardSize={cardSize}
                 imageFit={imageFit}
+                locale={locale}
               />
             ))}
           </div>
@@ -415,6 +566,7 @@ function ContentRow({
                 templateId={item.templateId}
                 cardSize={cardSize}
                 imageFit={imageFit}
+                locale={locale}
               />
             ))}
           </div>
@@ -424,7 +576,8 @@ function ContentRow({
   );
 }
 
-function TemplateRowLoading() {
+function TemplateRowLoading({ locale = "kr" }: { locale?: PlayroomSiteLocale }) {
+  const t = PLAYROOM_UI_COPY[locale];
   const mobileSkeletons = Array.from({ length: 3 });
   const desktopSkeletons = Array.from({ length: 4 });
 
@@ -433,7 +586,7 @@ function TemplateRowLoading() {
       <div className="max-w-[1200px] mx-auto px-5 md:px-8">
         <div className="mb-4 md:mb-6">
           <h2 className="text-gray-900 text-[18px] sm:text-[22px] md:text-[26px] lg:text-[28px] font-bold">
-            템플릿을 불러오는 중입니다
+            {t.loadingTemplates}
           </h2>
         </div>
         <div className="md:hidden pb-4">
@@ -596,6 +749,7 @@ export default function PlayroomPage({
 }: {
   locale?: PlayroomSiteLocale;
 }) {
+  const t = PLAYROOM_UI_COPY[locale];
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
@@ -791,7 +945,7 @@ export default function PlayroomPage({
                       ? "bg-white w-8"
                       : "bg-white/50 w-2"
                   }`}
-                  aria-label={`${index + 1}번 배너로 이동`}
+                  aria-label={t.bannerIndicator(index + 1)}
                 />
               ))}
             </div>
@@ -799,22 +953,24 @@ export default function PlayroomPage({
         </div>
       </section>
 
-      {isTemplateLoading && <TemplateRowLoading />}
+      {isTemplateLoading && <TemplateRowLoading locale={locale} />}
 
       {!isTemplateLoading && templateGroups.story_mystery.length > 0 && (
         <ContentRow
-          title="스토리 추리게임"
+          title={t.storyMystery}
           items={templateGroups.story_mystery}
+          locale={locale}
         />
       )}
 
       {!isTemplateLoading && templateGroups.friends.length > 0 && (
         <ContentRow
-          title="친구들과 함께 즐기기"
+          title={t.playWithFriends}
           cardSize="small"
           mobileGap={12}
           imageFit="contain"
           items={templateGroups.friends}
+          locale={locale}
         />
       )}
 
@@ -825,7 +981,7 @@ export default function PlayroomPage({
             {/* 상단: 회사명 + SNS 버튼들 */}
             <div className="flex items-center justify-between mb-3">
               <p className="font-semibold text-gray-700 text-base">
-                주식회사 쏘빅
+                {t.companyName}
               </p>
               <div className="flex items-center gap-2">
                 {/* 인스타그램 */}
@@ -834,7 +990,7 @@ export default function PlayroomPage({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors flex items-center justify-center"
-                  aria-label="인스타그램"
+                  aria-label={t.instagram}
                 >
                   <svg
                     className="w-5 h-5 text-gray-600"
@@ -851,7 +1007,7 @@ export default function PlayroomPage({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors flex items-center justify-center"
-                  aria-label="유튜브"
+                  aria-label={t.youtube}
                 >
                   <svg
                     className="w-5 h-5 text-gray-600"
@@ -869,7 +1025,7 @@ export default function PlayroomPage({
               onClick={() => setIsFooterOpen(!isFooterOpen)}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors mb-2"
             >
-              <span className="text-xs font-medium">사업자 정보</span>
+              <span className="text-xs font-medium">{t.businessInfo}</span>
               <svg
                 className={`w-4 h-4 transition-transform duration-300 ${
                   isFooterOpen ? "rotate-180" : ""
@@ -894,17 +1050,12 @@ export default function PlayroomPage({
               }`}
             >
               <div className="pt-2 pb-3">
-                <p className="mb-1">대표자 : 조원철</p>
-                <p className="mb-1">사업자등록번호 : 140-87-03096</p>
-                <p className="mb-1">전화번호 : 02-2635-7942</p>
+                <p className="mb-1">{t.ceo}</p>
+                <p className="mb-1">{t.businessNumber}</p>
+                <p className="mb-1">{t.phone}</p>
                 <p className="mb-1">E-mail : ssobigstudio@gmail.com</p>
-                <p className="mb-1">
-                  통신판매업신고번호 : 제2024-서울영등포-0816호
-                </p>
-                <p>
-                  주소 : 서울특별시 서초구 사평대로55길 37,
-                  (실란트로타워)지하2층 (반포동)
-                </p>
+                <p className="mb-1">{t.salesRegistration}</p>
+                <p>{t.address}</p>
               </div>
             </div>
 
@@ -916,7 +1067,7 @@ export default function PlayroomPage({
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
               >
-                개인정보 처리방침
+                {t.privacyPolicy}
               </Link>
               <span className="mx-2">|</span>
               <Link
@@ -925,7 +1076,7 @@ export default function PlayroomPage({
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
               >
-                이용약관
+                {t.termsOfService}
               </Link>
               <span className="mx-2">|</span>
               <Link
@@ -934,7 +1085,7 @@ export default function PlayroomPage({
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
               >
-                환불 정책
+                {t.refundPolicy}
               </Link>
             </p>
           </div>

@@ -66,7 +66,7 @@ export async function generateMetadata({
       title: copy.title,
       description: copy.description,
       url: canonicalUrl,
-      siteName: "쏘빅 PLAYROOM",
+      siteName: "SSOBIG PLAYROOM",
       locale: localeToOgLocale(normalizedLocale),
       type: "website",
       images: [
@@ -74,7 +74,7 @@ export async function generateMetadata({
           url: OG_IMAGE,
           width: 1200,
           height: 630,
-          alt: "쏘빅 PLAYROOM 스토리 추리게임 미리보기",
+          alt: copy.title,
         },
       ],
     },
