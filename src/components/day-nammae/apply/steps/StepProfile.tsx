@@ -2,11 +2,27 @@ import { ChangeEvent } from "react";
 import { getDefaultDayNammeBirthYears } from "@/features/day-nammae/age";
 import { DayNammeFormValues } from "@/features/day-nammae/types";
 
+const ACQUISITION_CHANNEL_OPTIONS = [
+  "지인 추천",
+  "공식 인스타그램",
+  "광고",
+  "블로그·카페",
+  "재참여",
+  "기타",
+];
+
 interface StepProfileProps {
   formValues: DayNammeFormValues;
   onValueChange: (
-    field: "name" | "birthYear" | "height" | "phone" | "traits"
+    field:
+      | "name"
+      | "birthYear"
+      | "height"
+      | "phone"
+      | "traits"
+      | "acquisitionChannelOther"
   ) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onAcquisitionChannelSelect: (channel: string) => void;
   onBirthYearSelect: (year: string) => void;
   birthYears?: string[];
   ageRangeLabel?: string;
@@ -22,6 +38,7 @@ function inputClass(hasError: boolean) {
 export default function StepProfile({
   formValues,
   onValueChange,
+  onAcquisitionChannelSelect,
   onBirthYearSelect,
   birthYears = getDefaultDayNammeBirthYears(),
   ageRangeLabel = "",
@@ -34,8 +51,20 @@ export default function StepProfile({
         height: !formValues.height.trim(),
         phone: formValues.phone.replace(/\D/g, "").length !== 11,
         traits: !formValues.traits.trim(),
+        acquisitionChannel: !formValues.acquisitionChannel,
+        acquisitionChannelOther:
+          formValues.acquisitionChannel === "기타" &&
+          !formValues.acquisitionChannelOther.trim(),
       }
-    : { name: false, birthYear: false, height: false, phone: false, traits: false };
+    : {
+        name: false,
+        birthYear: false,
+        height: false,
+        phone: false,
+        traits: false,
+        acquisitionChannel: false,
+        acquisitionChannelOther: false,
+      };
 
   return (
     <div className="space-y-5 rounded-2xl border border-[#2c2024] bg-[#1b1416] p-4">
@@ -147,6 +176,57 @@ export default function StepProfile({
         />
         {errors.traits && (
           <p className="mt-1 text-xs text-red-400">특징을 작성해주세요.</p>
+        )}
+      </div>
+
+      <div>
+        <div className="text-sm font-semibold text-white/80">
+          일일남매를 어디서 보고 신청하게 되셨나요?
+        </div>
+        <div
+          className={`mt-2 grid grid-cols-2 gap-2 rounded-xl ${
+            errors.acquisitionChannel ? "ring-1 ring-red-500 p-1" : ""
+          }`}
+        >
+          {ACQUISITION_CHANNEL_OPTIONS.map((option) => {
+            const selected = formValues.acquisitionChannel === option;
+            return (
+              <button
+                key={option}
+                type="button"
+                onClick={() => onAcquisitionChannelSelect(option)}
+                className={`min-h-11 rounded-lg border px-3 py-2 text-sm font-medium [touch-action:manipulation] ${
+                  selected
+                    ? "border-[#FF6B9F] bg-[#351923] text-[#FFB1D4]"
+                    : "border-[#2c2024] bg-[#21161a] text-white/60"
+                }`}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
+        {errors.acquisitionChannel && (
+          <p className="mt-1 text-xs text-red-400">유입경로를 선택해주세요.</p>
+        )}
+        {formValues.acquisitionChannel === "기타" && (
+          <div>
+            <input
+              value={formValues.acquisitionChannelOther}
+              onChange={onValueChange("acquisitionChannelOther")}
+              placeholder="어디서 보셨는지 적어주세요"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="sentences"
+              spellCheck={false}
+              className={inputClass(errors.acquisitionChannelOther)}
+            />
+            {errors.acquisitionChannelOther && (
+              <p className="mt-1 text-xs text-red-400">
+                기타 경로를 입력해주세요.
+              </p>
+            )}
+          </div>
         )}
       </div>
     </div>

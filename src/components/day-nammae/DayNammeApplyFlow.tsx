@@ -41,6 +41,8 @@ const INITIAL_FORM_VALUES: DayNammeFormValues = {
   height: "",
   phone: "",
   traits: "",
+  acquisitionChannel: "",
+  acquisitionChannelOther: "",
   photo: null,
   hasCoupon: null,
   couponCode: "",

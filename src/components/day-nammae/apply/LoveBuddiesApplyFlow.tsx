@@ -391,6 +391,8 @@ const INITIAL_FORM_VALUES: DayNammeFormValues = {
   height: "",
   phone: "",
   traits: "",
+  acquisitionChannel: "",
+  acquisitionChannelOther: "",
   photo: null,
   hasCoupon: null,
   couponCode: "",
@@ -2015,7 +2017,15 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const handleValueChange =
-    (field: "name" | "birthYear" | "height" | "phone" | "traits") =>
+    (
+      field:
+        | "name"
+        | "birthYear"
+        | "height"
+        | "phone"
+        | "traits"
+        | "acquisitionChannelOther"
+    ) =>
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       let nextValue = event.target.value;
       if (field === "phone") nextValue = formatPhoneNumber(nextValue);
@@ -2023,6 +2033,16 @@ export default function LoveBuddiesApplyFlow({
       setFormValues((current) => ({ ...current, [field]: nextValue }));
       setFormError("");
     };
+
+  const handleAcquisitionChannelSelect = (channel: string) => {
+    setFormValues((current) => ({
+      ...current,
+      acquisitionChannel: channel,
+      acquisitionChannelOther:
+        channel === "기타" ? current.acquisitionChannelOther : "",
+    }));
+    setFormError("");
+  };
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
@@ -2411,7 +2431,10 @@ export default function LoveBuddiesApplyFlow({
           isSelectedBirthYearAllowed &&
           formValues.height.trim() !== "" &&
           formValues.phone.replace(/\D/g, "").length === 11 &&
-          formValues.traits.trim() !== ""
+          formValues.traits.trim() !== "" &&
+          formValues.acquisitionChannel !== "" &&
+          (formValues.acquisitionChannel !== "기타" ||
+            formValues.acquisitionChannelOther.trim() !== "")
         );
       case "photo":
         return formValues.photo !== null && !isOptimizingPhoto;
@@ -2471,7 +2494,10 @@ export default function LoveBuddiesApplyFlow({
       !isSelectedBirthYearAllowed ||
       !formValues.height.trim() ||
       formValues.phone.replace(/\D/g, "").length !== 11 ||
-      !formValues.traits.trim()
+      !formValues.traits.trim() ||
+      !formValues.acquisitionChannel ||
+      (formValues.acquisitionChannel === "기타" &&
+        !formValues.acquisitionChannelOther.trim())
     ) {
       return "profile";
     }
@@ -2589,6 +2615,13 @@ export default function LoveBuddiesApplyFlow({
           requestBody.append("birthYear", formValues.birthYear);
           requestBody.append("height", formValues.height.trim());
           requestBody.append("traits", formValues.traits.trim());
+          requestBody.append("acquisitionChannel", formValues.acquisitionChannel);
+          requestBody.append(
+            "acquisitionChannelOther",
+            formValues.acquisitionChannel === "기타"
+              ? formValues.acquisitionChannelOther.trim()
+              : ""
+          );
           requestBody.append("photo", formValues.photo as File);
         }
         if (fbp) {
@@ -3327,6 +3360,7 @@ export default function LoveBuddiesApplyFlow({
         <StepProfile
           formValues={formValues}
           onValueChange={handleValueChange}
+          onAcquisitionChannelSelect={handleAcquisitionChannelSelect}
           onBirthYearSelect={handleBirthYearSelect}
           birthYears={selectedBirthYears}
           ageRangeLabel={selectedAgeRangeLabel}

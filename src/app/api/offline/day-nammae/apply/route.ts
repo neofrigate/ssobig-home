@@ -24,6 +24,14 @@ const DAY_NAMMAE_AGE_RANGES: Record<string, { min: number; max: number }> = {
   "20_30": { min: 20, max: 30 },
   "25_35": { min: 25, max: 35 },
 };
+const ACQUISITION_CHANNEL_OPTIONS = new Set([
+  "공식 인스타그램",
+  "광고",
+  "지인 추천",
+  "블로그·카페",
+  "재참여",
+  "기타",
+]);
 
 function getRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -119,6 +127,8 @@ function isSafeClientErrorMessage(message: string) {
     message.endsWith("값이 비어 있습니다.") ||
     message === "업로드할 사진 파일이 필요합니다." ||
     message === "이미지 파일만 업로드할 수 있습니다." ||
+    message === "유입경로를 선택해주세요." ||
+    message === "기타 경로를 입력해주세요." ||
     message.startsWith("선택한 회차는 ") ||
     message === UNSUPPORTED_HEIC_PHOTO_ERROR_MESSAGE
   );
@@ -666,11 +676,22 @@ export async function POST(request: Request) {
     const birthYear = getRequiredString(formData, "birthYear");
     const height = getRequiredString(formData, "height");
     const traits = getRequiredString(formData, "traits");
+    const acquisitionChannel = getRequiredString(formData, "acquisitionChannel");
+    const acquisitionChannelOther =
+      getOptionalString(formData, "acquisitionChannelOther");
     const photo = formData.get("photo");
     const usedCouponId = getOptionalPositiveInt(formData, "usedCouponId");
     const couponCode = getOptionalString(formData, "couponCode");
     const freeCouponNoShowAgreement =
       getOptionalString(formData, "freeCouponNoShowAgreement") === "true";
+
+    if (!ACQUISITION_CHANNEL_OPTIONS.has(acquisitionChannel)) {
+      throw new Error("유입경로를 선택해주세요.");
+    }
+
+    if (acquisitionChannel === "기타" && !acquisitionChannelOther) {
+      throw new Error("기타 경로를 입력해주세요.");
+    }
 
     if (!(photo instanceof File) || photo.size === 0) {
       throw new Error("업로드할 사진 파일이 필요합니다.");
@@ -819,6 +840,9 @@ export async function POST(request: Request) {
       "Q. 이름": name,
       "Q. 지역": "",
       "Q. 특징": traits,
+      "Q. 유입경로": acquisitionChannel,
+      "Q. 유입경로 기타":
+        acquisitionChannel === "기타" ? acquisitionChannelOther : "",
       TemplateId: "",
       utm_medium: utmMedium,
       utm_source: utmSource,

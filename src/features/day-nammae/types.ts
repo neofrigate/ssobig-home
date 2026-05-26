@@ -35,6 +35,8 @@ export interface DayNammeFormValues {
   height: string;
   phone: string;
   traits: string;
+  acquisitionChannel: string;
+  acquisitionChannelOther: string;
   photo: File | null;
   hasCoupon: boolean | null;
   couponCode: string;
