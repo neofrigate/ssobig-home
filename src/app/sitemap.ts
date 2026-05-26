@@ -13,6 +13,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: "https://www.ssobig.com/playroom/kr",
+      lastModified: new Date(),
+      priority: 0.9,
+    },
+    {
+      url: "https://www.ssobig.com/playroom/en",
+      lastModified: new Date(),
+      priority: 0.9,
+    },
+    {
+      url: "https://www.ssobig.com/playroom/ja",
+      lastModified: new Date(),
+      priority: 0.9,
+    },
+    {
+      url: "https://www.ssobig.com/playroom/zh",
+      lastModified: new Date(),
+      priority: 0.9,
+    },
+    {
       url: "https://www.ssobig.com/offline",
       lastModified: new Date(),
       priority: 0.9,

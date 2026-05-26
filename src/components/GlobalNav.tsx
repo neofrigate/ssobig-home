@@ -34,7 +34,9 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const pathname = usePathname() ?? "/";
 
   // 플레이룸 페이지 체크 (실제 컨텐츠 페이지 - 화이트 배경 고정)
-  const isPlayroomPage = pathname === "/playroom";
+  const isPlayroomPage =
+    (pathname === "/playroom" || pathname.startsWith("/playroom/")) &&
+    !pathname.startsWith("/playroom/form/");
   // 플레이룸 하이드 페이지 (커밍순 페이지 - 투명 배경)
   const isPlayroomHidePage = pathname === "/playroom_hide";
   // 소셜링 페이지들 (투명 배경 유지)
@@ -426,14 +428,14 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 useBlackText ? "text-gray-900" : "text-white"
               }`}
               style={{
-                opacity: isMounted && pathname === "/playroom" ? 1 : 0.6,
+                opacity: isMounted && isPlayroomPage ? 1 : 0.6,
                 color: navMode === "light" ? "#111827" : undefined,
               }}
               suppressHydrationWarning
             >
               PLAYROOM
             </span>
-            {isMounted && pathname === "/playroom" && (
+            {isMounted && isPlayroomPage && (
               <div
                 className={`absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-700 ${underlineColorClass}`}
                 suppressHydrationWarning
@@ -559,13 +561,13 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 useBlackText ? "text-gray-900" : "text-white"
               }`}
               style={{
-                opacity: isMounted && pathname === "/playroom" ? 1 : 0.6,
+                opacity: isMounted && isPlayroomPage ? 1 : 0.6,
               }}
               suppressHydrationWarning
             >
               PLAYROOM
             </span>
-            {isMounted && pathname === "/playroom" && (
+            {isMounted && isPlayroomPage && (
               <div
                 className={`absolute bottom-0 left-0 right-0 h-[1px] ${underlineColorClass}`}
                 suppressHydrationWarning

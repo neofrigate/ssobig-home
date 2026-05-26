@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { trackLinkClick } from "../../utils/gtag";
 import { safeFbq } from "../../utils/metaPixel";
+import type { PlayroomSiteLocale } from "./playroomSiteLocale";
 
 const PLAYROOM_TRACKING_QUERY_KEYS = [
   "utm_source",
@@ -20,8 +21,7 @@ const PLAYROOM_TRACKING_QUERY_KEYS = [
 ];
 const PLAYROOM_CAMPAIGN_API_URL =
   "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-campaign-banners";
-const PLAYROOM_TEMPLATE_API_URL =
-  "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-templates";
+const PLAYROOM_TEMPLATE_API_URL = "/api/playroom/templates";
 
 function appendPlayroomTrackingParams(url: string): string {
   if (typeof window === "undefined") {
@@ -586,7 +586,11 @@ function groupPlayroomTemplates(items: PlayroomTemplateApiItem[]): PlayroomTempl
   );
 }
 
-export default function PlayroomPage() {
+export default function PlayroomPage({
+  locale = "kr",
+}: {
+  locale?: PlayroomSiteLocale;
+}) {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
@@ -622,9 +626,12 @@ export default function PlayroomPage() {
 
     async function loadPlayroomTemplates() {
       try {
-        const response = await fetch(PLAYROOM_TEMPLATE_API_URL, {
-          cache: "no-store",
-        });
+        const response = await fetch(
+          `${PLAYROOM_TEMPLATE_API_URL}?locale=${encodeURIComponent(locale)}`,
+          {
+            cache: "no-store",
+          }
+        );
         if (!response.ok) {
           throw new Error(`Playroom template API failed: ${response.status}`);
         }
@@ -650,7 +657,7 @@ export default function PlayroomPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     if (currentBannerIndex >= banners.length) {
