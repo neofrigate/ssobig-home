@@ -1,36 +1,16 @@
 import { NextResponse } from "next/server";
 
 import {
-  matchesPlayroomTemplateLocale,
-  normalizePlayroomSiteLocale,
-} from "@/app/playroom/playroomSiteLocale";
-
-const PLAYROOM_TEMPLATE_API_URL =
-  "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-templates";
-
-type PlayroomTemplateCategory = "story_mystery" | "friends";
-
-type PlayroomTemplateApiItem = {
-  category: PlayroomTemplateCategory;
-  ssobig_tool_template_id: string;
-  title: string;
-  description: string;
-  players_label: string;
-  price_label: string;
-  card_image_url: string;
-  destination_url: string;
-  locale?: string;
-  locale_visibility?: string;
-};
+  buildPlayroomTemplatesApiUrl,
+  type PlayroomTemplateApiItem,
+} from "@/app/playroom/playroomApi";
+import { normalizePlayroomSiteLocale } from "@/app/playroom/playroomSiteLocale";
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const locale = normalizePlayroomSiteLocale(url.searchParams.get("locale"));
-    const endpoint = new URL(PLAYROOM_TEMPLATE_API_URL);
-    if (locale) {
-      endpoint.searchParams.set("locale", locale);
-    }
+    const endpoint = buildPlayroomTemplatesApiUrl(locale || undefined);
     const response = await fetch(endpoint.toString(), {
       cache: "no-store",
     });
@@ -42,23 +22,8 @@ export async function GET(req: Request) {
       items?: PlayroomTemplateApiItem[];
     };
 
-    const items = (data.items || []).filter((item) => {
-      if (
-        locale &&
-        !matchesPlayroomTemplateLocale(
-          locale,
-          item.locale,
-          item.locale_visibility
-        )
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-
     return NextResponse.json(
-      { items },
+      { items: data.items || [] },
       {
         headers: {
           "Cache-Control": "no-store",

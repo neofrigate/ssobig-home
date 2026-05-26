@@ -33,6 +33,13 @@ export function localeToCanonicalPath(locale: PlayroomSiteLocale) {
   return `/playroom/${locale}`;
 }
 
+export function buildPlayroomDetailPath(
+  locale: PlayroomSiteLocale,
+  gameSettingsId: string,
+) {
+  return `/playroom/${locale}/${encodeURIComponent(gameSettingsId)}`;
+}
+
 export function localeToOgLocale(locale: PlayroomSiteLocale) {
   if (locale === "kr") return "ko_KR";
   if (locale === "ja") return "ja_JP";

@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { trackLinkClick } from "../../utils/gtag";
 import { safeFbq } from "../../utils/metaPixel";
-import type { PlayroomSiteLocale } from "./playroomSiteLocale";
+import type { PlayroomTemplateApiItem } from "./playroomApi";
+import {
+  buildPlayroomDetailPath,
+  type PlayroomSiteLocale,
+} from "./playroomSiteLocale";
 
 const PLAYROOM_TRACKING_QUERY_KEYS = [
   "utm_source",
@@ -138,6 +142,7 @@ function TrackedLink({
   children,
 }: TrackedLinkProps) {
   const [trackedHref, setTrackedHref] = useState(href);
+  const isExternalHref = /^https?:\/\//i.test(trackedHref);
 
   useEffect(() => {
     setTrackedHref(appendPlayroomTrackingParams(href));
@@ -174,8 +179,8 @@ function TrackedLink({
   return (
     <a
       href={trackedHref}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={isExternalHref ? "_blank" : undefined}
+      rel={isExternalHref ? "noopener noreferrer" : undefined}
       className={className}
       onClick={handleClick}
     >
@@ -543,42 +548,41 @@ function mapCampaignBanner(item: PlayroomCampaignBannerApiItem): BannerData {
   };
 }
 
-type PlayroomTemplateCategory = "story_mystery" | "friends";
-
-interface PlayroomTemplateApiItem {
-  category: PlayroomTemplateCategory;
-  ssobig_tool_template_id: string;
-  title: string;
-  description: string;
-  players_label: string;
-  price_label: string;
-  card_image_url: string;
-  destination_url: string;
-}
-
-type PlayroomTemplateGroups = Record<PlayroomTemplateCategory, ContentCardProps[]>;
+type PlayroomTemplateGroups = Record<
+  PlayroomTemplateApiItem["category"],
+  ContentCardProps[]
+>;
 
 function emptyTemplateGroups(): PlayroomTemplateGroups {
   return { story_mystery: [], friends: [] };
 }
 
-function mapPlayroomTemplate(item: PlayroomTemplateApiItem): ContentCardProps {
+function mapPlayroomTemplate(
+  item: PlayroomTemplateApiItem,
+  locale: PlayroomSiteLocale,
+): ContentCardProps {
+  const internalDetailPath = item.game_settings_id
+    ? buildPlayroomDetailPath(locale, item.game_settings_id)
+    : item.destination_url;
   return {
     image: item.card_image_url,
     title: item.title,
     description: item.description,
     players: item.players_label,
     price: item.price_label,
-    link: item.destination_url,
+    link: internalDetailPath,
     templateId: item.ssobig_tool_template_id,
   };
 }
 
-function groupPlayroomTemplates(items: PlayroomTemplateApiItem[]): PlayroomTemplateGroups {
+function groupPlayroomTemplates(
+  items: PlayroomTemplateApiItem[],
+  locale: PlayroomSiteLocale,
+): PlayroomTemplateGroups {
   return items.reduce<PlayroomTemplateGroups>(
     (groups, item) => {
       if (item.category === "story_mystery" || item.category === "friends") {
-        groups[item.category].push(mapPlayroomTemplate(item));
+        groups[item.category].push(mapPlayroomTemplate(item, locale));
       }
       return groups;
     },
@@ -638,7 +642,7 @@ export default function PlayroomPage({
         const data = (await response.json()) as {
           items?: PlayroomTemplateApiItem[];
         };
-        const nextGroups = groupPlayroomTemplates(data.items || []);
+        const nextGroups = groupPlayroomTemplates(data.items || [], locale);
         if (isMounted) {
           setTemplateGroups(nextGroups);
           setIsTemplateLoading(false);
