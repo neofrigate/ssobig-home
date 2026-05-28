@@ -349,6 +349,7 @@ const INITIAL_PHOTO_JPEG_QUALITY = 0.82;
 const MIN_PHOTO_JPEG_QUALITY = 0.56;
 const SUBMIT_NETWORK_RETRY_DELAY_MS = 700;
 const SUBMIT_IN_APP_BROWSER_NETWORK_RETRY_WINDOW_MS = 10000;
+const SUBMIT_RETRYABLE_HTTP_STATUSES = new Set([500, 502, 503, 504]);
 const HEIC_HEIF_MIME_TYPES = new Set([
   "image/heic",
   "image/heif",
@@ -1108,6 +1109,15 @@ function summarizeResponseText(text: string) {
   return `${normalizedText.slice(0, 277)}...`;
 }
 
+function isRetryableSubmitHttpResponse(response: Response) {
+  const responseContentType = response.headers.get("content-type") || "";
+
+  return (
+    SUBMIT_RETRYABLE_HTTP_STATUSES.has(response.status) &&
+    !responseContentType.includes("application/json")
+  );
+}
+
 async function parseSubmitResponse(response: Response): Promise<{
   result: unknown;
   meta: SubmitResponseMeta;
@@ -1617,6 +1627,24 @@ async function submitDayNammeApplyRequest(params: {
         method: "POST",
         body: requestBody,
       });
+
+      const retryEligible =
+        Boolean(inAppBrowserName) &&
+        attempt < maxAttempts &&
+        isRetryableSubmitHttpResponse(response);
+
+      if (retryEligible) {
+        console.warn("[day-nammae submit http retry]", {
+          clientRequestId,
+          attemptCount: attempt,
+          responseStatus: response.status,
+          responseContentType: response.headers.get("content-type") || "",
+          responseUrl: response.url,
+          inAppBrowserName,
+        });
+        await delay(SUBMIT_NETWORK_RETRY_DELAY_MS);
+        continue;
+      }
 
       return response;
     } catch (error) {
