@@ -18,6 +18,26 @@ export interface PlayroomTemplateApiItem {
   detail_description?: string | null;
   detail_description_html?: string | null;
   detail_description_format?: string | null;
+  imageUrl?: string | null;
+  backgroundImageUrl?: string | null;
+  logoImageUrl?: string | null;
+  themeColor?: string | number | null;
+  isDarkMode?: boolean | null;
+  credit?: string | number | null;
+  minPlayerCount?: string | number | null;
+  maxPlayerCount?: string | number | null;
+  minPlayers?: string | number | null;
+  maxPlayers?: string | number | null;
+  minTimeMinutes?: string | number | null;
+  maxTimeMinutes?: string | number | null;
+  rating_average?: string | number | null;
+  game?: {
+    imageUrl?: string | null;
+    backgroundImageUrl?: string | null;
+    logoImageUrl?: string | null;
+    themeColor?: string | number | null;
+    isDarkMode?: boolean | null;
+  } | null;
 }
 
 export function buildPlayroomTemplatesApiUrl(locale?: string) {
