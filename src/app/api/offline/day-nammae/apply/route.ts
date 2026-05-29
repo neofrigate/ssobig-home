@@ -584,6 +584,11 @@ export async function POST(request: Request) {
     const utmContent = (formData.get("utm_content") as string) || "";
     const fbp = getOptionalString(formData, "fbp");
     const fbc = getOptionalString(formData, "fbc");
+    const metaCompleteRegistrationEventId = getOptionalString(
+      formData,
+      "meta_complete_registration_event_id"
+    );
+    const metaCheckoutEventId = getOptionalString(formData, "meta_checkout_event_id");
 
     maskedPhone = maskPhoneNumber(phone);
 
@@ -850,6 +855,10 @@ export async function POST(request: Request) {
       utm_content: utmContent,
       ...(fbp ? { fbp } : {}),
       ...(fbc ? { fbc } : {}),
+      ...(metaCompleteRegistrationEventId
+        ? { metaCompleteRegistrationEventId }
+        : {}),
+      ...(metaCheckoutEventId ? { metaCheckoutEventId } : {}),
       "Q. 전화번호": phone,
       "Q. 기대되는점": "",
       "[일일남매] 일정 선택": schedule,
