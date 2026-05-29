@@ -90,6 +90,7 @@ export function buildMetaPixelPageViewScript(pixelId: string) {
     'https://connect.facebook.net/en_US/fbevents.js');
     window.__ssobigMetaPixelIds = window.__ssobigMetaPixelIds || {};
     if (!window.__ssobigMetaPixelIds['${pixelId}']) {
+      fbq('set', 'autoConfig', false, '${pixelId}');
       fbq('init', '${pixelId}');
       window.__ssobigMetaPixelIds['${pixelId}'] = true;
     }

@@ -23,6 +23,7 @@ const SocialGeniusPage = () => {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('set', 'autoConfig', false, '681386597924392');
             fbq('init', '681386597924392');
             fbq('track', 'PageView');
           `,
