@@ -6,6 +6,7 @@ type PlayroomHeroActionsProps = {
   shareLabel: string;
   backLabel: string;
   title: string;
+  shareUrl?: string;
 };
 
 export default function PlayroomHeroActions({
@@ -14,11 +15,17 @@ export default function PlayroomHeroActions({
   shareLabel,
   backLabel,
   title,
+  shareUrl = "",
 }: PlayroomHeroActionsProps) {
   const iconColorClass = isDarkMode ? "text-white" : "text-[#111111]";
 
   async function handleShare() {
-    const url = window.location.href;
+    const rawUrl = String(shareUrl || "").trim();
+    const url = rawUrl
+      ? rawUrl.startsWith("/")
+        ? new URL(rawUrl, window.location.origin).toString()
+        : rawUrl
+      : window.location.href;
 
     try {
       if (navigator.share) {

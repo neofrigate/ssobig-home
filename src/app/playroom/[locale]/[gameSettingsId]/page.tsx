@@ -770,6 +770,20 @@ function hexToRgbaString(hex: string, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function getContrastingTextColor(hex: string) {
+  const text = String(hex || "").trim();
+  const normalized = text.startsWith("#") ? text.slice(1) : text;
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return "#FFFFFF";
+  }
+
+  const r = Number.parseInt(normalized.slice(0, 2), 16);
+  const g = Number.parseInt(normalized.slice(2, 4), 16);
+  const b = Number.parseInt(normalized.slice(4, 6), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 160 ? "#111111" : "#FFFFFF";
+}
+
 function formatReviewDate(value: string) {
   if (!value) return "";
   const date = new Date(value);
@@ -1009,9 +1023,14 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
     reviewSummary.quadrant,
     item.locale || summaryItem?.locale || "ko_KR",
   );
+  const ctaHref =
+    pickTemplateString(item.destination_url, summaryItem?.destination_url) ||
+    backHref;
+  const ctaIsExternal = !ctaHref.startsWith("/");
+  const ctaTextColor = getContrastingTextColor(heroAccentColor);
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#ffffff_26%,#f8fafc_100%)]">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#ffffff_26%,#f8fafc_100%)] pb-[calc(env(safe-area-inset-bottom)+96px)] md:pb-[calc(env(safe-area-inset-bottom)+112px)]">
       <div className="mx-auto flex w-full max-w-[720px] flex-col gap-6 px-4 py-6 md:px-6 md:py-10">
         <section className="overflow-hidden rounded-[30px] bg-[#f8f8f8] shadow-[0_16px_40px_rgba(15,23,42,0.12)]">
           <div
@@ -1024,6 +1043,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
               shareLabel={dt.share}
               backLabel={dt.backToList}
               title={item.title}
+              shareUrl={ctaHref}
             />
 
             <div className="grid grid-cols-[123px_minmax(0,1fr)] gap-6 px-3">
@@ -1253,6 +1273,37 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
             </div>
           </div>
         </section>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4">
+        <div className="mx-auto w-full max-w-[720px] md:max-w-[600px]">
+          <a
+            href={ctaHref}
+            target={ctaIsExternal ? "_blank" : undefined}
+            rel={ctaIsExternal ? "noopener noreferrer" : undefined}
+            className="flex h-[56px] w-full items-center justify-center rounded-[100px] px-6 text-base font-bold transition-[filter,transform] md:text-lg md:hover:brightness-95"
+            style={{
+              backgroundColor: heroAccentColor,
+              color: ctaTextColor,
+            }}
+          >
+            게임하러 가기
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="ml-2 h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </a>
+        </div>
       </div>
     </main>
   );
