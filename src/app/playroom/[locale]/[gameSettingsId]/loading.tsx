@@ -1,137 +1,146 @@
 function SkeletonBlock({
   className,
 }: {
-  className: string;
+  className?: string;
 }) {
-  return <div className={`skeleton-shimmer rounded-2xl ${className}`} />;
+  return <div className={`skeleton-shimmer ${className || ""}`} />;
 }
 
-function NotebookRing() {
+function HeroMetaCard() {
   return (
-    <div className="h-7 w-4 rounded-r-full border-[3px] border-l-0 border-black/30 bg-white/80 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.7)] md:h-9 md:w-5" />
-  );
-}
-
-function DecorativeStar({ className }: { className: string }) {
-  return (
-    <div className={`pointer-events-none absolute ${className}`}>
-      <div className="relative h-7 w-7 opacity-50">
-        <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-black/35" />
-        <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-black/35" />
-        <div className="absolute left-1/2 top-1/2 h-full w-px -translate-x-1/2 -translate-y-1/2 rotate-45 bg-black/25" />
-        <div className="absolute left-1/2 top-1/2 h-full w-px -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-black/25" />
-      </div>
+    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center gap-1 rounded-[12px] bg-[#d9dce1] px-1 py-2">
+      <SkeletonBlock className="h-4 w-4 rounded-full" />
+      <SkeletonBlock className="h-3 w-8 rounded-full" />
     </div>
   );
 }
 
-function GridPaper({ className }: { className: string }) {
+function ReviewItemSkeleton() {
   return (
-    <div
-      className={`absolute ${className}`}
-      style={{
-        backgroundImage:
-          "linear-gradient(rgba(17,24,39,0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(17,24,39,0.14) 1px, transparent 1px)",
-        backgroundSize: "26px 26px",
-      }}
-    />
+    <article className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <SkeletonBlock className="h-8 w-8 shrink-0 rounded-full" />
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <SkeletonBlock className="h-4 w-16 rounded-full" />
+          <SkeletonBlock className="h-6 w-14 rounded-full" />
+        </div>
+        <SkeletonBlock className="h-5 w-5 rounded-full" />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <SkeletonBlock className="h-4 w-20 rounded-full" />
+        <SkeletonBlock className="h-4 w-16 rounded-full" />
+      </div>
+
+      <div className="space-y-2 pt-1">
+        <SkeletonBlock className="h-4 w-full rounded-full" />
+        <SkeletonBlock className="h-4 w-[92%] rounded-full" />
+      </div>
+    </article>
   );
 }
 
 export default function PlayroomGameDetailLoading() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#faf7ee_0%,#fffdfa_26%,#f8fafc_100%)]">
-      <GridPaper className="inset-0 opacity-90" />
-      <GridPaper className="right-0 top-0 h-40 w-44 rounded-bl-[36px] bg-black/6 opacity-70 md:h-52 md:w-72" />
-      <GridPaper className="bottom-0 left-0 h-24 w-36 rounded-tr-[28px] bg-black/6 opacity-70 md:h-32 md:w-52" />
-
-      <div className="pointer-events-none absolute left-6 top-8 hidden flex-col gap-4 md:flex">
-        {Array.from({ length: 7 }).map((_, index) => (
-          <NotebookRing key={`ring-${index}`} />
-        ))}
-      </div>
-
-      <DecorativeStar className="left-[32%] top-24 hidden md:block" />
-      <DecorativeStar className="right-[16%] top-40 hidden md:block" />
-
-      <div className="relative mx-auto flex w-full max-w-[1020px] flex-col gap-6 px-4 py-6 md:px-6 md:py-10">
-        <div className="flex items-center gap-3">
-          <SkeletonBlock className="h-10 w-36 rounded-full border border-white/80" />
-          <div className="h-4 w-4 rounded-full bg-[#f4d43d]/70 shadow-[0_0_0_6px_rgba(244,212,61,0.18)]" />
-        </div>
-
-        <section className="relative overflow-hidden rounded-[32px] border border-black/8 bg-[rgba(255,253,247,0.92)] shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
-          <div className="absolute left-1/2 top-5 h-5 w-20 -translate-x-1/2 rotate-[-7deg] rounded-sm bg-[#f1dfbb]/80 shadow-sm md:w-24" />
-          <div className="absolute left-[18%] top-[46%] h-4 w-14 rotate-[16deg] rounded-sm bg-[#efe4a8]/80 shadow-sm" />
-          <div className="absolute right-[14%] top-[18%] h-10 w-10 rounded-full border border-[#8ecf49]/55 bg-[#a6db63]/35" />
-
-          <div className="relative flex flex-col gap-7 p-5 md:flex-row md:items-start md:gap-8 md:p-8">
-            <div className="mx-auto w-full max-w-[270px] md:mx-0 md:w-[240px]">
-              <div className="relative rotate-[-3deg] rounded-[28px] bg-white p-3 shadow-[0_20px_40px_rgba(15,23,42,0.10)]">
-                <div className="absolute left-7 top-[-10px] h-5 w-16 rotate-[-8deg] rounded-sm bg-[#efe4c4]/85 shadow-sm" />
-                <div className="absolute right-7 top-[-8px] h-5 w-14 rotate-[9deg] rounded-sm bg-[#efe4c4]/75 shadow-sm" />
-                <div className="relative aspect-[3/4] overflow-hidden rounded-[20px] bg-slate-100">
-                  <div className="skeleton-shimmer h-full w-full" />
-                </div>
-                <div className="mt-4 space-y-3 px-1 pb-1">
-                  <SkeletonBlock className="h-4 w-24 rounded-full" />
-                  <SkeletonBlock className="h-8 w-40" />
-                </div>
-              </div>
+    <main className="min-h-screen bg-[linear-gradient(180deg,#fbfbfb_0%,#ffffff_26%,#f3f4f6_100%)] pb-[calc(env(safe-area-inset-bottom)+96px)] md:pb-[calc(env(safe-area-inset-bottom)+112px)]">
+      <div className="mx-auto flex w-full max-w-[720px] flex-col gap-6 px-4 py-6 md:px-6 md:py-10">
+        <section className="overflow-hidden rounded-[30px] bg-[#f8f8f8] shadow-[0_16px_40px_rgba(15,23,42,0.12)]">
+          <div className="bg-[linear-gradient(180deg,rgba(236,239,243,0.96),rgba(246,247,249,0.98))] p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <SkeletonBlock className="h-6 w-6 rounded-full" />
+              <SkeletonBlock className="h-6 w-6 rounded-full" />
             </div>
 
-            <div className="flex-1 pt-1">
-              <div className="mb-4 flex flex-wrap gap-2">
-                <SkeletonBlock className="h-8 w-28 rounded-full" />
-                <SkeletonBlock className="h-8 w-24 rounded-full" />
-              </div>
+            <div className="grid grid-cols-[123px_minmax(0,1fr)] gap-6 px-3">
+              <SkeletonBlock className="h-[173px] w-[123px] rounded-[12px]" />
 
-              <div className="space-y-3">
-                <SkeletonBlock className="h-6 w-28 rounded-full" />
-                <SkeletonBlock className="h-14 w-[78%] max-w-[500px] rounded-[28px]" />
-                <SkeletonBlock className="h-6 w-full max-w-[600px]" />
-                <SkeletonBlock className="h-6 w-[92%] max-w-[560px]" />
-                <SkeletonBlock className="h-6 w-[72%] max-w-[430px]" />
-              </div>
+              <div className="flex min-h-[173px] flex-col">
+                <div className="flex flex-1 flex-col gap-[10px] py-3">
+                  <SkeletonBlock className="h-9 w-[68%] rounded-[12px]" />
+                  <SkeletonBlock className="h-6 w-24 rounded-full" />
+                </div>
 
-              <div className="mt-7 flex items-center gap-4">
-                <SkeletonBlock className="h-12 w-40 rounded-full" />
-                <div className="h-12 w-12 rounded-full border border-pink-300/50 bg-pink-200/20" />
+                <div className="mt-auto flex items-center gap-3">
+                  <HeroMetaCard />
+                  <HeroMetaCard />
+                  <HeroMetaCard />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-black/8 bg-white/45 p-5 md:p-8">
-            <div className="mb-5 flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full border border-black/10 bg-[#f5ca4d]/30" />
-              <SkeletonBlock className="h-6 w-44 rounded-full" />
-            </div>
+          <div className="bg-[#f8f8f8]">
+            <div className="flex flex-col gap-2">
+              <section className="bg-white p-5">
+                <SkeletonBlock className="mb-3 h-4 w-28 rounded-full" />
+                <div className="grid grid-cols-[minmax(0,1fr)_142px] gap-[10px]">
+                  <div className="flex min-w-0 flex-col justify-center gap-2">
+                    <SkeletonBlock className="h-6 w-[86%] rounded-full" />
+                    <SkeletonBlock className="h-6 w-[72%] rounded-full" />
+                    <SkeletonBlock className="h-4 w-[78%] rounded-full" />
+                    <SkeletonBlock className="h-4 w-[70%] rounded-full" />
+                  </div>
 
-            <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="rounded-[26px] bg-white/75 p-4 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+                  <div className="flex items-center justify-center">
+                    <div className="flex h-[130px] w-[142px] items-center justify-center">
+                      <div className="relative h-[92px] w-[92px] rounded-[4px] bg-[#f2f3f5]">
+                        <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[#d7d7d7]" />
+                        <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[#d7d7d7]" />
+                        <SkeletonBlock className="absolute left-[58%] top-[24%] h-3 w-3 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="bg-white p-5">
                 <div className="space-y-3">
-                  <SkeletonBlock className="h-5 w-full" />
-                  <SkeletonBlock className="h-5 w-[96%]" />
-                  <SkeletonBlock className="h-5 w-[92%]" />
-                  <SkeletonBlock className="h-5 w-[78%]" />
+                  <SkeletonBlock className="h-5 w-24 rounded-full" />
+                  <SkeletonBlock className="h-4 w-full rounded-full" />
+                  <SkeletonBlock className="h-4 w-[96%] rounded-full" />
+                  <SkeletonBlock className="h-4 w-[92%] rounded-full" />
+                  <SkeletonBlock className="h-4 w-[84%] rounded-full" />
+                  <SkeletonBlock className="h-4 w-[88%] rounded-full" />
+                  <SkeletonBlock className="h-4 w-[80%] rounded-full" />
                 </div>
-              </div>
+              </section>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                <div className="rotate-[-2deg] rounded-[24px] bg-white/80 p-3 shadow-[0_12px_28px_rgba(15,23,42,0.08)]">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-[18px] bg-slate-100">
-                    <div className="skeleton-shimmer h-full w-full" />
+              <section className="bg-white p-5">
+                <div className="flex flex-col gap-8">
+                  <div className="flex items-center justify-center gap-3 py-3">
+                    <SkeletonBlock className="h-10 w-28 rounded-full" />
+                    <div className="flex min-w-0 flex-1 flex-col items-start gap-[10px]">
+                      <div className="flex w-full items-center gap-[10px]">
+                        <SkeletonBlock className="h-5 w-5 rounded-full" />
+                        <SkeletonBlock className="h-[6px] flex-1 rounded-full" />
+                      </div>
+                      <div className="flex w-full items-center gap-[10px]">
+                        <SkeletonBlock className="h-5 w-5 rounded-full" />
+                        <SkeletonBlock className="h-[6px] flex-1 rounded-full" />
+                      </div>
+                      <div className="flex w-full items-center gap-[10px]">
+                        <SkeletonBlock className="h-5 w-5 rounded-full" />
+                        <SkeletonBlock className="h-[6px] flex-1 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-8 px-1">
+                    <ReviewItemSkeleton />
+                    <ReviewItemSkeleton />
+                    <ReviewItemSkeleton />
                   </div>
                 </div>
-                <div className="rotate-[1.5deg] rounded-[24px] bg-white/80 p-3 shadow-[0_12px_28px_rgba(15,23,42,0.08)]">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-[18px] bg-slate-100">
-                    <div className="skeleton-shimmer h-full w-full" />
-                  </div>
-                </div>
-              </div>
+              </section>
             </div>
           </div>
         </section>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4">
+        <div className="mx-auto w-full max-w-[720px] md:max-w-[600px]">
+          <SkeletonBlock className="h-[56px] w-full rounded-[100px]" />
+        </div>
       </div>
     </main>
   );

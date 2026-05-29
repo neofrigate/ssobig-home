@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:mobile": "next dev --turbopack -H 0.0.0.0",
+    "dev:stable": "next dev -H 127.0.0.1 -p 3000",
+    "dev:stable:reset": "rm -rf .next && next dev -H 127.0.0.1 -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
