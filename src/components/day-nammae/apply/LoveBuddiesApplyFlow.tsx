@@ -34,7 +34,11 @@ import {
   DayNammeFormValues,
   ScheduleItem,
 } from "@/features/day-nammae/types";
-import { safeFbq } from "@/utils/metaPixel";
+import {
+  buildDayNammaeMetaEventId,
+  safeFbq,
+  trackDayNammaeMetaStandardEvent,
+} from "@/utils/metaPixel";
 import { trackGAEvent } from "@/utils/gtag";
 import { getSafeSearchParams } from "@/utils/utm";
 import ApplyStepShell from "./ApplyStepShell";
@@ -49,16 +53,6 @@ import StepWaitlistContact from "./steps/StepWaitlistContact";
 
 function trackEvent(eventName: string, params?: Record<string, unknown>) {
   safeFbq("trackCustom", eventName, params);
-}
-
-function trackCompleteRegistration() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  safeFbq("track", "CompleteRegistration", {
-    content_name: "일일남매",
-  });
 }
 
 function toAnalyticsBoolean(value: boolean | null) {
@@ -194,6 +188,7 @@ interface CheckoutState {
   finalPrice: number;
   couponLabel: string;
   isDiscounted: boolean;
+  metaCheckoutEventId: string;
 }
 
 interface SubmitState {
@@ -1567,7 +1562,8 @@ function formatPrice(value: number) {
 
 function buildCheckoutState(
   scheduleLabel: string,
-  coupon?: Partial<CouponValidationResult & CouponUseResult> | null
+  coupon?: Partial<CouponValidationResult & CouponUseResult> | null,
+  clientRequestId = ""
 ): CheckoutState {
   const discountRate = getCouponDiscountRate(coupon);
   const normalLink =
@@ -1607,6 +1603,10 @@ function buildCheckoutState(
     finalPrice,
     couponLabel: coupon?.discount_label || "",
     isDiscounted,
+    metaCheckoutEventId: buildDayNammaeMetaEventId(
+      "InitiateCheckout",
+      clientRequestId || `${scheduleLabel}:${Date.now()}`
+    ),
   };
 }
 
@@ -2612,6 +2612,14 @@ export default function LoveBuddiesApplyFlow({
     setFormError("");
 
     const clientRequestId = createClientRequestId();
+    const completeRegistrationEventId = buildDayNammaeMetaEventId(
+      "CompleteRegistration",
+      clientRequestId
+    );
+    const checkoutEventId = buildDayNammaeMetaEventId(
+      "InitiateCheckout",
+      clientRequestId
+    );
     const clientDebugContext = buildClientDebugContext(formValues.photo, clientRequestId);
     let submitStage = submitState.applicationSubmitted
       ? "client:coupon-use:retry"
@@ -2659,6 +2667,11 @@ export default function LoveBuddiesApplyFlow({
           requestBody.append("fbc", fbc);
         }
         requestBody.append("client_request_id", clientRequestId);
+        requestBody.append(
+          "meta_complete_registration_event_id",
+          completeRegistrationEventId
+        );
+        requestBody.append("meta_checkout_event_id", checkoutEventId);
         if (wantsCoupon && validatedCoupon) {
           requestBody.append("usedCouponId", String(validatedCoupon.id));
           requestBody.append("couponCode", validatedCoupon.code);
@@ -2729,7 +2742,13 @@ export default function LoveBuddiesApplyFlow({
           result: "success",
           application_submitted: "true",
         });
-        trackCompleteRegistration();
+        trackDayNammaeMetaStandardEvent("CompleteRegistration", {
+          value: BASE_PRICE,
+          eventId: completeRegistrationEventId,
+          schedule: formValues.schedule,
+          couponApplied: wantsCoupon,
+          couponLabel: validatedCoupon?.discount_label,
+        });
       }
 
       let checkoutSource: Partial<CouponValidationResult & CouponUseResult> | null = null;
@@ -2781,7 +2800,11 @@ export default function LoveBuddiesApplyFlow({
         return;
       }
 
-      const checkout = buildCheckoutState(formValues.schedule, checkoutSource);
+      const checkout = buildCheckoutState(
+        formValues.schedule,
+        checkoutSource,
+        clientRequestId
+      );
       trackApplyAnalyticsEvent("dn_checkout_ready", {
         result: "success",
         payment_required: "true",
@@ -3210,10 +3233,12 @@ export default function LoveBuddiesApplyFlow({
               coupon_applied: checkout.isDiscounted,
               coupon_label: checkout.couponLabel,
             });
-            safeFbq("track", "InitiateCheckout", {
+            trackDayNammaeMetaStandardEvent("InitiateCheckout", {
               value: checkout.value,
-              currency: "KRW",
-              content_name: "일일남매",
+              eventId: checkout.metaCheckoutEventId,
+              schedule: formValues.schedule,
+              couponApplied: checkout.isDiscounted,
+              couponLabel: checkout.couponLabel,
             });
           }}
           className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98]"
