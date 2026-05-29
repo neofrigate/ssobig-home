@@ -36,7 +36,6 @@ import {
 } from "@/features/day-nammae/types";
 import {
   buildDayNammaeMetaEventId,
-  safeFbq,
   trackDayNammaeMetaStandardEvent,
 } from "@/utils/metaPixel";
 import { trackGAEvent } from "@/utils/gtag";
@@ -52,7 +51,8 @@ import StepSchedule from "./steps/StepSchedule";
 import StepWaitlistContact from "./steps/StepWaitlistContact";
 
 function trackEvent(eventName: string, params?: Record<string, unknown>) {
-  safeFbq("trackCustom", eventName, params);
+  void eventName;
+  void params;
 }
 
 function toAnalyticsBoolean(value: boolean | null) {
