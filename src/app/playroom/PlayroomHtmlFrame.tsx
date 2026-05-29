@@ -19,9 +19,11 @@ function buildSrcDoc(html: string, messageKey: string) {
         margin: 0;
         padding: 0;
         background: transparent;
+        overflow: hidden;
       }
       body {
         overflow-x: hidden;
+        overflow-y: hidden;
       }
     </style>
   </head>
@@ -92,6 +94,7 @@ export default function PlayroomHtmlFrame({
       title={title}
       srcDoc={srcDoc}
       sandbox="allow-scripts"
+      scrolling="no"
       className="block w-full overflow-hidden border-0 bg-transparent"
       style={{ height }}
     />

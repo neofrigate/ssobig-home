@@ -8,6 +8,7 @@ import {
   buildPlayroomTemplateDetailApiUrl,
   type PlayroomTemplateApiItem,
 } from "@/app/playroom/playroomApi";
+import { getPlayroomTemplateAssetOverride } from "@/app/playroom/playroomTemplateAssets";
 import {
   localeToCanonicalPath,
   normalizePlayroomSiteLocale,
@@ -104,6 +105,8 @@ type ReviewRecord = {
   sent_time?: string | null;
   nickname?: string | null;
   additional_comment?: string | null;
+  recommendation_target?: string | null;
+  charm_point?: string | null;
 };
 
 type PlayroomReviewItem = {
@@ -120,6 +123,27 @@ type PlayroomReviewSummary = {
   okayCount: number;
   notForMeCount: number;
   reviews: PlayroomReviewItem[];
+  quadrant: {
+    x: number | null;
+    y: number | null;
+    hasX: boolean;
+    hasY: boolean;
+    recommendationTop: string | null;
+    charmTop: string | null;
+  };
+};
+
+type RecommendationQuadrantKey =
+  | "beginner-immersion"
+  | "beginner-deduction"
+  | "experienced-immersion"
+  | "experienced-deduction";
+
+type PlayroomTemplateAssets = {
+  posterImageUrl: string;
+  backgroundImageUrl: string;
+  logoImageUrl: string;
+  themeColor: string | number | null;
 };
 
 async function fetchPlayroomTemplateDetail(
@@ -188,6 +212,65 @@ function resolvePlayroomAssetUrl(value?: string | null) {
 
 function getTemplateGame(item?: PlayroomTemplateApiItem | null) {
   return item?.game && typeof item.game === "object" ? item.game : {};
+}
+
+function getToolTemplateAssets(
+  summary: PlayroomTemplateApiItem | null = null,
+  item: PlayroomTemplateApiItem | null = null,
+): PlayroomTemplateAssets {
+  const game = getTemplateGame(item);
+  const summaryGame = getTemplateGame(summary);
+  const override = getPlayroomTemplateAssetOverride(item?.title, summary?.title);
+
+  return {
+    posterImageUrl: pickTemplateString(
+      game.imageUrl,
+      item?.imageUrl,
+      summaryGame.imageUrl,
+      summary?.imageUrl,
+      item?.card_image_url,
+      summary?.card_image_url,
+      override?.posterImageUrl,
+    ),
+    backgroundImageUrl: pickTemplateString(
+      game.backgroundImageUrl,
+      item?.backgroundImageUrl,
+      summaryGame.backgroundImageUrl,
+      summary?.backgroundImageUrl,
+      override?.backgroundImageUrl,
+    ),
+    logoImageUrl: pickTemplateString(
+      game.logoImageUrl,
+      item?.logoImageUrl,
+      summaryGame.logoImageUrl,
+      summary?.logoImageUrl,
+      override?.logoImageUrl,
+    ),
+    themeColor:
+      game.themeColor ??
+      item?.themeColor ??
+      summaryGame.themeColor ??
+      summary?.themeColor ??
+      override?.themeColor ??
+      null,
+  };
+}
+
+function toolTemplateIsDarkMode(
+  summary: PlayroomTemplateApiItem | null = null,
+  item: PlayroomTemplateApiItem | null = null,
+) {
+  const game = getTemplateGame(item);
+  const summaryGame = getTemplateGame(summary);
+  const override = getPlayroomTemplateAssetOverride(item?.title, summary?.title);
+
+  return (
+    item?.isDarkMode === true ||
+    game.isDarkMode === true ||
+    summary?.isDarkMode === true ||
+    summaryGame.isDarkMode === true ||
+    override?.isDarkMode === true
+  );
 }
 
 function pickTemplateString(...values: Array<string | null | undefined>) {
@@ -377,6 +460,48 @@ function normalizeComment(value?: string | null) {
   return trimmed;
 }
 
+function normalizeReviewDistributionValue(
+  value: string | null | undefined,
+  kind: "recommendation" | "charm",
+) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  if (kind === "recommendation") {
+    if (text.includes("입문")) return "입문자";
+    if (text.includes("경험")) return "경험자";
+    if (text.includes("고인물")) return "고인물";
+    return "";
+  }
+
+  if (text.includes("몰입") || text.includes("연기") || text.includes("대화")) {
+    return "몰입";
+  }
+  if (text.includes("추리") || text.includes("단서") || text.includes("범인")) {
+    return "추리";
+  }
+  return "";
+}
+
+function buildReviewCountMap(
+  rows: ReviewRecord[],
+  key: "recommendation_target" | "charm_point",
+  kind: "recommendation" | "charm",
+) {
+  const raw: Record<string, number> = {};
+  for (const row of rows) {
+    const normalized = normalizeReviewDistributionValue(row[key], kind);
+    if (!normalized) continue;
+    raw[normalized] = (raw[normalized] || 0) + 1;
+  }
+  return raw;
+}
+
+function getTopCountLabel(raw: Record<string, number>) {
+  const entries = Object.entries(raw).sort((a, b) => b[1] - a[1]);
+  return entries.length ? entries[0][0] : null;
+}
+
 async function fetchPlayroomReviewSummary(
   templateId: string,
 ): Promise<PlayroomReviewSummary> {
@@ -388,12 +513,20 @@ async function fetchPlayroomReviewSummary(
       okayCount: 0,
       notForMeCount: 0,
       reviews: [],
+      quadrant: {
+        x: null,
+        y: null,
+        hasX: false,
+        hasY: false,
+        recommendationTop: null,
+        charmTop: null,
+      },
     };
   }
 
   const response = await fetch(
     buildSupabaseUrl(
-      `/rest/v1/reviews?template_id=eq.${encodeURIComponent(templateId)}&select=satisfaction,sent_time,nickname,additional_comment&order=sent_time.desc`
+      `/rest/v1/reviews?template_id=eq.${encodeURIComponent(templateId)}&select=satisfaction,sent_time,nickname,additional_comment,recommendation_target,charm_point&order=sent_time.desc`
     ),
     {
       headers: QUALITY_SB_HEADERS,
@@ -409,6 +542,14 @@ async function fetchPlayroomReviewSummary(
       okayCount: 0,
       notForMeCount: 0,
       reviews: [],
+      quadrant: {
+        x: null,
+        y: null,
+        hasX: false,
+        hasY: false,
+        recommendationTop: null,
+        charmTop: null,
+      },
     };
   }
 
@@ -437,6 +578,25 @@ async function fetchPlayroomReviewSummary(
     .filter((record) => record.comment)
     .slice(0, 8);
 
+  const recommendationRaw = buildReviewCountMap(
+    records,
+    "recommendation_target",
+    "recommendation",
+  );
+  const charmRaw = buildReviewCountMap(records, "charm_point", "charm");
+  const beginnerCount = recommendationRaw["입문자"] || 0;
+  const experiencedCount = recommendationRaw["경험자"] || 0;
+  const veteranCount = recommendationRaw["고인물"] || 0;
+  const recommendationTotal = beginnerCount + experiencedCount + veteranCount;
+  const recommendationScore = recommendationTotal
+    ? (beginnerCount * 0 + experiencedCount * 3 + veteranCount * 5) /
+      recommendationTotal
+    : null;
+  const immersiveCount = charmRaw["몰입"] || 0;
+  const mysteryCount = charmRaw["추리"] || 0;
+  const charmTotal = immersiveCount + mysteryCount;
+  const charmRatio = charmTotal ? immersiveCount / charmTotal : null;
+
   const rating = validScores.length
     ? Number(
         (
@@ -453,6 +613,17 @@ async function fetchPlayroomReviewSummary(
     okayCount,
     notForMeCount,
     reviews,
+    quadrant: {
+      x:
+        recommendationScore == null
+          ? null
+          : Number((recommendationScore / 5).toFixed(3)),
+      y: charmRatio == null ? null : Number(charmRatio.toFixed(3)),
+      hasX: recommendationScore != null,
+      hasY: charmRatio != null,
+      recommendationTop: getTopCountLabel(recommendationRaw),
+      charmTop: getTopCountLabel(charmRaw),
+    },
   };
 }
 
@@ -482,6 +653,123 @@ function buildPercent(count: number, total: number) {
   return Math.round((count / total) * 100);
 }
 
+function previewLocaleGroup(locale: string) {
+  const text = String(locale || "").trim();
+  if (text === "ja_JP" || /^ja(?:[_-]|$)/i.test(text)) return "ja";
+  if (text === "en_US" || /^en(?:[_-]|$)/i.test(text)) return "en";
+  if (text === "zh_CN" || /^zh(?:[_-]|$)/i.test(text)) return "zh";
+  return "ko";
+}
+
+function getRecommendationCopy(locale: string) {
+  const group = previewLocaleGroup(locale);
+  const axis = {
+    ko: { experienced: "경험자", beginner: "입문자", immersion: "몰입", deduction: "추리" },
+    ja: { experienced: "経験者", beginner: "初心者", immersion: "没入", deduction: "推理" },
+    en: { experienced: "Experienced", beginner: "Beginner", immersion: "Immersion", deduction: "Deduction" },
+    zh: { experienced: "熟练者", beginner: "新手", immersion: "沉浸", deduction: "推理" },
+  };
+  const response = {
+    ko: (count: number) => `${count}명이 응답했어요!`,
+    ja: (count: number) => `${count}人が回答しました！`,
+    en: (count: number) => `${count} players responded!`,
+    zh: (count: number) => `已有${count}人参与回答！`,
+  };
+  const narratives: Record<string, Record<RecommendationQuadrantKey, { headline: string; lines: string[] }>> = {
+    ko: {
+      "beginner-immersion": {
+        headline: "순수 몰입러에게 추천한대요!",
+        lines: ["입문하기 좋은 작품이에요!", "서사에 몰입하기 좋은 작품이에요!"],
+      },
+      "beginner-deduction": {
+        headline: "추리 입문자에게 추천한대요!",
+        lines: ["입문하기 좋은 작품이에요!", "단서로 추리하는 재미가 있는 작품이에요!"],
+      },
+      "experienced-immersion": {
+        headline: "몰입 마니아에게 추천한대요!",
+        lines: ["경험자가 플레이하기 좋은 작품이에요!", "서사에 몰입하기 좋은 작품이에요!"],
+      },
+      "experienced-deduction": {
+        headline: "추리 경험자에게 추천한대요!",
+        lines: ["경험자가 플레이하기 좋은 작품이에요!", "치밀한 추리가 필요한 작품이에요!"],
+      },
+    },
+    ja: {
+      "beginner-immersion": {
+        headline: "没入好きの初心者に\nおすすめです！",
+        lines: ["初めてでも遊びやすい\n作品です！", "物語への没入感を\n楽しみやすい作品です！"],
+      },
+      "beginner-deduction": {
+        headline: "推理好きの初心者に\nおすすめです！",
+        lines: ["初めてでも遊びやすい\n作品です！", "手がかりをたどる推理の\n面白さがある作品です！"],
+      },
+      "experienced-immersion": {
+        headline: "没入好きの経験者に\nおすすめです！",
+        lines: ["経験者が遊びやすい\n作品です！", "物語への没入感を\n楽しみやすい作品です！"],
+      },
+      "experienced-deduction": {
+        headline: "推理好きの経験者に\nおすすめです！",
+        lines: ["経験者が遊びやすい\n作品です！", "緻密な推理を\n楽しめる作品です！"],
+      },
+    },
+    en: {
+      "beginner-immersion": {
+        headline: "Recommended for beginner immersion fans!",
+        lines: ["A great pick for first-time players!", "A great pick if you love immersive storytelling!"],
+      },
+      "beginner-deduction": {
+        headline: "Recommended for beginner sleuths!",
+        lines: ["A great pick for first-time players!", "A great pick if you enjoy clue-based deduction!"],
+      },
+      "experienced-immersion": {
+        headline: "Recommended for immersion enthusiasts!",
+        lines: ["A strong fit for experienced players!", "A great pick if you love immersive storytelling!"],
+      },
+      "experienced-deduction": {
+        headline: "Recommended for experienced detectives!",
+        lines: ["A strong fit for experienced players!", "A great pick if you enjoy intricate deduction!"],
+      },
+    },
+    zh: {
+      "beginner-immersion": {
+        headline: "推荐给沉浸向新手！",
+        lines: ["对新手也很友好！", "很适合享受剧情沉浸感的作品！"],
+      },
+      "beginner-deduction": {
+        headline: "推荐给推理向新手！",
+        lines: ["对新手也很友好！", "很适合享受线索推理乐趣的作品！"],
+      },
+      "experienced-immersion": {
+        headline: "推荐给沉浸向老手！",
+        lines: ["很适合有经验的玩家！", "很适合享受剧情沉浸感的作品！"],
+      },
+      "experienced-deduction": {
+        headline: "推荐给推理向老手！",
+        lines: ["很适合有经验的玩家！", "很适合体验缜密推理乐趣的作品！"],
+      },
+    },
+  };
+
+  return {
+    axis: axis[group] || axis.ko,
+    response: response[group] || response.ko,
+    narratives: narratives[group] || narratives.ko,
+  };
+}
+
+function hexToRgbaString(hex: string, alpha = 1) {
+  const text = String(hex || "").trim();
+  const normalized = text.startsWith("#") ? text.slice(1) : text;
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return `rgba(0, 151, 136, ${alpha})`;
+  }
+
+  const r = Number.parseInt(normalized.slice(0, 2), 16);
+  const g = Number.parseInt(normalized.slice(2, 4), 16);
+  const b = Number.parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function formatReviewDate(value: string) {
   if (!value) return "";
   const date = new Date(value);
@@ -492,6 +780,64 @@ function formatReviewDate(value: string) {
   return `${year}.${month}.${day}`;
 }
 
+function inferAxisFromLabel(label: string | null | undefined, axis: "x" | "y") {
+  if (!label) return null;
+  if (axis === "x") {
+    if (label === "입문자") return 0.25;
+    if (label === "경험자" || label === "고인물") return 0.75;
+    return null;
+  }
+  if (label === "몰입") return 0.75;
+  if (label === "추리") return 0.25;
+  return null;
+}
+
+function resolveQuadrantPoint(quadrant: PlayroomReviewSummary["quadrant"]) {
+  const rawX =
+    quadrant.hasX && quadrant.x != null
+      ? Number(quadrant.x)
+      : inferAxisFromLabel(quadrant.recommendationTop, "x");
+  const rawY =
+    quadrant.hasY && quadrant.y != null
+      ? Number(quadrant.y)
+      : inferAxisFromLabel(quadrant.charmTop, "y");
+
+  if (rawX == null || rawY == null) {
+    return null;
+  }
+
+  return {
+    x: Math.max(0, Math.min(1, rawX || 0)),
+    y: Math.max(0, Math.min(1, rawY || 0)),
+  };
+}
+
+function buildQuadrantNarrative(
+  quadrant: PlayroomReviewSummary["quadrant"],
+  locale: string,
+) {
+  const copy = getRecommendationCopy(locale);
+  const point = resolveQuadrantPoint(quadrant);
+
+  if (!point) {
+    return copy.narratives["beginner-deduction"];
+  }
+
+  const isExperienced = point.x >= 0.5;
+  const isImmersion = point.y >= 0.5;
+
+  if (!isExperienced && isImmersion) {
+    return copy.narratives["beginner-immersion"];
+  }
+  if (!isExperienced && !isImmersion) {
+    return copy.narratives["beginner-deduction"];
+  }
+  if (isExperienced && isImmersion) {
+    return copy.narratives["experienced-immersion"];
+  }
+  return copy.narratives["experienced-deduction"];
+}
+
 function getSatisfactionMeta(
   label: PlayroomReviewItem["satisfactionLabel"],
   dt: (typeof DETAIL_UI_COPY)[PlayroomSiteLocale],
@@ -499,6 +845,89 @@ function getSatisfactionMeta(
   if (label === "excellent") return { emoji: "😍", text: dt.excellent };
   if (label === "notForMe") return { emoji: "🥲", text: dt.notForMe };
   return { emoji: "🙂", text: dt.okay };
+}
+
+function RecommendationQuadrantChart({
+  accentColor,
+  quadrant,
+  locale,
+}: {
+  accentColor: string;
+  quadrant: PlayroomReviewSummary["quadrant"];
+  locale: string;
+}) {
+  const axis = getRecommendationCopy(locale).axis;
+  const point = resolveQuadrantPoint(quadrant);
+  if (!point) {
+    return (
+      <div className="flex h-[130px] w-[142px] items-center justify-center text-center text-[12px] leading-[18px] text-[#94a3b8]">
+        추천 대상 데이터가
+        <br />
+        아직 부족해요.
+      </div>
+    );
+  }
+
+  const chartSize = 92;
+  const axisLeft = 42;
+  const axisBottom = 22;
+  const originX = axisLeft;
+  const originY = 8;
+  const half = chartSize / 2;
+  const inset = 6;
+  const markerX = originX + inset + (1 - point.y) * (chartSize - inset * 2);
+  const markerY = originY + inset + (1 - point.x) * (chartSize - inset * 2);
+  const highlightX = point.y >= 0.5 ? originX : originX + half;
+  const highlightY = point.x >= 0.5 ? originY : originY + half;
+
+  return (
+    <svg
+      viewBox="0 0 142 130"
+      className="h-[130px] w-[142px] shrink-0"
+      role="presentation"
+      focusable="false"
+    >
+      <rect x={originX} y={originY} width={chartSize} height={chartSize} rx="4" fill="#f8f8f8" />
+      <rect
+        x={highlightX}
+        y={highlightY}
+        width={half}
+        height={half}
+        fill={hexToRgbaString(accentColor, 0.14)}
+      />
+      <line
+        x1={originX + half}
+        y1={originY}
+        x2={originX + half}
+        y2={originY + chartSize}
+        stroke="rgba(0,0,0,0.2)"
+        strokeWidth="0.5"
+        strokeDasharray="4 4"
+      />
+      <line
+        x1={originX}
+        y1={originY + half}
+        x2={originX + chartSize}
+        y2={originY + half}
+        stroke="rgba(0,0,0,0.2)"
+        strokeWidth="0.5"
+        strokeDasharray="4 4"
+      />
+      <circle cx={markerX} cy={markerY} r="6" fill={accentColor} />
+      <text x={originX - 12} y={originY + 16} textAnchor="end" fontSize="10" fill="#767676">
+        {axis.experienced}
+      </text>
+      <text x={originX - 12} y={originY + chartSize - 8} textAnchor="end" fontSize="10" fill="#767676">
+        {axis.beginner}
+      </text>
+      <text x={originX} y={originY + chartSize + axisBottom - 2} textAnchor="start" fontSize="10" fill="#767676">
+        {axis.immersion}
+      </text>
+      <text x={originX + chartSize} y={originY + chartSize + axisBottom - 2} textAnchor="end" fontSize="10" fill="#767676">
+        {axis.deduction}
+      </text>
+    </svg>
+  );
 }
 
 export default async function PlayroomGameDetailPage({ params }: PageProps) {
@@ -519,8 +948,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
     item.ssobig_tool_template_id,
   );
   const reviewSummary = await fetchPlayroomReviewSummary(item.ssobig_tool_template_id);
-  const itemGame = getTemplateGame(item);
-  const summaryGame = getTemplateGame(summaryItem);
+  const assets = getToolTemplateAssets(summaryItem, item);
 
   const detailHtml = String(item.detail_description_html || "").trim();
   const detailText = String(
@@ -532,36 +960,11 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
   const shouldRenderHtml = detailFormat === "html" && detailHtml;
   const backHref = localeToCanonicalPath(normalizedLocale);
   const dt = DETAIL_UI_COPY[normalizedLocale];
-  const posterImageUrl = resolvePlayroomAssetUrl(
-    pickTemplateString(
-      itemGame.imageUrl,
-      item.imageUrl,
-      summaryGame.imageUrl,
-      summaryItem?.imageUrl,
-      item.card_image_url,
-    ),
-  );
-  const backgroundImageUrl = resolvePlayroomAssetUrl(
-    pickTemplateString(
-      itemGame.backgroundImageUrl,
-      item.backgroundImageUrl,
-      summaryGame.backgroundImageUrl,
-      summaryItem?.backgroundImageUrl,
-    ),
-  );
-  const themeColor = describeThemeColor(
-    itemGame.themeColor ??
-      item.themeColor ??
-      summaryGame.themeColor ??
-      summaryItem?.themeColor ??
-      null,
-  );
+  const posterImageUrl = resolvePlayroomAssetUrl(assets.posterImageUrl);
+  const backgroundImageUrl = resolvePlayroomAssetUrl(assets.backgroundImageUrl);
+  const themeColor = describeThemeColor(assets.themeColor);
   const heroAccentColor = themeColor.hex || "#009788";
-  const isDarkMode =
-    item.isDarkMode === true ||
-    itemGame.isDarkMode === true ||
-    summaryItem?.isDarkMode === true ||
-    summaryGame.isDarkMode === true;
+  const isDarkMode = toolTemplateIsDarkMode(summaryItem, item);
   const heroTextClass = isDarkMode ? "text-white" : "text-black";
   const heroOverlayColor = isDarkMode
     ? "rgba(0,0,0,0.6)"
@@ -599,6 +1002,12 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
   const notForMePercent = buildPercent(
     reviewSummary.notForMeCount,
     ratedResponseCount,
+  );
+  const accentTrackColor = hexToRgbaString(heroAccentColor, 0.14);
+  const recommendationCopy = getRecommendationCopy(item.locale || summaryItem?.locale || "ko_KR");
+  const recommendationNarrative = buildQuadrantNarrative(
+    reviewSummary.quadrant,
+    item.locale || summaryItem?.locale || "ko_KR",
   );
 
   return (
@@ -707,57 +1116,94 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          <div className="bg-white p-5 md:p-8">
-            {shouldRenderHtml ? (
-              <PlayroomHtmlFrame
-                html={detailHtml}
-                messageKey={`${normalizedLocale}:${gameSettingsId}`}
-                title={`${item.title} ${dt.detailSuffix}`}
-              />
-            ) : (
-              renderTextDescription(detailText)
-            )}
-
-            {ratedResponseCount > 0 ? (
-              <section className="-mx-5 mt-6 bg-[#f8f8f8] md:-mx-8 md:mt-8">
-                <div className="h-2 w-full bg-[#f8f8f8]" />
-                <div className="bg-white px-5 py-5 md:px-8 md:py-8">
-                  <div className="grid grid-cols-2 items-center gap-3 py-3">
-                    <div className="flex items-center justify-center gap-2 text-center">
-                      <span className="text-[32px] leading-[42px] text-[#f6b617]">⭐️</span>
-                      <span className="text-[32px] font-bold leading-[42px] tracking-[-0.05em] text-[#333333]">
-                        {reviewSummary.rating?.toFixed(1) || "-"}
-                      </span>
+          <div className="bg-[#f8f8f8]">
+            <div className="flex flex-col gap-2">
+              {reviewSummary.responseCount > 0 ? (
+                <section className="bg-white p-5">
+                  <p
+                    className="mb-3 text-[12px] font-semibold leading-[18px] tracking-[-0.025em]"
+                    style={{ color: heroAccentColor }}
+                  >
+                    {recommendationCopy.response(reviewSummary.responseCount)}
+                  </p>
+                  <div className="grid grid-cols-[minmax(0,1fr)_142px] gap-[10px]">
+                    <div className="flex min-w-0 flex-col justify-center gap-2 text-[#333333]">
+                      <h2 className="m-0 whitespace-pre-wrap text-[18px] font-semibold leading-[26px] tracking-[-0.025em]">
+                        {recommendationNarrative.headline}
+                      </h2>
+                      <div className="text-[14px] font-normal leading-[20px] tracking-[-0.025em]">
+                        {recommendationNarrative.lines.map((line) => (
+                          <p key={line} className="m-0">
+                            {line}
+                          </p>
+                        ))}
+                      </div>
                     </div>
-
-                    <div className="flex min-w-0 flex-col items-start">
-                      {[
-                        { emoji: "😍", percent: excellentPercent },
-                        { emoji: "🙂", percent: okayPercent },
-                        { emoji: "🥲", percent: notForMePercent },
-                      ].map((item) => (
-                        <div
-                          key={`${item.emoji}:${item.percent}`}
-                          className="flex w-full items-center gap-[10px] px-1 py-[2px]"
-                        >
-                          <span className="shrink-0 text-[18px] leading-[26px]">
-                            {item.emoji}
-                          </span>
-                          <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-full bg-[rgba(0,151,136,0.1)]">
-                            <div
-                              className="h-[6px] shrink-0 rounded-full bg-[#009788]"
-                              style={{ width: `${item.percent}%` }}
-                            />
-                            <div className="h-[6px] min-w-0 flex-1" />
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex items-center justify-center">
+                      <RecommendationQuadrantChart
+                        accentColor={heroAccentColor}
+                        quadrant={reviewSummary.quadrant}
+                        locale={item.locale || summaryItem?.locale || "ko_KR"}
+                      />
                     </div>
                   </div>
+                </section>
+              ) : null}
 
-                  <div className="mt-8">
+              <div className="bg-white p-5">
+                {shouldRenderHtml ? (
+                  <PlayroomHtmlFrame
+                    html={detailHtml}
+                    messageKey={`${normalizedLocale}:${gameSettingsId}`}
+                    title={`${item.title} ${dt.detailSuffix}`}
+                  />
+                ) : (
+                  renderTextDescription(detailText)
+                )}
+              </div>
+
+              {(ratedResponseCount > 0 || reviewSummary.reviews.length > 0) ? (
+                <section className="bg-white p-5">
+                  <div className="flex flex-col gap-8">
+                    {ratedResponseCount > 0 ? (
+                      <div className="flex items-center justify-center gap-3 py-3">
+                        <p className="min-w-0 flex-1 text-center text-[32px] font-bold leading-[42px] tracking-[-0.025em] text-[#333333]">
+                          ⭐️ {reviewSummary.rating?.toFixed(1) || "-"}
+                        </p>
+                        <div className="flex min-w-0 flex-1 flex-col items-start">
+                          {[
+                            { emoji: "😍", percent: excellentPercent },
+                            { emoji: "🙂", percent: okayPercent },
+                            { emoji: "🥲", percent: notForMePercent },
+                          ].map((item) => (
+                            <div
+                              key={`${item.emoji}:${item.percent}`}
+                              className="flex w-full items-center gap-[10px] px-1 py-[2px]"
+                            >
+                              <span className="shrink-0 text-[18px] leading-[26px]">
+                                {item.emoji}
+                              </span>
+                              <div
+                                className="flex min-w-0 flex-1 items-center overflow-hidden rounded-full"
+                                style={{ backgroundColor: accentTrackColor }}
+                              >
+                                <div
+                                  className="h-[6px] shrink-0 rounded-full"
+                                  style={{
+                                    backgroundColor: heroAccentColor,
+                                    width: `${item.percent}%`,
+                                  }}
+                                />
+                                <div className="h-[6px] min-w-0 flex-1" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
                     {reviewSummary.reviews.length > 0 ? (
-                      <div className="space-y-8">
+                      <div className="space-y-8 px-1">
                         {reviewSummary.reviews.map((review, index) => {
                           const meta = getSatisfactionMeta(
                             review.satisfactionLabel,
@@ -767,7 +1213,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
                           return (
                             <article
                               key={`${review.nickname}:${review.comment}:${index}`}
-                              className="flex flex-col gap-1 px-1"
+                              className="flex flex-col gap-1"
                             >
                               <div className="flex items-center gap-2">
                                 <div className="h-8 w-8 shrink-0 rounded-full bg-[#e8e8e8]" />
@@ -800,15 +1246,11 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
                           );
                         })}
                       </div>
-                    ) : (
-                      <p className="text-[14px] leading-5 text-[#767676]">
-                        {dt.noReviews}
-                      </p>
-                    )}
+                    ) : null}
                   </div>
-                </div>
-              </section>
-            ) : null}
+                </section>
+              ) : null}
+            </div>
           </div>
         </section>
       </div>
