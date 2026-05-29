@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import PlayroomHeroActions from "@/app/playroom/PlayroomHeroActions";
 import PlayroomHtmlFrame from "@/app/playroom/PlayroomHtmlFrame";
+import PlayroomReviewComment from "@/app/playroom/PlayroomReviewComment";
 import {
   buildPlayroomTemplatesApiUrl,
   buildPlayroomTemplateDetailApiUrl,
@@ -101,20 +102,30 @@ type PageProps = {
 };
 
 type ReviewRecord = {
+  id?: number | string | null;
   satisfaction?: string | null;
   sent_time?: string | null;
   nickname?: string | null;
   additional_comment?: string | null;
   recommendation_target?: string | null;
   charm_point?: string | null;
+  moderation_status?: string | null;
 };
 
 type PlayroomReviewItem = {
+  id: string;
   nickname: string;
   comment: string;
   satisfactionLabel: "excellent" | "okay" | "notForMe" | null;
   sentTime: string;
+  moderationStatus: TemplateReviewModerationStatus;
 };
+
+type TemplateReviewModerationStatus =
+  | "visible"
+  | "spoiler_hidden"
+  | "preview_hidden"
+  | "archived_abuse_spam";
 
 type PlayroomReviewSummary = {
   rating: number | null;
@@ -502,6 +513,34 @@ function getTopCountLabel(raw: Record<string, number>) {
   return entries.length ? entries[0][0] : null;
 }
 
+function normalizeTemplateReviewModerationStatus(
+  value: unknown,
+): TemplateReviewModerationStatus {
+  const status = String(value || "visible").trim();
+  if (
+    status === "visible" ||
+    status === "spoiler_hidden" ||
+    status === "preview_hidden" ||
+    status === "archived_abuse_spam"
+  ) {
+    return status;
+  }
+  return "visible";
+}
+
+function isTemplateReviewPreviewHidden(review: Pick<ReviewRecord, "moderation_status">) {
+  const status = normalizeTemplateReviewModerationStatus(
+    review?.moderation_status,
+  );
+  return status === "preview_hidden" || status === "archived_abuse_spam";
+}
+
+function isTemplateReviewSpoilerHidden(
+  review: Pick<PlayroomReviewItem, "moderationStatus">,
+) {
+  return review.moderationStatus === "spoiler_hidden";
+}
+
 async function fetchPlayroomReviewSummary(
   templateId: string,
 ): Promise<PlayroomReviewSummary> {
@@ -526,7 +565,7 @@ async function fetchPlayroomReviewSummary(
 
   const response = await fetch(
     buildSupabaseUrl(
-      `/rest/v1/reviews?template_id=eq.${encodeURIComponent(templateId)}&select=satisfaction,sent_time,nickname,additional_comment,recommendation_target,charm_point&order=sent_time.desc`
+      `/rest/v1/reviews?template_id=eq.${encodeURIComponent(templateId)}&select=id,satisfaction,sent_time,nickname,additional_comment,recommendation_target,charm_point,moderation_status&order=sent_time.desc`
     ),
     {
       headers: QUALITY_SB_HEADERS,
@@ -569,11 +608,16 @@ async function fetchPlayroomReviewSummary(
   ).length;
 
   const reviews = records
+    .filter((record) => !isTemplateReviewPreviewHidden(record))
     .map((record) => ({
+      id: String(record.id || `${record.nickname || "익명"}:${record.sent_time || ""}`),
       nickname: String(record.nickname || "익명").trim() || "익명",
       comment: normalizeComment(record.additional_comment),
       satisfactionLabel: simplifySatisfaction(record.satisfaction),
       sentTime: String(record.sent_time || "").trim(),
+      moderationStatus: normalizeTemplateReviewModerationStatus(
+        record.moderation_status,
+      ),
     }))
     .filter((record) => record.comment)
     .slice(0, 8);
@@ -1231,38 +1275,17 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
                           );
 
                           return (
-                            <article
-                              key={`${review.nickname}:${review.comment}:${index}`}
-                              className="flex flex-col gap-1"
-                            >
-                              <div className="flex items-center gap-2">
-                                <div className="h-8 w-8 shrink-0 rounded-full bg-[#e8e8e8]" />
-                                <div className="flex min-w-0 flex-1 items-center gap-2">
-                                  <span className="truncate text-[15px] font-light leading-[22px] tracking-[-0.025em] text-[#333333]">
-                                    {review.nickname}
-                                  </span>
-                                  <span className="shrink-0 rounded-full bg-[#f4f4f4] px-2 py-[2px] text-[13px] font-light leading-[18px] tracking-[-0.025em] text-[#767676]">
-                                    {dt.localeLabel}
-                                  </span>
-                                </div>
-                                <span className="ml-auto shrink-0 text-[18px] leading-none text-[#111111]">
-                                  ⋮
-                                </span>
-                              </div>
-
-                              <div className="flex flex-wrap items-center gap-2 text-[#767676]">
-                                <span className="text-[15px] font-normal leading-[22px] tracking-[-0.025em] text-[#111111]">
-                                  {meta.emoji} {meta.text}
-                                </span>
-                                <span className="text-[13px] font-light leading-[18px] tracking-[-0.025em]">
-                                  {formatReviewDate(review.sentTime)}
-                                </span>
-                              </div>
-
-                              <p className="whitespace-pre-wrap text-[14px] font-normal leading-[20px] tracking-[-0.025em] text-[#333333]">
-                                {review.comment}
-                              </p>
-                            </article>
+                            <PlayroomReviewComment
+                              key={`${review.id}:${index}`}
+                              nickname={review.nickname}
+                              localeLabel={dt.localeLabel}
+                              satisfactionText={meta.text}
+                              satisfactionEmoji={meta.emoji}
+                              dateLabel={formatReviewDate(review.sentTime)}
+                              comment={review.comment}
+                              spoilerHidden={isTemplateReviewSpoilerHidden(review)}
+                              accentColor={heroAccentColor}
+                            />
                           );
                         })}
                       </div>
