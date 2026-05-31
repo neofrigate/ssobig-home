@@ -365,15 +365,43 @@ export default function SurveyPageClient({
     form.improvementPoints.includes("기타") ||
     form.improvementPoints.includes(CONTENT_EXPLANATION_ISSUE_OPTION);
 
-  const canSubmit =
-    form.overallSatisfaction !== null &&
-    form.likedFactors.length > 0 &&
-    (!requiresLikedFactorOther || form.likedFactorOther.trim().length > 0) &&
-    form.improvementPoints.length > 0 &&
-    (!requiresImprovementPointOther ||
-      form.improvementPointOther.trim().length > 0) &&
-    form.futureSessionPreferences.length > 0 &&
-    !context?.alreadySubmitted;
+  const getSubmitValidationReasons = () => {
+    const reasons: string[] = [];
+
+    if (!context) {
+      reasons.push("설문 정보를 아직 불러오지 못했습니다.");
+    }
+
+    if (context?.alreadySubmitted) {
+      reasons.push("이미 제출된 설문입니다.");
+    }
+
+    if (form.overallSatisfaction === null) {
+      reasons.push("Q1 만족도를 선택해 주세요.");
+    }
+
+    if (form.likedFactors.length === 0) {
+      reasons.push("Q2 좋았던 콘텐츠를 1개 이상 선택해 주세요.");
+    }
+
+    if (requiresLikedFactorOther && !form.likedFactorOther.trim()) {
+      reasons.push("Q2 기타 내용을 적어 주세요.");
+    }
+
+    if (form.improvementPoints.length === 0) {
+      reasons.push("Q3 아쉽거나 개선되면 좋겠는 부분을 선택해 주세요.");
+    }
+
+    if (requiresImprovementPointOther && !form.improvementPointOther.trim()) {
+      reasons.push("Q3 선택 항목의 상세 내용을 적어 주세요.");
+    }
+
+    if (form.futureSessionPreferences.length === 0) {
+      reasons.push("Q4 다음에 끌리는 회차를 1개 이상 선택해 주세요.");
+    }
+
+    return reasons;
+  };
 
   const handleMultiSelect = (
     key: "likedFactors" | "improvementPoints" | "futureSessionPreferences",
@@ -420,12 +448,23 @@ export default function SurveyPageClient({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!context || !canSubmit || isSubmitting) {
+    if (isSubmitting) {
+      return;
+    }
+
+    setSubmitError("");
+    const validationReasons = getSubmitValidationReasons();
+
+    if (validationReasons.length > 0) {
+      setSubmitError(validationReasons.join("\n"));
+      return;
+    }
+
+    if (!context) {
       return;
     }
 
     setIsSubmitting(true);
-    setSubmitError("");
     const shouldShowReviewIncentive = isReviewIncentiveEligible(form);
 
     if (isDummySurvey) {
@@ -821,15 +860,15 @@ export default function SurveyPageClient({
             </Section>
 
             {submitError ? (
-              <div className="rounded-2xl border border-[#FF7A59]/25 bg-[#120C0A] px-4 py-3 text-sm text-[#FFD3C4]">
+              <div className="whitespace-pre-line rounded-2xl border border-[#FF7A59]/25 bg-[#120C0A] px-4 py-3 text-sm leading-6 text-[#FFD3C4]">
                 {submitError}
               </div>
             ) : null}
 
             <button
               type="submit"
-              disabled={!canSubmit || isSubmitting}
-              className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#FF7A59] px-6 text-base font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:bg-[#7F4A3A] disabled:text-white/55"
+              disabled={isSubmitting}
+              className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#FF7A59] px-6 text-base font-semibold text-white transition hover:brightness-105 disabled:cursor-wait disabled:bg-[#7F4A3A] disabled:text-white/70"
             >
               {isSubmitting ? "응답 제출 중..." : "설문 제출하기"}
             </button>
