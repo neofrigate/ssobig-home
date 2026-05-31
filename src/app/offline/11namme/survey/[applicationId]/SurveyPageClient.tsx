@@ -624,9 +624,6 @@ export default function SurveyPageClient({
                       커피 쿠폰 또는 일일남매 30% 할인 쿠폰을 보내드립니다.
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-[#FFD8CA] md:min-w-28 md:text-center">
-                    평균 7점 이상
-                  </div>
                 </div>
 
                 <div className="mt-6 grid gap-3 text-sm text-white/72 md:grid-cols-3">
