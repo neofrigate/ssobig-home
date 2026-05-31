@@ -20,34 +20,56 @@ type SurveySubmitResponse = {
 
 type FormState = {
   overallSatisfaction: number | null;
-  acquisitionChannels: string[];
-  acquisitionChannelEtc: string;
-  contentFlowScore: number | null;
-  recommendationScore: number | null;
-  recommendedTargets: string[];
-  recommendedTargetEtc: string;
-  freeText: string;
+  likedFactors: string[];
+  likedFactorOther: string;
+  improvementPoints: string[];
+  improvementPointOther: string;
+  futureSessionPreferences: string[];
+  friendIntroText: string;
+  finalOpinionText: string;
 };
 
 type SurveyPageClientProps = {
   surveyToken: string;
 };
 
-const ACQUISITION_CHANNEL_OPTIONS = [
-  "공식 인스타그램",
-  "광고",
-  "지인 추천",
-  "블로그·카페",
+const LIKED_FACTOR_OPTIONS = [
+  "현장 MC의 진행",
+  "AI 집사의 시스템 안내",
+  "서로 돌아가며 남매소개서를 말해주던 시간",
+  "첫인상 투표로 다른 사람이 보는 나를 알 수 있던 것",
+  "연애 가치관/밸런스를 통해 나와 잘 맞는 사람의 유사도를 볼 수 있었던 것",
+  "쪽지 미션으로 내 남매가 나를 어필해준 시간",
+  "QR 미션으로 궁금한 이성과 대화를 나누는 시간",
+  "최종 선택 및 매칭 결과 공개",
   "기타",
 ] as const;
 
-const RECOMMENDED_TARGET_OPTIONS = [
-  "새로운 친구를 사귀고 싶은 분",
-  "주말에 혼자 시간 보내기 심심한 분",
-  "이성/동성 친구를 만들고 싶은 분",
-  "색다른 경험을 해보고 싶은 분",
-  "사회생활 외 인간관계를 넓히고 싶은 분",
+const CONTENT_EXPLANATION_ISSUE_OPTION =
+  "콘텐츠 설명이 어려운 부분이 있었음";
+const NO_IMPROVEMENT_POINT_OPTION = "특별히 없음";
+const MAX_LIKED_FACTOR_SELECTIONS = 3;
+
+const IMPROVEMENT_POINT_OPTIONS = [
+  CONTENT_EXPLANATION_ISSUE_OPTION,
+  "테이블 대화 시간이 전반적으로 부족했음",
+  "쪽지 or QR미션 수행 방식이 어렵거나 부담스러웠음",
+  "참가자 연령대와 분위기가 생각과 달랐음",
+  "자리 이동 횟수가 적었음",
+  "공간이 불편했음",
+  NO_IMPROVEMENT_POINT_OPTION,
   "기타",
+] as const;
+
+const FUTURE_SESSION_OPTIONS = [
+  "비슷한 기본 일일남매",
+  "연령대가 더 비슷한 사람끼리 만나는 회차",
+  "관심사/취향 기반 회차",
+  "조금 더 소규모 회차",
+  "더 많은 사람을 만나는 회차",
+  "친구와 함께 참여 가능한 회차",
+  "가격 혜택이 있는 회차",
+  "아직 재참여 의향 없음",
 ] as const;
 
 const TEN_POINT_SCORE_VALUES = Array.from(
@@ -62,13 +84,13 @@ const REVIEW_SCREENSHOT_MESSAGE =
 
 const INITIAL_FORM_STATE: FormState = {
   overallSatisfaction: null,
-  acquisitionChannels: [],
-  acquisitionChannelEtc: "",
-  contentFlowScore: null,
-  recommendationScore: null,
-  recommendedTargets: [],
-  recommendedTargetEtc: "",
-  freeText: "",
+  likedFactors: [],
+  likedFactorOther: "",
+  improvementPoints: [],
+  improvementPointOther: "",
+  futureSessionPreferences: [],
+  friendIntroText: "",
+  finalOpinionText: "",
 };
 
 const DUMMY_SURVEY_TOKENS = new Set([
@@ -145,21 +167,39 @@ function toggleOption(currentValues: string[], option: string) {
     : [...currentValues, option];
 }
 
-function getReviewScoreAverage(form: FormState) {
-  const scores = [
-    form.overallSatisfaction,
-    form.contentFlowScore,
-    form.recommendationScore,
-  ];
-  const validScores = scores.filter((score): score is number => score !== null);
+function toggleLikedFactor(currentValues: string[], option: string) {
+  if (currentValues.includes(option)) {
+    return currentValues.filter((value) => value !== option);
+  }
 
-  if (validScores.length !== scores.length) {
+  if (currentValues.length >= MAX_LIKED_FACTOR_SELECTIONS) {
+    return currentValues;
+  }
+
+  return [...currentValues, option];
+}
+
+function toggleImprovementPoint(currentValues: string[], option: string) {
+  if (currentValues.includes(option)) {
+    return currentValues.filter((value) => value !== option);
+  }
+
+  if (option === NO_IMPROVEMENT_POINT_OPTION) {
+    return [NO_IMPROVEMENT_POINT_OPTION];
+  }
+
+  return [
+    ...currentValues.filter((value) => value !== NO_IMPROVEMENT_POINT_OPTION),
+    option,
+  ];
+}
+
+function getReviewScoreAverage(form: FormState) {
+  if (form.overallSatisfaction === null) {
     return null;
   }
 
-  return (
-    validScores.reduce((total, score) => total + score, 0) / validScores.length
-  );
+  return form.overallSatisfaction;
 }
 
 function isReviewIncentiveEligible(form: FormState) {
@@ -169,18 +209,21 @@ function isReviewIncentiveEligible(form: FormState) {
 
 function ChoiceChip({
   selected,
+  disabled = false,
   label,
   onClick,
 }: {
   selected: boolean;
+  disabled?: boolean;
   label: string;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={onClick}
-      className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${
+      className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-45 ${
         selected
           ? "border-[#FF7A59] bg-[#FF7A59] text-white shadow-[0_12px_30px_rgba(255,122,89,0.25)]"
           : "border-white/15 bg-white/[0.03] text-white/78 hover:border-white/30 hover:bg-white/[0.06]"
@@ -246,9 +289,11 @@ export default function SurveyPageClient({
   surveyToken,
 }: SurveyPageClientProps) {
   const isDummySurvey = isDummySurveyToken(surveyToken);
-  const [context, setContext] = useState<SurveyContext | null>(null);
+  const [context, setContext] = useState<SurveyContext | null>(
+    isDummySurvey ? DUMMY_SURVEY_CONTEXT : null
+  );
   const [form, setForm] = useState<FormState>(INITIAL_FORM_STATE);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!isDummySurvey);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [submitError, setSubmitError] = useState("");
@@ -315,42 +360,61 @@ export default function SurveyPageClient({
     context?.scheduleDateTime
   );
 
-  const requiresAcquisitionEtc = form.acquisitionChannels.includes("기타");
-  const requiresRecommendedTargetEtc = form.recommendedTargets.includes("기타");
+  const requiresLikedFactorOther = form.likedFactors.includes("기타");
+  const requiresImprovementPointOther =
+    form.improvementPoints.includes("기타") ||
+    form.improvementPoints.includes(CONTENT_EXPLANATION_ISSUE_OPTION);
 
   const canSubmit =
     form.overallSatisfaction !== null &&
-    form.acquisitionChannels.length > 0 &&
-    (!requiresAcquisitionEtc || form.acquisitionChannelEtc.trim().length > 0) &&
-    form.contentFlowScore !== null &&
-    form.recommendationScore !== null &&
-    form.recommendedTargets.length > 0 &&
-    (!requiresRecommendedTargetEtc ||
-      form.recommendedTargetEtc.trim().length > 0) &&
+    form.likedFactors.length > 0 &&
+    (!requiresLikedFactorOther || form.likedFactorOther.trim().length > 0) &&
+    form.improvementPoints.length > 0 &&
+    (!requiresImprovementPointOther ||
+      form.improvementPointOther.trim().length > 0) &&
+    form.futureSessionPreferences.length > 0 &&
     !context?.alreadySubmitted;
 
   const handleMultiSelect = (
-    key: "acquisitionChannels" | "recommendedTargets",
+    key: "likedFactors" | "improvementPoints" | "futureSessionPreferences",
     option: string
   ) => {
-    setForm((current) => ({
-      ...current,
-      [key]: toggleOption(current[key], option),
-      ...(key === "acquisitionChannels" && option === "기타"
-        ? {
-            acquisitionChannelEtc: current[key].includes("기타")
-              ? ""
-              : current.acquisitionChannelEtc,
-          }
-        : {}),
-      ...(key === "recommendedTargets" && option === "기타"
-        ? {
-            recommendedTargetEtc: current[key].includes("기타")
-              ? ""
-              : current.recommendedTargetEtc,
-          }
-        : {}),
-    }));
+    setForm((current) => {
+      if (key === "likedFactors") {
+        const nextLikedFactors = toggleLikedFactor(current.likedFactors, option);
+
+        return {
+          ...current,
+          likedFactors: nextLikedFactors,
+          likedFactorOther: nextLikedFactors.includes("기타")
+            ? current.likedFactorOther
+            : "",
+        };
+      }
+
+      if (key === "improvementPoints") {
+        const nextImprovementPoints = toggleImprovementPoint(
+          current.improvementPoints,
+          option
+        );
+        const needsImprovementDetail =
+          nextImprovementPoints.includes("기타") ||
+          nextImprovementPoints.includes(CONTENT_EXPLANATION_ISSUE_OPTION);
+
+        return {
+          ...current,
+          improvementPoints: nextImprovementPoints,
+          improvementPointOther: needsImprovementDetail
+            ? current.improvementPointOther
+            : "",
+        };
+      }
+
+      return {
+        ...current,
+        [key]: toggleOption(current[key], option),
+      };
+    });
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -391,13 +455,13 @@ export default function SurveyPageClient({
           token: surveyToken,
           surveyScaleVersion: 2,
           overallSatisfaction: form.overallSatisfaction,
-          acquisitionChannels: form.acquisitionChannels,
-          acquisitionChannelEtc: form.acquisitionChannelEtc.trim() || null,
-          contentFlowScore: form.contentFlowScore,
-          recommendationScore: form.recommendationScore,
-          recommendedTargets: form.recommendedTargets,
-          recommendedTargetEtc: form.recommendedTargetEtc.trim() || null,
-          freeText: form.freeText.trim() || null,
+          likedFactors: form.likedFactors,
+          likedFactorOther: form.likedFactorOther.trim() || null,
+          improvementPoints: form.improvementPoints,
+          improvementPointOther: form.improvementPointOther.trim() || null,
+          futureSessionPreferences: form.futureSessionPreferences,
+          friendIntroText: form.friendIntroText.trim() || null,
+          finalOpinionText: form.finalOpinionText.trim() || null,
         }),
       });
 
@@ -608,7 +672,7 @@ export default function SurveyPageClient({
             <Section
               step="Q1"
               title="일일남매 경험에 전반적으로 얼마나 만족하셨나요?"
-              description="1점은 매우 불만족, 10점은 매우 만족입니다."
+              description="1점은 매우 아쉬움, 10점은 매우 만족입니다."
             >
               <div className="grid grid-cols-5 gap-3 md:grid-cols-10">
                 {TEN_POINT_SCORE_VALUES.map((value) => (
@@ -626,36 +690,43 @@ export default function SurveyPageClient({
                 ))}
               </div>
               <div className="mt-3 flex justify-between text-xs text-white/45">
-                <span>매우 불만족</span>
+                <span>매우 아쉬움</span>
                 <span>매우 만족</span>
               </div>
             </Section>
 
             <Section
               step="Q2"
-              title="일일남매를 어떤 경로로 알게 되셨나요?"
-              description="해당되는 항목을 모두 선택해 주세요."
+              title="오늘 콘텐츠 중 좋았던 건 무엇이었나요?"
+              description="1~3개까지 편하게 선택해 주세요!"
             >
               <div className="grid gap-3 md:grid-cols-2">
-                {ACQUISITION_CHANNEL_OPTIONS.map((option) => (
-                  <ChoiceChip
-                    key={option}
-                    label={option}
-                    selected={form.acquisitionChannels.includes(option)}
-                    onClick={() => handleMultiSelect("acquisitionChannels", option)}
-                  />
-                ))}
+                {LIKED_FACTOR_OPTIONS.map((option) => {
+                  const selected = form.likedFactors.includes(option);
+                  return (
+                    <ChoiceChip
+                      key={option}
+                      label={option}
+                      selected={selected}
+                      disabled={
+                        !selected &&
+                        form.likedFactors.length >= MAX_LIKED_FACTOR_SELECTIONS
+                      }
+                      onClick={() => handleMultiSelect("likedFactors", option)}
+                    />
+                  );
+                })}
               </div>
-              {requiresAcquisitionEtc ? (
+              {requiresLikedFactorOther ? (
                 <textarea
-                  value={form.acquisitionChannelEtc}
+                  value={form.likedFactorOther}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
-                      acquisitionChannelEtc: event.target.value,
+                      likedFactorOther: event.target.value,
                     }))
                   }
-                  placeholder="기타 경로를 적어 주세요"
+                  placeholder="좋았던 다른 순간이 있다면 적어 주세요"
                   className="mt-4 h-28 w-full rounded-2xl border border-white/12 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/28 focus:border-[#FF7A59]"
                 />
               ) : null}
@@ -663,100 +734,91 @@ export default function SurveyPageClient({
 
             <Section
               step="Q3"
-              title="콘텐츠의 전반적 흐름은 어떠셨했나요?"
-              description="1점은 매우 지루, 10점은 매우 흥미로움입니다."
+              title="아쉽거나 더 좋아지면 좋겠다고 느낀 부분"
+              description="없다면 '특별히 없음'을 선택해 주세요."
             >
-              <div className="grid grid-cols-5 gap-3 md:grid-cols-10">
-                {TEN_POINT_SCORE_VALUES.map((value) => (
-                  <ScoreButton
-                    key={value}
-                    value={value}
-                    selected={form.contentFlowScore === value}
-                    onClick={() =>
-                      setForm((current) => ({
-                        ...current,
-                        contentFlowScore: value,
-                      }))
-                    }
-                  />
-                ))}
-              </div>
-              <div className="mt-3 flex justify-between text-xs text-white/45">
-                <span>매우 지루</span>
-                <span>매우 흥미로움</span>
-              </div>
-            </Section>
-
-            <Section
-              step="Q4"
-              title="주변 지인에게 일일남매를 추천할 의향이 있으신가요?"
-              description="0점은 전혀 추천하지 않음, 10점은 적극 추천입니다."
-            >
-              <div className="grid grid-cols-6 gap-3 md:grid-cols-11">
-                {Array.from({ length: 11 }, (_, value) => (
-                  <ScoreButton
-                    key={value}
-                    value={value}
-                    selected={form.recommendationScore === value}
-                    onClick={() =>
-                      setForm((current) => ({
-                        ...current,
-                        recommendationScore: value,
-                      }))
-                    }
-                  />
-                ))}
-              </div>
-              <div className="mt-3 flex justify-between text-xs text-white/45">
-                <span>전혀 추천하지 않음</span>
-                <span>적극 추천</span>
-              </div>
-            </Section>
-
-            <Section
-              step="Q5"
-              title="일일남매를 어떤 분에게 추천하고 싶으신가요?"
-              description="해당되는 항목을 모두 선택해 주세요."
-            >
-              <div className="grid gap-3">
-                {RECOMMENDED_TARGET_OPTIONS.map((option) => (
+              <div className="grid gap-3 md:grid-cols-2">
+                {IMPROVEMENT_POINT_OPTIONS.map((option) => (
                   <ChoiceChip
                     key={option}
                     label={option}
-                    selected={form.recommendedTargets.includes(option)}
-                    onClick={() => handleMultiSelect("recommendedTargets", option)}
+                    selected={form.improvementPoints.includes(option)}
+                    onClick={() => handleMultiSelect("improvementPoints", option)}
                   />
                 ))}
               </div>
-              {requiresRecommendedTargetEtc ? (
+              {requiresImprovementPointOther ? (
                 <textarea
-                  value={form.recommendedTargetEtc}
+                  value={form.improvementPointOther}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
-                      recommendedTargetEtc: event.target.value,
+                      improvementPointOther: event.target.value,
                     }))
                   }
-                  placeholder="기타 추천 대상을 적어 주세요"
+                  placeholder={
+                    form.improvementPoints.includes(
+                        CONTENT_EXPLANATION_ISSUE_OPTION
+                      )
+                      ? "어떤 콘텐츠 설명이 어려웠는지 적어 주세요"
+                      : "더 좋아지면 좋겠는 다른 부분이 있다면 적어 주세요"
+                  }
                   className="mt-4 h-28 w-full rounded-2xl border border-white/12 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/28 focus:border-[#FF7A59]"
                 />
               ) : null}
             </Section>
 
             <Section
-              step="Q6"
-              title="좋았던 점이나 개선되었으면 하는 점을 자유롭게 알려주세요."
-              description="짧게 남겨주셔도 충분합니다."
+              step="Q4"
+              title="다음에 또 온다면 어떤 회차가 끌리나요?"
+              description="관심 있는 회차를 편하게 골라주세요."
+            >
+              <div className="grid gap-3">
+                {FUTURE_SESSION_OPTIONS.map((option) => (
+                  <ChoiceChip
+                    key={option}
+                    label={option}
+                    selected={form.futureSessionPreferences.includes(option)}
+                    onClick={() =>
+                      handleMultiSelect("futureSessionPreferences", option)
+                    }
+                  />
+                ))}
+              </div>
+            </Section>
+
+            <Section
+              step="Q5"
+              title="친구에게 소개한다면 뭐라고 말하고 싶나요?"
+              description="짧게 적어도 좋고, 비워두셔도 괜찮습니다."
             >
               <textarea
-                value={form.freeText}
+                value={form.friendIntroText}
                 onChange={(event) =>
                   setForm((current) => ({
                     ...current,
-                    freeText: event.target.value,
+                    friendIntroText: event.target.value,
                   }))
                 }
-                placeholder="좋았던 점, 아쉬웠던 점, 다음 회차에 바라는 점 등을 편하게 적어 주세요."
+                placeholder="예: 혼자 가도 어색하지 않았고, 여러 사람과 자연스럽게 대화할 수 있었어."
+                className="h-36 w-full rounded-2xl border border-white/12 bg-black/30 px-4 py-4 text-sm leading-6 text-white outline-none transition placeholder:text-white/28 focus:border-[#FF7A59]"
+              />
+            </Section>
+
+            <Section
+              step="Q6"
+              title="마지막으로 남기고 싶은 말이 있다면 적어주세요."
+              description="좋았던 점, 아쉬웠던 점 모두 편하게 남겨주세요."
+            >
+              <textarea
+                value={form.finalOpinionText}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    finalOpinionText: event.target.value,
+                  }))
+                }
+                placeholder="운영팀에게 전하고 싶은 말을 자유롭게 적어 주세요."
                 className="h-44 w-full rounded-2xl border border-white/12 bg-black/30 px-4 py-4 text-sm leading-6 text-white outline-none transition placeholder:text-white/28 focus:border-[#FF7A59]"
               />
             </Section>

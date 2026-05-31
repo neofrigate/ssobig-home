@@ -33,6 +33,13 @@ function normalizeSurveyPayload(body: Record<string, unknown>) {
     token: body.token,
     surveyScaleVersion: body.surveyScaleVersion,
     overallSatisfaction: body.overallSatisfaction,
+    likedFactors: body.likedFactors,
+    likedFactorOther: body.likedFactorOther,
+    improvementPoints: body.improvementPoints,
+    improvementPointOther: body.improvementPointOther,
+    futureSessionPreferences: body.futureSessionPreferences,
+    friendIntroText: body.friendIntroText,
+    finalOpinionText: body.finalOpinionText,
     discoveryChannels: body.discoveryChannels ?? body.acquisitionChannels,
     discoveryChannelOther:
       body.discoveryChannelOther ?? body.acquisitionChannelEtc,
