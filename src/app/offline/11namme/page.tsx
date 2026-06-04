@@ -434,9 +434,6 @@ const ElevenNammePage = () => {
                 content_ids: [DAY_NAMMAE_CONTENT_ID],
                 content_type: "product",
               },
-              options: {
-                eventID: `${DAY_NAMMAE_CONTENT_ID}:ViewContent:detail`,
-              },
             },
           ]),
         }}
