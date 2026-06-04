@@ -3,6 +3,7 @@ export const SSOBIG_STORY_PIXEL_ID = "2156713988421222";
 export const META_EVENT_CURRENCY = "KRW";
 export const DAY_NAMMAE_CONTENT_NAME = "일일남매";
 export const DAY_NAMMAE_CONTENT_ID = "day-nammae";
+export const DAY_NAMMAE_BASE_PRICE = 35000;
 
 declare global {
   interface Window {
@@ -23,7 +24,13 @@ export function safeFbq(...args: unknown[]) {
   }
 }
 
-type MetaStandardEventName = "CompleteRegistration" | "InitiateCheckout";
+type MetaStandardEventName = "ViewContent" | "CompleteRegistration" | "InitiateCheckout";
+
+interface MetaPixelExtraEvent {
+  eventName: MetaStandardEventName;
+  payload: Record<string, unknown>;
+  options?: Record<string, unknown>;
+}
 
 interface DayNammaeStandardEventParams {
   value: number;
@@ -78,7 +85,24 @@ export function trackDayNammaeMetaStandardEvent(
   safeFbq("track", eventName, payload);
 }
 
-export function buildMetaPixelPageViewScript(pixelId: string) {
+function buildMetaPixelExtraEventScript(events: MetaPixelExtraEvent[]) {
+  return events
+    .map((event) => {
+      const eventName = JSON.stringify(event.eventName);
+      const payload = JSON.stringify(event.payload);
+      const options = event.options ? `, ${JSON.stringify(event.options)}` : "";
+
+      return `fbq('track', ${eventName}, ${payload}${options});`;
+    })
+    .join("\n");
+}
+
+export function buildMetaPixelPageViewScript(
+  pixelId: string,
+  extraEvents: MetaPixelExtraEvent[] = []
+) {
+  const extraEventScript = buildMetaPixelExtraEventScript(extraEvents);
+
   return `
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -95,5 +119,6 @@ export function buildMetaPixelPageViewScript(pixelId: string) {
       window.__ssobigMetaPixelIds['${pixelId}'] = true;
     }
     fbq('track', 'PageView');
+    ${extraEventScript}
   `;
 }

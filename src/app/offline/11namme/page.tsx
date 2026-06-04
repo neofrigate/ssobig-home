@@ -11,6 +11,10 @@ import { isDefaultDayNammeAgeRange } from "@/features/day-nammae/age";
 import { ScheduleItem } from "@/features/day-nammae/types";
 import {
   buildMetaPixelPageViewScript,
+  DAY_NAMMAE_BASE_PRICE,
+  DAY_NAMMAE_CONTENT_ID,
+  DAY_NAMMAE_CONTENT_NAME,
+  META_EVENT_CURRENCY,
   LOVE_BUDDIES_PIXEL_ID,
 } from "@/utils/metaPixel";
 import { trackGAEvent } from "@/utils/gtag";
@@ -420,7 +424,21 @@ const ElevenNammePage = () => {
         id="facebook-pixel-love-buddies"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: buildMetaPixelPageViewScript(LOVE_BUDDIES_PIXEL_ID),
+          __html: buildMetaPixelPageViewScript(LOVE_BUDDIES_PIXEL_ID, [
+            {
+              eventName: "ViewContent",
+              payload: {
+                value: DAY_NAMMAE_BASE_PRICE,
+                currency: META_EVENT_CURRENCY,
+                content_name: DAY_NAMMAE_CONTENT_NAME,
+                content_ids: [DAY_NAMMAE_CONTENT_ID],
+                content_type: "product",
+              },
+              options: {
+                eventID: `${DAY_NAMMAE_CONTENT_ID}:ViewContent:detail`,
+              },
+            },
+          ]),
         }}
       />
       {/* End Meta Pixel Code */}
