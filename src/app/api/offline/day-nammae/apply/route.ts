@@ -2,12 +2,14 @@ import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { createHash } from "node:crypto";
 
 const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
-const DEFAULT_META_PIXEL_ID = "1541266446734040";
-const META_CAPI_GRAPH_VERSION = "v24.0";
+const MARKETING_SUPABASE_URL = "https://flpcungrkapftfkbhxkm.supabase.co";
+const MARKETING_SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_IGB_G9pJ3Prdz_by7xK44g_wx6GkEFu";
+const DAY_NAMMAE_CAPI_RELAY_URL =
+  `${MARKETING_SUPABASE_URL}/functions/v1/meta-day-nammae-conversions`;
 const DEFAULT_WAITLIST_ALERT_API_URL =
   "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-waitlist-alert";
 const DEFAULT_CLIENT_ERROR_MESSAGE =
@@ -125,51 +127,12 @@ function maskPhoneNumber(phone: string) {
   return `${"*".repeat(Math.max(0, digits.length - 4))}${digits.slice(-4)}`;
 }
 
-function sha256(value: string) {
-  return createHash("sha256").update(value).digest("hex");
-}
-
-function normalizeMetaPhone(phone: string) {
-  let digits = String(phone || "").replace(/\D/g, "");
-  if (digits.startsWith("82")) {
-    digits = `0${digits.slice(2)}`;
-  }
-  return digits;
-}
-
-function normalizeMetaText(value: string) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function normalizeMetaGender(gender: string) {
-  const normalized = String(gender || "").trim();
-  if (normalized.includes("여")) return "f";
-  if (normalized.includes("남")) return "m";
-  return "";
-}
-
 function getClientIp(headers: Headers) {
   return (
     headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     headers.get("x-real-ip") ||
     headers.get("cf-connecting-ip") ||
     ""
-  );
-}
-
-function getMetaCapiAccessToken() {
-  return (
-    process.env.META_CAPI_ACCESS_TOKEN?.trim() ||
-    process.env.META_ADS_ACCESS_TOKEN?.trim() ||
-    ""
-  );
-}
-
-function getMetaPixelId() {
-  return (
-    process.env.META_PIXEL_ID?.trim() ||
-    process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() ||
-    DEFAULT_META_PIXEL_ID
   );
 }
 
@@ -186,87 +149,55 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
   fbp: string;
   fbc: string;
 }) {
-  const accessToken = getMetaCapiAccessToken();
-  const pixelId = getMetaPixelId();
-
-  if (!accessToken || !pixelId || !params.eventId) {
+  if (!params.eventId) {
     logSubmitEvent(params.requestId, "meta:capi:skipped", {
       clientRequestId: params.clientRequestId,
       uuid: params.uuid,
-      reason: !accessToken
-        ? "missing_access_token"
-        : !pixelId
-          ? "missing_pixel_id"
-          : "missing_event_id",
+      reason: "missing_event_id",
     });
     return;
   }
 
-  const userData: Record<string, string | string[]> = {
-    country: [sha256("kr")],
-  };
-
-  const phone = normalizeMetaPhone(params.phone);
-  if (phone) {
-    userData.ph = [sha256(phone)];
-  }
-
-  const name = normalizeMetaText(params.name);
-  if (name) {
-    userData.fn = [sha256(name)];
-    userData.ln = [sha256(name)];
-  }
-
-  const gender = normalizeMetaGender(params.gender);
-  if (gender) {
-    userData.ge = [sha256(gender)];
-  }
-
-  if (params.uuid) {
-    userData.external_id = [sha256(params.uuid)];
-  }
-
   const clientIp = getClientIp(params.request.headers);
   const clientUserAgent = params.request.headers.get("user-agent") || "";
-  if (clientIp) userData.client_ip_address = clientIp;
-  if (clientUserAgent) userData.client_user_agent = clientUserAgent;
-  if (params.fbp) userData.fbp = params.fbp;
-  if (params.fbc) userData.fbc = params.fbc;
-
   const eventSourceUrl =
     params.request.headers.get("referer") ||
     "https://www.ssobig.com/offline/11namme/apply";
 
-  const body = {
-    data: [
-      {
-        event_name: "CompleteRegistration",
-        event_time: Math.floor(Date.now() / 1000),
-        event_id: params.eventId,
-        action_source: "website",
-        event_source_url: eventSourceUrl,
-        user_data: userData,
-        custom_data: {
-          value: 35000,
-          currency: "KRW",
-          content_name: "일일남매",
-          content_ids: ["day-nammae"],
-          content_type: "product",
-          schedule: params.schedule,
-        },
-      },
-    ],
+  const relayPayload = {
+    event_id: params.eventId,
+    event_time: Math.floor(Date.now() / 1000),
+    event_source_url: eventSourceUrl,
+    value: 35000,
+    currency: "KRW",
+    schedule: params.schedule,
+    user_data: {
+      name: params.name,
+      phone: params.phone,
+      gender: params.gender,
+      external_id: params.uuid,
+      fbp: params.fbp,
+      fbc: params.fbc,
+      client_ip_address: clientIp,
+      client_user_agent: clientUserAgent,
+    },
   };
 
+  const relaySecret = process.env.DAY_NAMMAE_CAPI_RELAY_SECRET?.trim() || "";
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${MARKETING_SUPABASE_PUBLISHABLE_KEY}`,
+  };
+  if (relaySecret) {
+    headers["x-ssobig-relay-token"] = relaySecret;
+  }
+
   try {
-    const response = await fetch(
-      `https://graph.facebook.com/${META_CAPI_GRAPH_VERSION}/${pixelId}/events?access_token=${accessToken}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      }
-    );
+    const response = await fetch(DAY_NAMMAE_CAPI_RELAY_URL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(relayPayload),
+    });
     const responseBody = await response.json().catch(() => null);
 
     logSubmitEvent(
@@ -277,7 +208,6 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
         uuid: params.uuid,
         eventName: "CompleteRegistration",
         eventId: params.eventId,
-        pixelId,
         status: response.status,
         hasFbp: Boolean(params.fbp),
         hasFbc: Boolean(params.fbc),
@@ -294,7 +224,6 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
         uuid: params.uuid,
         eventName: "CompleteRegistration",
         eventId: params.eventId,
-        pixelId,
         error: error instanceof Error ? error.message : String(error),
       },
       "error"
