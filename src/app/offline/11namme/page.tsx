@@ -12,10 +12,8 @@ import { ScheduleItem } from "@/features/day-nammae/types";
 import {
   buildMetaPixelPageViewScript,
   DAY_NAMMAE_BASE_PRICE,
-  DAY_NAMMAE_CONTENT_ID,
-  DAY_NAMMAE_CONTENT_NAME,
-  META_EVENT_CURRENCY,
   LOVE_BUDDIES_PIXEL_ID,
+  trackDayNammaeMetaStandardEvent,
 } from "@/utils/metaPixel";
 import { trackGAEvent } from "@/utils/gtag";
 import { getSafeSearchParams } from "@/utils/utm";
@@ -137,6 +135,38 @@ const ElevenNammePage = () => {
         getSafeSearchParams(window.location.search).get("coupon")
       )
     );
+  }, []);
+
+  useEffect(() => {
+    let attempts = 0;
+    const maxAttempts = 20;
+
+    const sendViewContent = () => {
+      attempts += 1;
+
+      if (window.fbq) {
+        trackDayNammaeMetaStandardEvent("ViewContent", {
+          value: DAY_NAMMAE_BASE_PRICE,
+        });
+        return true;
+      }
+
+      return attempts >= maxAttempts;
+    };
+
+    if (sendViewContent()) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      if (sendViewContent()) {
+        window.clearInterval(intervalId);
+      }
+    }, 250);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   useEffect(() => {
@@ -424,18 +454,7 @@ const ElevenNammePage = () => {
         id="facebook-pixel-love-buddies"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: buildMetaPixelPageViewScript(LOVE_BUDDIES_PIXEL_ID, [
-            {
-              eventName: "ViewContent",
-              payload: {
-                value: DAY_NAMMAE_BASE_PRICE,
-                currency: META_EVENT_CURRENCY,
-                content_name: DAY_NAMMAE_CONTENT_NAME,
-                content_ids: [DAY_NAMMAE_CONTENT_ID],
-                content_type: "product",
-              },
-            },
-          ]),
+          __html: buildMetaPixelPageViewScript(LOVE_BUDDIES_PIXEL_ID),
         }}
       />
       {/* End Meta Pixel Code */}
