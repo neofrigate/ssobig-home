@@ -766,6 +766,20 @@ export async function POST(request: Request) {
         applicationMode,
       });
 
+      await sendDayNammaeCompleteRegistrationCapi({
+        request,
+        requestId,
+        clientRequestId,
+        eventId: metaCompleteRegistrationEventId,
+        uuid: requestId,
+        name,
+        phone,
+        gender,
+        schedule,
+        fbp,
+        fbc,
+      });
+
       return NextResponse.json(
         {
           success: true,
