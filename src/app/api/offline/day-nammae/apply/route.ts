@@ -2,9 +2,12 @@ import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createHash } from "node:crypto";
 
 const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
+const DEFAULT_META_PIXEL_ID = "1541266446734040";
+const META_CAPI_GRAPH_VERSION = "v24.0";
 const DEFAULT_WAITLIST_ALERT_API_URL =
   "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-waitlist-alert";
 const DEFAULT_CLIENT_ERROR_MESSAGE =
@@ -120,6 +123,183 @@ function maskPhoneNumber(phone: string) {
   }
 
   return `${"*".repeat(Math.max(0, digits.length - 4))}${digits.slice(-4)}`;
+}
+
+function sha256(value: string) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function normalizeMetaPhone(phone: string) {
+  let digits = String(phone || "").replace(/\D/g, "");
+  if (digits.startsWith("82")) {
+    digits = `0${digits.slice(2)}`;
+  }
+  return digits;
+}
+
+function normalizeMetaText(value: string) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function normalizeMetaGender(gender: string) {
+  const normalized = String(gender || "").trim();
+  if (normalized.includes("여")) return "f";
+  if (normalized.includes("남")) return "m";
+  return "";
+}
+
+function getClientIp(headers: Headers) {
+  return (
+    headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    headers.get("x-real-ip") ||
+    headers.get("cf-connecting-ip") ||
+    ""
+  );
+}
+
+function getMetaCapiAccessToken() {
+  return (
+    process.env.META_CAPI_ACCESS_TOKEN?.trim() ||
+    process.env.META_ADS_ACCESS_TOKEN?.trim() ||
+    ""
+  );
+}
+
+function getMetaPixelId() {
+  return (
+    process.env.META_PIXEL_ID?.trim() ||
+    process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim() ||
+    DEFAULT_META_PIXEL_ID
+  );
+}
+
+async function sendDayNammaeCompleteRegistrationCapi(params: {
+  request: Request;
+  requestId: string;
+  clientRequestId: string;
+  eventId: string;
+  uuid: string;
+  name: string;
+  phone: string;
+  gender: string;
+  schedule: string;
+  fbp: string;
+  fbc: string;
+}) {
+  const accessToken = getMetaCapiAccessToken();
+  const pixelId = getMetaPixelId();
+
+  if (!accessToken || !pixelId || !params.eventId) {
+    logSubmitEvent(params.requestId, "meta:capi:skipped", {
+      clientRequestId: params.clientRequestId,
+      uuid: params.uuid,
+      reason: !accessToken
+        ? "missing_access_token"
+        : !pixelId
+          ? "missing_pixel_id"
+          : "missing_event_id",
+    });
+    return;
+  }
+
+  const userData: Record<string, string | string[]> = {
+    country: [sha256("kr")],
+  };
+
+  const phone = normalizeMetaPhone(params.phone);
+  if (phone) {
+    userData.ph = [sha256(phone)];
+  }
+
+  const name = normalizeMetaText(params.name);
+  if (name) {
+    userData.fn = [sha256(name)];
+    userData.ln = [sha256(name)];
+  }
+
+  const gender = normalizeMetaGender(params.gender);
+  if (gender) {
+    userData.ge = [sha256(gender)];
+  }
+
+  if (params.uuid) {
+    userData.external_id = [sha256(params.uuid)];
+  }
+
+  const clientIp = getClientIp(params.request.headers);
+  const clientUserAgent = params.request.headers.get("user-agent") || "";
+  if (clientIp) userData.client_ip_address = clientIp;
+  if (clientUserAgent) userData.client_user_agent = clientUserAgent;
+  if (params.fbp) userData.fbp = params.fbp;
+  if (params.fbc) userData.fbc = params.fbc;
+
+  const eventSourceUrl =
+    params.request.headers.get("referer") ||
+    "https://www.ssobig.com/offline/11namme/apply";
+
+  const body = {
+    data: [
+      {
+        event_name: "CompleteRegistration",
+        event_time: Math.floor(Date.now() / 1000),
+        event_id: params.eventId,
+        action_source: "website",
+        event_source_url: eventSourceUrl,
+        user_data: userData,
+        custom_data: {
+          value: 35000,
+          currency: "KRW",
+          content_name: "일일남매",
+          content_ids: ["day-nammae"],
+          content_type: "product",
+          schedule: params.schedule,
+        },
+      },
+    ],
+  };
+
+  try {
+    const response = await fetch(
+      `https://graph.facebook.com/${META_CAPI_GRAPH_VERSION}/${pixelId}/events?access_token=${accessToken}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    );
+    const responseBody = await response.json().catch(() => null);
+
+    logSubmitEvent(
+      params.requestId,
+      response.ok ? "meta:capi:success" : "meta:capi:error",
+      {
+        clientRequestId: params.clientRequestId,
+        uuid: params.uuid,
+        eventName: "CompleteRegistration",
+        eventId: params.eventId,
+        pixelId,
+        status: response.status,
+        hasFbp: Boolean(params.fbp),
+        hasFbc: Boolean(params.fbc),
+        responseBody,
+      },
+      response.ok ? "log" : "error"
+    );
+  } catch (error) {
+    logSubmitEvent(
+      params.requestId,
+      "meta:capi:error",
+      {
+        clientRequestId: params.clientRequestId,
+        uuid: params.uuid,
+        eventName: "CompleteRegistration",
+        eventId: params.eventId,
+        pixelId,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      "error"
+    );
+  }
 }
 
 function isSafeClientErrorMessage(message: string) {
@@ -960,6 +1140,20 @@ export async function POST(request: Request) {
       storage_upload_ms: storageUploadMs,
       edge_request_ms: edgeRequestMs,
       total_api_ms: Date.now() - apiStartedAt,
+    });
+
+    await sendDayNammaeCompleteRegistrationCapi({
+      request,
+      requestId,
+      clientRequestId,
+      eventId: metaCompleteRegistrationEventId,
+      uuid,
+      name,
+      phone,
+      gender,
+      schedule,
+      fbp,
+      fbc,
     });
 
     return NextResponse.json({
