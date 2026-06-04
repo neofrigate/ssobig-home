@@ -89,6 +89,10 @@ function createRequestId() {
   return `dn-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+function createFallbackMetaEventId(eventName: "CompleteRegistration", requestId: string) {
+  return `day-nammae:${eventName}:server:${requestId}`;
+}
+
 function getOptionalString(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
@@ -149,14 +153,8 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
   fbp: string;
   fbc: string;
 }) {
-  if (!params.eventId) {
-    logSubmitEvent(params.requestId, "meta:capi:skipped", {
-      clientRequestId: params.clientRequestId,
-      uuid: params.uuid,
-      reason: "missing_event_id",
-    });
-    return;
-  }
+  const eventId = params.eventId ||
+    createFallbackMetaEventId("CompleteRegistration", params.requestId);
 
   const clientIp = getClientIp(params.request.headers);
   const clientUserAgent = params.request.headers.get("user-agent") || "";
@@ -165,7 +163,7 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
     "https://www.ssobig.com/offline/11namme/apply";
 
   const relayPayload = {
-    event_id: params.eventId,
+    event_id: eventId,
     event_time: Math.floor(Date.now() / 1000),
     event_source_url: eventSourceUrl,
     value: 35000,
@@ -207,7 +205,8 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
         clientRequestId: params.clientRequestId,
         uuid: params.uuid,
         eventName: "CompleteRegistration",
-        eventId: params.eventId,
+        eventId,
+        eventIdSource: params.eventId ? "client" : "server_fallback",
         status: response.status,
         hasFbp: Boolean(params.fbp),
         hasFbc: Boolean(params.fbc),
@@ -223,7 +222,8 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
         clientRequestId: params.clientRequestId,
         uuid: params.uuid,
         eventName: "CompleteRegistration",
-        eventId: params.eventId,
+        eventId,
+        eventIdSource: params.eventId ? "client" : "server_fallback",
         error: error instanceof Error ? error.message : String(error),
       },
       "error"
