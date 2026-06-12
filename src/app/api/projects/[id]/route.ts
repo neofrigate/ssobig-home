@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getProjectById } from "@/utils/markdown";
 
-export const dynamic = "force-dynamic";
+const CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=0, s-maxage=300, stale-while-revalidate=600",
+  "CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
+  "Vercel-CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
+};
 
 export async function GET(
   request: Request,
@@ -19,7 +23,9 @@ export async function GET(
       );
     }
 
-    console.log("프로젝트 ID:", projectId);
+    if (process.env.NODE_ENV === "development") {
+      console.log("프로젝트 ID:", projectId);
+    }
 
     // MD 파일에서 프로젝트 데이터 가져오기
     const projectData = getProjectById(projectId);
@@ -47,17 +53,14 @@ export async function GET(
       content: projectData.content,
     };
 
-    console.log("MD 파일에서 로드된 프로젝트:", project.title);
+    if (process.env.NODE_ENV === "development") {
+      console.log("MD 파일에서 로드된 프로젝트:", project.title);
+    }
 
     return NextResponse.json(
       { project },
       {
-        headers: {
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
+        headers: CACHE_HEADERS,
       }
     );
   } catch (error) {

@@ -6,13 +6,21 @@ import {
 } from "@/app/playroom/playroomApi";
 import { normalizePlayroomSiteLocale } from "@/app/playroom/playroomSiteLocale";
 
+const CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=0, s-maxage=300, stale-while-revalidate=600",
+  "CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
+  "Vercel-CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
+};
+
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const locale = normalizePlayroomSiteLocale(url.searchParams.get("locale"));
     const endpoint = buildPlayroomTemplatesApiUrl(locale || undefined);
     const response = await fetch(endpoint.toString(), {
-      cache: "no-store",
+      next: {
+        revalidate: 300,
+      },
     });
     if (!response.ok) {
       throw new Error(`Playroom template API failed: ${response.status}`);
@@ -25,9 +33,7 @@ export async function GET(req: Request) {
     return NextResponse.json(
       { items: data.items || [] },
       {
-        headers: {
-          "Cache-Control": "no-store",
-        },
+        headers: CACHE_HEADERS,
       }
     );
   } catch (error) {

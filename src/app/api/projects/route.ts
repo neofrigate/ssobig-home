@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getAllProjects } from "@/utils/markdown";
 
-export const dynamic = "force-dynamic";
+const CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=0, s-maxage=300, stale-while-revalidate=600",
+  "CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
+  "Vercel-CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
+};
 
 export async function GET() {
   try {
@@ -20,9 +24,16 @@ export async function GET() {
       year: project.year,
     }));
 
-    console.log("MD 파일에서 로드된 프로젝트 수:", projects.length);
+    if (process.env.NODE_ENV === "development") {
+      console.log("MD 파일에서 로드된 프로젝트 수:", projects.length);
+    }
 
-    return NextResponse.json({ projects });
+    return NextResponse.json(
+      { projects },
+      {
+        headers: CACHE_HEADERS,
+      }
+    );
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "알 수 없는 오류";

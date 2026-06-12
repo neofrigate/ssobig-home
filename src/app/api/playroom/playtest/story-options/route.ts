@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 
+const CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=0, s-maxage=300, stale-while-revalidate=600",
+  "CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
+  "Vercel-CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
+};
+
 const QUALITY_SUPABASE_URL = "https://tlyioijsopxeegzfjlqe.supabase.co";
 const QUALITY_SUPABASE_KEY = "sb_publishable_AdEHgXPGJ2gKGVAjb7RYSg_YzUuT6jB";
 
@@ -142,7 +148,9 @@ export async function GET() {
         ),
         {
           headers: SB_HEADERS,
-          cache: "no-store",
+          next: {
+            revalidate: 300,
+          },
         }
       ),
       fetch(
@@ -151,7 +159,9 @@ export async function GET() {
         ),
         {
           headers: SB_HEADERS,
-          cache: "no-store",
+          next: {
+            revalidate: 300,
+          },
         }
       ),
     ]);
@@ -268,9 +278,7 @@ export async function GET() {
     return NextResponse.json(
       { items },
       {
-        headers: {
-          "Cache-Control": "no-store",
-        },
+        headers: CACHE_HEADERS,
       }
     );
   } catch (error) {

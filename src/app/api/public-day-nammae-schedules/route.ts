@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const DEFAULT_PUBLIC_SCHEDULES_API_URL =
   "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-schedules";
 const BROWSER_CACHE_CONTROL = "public, max-age=0, must-revalidate";
-const CDN_CACHE_CONTROL = "max-age=5, stale-while-revalidate=5";
+const CDN_CACHE_CONTROL = "max-age=60, stale-while-revalidate=300";
 
 function getPublicSchedulesApiUrl() {
   const configuredUrl = process.env.DAY_NAMMAE_PUBLIC_SCHEDULES_API_URL?.trim();
@@ -45,7 +45,7 @@ export async function GET() {
   try {
     const upstreamResponse = await fetch(upstreamUrl, {
       next: {
-        revalidate: 5,
+        revalidate: 60,
       },
       headers: {
         Accept: "application/json",
@@ -90,9 +90,8 @@ export async function GET() {
       payload,
       200,
       BROWSER_CACHE_CONTROL,
-      upstreamResponse.headers.get("vercel-cdn-cache-control") ||
-        CDN_CACHE_CONTROL,
-      upstreamResponse.headers.get("cdn-cache-control") || CDN_CACHE_CONTROL
+      CDN_CACHE_CONTROL,
+      CDN_CACHE_CONTROL
     );
   } catch (error) {
     return jsonResponse(
