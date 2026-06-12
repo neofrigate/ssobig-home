@@ -249,33 +249,31 @@ const ElevenNammePage = () => {
         : gender === "여자"
           ? "text-[#FF5A8F]"
           : "text-[#6498ED]";
+      const remainingTagClass =
+        gender === "여자"
+          ? "bg-[#FF5A8F]"
+          : "bg-[#6498ED]";
       const fillClass = closed ? "bg-[#BDBDBD]" : color;
       const trackClass = closed ? "bg-transparent" : "bg-[#ECECEC]";
-      const remainClass = closed
-        ? "text-black/25"
-        : gender === "여자"
-          ? "text-[#C6A9B5]"
-          : "text-[#A9BFE9]";
-
       return (
-        <div className="grid grid-cols-[68px_minmax(0,1fr)] items-center gap-3 md:grid-cols-[82px_minmax(0,1fr)] md:gap-4">
-          <div className={`text-[13px] font-medium md:text-[16px] ${labelClass}`}>
-            {labelText}
-          </div>
-          <div className="relative">
-            <div className={`h-3 overflow-hidden rounded-r-full ${trackClass}`}>
-              <div
-                className={`h-full rounded-r-full transition-all duration-700 ease-out ${fillClass}`}
-                style={{ width: `${fillPercentage}%` }}
-              />
-            </div>
+        <div className="grid grid-cols-[118px_minmax(0,1fr)] items-center gap-1.5 md:grid-cols-[148px_minmax(0,1fr)] md:gap-3">
+          <div
+            className={`flex min-w-0 items-center gap-1.5 text-[13px] font-medium md:gap-2 md:text-[16px] ${labelClass}`}
+          >
+            <span className="whitespace-nowrap">{labelText}</span>
             {remainingText ? (
-              <div
-                className={`pointer-events-none absolute inset-y-0 right-3 flex items-center text-[11px] font-bold md:text-[13px] ${remainClass}`}
+              <span
+                className={`inline-flex h-5 shrink-0 items-center rounded-[5px] px-1.5 text-[11px] font-extrabold leading-none text-white md:h-6 md:px-2 md:text-[13px] ${remainingTagClass}`}
               >
                 {remainingText}
-              </div>
+              </span>
             ) : null}
+          </div>
+          <div className={`h-3 min-w-0 overflow-hidden rounded-r-full ${trackClass}`}>
+            <div
+              className={`h-full rounded-r-full transition-all duration-700 ease-out ${fillClass}`}
+              style={{ width: `${fillPercentage}%` }}
+            />
           </div>
         </div>
       );
