@@ -898,6 +898,7 @@ export default function PlayroomPage({
                         className="object-cover sm:hidden"
                         priority={index === 0}
                         sizes="100vw"
+                        unoptimized
                       />
                     )}
                     {/* 태블릿 이상 데스크톱 이미지 */}
@@ -910,6 +911,7 @@ export default function PlayroomPage({
                       }`}
                       priority={index === 0}
                       sizes="100vw"
+                      unoptimized
                     />
                   </div>
 
