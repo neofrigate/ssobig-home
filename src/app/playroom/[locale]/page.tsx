@@ -41,7 +41,7 @@ const METADATA_COPY: Record<
 };
 
 const OG_IMAGE =
-  "https://www.ssobig.com/ssobig_assets/playroom/히어로_밤아일랜드_데스크톱.jpg";
+  "https://www.ssobig.com/ssobig_assets/playroom/%ED%9E%88%EC%96%B4%EB%A1%9C_%EB%B0%A4%EC%95%84%EC%9D%BC%EB%9E%9C%EB%93%9C_%EB%8D%B0%EC%8A%A4%ED%81%AC%ED%86%B1.jpg";
 
 export async function generateMetadata({
   params,
