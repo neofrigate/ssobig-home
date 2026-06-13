@@ -7,7 +7,6 @@ import {
 } from "./prototypeData";
 import {
   characterImages,
-  TUMBLBUG_URL,
 } from "./prototypeCharacters";
 import { resolveResult, type Answers, type Result } from "./prototypeEngine";
 
@@ -489,6 +488,93 @@ function drawContainedImage(
   );
 }
 
+function fillRoundRect(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+) {
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.lineTo(x + width - radius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + radius);
+  context.lineTo(x + width, y + height - radius);
+  context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  context.lineTo(x + radius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - radius);
+  context.lineTo(x, y + radius);
+  context.quadraticCurveTo(x, y, x + radius, y);
+  context.closePath();
+  context.fill();
+}
+
+function drawShareAxis({
+  context,
+  title,
+  winner,
+  labels,
+  scores,
+  y,
+}: {
+  context: CanvasRenderingContext2D;
+  title: string;
+  winner: string;
+  labels: string[];
+  scores: number[];
+  y: number;
+}) {
+  const x = 108;
+  const width = 864;
+  const markerPosition = getAxisPosition(scores);
+  const total = scores.reduce((sum, score) => sum + score, 0);
+
+  context.textAlign = "left";
+  context.fillStyle = "#d60404";
+  context.font = "900 26px MaruBuri, serif";
+  context.fillText(title.toUpperCase(), x, y);
+
+  context.textAlign = "right";
+  context.fillStyle = "#fff1df";
+  context.font = "900 30px MaruBuri, serif";
+  context.fillText(winner, x + width, y);
+
+  const lineY = y + 58;
+  context.strokeStyle = "rgba(214, 4, 4, 0.42)";
+  context.lineWidth = 5;
+  context.beginPath();
+  context.moveTo(x, lineY);
+  context.lineTo(x + width, lineY);
+  context.stroke();
+
+  const markerX = x + (width * markerPosition) / 100;
+  context.save();
+  context.translate(markerX, lineY);
+  context.rotate(Math.PI / 4);
+  context.fillStyle = "#d60404";
+  context.shadowColor = "rgba(214, 4, 4, 0.88)";
+  context.shadowBlur = 18;
+  context.fillRect(-13, -13, 26, 26);
+  context.restore();
+
+  labels.forEach((label, index) => {
+    const left =
+      labels.length === 1 ? 50 : (index / (labels.length - 1)) * 100;
+    const labelX = x + (width * left) / 100;
+    const percent = getPercent(scores[index] ?? 0, total);
+    const isWinner = label === winner;
+
+    context.textAlign = "center";
+    context.fillStyle = isWinner ? "#fff1df" : "#a97864";
+    context.font = "900 28px MaruBuri, serif";
+    context.fillText(label, labelX, lineY + 58);
+    context.fillStyle = isWinner ? "#d60404" : "#6f493c";
+    context.font = "900 24px MaruBuri, serif";
+    context.fillText(`${percent}%`, labelX, lineY + 92);
+  });
+}
+
 function wrapCanvasText(
   context: CanvasRenderingContext2D,
   text: string,
@@ -542,7 +628,7 @@ async function createResultShareImage({
 }) {
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
-  canvas.height = 1440;
+  canvas.height = 1920;
   const context = canvas.getContext("2d");
 
   if (!context) {
@@ -551,87 +637,103 @@ async function createResultShareImage({
 
   await document.fonts.ready;
 
-  const [background, logo, character] = await Promise.all([
+  const [background, character] = await Promise.all([
     loadCanvasImage("/images/prototype-background.png"),
-    loadCanvasImage("/images/prototype-logo-transparent.png"),
     resultImageSrc ? loadCanvasImage(resultImageSrc) : Promise.resolve(null),
   ]);
 
   drawCoverImage(context, background, 0, 0, canvas.width, canvas.height);
 
   const overlay = context.createLinearGradient(0, 0, 0, canvas.height);
-  overlay.addColorStop(0, "rgba(0, 0, 0, 0.5)");
-  overlay.addColorStop(0.38, "rgba(0, 0, 0, 0.28)");
-  overlay.addColorStop(1, "rgba(0, 0, 0, 0.86)");
+  overlay.addColorStop(0, "rgba(0, 0, 0, 0.56)");
+  overlay.addColorStop(0.42, "rgba(0, 0, 0, 0.18)");
+  overlay.addColorStop(0.72, "rgba(0, 0, 0, 0.48)");
+  overlay.addColorStop(1, "rgba(0, 0, 0, 0.92)");
   context.fillStyle = overlay;
   context.fillRect(0, 0, canvas.width, canvas.height);
 
   const sideVignette = context.createRadialGradient(
     canvas.width / 2,
-    canvas.height * 0.42,
+    canvas.height * 0.34,
     180,
     canvas.width / 2,
-    canvas.height * 0.42,
-    880,
+    canvas.height * 0.34,
+    980,
   );
   sideVignette.addColorStop(0, "rgba(0, 0, 0, 0)");
-  sideVignette.addColorStop(1, "rgba(0, 0, 0, 0.72)");
+  sideVignette.addColorStop(1, "rgba(0, 0, 0, 0.78)");
   context.fillStyle = sideVignette;
   context.fillRect(0, 0, canvas.width, canvas.height);
 
-  drawContainedImage(context, logo, 340, 64, 400, 135);
-
-  if (character) {
-    drawContainedImage(context, character, 430, 320, 520, 690);
-  }
-
-  context.fillStyle = "#d60404";
-  context.font = "800 30px MaruBuri, serif";
-  context.letterSpacing = "4px";
-  context.fillText("SURVIVAL RESULT", 78, 260);
-  context.letterSpacing = "0px";
-
-  context.fillStyle = "#fff1df";
-  context.font = "900 52px MaruBuri, serif";
-  const titleLines = wrapCanvasText(
-    context,
-    resultCopy?.resultTitle ?? result.profile.tagline,
-    610,
-  ).slice(0, 4);
-  titleLines.forEach((line, index) => {
-    context.fillText(line, 78, 340 + index * 68);
-  });
-
-  const tagText = [
+  const tagItems = [
     groupLabels[result.group],
     result.position,
     result.judgment,
-  ].join(" · ");
-  context.fillStyle = "#d60404";
-  context.font = "900 34px MaruBuri, serif";
-  context.fillText(tagText, 78, 615);
-
-  context.fillStyle = "#fff1df";
-  context.font = "900 44px MaruBuri, serif";
-  context.fillText(`프로토타입 캐릭터: ${result.profile.name}`, 78, 725);
-
-  context.fillStyle = "#e7d0bb";
-  context.font = "700 30px MaruBuri, serif";
-  const summaryText =
-    resultCopy?.behaviorSummary[0] ?? result.profile.summary;
-  const summaryLines = wrapCanvasText(context, summaryText, 900).slice(0, 5);
-  summaryLines.forEach((line, index) => {
-    context.fillText(line, 78, 805 + index * 44);
+  ];
+  let tagX = 78;
+  context.font = "900 30px MaruBuri, serif";
+  tagItems.forEach((tag) => {
+    const tagWidth = Math.ceil(context.measureText(tag).width) + 44;
+    context.fillStyle = "rgba(0, 0, 0, 0.44)";
+    fillRoundRect(context, tagX, 96, tagWidth, 58, 4);
+    context.strokeStyle = "rgba(214, 4, 4, 0.78)";
+    context.lineWidth = 2;
+    context.strokeRect(tagX, 96, tagWidth, 58);
+    context.fillStyle = "#fff1df";
+    context.fillText(tag, tagX + 22, 134);
+    tagX += tagWidth + 14;
   });
 
-  context.fillStyle = "rgba(214, 4, 4, 0.92)";
-  context.fillRect(78, 1240, 886, 4);
   context.fillStyle = "#fff1df";
-  context.font = "900 32px MaruBuri, serif";
-  context.fillText("www.ssobig.com/survival-test", 78, 1304);
-  context.fillStyle = "#d60404";
-  context.font = "900 26px MaruBuri, serif";
-  context.fillText("PROTO TYPE", 78, 1352);
+  context.font = "900 58px MaruBuri, serif";
+  context.textAlign = "left";
+  const titleLines = wrapCanvasText(
+    context,
+    resultCopy?.resultTitle ?? result.profile.tagline,
+    900,
+  ).slice(0, 4);
+  titleLines.forEach((line, index) => {
+    context.fillText(line, 78, 245 + index * 76);
+  });
+
+  if (character) {
+    drawContainedImage(context, character, 180, 520, 720, 760);
+  }
+
+  drawShareAxis({
+    context,
+    title: "survival tendency",
+    winner: groupLabels[result.group],
+    labels: ["공존형", "통제형", "경계형"],
+    scores: [
+      result.scoreBreakdown.group.A그룹,
+      result.scoreBreakdown.group.B그룹,
+      result.scoreBreakdown.group.C그룹,
+    ],
+    y: 1335,
+  });
+  drawShareAxis({
+    context,
+    title: "role position",
+    winner: result.position,
+    labels: ["주도형", "지원형"],
+    scores: [
+      result.scoreBreakdown.position.주도형,
+      result.scoreBreakdown.position.지원형,
+    ],
+    y: 1540,
+  });
+  drawShareAxis({
+    context,
+    title: "judgment mode",
+    winner: result.judgment,
+    labels: ["본능형", "전략형"],
+    scores: [
+      result.scoreBreakdown.judgment.본능형,
+      result.scoreBreakdown.judgment.전략형,
+    ],
+    y: 1745,
+  });
 
   return canvasToBlob(canvas);
 }
@@ -1043,27 +1145,6 @@ export default function PrototypeQuizClient() {
                         </div>
                       </div>
                     )}
-                    <div className="mt-7 border border-[#d60404]/58 bg-black/38 p-4 shadow-[5px_5px_0_rgba(0,0,0,0.62)] backdrop-blur-sm sm:p-5">
-                      <p className="font-[family-name:var(--font-preview-display)] text-[9px] uppercase tracking-[0.16em] text-[#d60404] sm:text-[12px] sm:tracking-[0.2em]">
-                        next survival record
-                      </p>
-                      <h2 className="mt-3 text-[18px] font-black leading-[1.35] tracking-normal text-[#fff1df] sm:text-[24px]">
-                        테스트는 끝났지만, 생존은 이제 시작됩니다.
-                      </h2>
-                      <p className="mt-3 text-[12px] font-bold leading-[1.65] tracking-normal text-[#d7bda1] sm:text-[15px] sm:leading-7">
-                        이 캐릭터가 등장하는 12인 생존 머더미스터리
-                        <span className="text-[#fff1df]"> PROTO TYPE</span>을
-                        텀블벅에서 먼저 만나보세요.
-                      </p>
-                      <a
-                        href={TUMBLBUG_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-5 flex w-full items-center justify-center bg-[#d60404] px-4 py-4 text-[13px] font-black tracking-normal text-black transition shadow-[5px_5px_0_rgba(0,0,0,0.75)] hover:bg-[#ff1d1d] sm:px-6 sm:text-[17px]"
-                      >
-                        텀블벅 알림신청 하러가기
-                      </a>
-                    </div>
                   </div>
                 </div>
 
@@ -1080,19 +1161,11 @@ export default function PrototypeQuizClient() {
               </div>
             ) : isResult ? (
               <div className="flex flex-col gap-3">
-                <a
-                  href={TUMBLBUG_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-[#d60404] px-4 py-4 text-center text-[13px] font-black tracking-normal text-black transition shadow-[5px_5px_0_rgba(0,0,0,0.75)] hover:bg-[#ff1d1d] sm:px-6 sm:text-[17px]"
-                >
-                  텀블벅 알림신청 하러가기
-                </a>
                 <button
                   type="button"
                   onClick={handleSaveAndShare}
                   disabled={shareState === "working"}
-                  className="w-full border border-[#d60404]/55 bg-black/28 px-4 py-4 text-[13px] font-black tracking-normal text-[#fff1df] transition hover:bg-[#d60404]/18 disabled:border-[#6f1c18] disabled:text-[#8d7266] sm:px-6 sm:text-[17px]"
+                  className="w-full bg-[#d60404] px-4 py-4 text-[13px] font-black tracking-normal text-black transition shadow-[5px_5px_0_rgba(0,0,0,0.75)] hover:bg-[#ff1d1d] disabled:bg-[#6f1c18] disabled:text-[#8d7266] sm:px-6 sm:text-[17px]"
                 >
                   {shareState === "working" && "이미지 생성 중"}
                   {shareState === "done" && "이미지 저장/공유 완료"}
@@ -1100,6 +1173,12 @@ export default function PrototypeQuizClient() {
                   {shareState === "failed" && "저장/공유 재시도"}
                   {shareState === "idle" && "결과 저장하고 공유하기"}
                 </button>
+                <a
+                  href="/survival-test/characters"
+                  className="w-full border border-[#d60404]/55 bg-black/28 px-4 py-4 text-center text-[13px] font-black tracking-normal text-[#fff1df] transition hover:bg-[#d60404]/18 sm:px-6 sm:text-[17px]"
+                >
+                  모든 캐릭터 보러가기
+                </a>
                 <button
                   type="button"
                   onClick={handleNext}
@@ -1107,12 +1186,6 @@ export default function PrototypeQuizClient() {
                 >
                   다시하기
                 </button>
-                <a
-                  href="/survival-test/characters"
-                  className="w-full border border-[#d60404]/55 bg-black/28 px-4 py-4 text-[13px] font-black tracking-normal text-[#fff1df] transition hover:bg-[#d60404]/18 sm:px-6 sm:text-[17px]"
-                >
-                  모든 캐릭터 보러가기
-                </a>
               </div>
             ) : isIntro ? (
               <div className="flex justify-center">

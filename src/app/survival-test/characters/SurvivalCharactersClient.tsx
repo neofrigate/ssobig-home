@@ -128,8 +128,8 @@ export default function SurvivalCharactersClient() {
 
             <div className="mt-7 grid grid-cols-3 gap-2 sm:gap-3">
               {[
-                ["★", "4.3"],
-                ["☻", "10~12인"],
+                ["★", "수집중"],
+                ["☻", "12인"],
                 ["◷", "150분"],
               ].map(([icon, label]) => (
                 <div
