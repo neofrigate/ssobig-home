@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "MaruBuri";
+  src: url("/fonts/MaruBuri-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaruBuri";
+  src: url("/fonts/MaruBuri-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaruBuri";
+  src: url("/fonts/MaruBuri-Bold.ttf") format("truetype");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Tailwind CSS v4 @theme directive - valid but not recognized by some linters */
 @theme inline {
   --color-background: var(--background);
@@ -16,6 +40,12 @@
   --gnb-height-desktop: 60px;
   /* Safe area */
   --safe-area-top: env(safe-area-inset-top, 0px);
+  --font-preview-sans:
+    "MaruBuri", "Apple SD Gothic Neo", "Noto Serif KR", serif;
+  --font-preview-display:
+    "MaruBuri", "Apple SD Gothic Neo", "Noto Serif KR", serif;
+  --font-preview-mono:
+    "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
 @theme inline {
@@ -163,4 +193,75 @@ nextjs-portal {
   );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
+
+body.survival-test-page {
+  background: #050505;
+}
+
+body.survival-test-page .global-nav,
+body.survival-test-page [class*="fixed top-0 left-0 h-full w-[280px]"] {
+  display: none;
+}
+
+body.survival-test-page > main {
+  min-height: 0;
+}
+
+.prototype-grit {
+  isolation: isolate;
+  background: #050505;
+  font-family: var(--font-preview-sans);
+}
+
+.prototype-grit::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.48), transparent 22%, transparent 78%, rgba(0, 0, 0, 0.48)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.04), transparent 42%, rgba(0, 0, 0, 0.5)),
+    linear-gradient(180deg, rgba(3, 3, 3, 0.1) 0%, rgba(3, 3, 3, 0.3) 48%, rgba(3, 3, 3, 0.74) 100%),
+    url("/images/prototype-background.png") center top / cover no-repeat;
+  opacity: 1;
+}
+
+.prototype-grit::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(214, 4, 4, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.1), transparent 28%, rgba(0, 0, 0, 0.68) 94%);
+}
+
+.prototype-logo {
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.72))
+    drop-shadow(0 0 18px rgba(214, 4, 4, 0.38));
+}
+
+.prototype-title {
+  font-family: var(--font-preview-display);
+  text-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.72),
+    -1px 0 0 rgba(214, 4, 4, 0.68);
+}
+
+.prototype-loading-bar {
+  transform-origin: left center;
+  animation: prototype-loading-fill 2s linear forwards;
+}
+
+@keyframes prototype-loading-fill {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
