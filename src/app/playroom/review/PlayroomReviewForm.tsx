@@ -34,6 +34,7 @@ type FormState = {
   satisfaction: string;
   playExperience: string;
   inflowSource: string;
+  inflowSourceOther: string;
   recommendationTarget: string;
   charmPoint: string;
   sequelInterest: string;
@@ -72,6 +73,8 @@ type ReviewCopy = {
   satisfactionLabel: string;
   playExperienceLabel: string;
   inflowLabel: string;
+  inflowOtherLabel: string;
+  inflowOtherPlaceholder: string;
   recommendationTargetLabel: string;
   recommendationTargetPlaceholder: string;
   charmPointLabel: string;
@@ -101,13 +104,14 @@ const INITIAL_FORM: FormState = {
   satisfaction: "",
   playExperience: "",
   inflowSource: "",
+  inflowSourceOther: "",
   recommendationTarget: "",
   charmPoint: "",
   sequelInterest: "",
   additionalComment: "",
 };
 
-const SATISFACTION_VALUES = ["🥰 최고예요", "🙂 괜찮아요", "🥲 아쉬워요"] as const;
+const SATISFACTION_VALUES = ["excellent", "okay", "poor"] as const;
 const PLAY_EXPERIENCE_VALUES = [
   "처음 플레이했어요",
   "1~2번 플레이해봤어요",
@@ -158,6 +162,8 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     satisfactionLabel: "만족도",
     playExperienceLabel: "플레이 경험",
     inflowLabel: "유입 경로",
+    inflowOtherLabel: "기타 유입 경로",
+    inflowOtherPlaceholder: "어디에서 알게 되었는지 적어주세요.",
     recommendationTargetLabel: "추천 대상",
     recommendationTargetPlaceholder: "이 게임을 누구에게 추천하고 싶은지 적어주세요.",
     charmPointLabel: "매력 포인트",
@@ -193,6 +199,8 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     satisfactionLabel: "Satisfaction",
     playExperienceLabel: "Play experience",
     inflowLabel: "How did you find this?",
+    inflowOtherLabel: "Other source",
+    inflowOtherPlaceholder: "Tell us where you found this game.",
     recommendationTargetLabel: "Who would you recommend it to?",
     recommendationTargetPlaceholder: "Tell us who you would recommend this game to.",
     charmPointLabel: "Favorite part",
@@ -229,6 +237,8 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     satisfactionLabel: "満足度",
     playExperienceLabel: "プレイ経験",
     inflowLabel: "流入経路",
+    inflowOtherLabel: "その他の流入経路",
+    inflowOtherPlaceholder: "どこで知ったか入力してください。",
     recommendationTargetLabel: "おすすめしたい相手",
     recommendationTargetPlaceholder: "このゲームを誰におすすめしたいか入力してください。",
     charmPointLabel: "魅力ポイント",
@@ -268,9 +278,9 @@ const CHOICE_LABELS: Record<
   >
 > = {
   ko: {
-    "🥰 최고예요": "🥰 최고예요",
-    "🙂 괜찮아요": "🙂 괜찮아요",
-    "🥲 아쉬워요": "🥲 아쉬워요",
+    excellent: "🥰 최고예요",
+    okay: "🙂 괜찮아요",
+    poor: "🥲 아쉬워요",
     "처음 플레이했어요": "처음 플레이했어요",
     "1~2번 플레이해봤어요": "1~2번 플레이해봤어요",
     "3번 이상 플레이해봤어요": "3번 이상 플레이해봤어요",
@@ -286,9 +296,9 @@ const CHOICE_LABELS: Record<
     "아직은 아니에요": "아직은 아니에요",
   },
   en: {
-    "🥰 최고예요": "🥰 Excellent",
-    "🙂 괜찮아요": "🙂 Good",
-    "🥲 아쉬워요": "🥲 Not for me",
+    excellent: "🥰 Excellent",
+    okay: "🙂 Good",
+    poor: "🥲 Not for me",
     "처음 플레이했어요": "This was my first time",
     "1~2번 플레이해봤어요": "I have played 1-2 times",
     "3번 이상 플레이해봤어요": "I have played 3+ times",
@@ -304,9 +314,9 @@ const CHOICE_LABELS: Record<
     "아직은 아니에요": "Not yet",
   },
   ja: {
-    "🥰 최고예요": "🥰 最高です",
-    "🙂 괜찮아요": "🙂 よかったです",
-    "🥲 아쉬워요": "🥲 惜しかったです",
+    excellent: "🥰 最高です",
+    okay: "🙂 よかったです",
+    poor: "🥲 惜しかったです",
     "처음 플레이했어요": "初めてプレイしました",
     "1~2번 플레이해봤어요": "1〜2回プレイしたことがあります",
     "3번 이상 플레이해봤어요": "3回以上プレイしたことがあります",
@@ -551,7 +561,13 @@ export default function PlayroomReviewForm({
   }, [copy, gameId, isPreview, language, playerId, query]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((current) => ({ ...current, [key]: value }));
+    setForm((current) => {
+      const next = { ...current, [key]: value };
+      if (key === "inflowSource" && value !== "기타") {
+        next.inflowSourceOther = "";
+      }
+      return next;
+    });
     if (submitState.status === "error") setSubmitState({ status: "idle" });
   }
 
@@ -695,6 +711,14 @@ export default function PlayroomReviewForm({
                 options={inflowOptions}
                 onChange={(value) => update("inflowSource", value)}
               />
+              {form.inflowSource === "기타" ? (
+                <TextAreaField
+                  label={copy.inflowOtherLabel}
+                  value={form.inflowSourceOther}
+                  placeholder={copy.inflowOtherPlaceholder}
+                  onChange={(value) => update("inflowSourceOther", value)}
+                />
+              ) : null}
               <TextAreaField
                 label={copy.recommendationTargetLabel}
                 value={form.recommendationTarget}

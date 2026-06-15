@@ -53,9 +53,15 @@ const FIREBASE_SCOPE =
   "https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email";
 const TOKEN_CACHE = new Map<EnvName, AccessTokenCacheEntry>();
 const SATISFACTION_VALUES = new Set([
+  "excellent",
+  "okay",
+  "poor",
   "🥰 최고예요",
   "🙂 괜찮아요",
   "🥲 아쉬워요",
+  "최고",
+  "괜찮음",
+  "아쉬움",
 ]);
 
 function jsonResponse(body: unknown, status = 200) {
@@ -489,6 +495,7 @@ export async function POST(request: Request) {
         satisfaction,
         playExperience: readStringField(body, "playExperience"),
         inflowSource: readStringField(body, "inflowSource"),
+        inflowSourceOther: readStringField(body, "inflowSourceOther"),
         recommendationTarget: readStringField(body, "recommendationTarget"),
         charmPoint: readStringField(body, "charmPoint"),
         sequelInterest: readStringField(body, "sequelInterest"),
