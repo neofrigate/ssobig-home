@@ -28,6 +28,32 @@ type ReviewContext = {
     email: string;
     age: string;
   };
+  existingReview?: ExistingReview | null;
+};
+
+type ExistingReview = {
+  id: number | string;
+  sentTime: string;
+  satisfaction: string;
+  satisfactionCode: string;
+  playExperience: string;
+  inflowSource: string;
+  inflowSourceOther: string;
+  recommendationTarget: string;
+  charmPoint: string;
+  sequelInterest: string;
+  additionalComment: string;
+};
+
+type RewardResult = {
+  status: "rewarded" | "already_rewarded" | "skipped" | "failed";
+  campaignId: string | null;
+  couponCode: string | null;
+  creditCount: number | null;
+  previousCredit: number | null;
+  remainCredit: number | null;
+  delta: number | null;
+  message: string | null;
 };
 
 type FormState = {
@@ -49,7 +75,7 @@ type LoadState =
 type SubmitState =
   | { status: "idle" }
   | { status: "submitting" }
-  | { status: "success" }
+  | { status: "success"; reward: RewardResult | null }
   | { status: "error"; message: string };
 
 type ChoiceGroupProps = {
@@ -83,8 +109,15 @@ type ReviewCopy = {
   additionalCommentLabel: string;
   additionalCommentPlaceholder: string;
   submitIdle: string;
+  submitEdit: string;
   submitLoading: string;
   submitSuccess: string;
+  modalTitle: string;
+  modalClose: string;
+  rewardSuccess: (previous: number | null, next: number | null, delta: number | null) => string;
+  rewardAlready: string;
+  rewardSkipped: string;
+  rewardFailed: string;
   validationSatisfaction: string;
   missingLink: string;
   contextNotFound: string;
@@ -172,8 +205,18 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     additionalCommentLabel: "추가 의견",
     additionalCommentPlaceholder: "작가에게 남기고 싶은 말을 자유롭게 적어주세요.",
     submitIdle: "리뷰 남기기",
+    submitEdit: "리뷰 수정하기",
     submitLoading: "저장 중",
     submitSuccess: "리뷰가 저장되었습니다.",
+    modalTitle: "리뷰 저장 완료",
+    modalClose: "확인",
+    rewardSuccess: (previous, next, delta) =>
+      previous !== null && next !== null
+        ? `30토큰 보상이 적용되어 보유 토큰이 ${previous} → ${next}로 늘었습니다. 증가량: +${delta ?? 30}토큰`
+        : `30토큰 보상이 적용되었습니다.`,
+    rewardAlready: "이 템플릿 리뷰 보상은 이미 지급되어 추가 지급은 없습니다.",
+    rewardSkipped: "리뷰는 저장되었지만 보상 지급 대상이 아닙니다.",
+    rewardFailed: "리뷰는 저장되었지만 토큰 보상 처리에 실패했습니다. 잠시 후 다시 확인해 주세요.",
     validationSatisfaction: "만족도를 선택해 주세요.",
     missingLink: "리뷰 링크에 필요한 정보가 없습니다.",
     contextNotFound: "방 또는 플레이어 정보를 찾을 수 없습니다.",
@@ -210,8 +253,18 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     additionalCommentLabel: "Additional comments",
     additionalCommentPlaceholder: "Leave any message you would like to share.",
     submitIdle: "Submit Review",
+    submitEdit: "Edit Review",
     submitLoading: "Saving",
     submitSuccess: "Your review has been saved.",
+    modalTitle: "Review Saved",
+    modalClose: "OK",
+    rewardSuccess: (previous, next, delta) =>
+      previous !== null && next !== null
+        ? `A 30-token reward was applied. Your token balance increased from ${previous} to ${next}. Increase: +${delta ?? 30} tokens.`
+        : "A 30-token reward was applied.",
+    rewardAlready: "You have already received the review reward for this template.",
+    rewardSkipped: "Your review was saved, but this submission is not eligible for a reward.",
+    rewardFailed: "Your review was saved, but the token reward could not be applied. Please check again later.",
     validationSatisfaction: "Please select your satisfaction level.",
     missingLink: "This review link is missing required information.",
     contextNotFound: "Room or player information could not be found.",
@@ -247,8 +300,18 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     additionalCommentLabel: "その他のご意見",
     additionalCommentPlaceholder: "作者に伝えたいことを自由に入力してください。",
     submitIdle: "レビューを送信",
+    submitEdit: "レビューを修正",
     submitLoading: "保存中",
     submitSuccess: "レビューが保存されました。",
+    modalTitle: "レビュー保存完了",
+    modalClose: "確認",
+    rewardSuccess: (previous, next, delta) =>
+      previous !== null && next !== null
+        ? `30トークンの特典が適用され、保有トークンが ${previous} → ${next} に増えました。増加量: +${delta ?? 30}トークン`
+        : "30トークンの特典が適用されました。",
+    rewardAlready: "このテンプレートのレビュー特典はすでに付与されています。",
+    rewardSkipped: "レビューは保存されましたが、特典付与の対象ではありません。",
+    rewardFailed: "レビューは保存されましたが、トークン特典を適用できませんでした。しばらくしてから確認してください。",
     validationSatisfaction: "満足度を選択してください。",
     missingLink: "レビューリンクに必要な情報がありません。",
     contextNotFound: "ルームまたはプレイヤー情報が見つかりません。",
@@ -382,7 +445,51 @@ function localPreviewContext(language: ReviewLanguage): ReviewContext {
       email: "",
       age: "",
     },
+    existingReview: null,
   };
+}
+
+function normalizeExistingSatisfaction(review: ExistingReview) {
+  const code = review.satisfactionCode || review.satisfaction;
+  const normalized = code.toLowerCase();
+  if (normalized.includes("excellent") || review.satisfaction.includes("최고")) {
+    return "excellent";
+  }
+  if (normalized.includes("okay") || review.satisfaction.includes("괜찮")) {
+    return "okay";
+  }
+  if (normalized.includes("poor") || review.satisfaction.includes("아쉬")) {
+    return "poor";
+  }
+  return "";
+}
+
+function formFromExistingReview(review: ExistingReview | null | undefined): FormState {
+  if (!review) return INITIAL_FORM;
+  return {
+    satisfaction: normalizeExistingSatisfaction(review),
+    playExperience: review.playExperience || "",
+    inflowSource: review.inflowSource || "",
+    inflowSourceOther: review.inflowSourceOther || "",
+    recommendationTarget: review.recommendationTarget || "",
+    charmPoint: review.charmPoint || "",
+    sequelInterest: review.sequelInterest || "",
+    additionalComment: review.additionalComment || "",
+  };
+}
+
+function rewardMessage(copy: ReviewCopy, reward: RewardResult | null) {
+  if (!reward) return copy.rewardSkipped;
+  if (reward.status === "rewarded") {
+    return copy.rewardSuccess(reward.previousCredit, reward.remainCredit, reward.delta);
+  }
+  if (reward.status === "already_rewarded") {
+    return copy.rewardAlready;
+  }
+  if (reward.status === "failed") {
+    return copy.rewardFailed;
+  }
+  return copy.rewardSkipped;
 }
 
 function ChoiceGroup({ label, value, options, onChange }: ChoiceGroupProps) {
@@ -497,6 +604,7 @@ export default function PlayroomReviewForm({
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
   const [submitState, setSubmitState] = useState<SubmitState>({ status: "idle" });
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [hasExistingReview, setHasExistingReview] = useState(false);
   const isPreview =
     (gameId === PREVIEW_GAME_ID && playerId === PREVIEW_PLAYER_ID) ||
     (process.env.NODE_ENV === "development" && (!gameId || !playerId));
@@ -515,6 +623,8 @@ export default function PlayroomReviewForm({
     async function loadContext() {
       if (isPreview) {
         setLoadState({ status: "ready", context: localPreviewContext(language) });
+        setHasExistingReview(false);
+        setForm(INITIAL_FORM);
         return;
       }
 
@@ -543,6 +653,9 @@ export default function PlayroomReviewForm({
           });
           return;
         }
+        const existingReview = payload.data.existingReview || null;
+        setHasExistingReview(Boolean(existingReview));
+        setForm(formFromExistingReview(existingReview));
         setLoadState({ status: "ready", context: payload.data });
       } catch {
         if (!cancelled) {
@@ -591,7 +704,20 @@ export default function PlayroomReviewForm({
     setSubmitState({ status: "submitting" });
     if (isPreview) {
       window.setTimeout(() => {
-        setSubmitState({ status: "success" });
+        setHasExistingReview(true);
+        setSubmitState({
+          status: "success",
+          reward: {
+            status: "rewarded",
+            campaignId: "review_preview-template",
+            couponCode: "PREV-IEW1",
+            creditCount: 30,
+            previousCredit: 10,
+            remainCredit: 40,
+            delta: 30,
+            message: null,
+          },
+        });
       }, 250);
       return;
     }
@@ -610,7 +736,7 @@ export default function PlayroomReviewForm({
         }),
       });
       const payload = (await response.json().catch(() => null)) as
-        | { success?: boolean; error?: string }
+        | { success?: boolean; data?: { reward?: RewardResult | null }; error?: string }
         | null;
 
       if (!response.ok || !payload?.success) {
@@ -620,7 +746,8 @@ export default function PlayroomReviewForm({
         });
         return;
       }
-      setSubmitState({ status: "success" });
+      setHasExistingReview(true);
+      setSubmitState({ status: "success", reward: payload.data?.reward || null });
     } catch {
       setSubmitState({
         status: "error",
@@ -753,13 +880,10 @@ export default function PlayroomReviewForm({
               >
                 {submitState.status === "submitting"
                   ? copy.submitLoading
-                  : copy.submitIdle}
+                  : hasExistingReview
+                    ? copy.submitEdit
+                    : copy.submitIdle}
               </button>
-              {submitState.status === "success" && (
-                <p className="rounded-md bg-[#ecfdf5] px-4 py-3 text-sm font-semibold text-[#047857]">
-                  {copy.submitSuccess}
-                </p>
-              )}
               {submitState.status === "error" && (
                 <p className="rounded-md bg-[#fef2f2] px-4 py-3 text-sm font-semibold text-[#b91c1c]">
                   {submitState.message}
@@ -769,6 +893,36 @@ export default function PlayroomReviewForm({
           </form>
         )}
       </div>
+      {submitState.status === "success" && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-5"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="review-success-title"
+        >
+          <section className="w-full max-w-md rounded-md bg-white p-6 shadow-xl">
+            <h2
+              id="review-success-title"
+              className="text-xl font-bold leading-8 text-[#111827]"
+            >
+              {copy.modalTitle}
+            </h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-[#047857]">
+              {copy.submitSuccess}
+            </p>
+            <p className="mt-3 text-sm leading-6 text-[#374151]">
+              {rewardMessage(copy, submitState.reward)}
+            </p>
+            <button
+              type="button"
+              onClick={() => setSubmitState({ status: "idle" })}
+              className="mt-6 min-h-[44px] w-full rounded-md bg-[#111827] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#374151]"
+            >
+              {copy.modalClose}
+            </button>
+          </section>
+        </div>
+      )}
     </main>
   );
 }
