@@ -98,7 +98,10 @@ type ChoiceOption = {
 type ReviewCopy = {
   eyebrow: string;
   title: string;
+  introDescription: string;
   loading: string;
+  loadingHint: string;
+  unavailableEyebrow: string;
   unavailableTitle: string;
   targetLabel: string;
   rewardNotice: string;
@@ -120,8 +123,11 @@ type ReviewCopy = {
   submitWaitShort: string;
   submitWaitLong: string;
   submitSuccess: string;
+  modalEyebrow: string;
   modalTitle: string;
   modalClose: string;
+  optionalQuestionNumber: string;
+  environmentBadge: string;
   rewardSuccess: (previous: number | null, next: number | null, delta: number | null) => string;
   rewardAlready: string;
   rewardSkipped: string;
@@ -202,11 +208,21 @@ function numberPrefixJa(context: ReviewContext) {
     : "";
 }
 
+function numberPrefixZh(context: ReviewContext) {
+  return typeof context.player.number === "number" && context.player.number > 0
+    ? `${context.player.number}号 `
+    : "";
+}
+
 const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
   ko: {
     eyebrow: "ssobig playroom",
     title: "플레이 리뷰",
+    introDescription:
+      "플레이가 끝난 뒤 느낀 점을 남겨주세요. 작성 내용은 다음 플레이룸 콘텐츠를 다듬는 데 사용됩니다.",
     loading: "리뷰 작성 정보를 불러오는 중입니다.",
+    loadingHint: "잠시만 기다려 주세요.",
+    unavailableEyebrow: "리뷰 링크 확인",
     unavailableTitle: "리뷰를 작성할 수 없습니다",
     targetLabel: "작성 대상",
     rewardNotice:
@@ -237,8 +253,11 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
       "리뷰 저장과 토큰 지급을 함께 처리하고 있어 조금 걸릴 수 있습니다.",
     submitWaitLong: "창을 닫지 말고 잠시만 기다려 주세요.",
     submitSuccess: "리뷰가 저장되었습니다.",
+    modalEyebrow: "제출 완료",
     modalTitle: "리뷰 저장 완료",
     modalClose: "확인",
+    optionalQuestionNumber: "Q7 (선택)",
+    environmentBadge: "테스트",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
         ? `30토큰 보상이 적용되어 보유 토큰이 ${previous} → ${next}로 늘었습니다. 증가량: +${delta ?? 30}토큰`
@@ -265,23 +284,27 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
   en: {
     eyebrow: "ssobig playroom",
     title: "Play Review",
+    introDescription:
+      "Tell us what you thought after playing. Your feedback helps us make future Playroom stories better.",
     loading: "Loading review details.",
+    loadingHint: "Please wait a moment.",
+    unavailableEyebrow: "Review Link",
     unavailableTitle: "This review link is unavailable",
     targetLabel: "Reviewing",
     rewardNotice:
-      "Submit a review and receive 30 tokens for SsoBig Tool content purchases.",
-    satisfactionLabel: (context) => `How was your play of "${context.game.title}"?`,
-    playExperienceLabel: "How many murder mystery games have you played?",
-    inflowLabel: "How did you find this game?",
+      "Leave a review and get 30 tokens to use on SsoBig Tool content.",
+    satisfactionLabel: (context) => `How was "${context.game.title}"?`,
+    playExperienceLabel: "How much murder mystery experience do you have?",
+    inflowLabel: "How did you hear about this game?",
     inflowOtherLabel: "Other source",
     inflowOtherPlaceholder: "Tell us where you found this game.",
-    recommendationTargetLabel: "Who would you recommend this game to?",
-    charmPointLabel: "What was this game's strongest appeal?",
-    charmPointPlaceholder: "Enter your own answer.",
-    sequelInterestLabel: "Would you play the next title if it is released?",
+    recommendationTargetLabel: "Who do you think would enjoy this game most?",
+    charmPointLabel: "What stood out to you the most?",
+    charmPointPlaceholder: "Write your answer here.",
+    sequelInterestLabel: "Would you be interested in playing another story?",
     additionalCommentLabel:
-      "If you have a message or review for the creator, please write it freely.",
-    additionalCommentPlaceholder: "Enter your message",
+      "Anything else you would like to tell the creator?",
+    additionalCommentPlaceholder: "Share any extra thoughts here.",
     submitIdle: "Submit Review",
     submitEdit: "Edit Review",
     submitLoading: "Saving",
@@ -295,12 +318,15 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
       "Saving the review and applying the token reward can take a moment.",
     submitWaitLong: "Please keep this window open for a little longer.",
     submitSuccess: "Your review has been saved.",
+    modalEyebrow: "Submitted",
     modalTitle: "Review Saved",
     modalClose: "OK",
+    optionalQuestionNumber: "Q7 (Optional)",
+    environmentBadge: "Staging",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
-        ? `A 30-token reward was applied. Your token balance increased from ${previous} to ${next}. Increase: +${delta ?? 30} tokens.`
-        : "A 30-token reward was applied.",
+        ? `Your 30-token reward has been added. Your balance is now ${next}, up from ${previous}. +${delta ?? 30} tokens.`
+        : "Your 30-token reward has been added.",
     rewardAlready: "You have already received the review reward for this template.",
     rewardSkipped: "Your review was saved, but this submission is not eligible for a reward.",
     rewardFailed: "Your review was saved, but the token reward could not be applied. Please check again later.",
@@ -323,7 +349,11 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
   ja: {
     eyebrow: "ssobig playroom",
     title: "プレイレビュー",
+    introDescription:
+      "プレイ後に感じたことをお聞かせください。いただいた内容は今後の Playroom コンテンツ改善に活用します。",
     loading: "レビュー作成情報を読み込んでいます。",
+    loadingHint: "少々お待ちください。",
+    unavailableEyebrow: "レビューリンク確認",
     unavailableTitle: "レビューを作成できません",
     targetLabel: "レビュー対象",
     rewardNotice:
@@ -353,8 +383,11 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
       "レビュー保存とトークン付与を同時に処理しているため、少し時間がかかる場合があります。",
     submitWaitLong: "この画面を閉じずに、もう少しお待ちください。",
     submitSuccess: "レビューが保存されました。",
+    modalEyebrow: "送信完了",
     modalTitle: "レビュー保存完了",
-    modalClose: "確認",
+    modalClose: "OK",
+    optionalQuestionNumber: "Q7（任意）",
+    environmentBadge: "ステージング",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
         ? `30トークンの特典が適用され、保有トークンが ${previous} → ${next} に増えました。増加量: +${delta ?? 30}トークン`
@@ -377,6 +410,68 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     botBlockedMessage: "bot プレイヤーはレビューを作成できません。",
     contextTitle: (context) =>
       `${context.game.title} / ${numberPrefixJa(context)}${context.player.nickname}`,
+  },
+  zh: {
+    eyebrow: "ssobig playroom",
+    title: "游玩评价",
+    introDescription:
+      "请分享游玩后的感受。你的反馈将用于改进之后的 Playroom 内容。",
+    loading: "正在加载评价信息。",
+    loadingHint: "请稍候。",
+    unavailableEyebrow: "评价链接确认",
+    unavailableTitle: "无法填写评价",
+    targetLabel: "评价对象",
+    rewardNotice:
+      "提交评价后，将立即发放可用于购买 SsoBig Tool 内容的 30 个代币。",
+    satisfactionLabel: (context) => `你觉得《${context.game.title}》的游玩体验如何？`,
+    playExperienceLabel: "你玩过多少次谋杀推理游戏？",
+    inflowLabel: "你是怎么知道这个游戏的？",
+    inflowOtherLabel: "其他来源",
+    inflowOtherPlaceholder: "请写下你是在哪里知道这个游戏的。",
+    recommendationTargetLabel: "如果推荐给朋友，你想推荐给哪类人？",
+    charmPointLabel: "这个游戏最吸引你的地方是什么？",
+    charmPointPlaceholder: "请输入其他回答。",
+    sequelInterestLabel: "如果推出下一部作品，你愿意游玩吗？",
+    additionalCommentLabel: "如果有想对作者说的话或评价，请自由填写。",
+    additionalCommentPlaceholder: "请在这里输入",
+    submitIdle: "提交评价",
+    submitEdit: "修改评价",
+    submitLoading: "保存中",
+    submitProgress: [
+      "正在保存评价。",
+      "正在确认评价状态。",
+      "正在处理 30 个代币奖励。",
+      "即将完成。",
+    ],
+    submitWaitShort: "评价保存和代币发放需要一点时间。",
+    submitWaitLong: "请不要关闭窗口，再稍等一下。",
+    submitSuccess: "评价已保存。",
+    modalEyebrow: "提交完成",
+    modalTitle: "评价保存完成",
+    modalClose: "OK",
+    optionalQuestionNumber: "Q7（可选）",
+    environmentBadge: "预览环境",
+    rewardSuccess: (previous, next, delta) =>
+      previous !== null && next !== null
+        ? `30 个代币奖励已发放。你的代币余额从 ${previous} 增加到 ${next}。增加量：+${delta ?? 30} 个代币。`
+        : "30 个代币奖励已发放。",
+    rewardAlready: "此模板的评价奖励已经发放过，不会重复发放。",
+    rewardSkipped: "评价已保存，但本次提交不符合奖励条件。",
+    rewardFailed: "评价已保存，但代币奖励处理失败。请稍后再确认。",
+    validationSatisfaction: "请选择满意度。",
+    missingLink: "评价链接缺少必要信息。",
+    contextNotFound: "找不到房间或玩家信息。",
+    invalidLink: "评价链接无效。",
+    contextLoadFailed: "无法加载房间和玩家信息。请稍后重试。",
+    contextLoadFailedShort: "无法加载评价信息。",
+    submitFailedRetry: "评价保存失败。请稍后重新提交。",
+    submitInvalid: "请检查评价链接或输入内容。",
+    submitFailed: "提交评价时发生问题。请稍后重试。",
+    submitFailedShort: "无法保存评价。",
+    botBlockedTitle: "无法填写评价",
+    botBlockedMessage: "Bot 玩家不能提交评价。",
+    contextTitle: (context) =>
+      `${context.game.title} / ${numberPrefixZh(context)}${context.player.nickname}`,
   },
 };
 
@@ -409,25 +504,25 @@ const CHOICE_LABELS: Record<ReviewLanguage, Record<string, string>> = {
     excellent: "🥰 Excellent",
     okay: "🙂 Good",
     poor: "🥲 Not for me",
-    "2~5회": "2-5",
-    "6회~15회": "6-15",
-    "16~25회": "16-25",
-    "26회 이상": "26+",
+    "2~5회": "A few times",
+    "6회~15회": "Several times",
+    "16~25회": "Quite a lot",
+    "26회 이상": "Very experienced",
     "온라인 광고": "Online ad",
     "지인 추천": "Friend recommendation",
     "텀블벅 펀딩": "Tumblbug funding",
-    "머더 미스터리가 처음인 '입문자'": "Murder mystery beginners",
-    "몇 번 해본 적 있는 '경험자'": "Players with some experience",
-    "추리에 자신 있는 '고인물'": "Confident deduction fans",
+    "머더 미스터리가 처음인 '입문자'": "First-time murder mystery players",
+    "몇 번 해본 적 있는 '경험자'": "Players with some mystery game experience",
+    "추리에 자신 있는 '고인물'": "Players who love solving tough mysteries",
     "단서를 모아 범인을 추리하는 과정이 재밌었어요":
-      "Collecting clues and deducing the culprit was fun.",
+      "Piecing together clues to find the culprit was fun.",
     "캐릭터가 되어 연기하고 대화하는 롤플레이가 재밌었어요":
-      "Role-playing and talking in character was fun.",
-    [CHARM_POINT_OTHER_VALUE]: "Write another answer",
+      "Getting into character and role-playing with others was fun.",
+    [CHARM_POINT_OTHER_VALUE]: "Something else",
     "네 무조건 플레이하고 싶습니다.": "Yes, definitely.",
     "주제나 스토리를 보고 결정할 것 같습니다.":
-      "I would decide after seeing the theme or story.",
-    "아니요, 이번 경험으로 충분합니다.": "No, this experience was enough.",
+      "Maybe, depending on the theme and story.",
+    "아니요, 이번 경험으로 충분합니다.": "Probably not for now.",
   },
   ja: {
     excellent: "🥰 最高です",
@@ -452,6 +547,30 @@ const CHOICE_LABELS: Record<ReviewLanguage, Record<string, string>> = {
     "주제나 스토리를 보고 결정할 것 같습니다.":
       "テーマやストーリーを見て決めたいです。",
     "아니요, 이번 경험으로 충분합니다.": "いいえ、今回の体験で十分です。",
+  },
+  zh: {
+    excellent: "🥰 很喜欢",
+    okay: "🙂 还不错",
+    poor: "🥲 有些可惜",
+    "2~5회": "2-5 次",
+    "6회~15회": "6-15 次",
+    "16~25회": "16-25 次",
+    "26회 이상": "26 次以上",
+    "온라인 광고": "线上广告",
+    "지인 추천": "朋友推荐",
+    "텀블벅 펀딩": "Tumblbug 众筹",
+    "머더 미스터리가 처음인 '입문자'": "第一次玩谋杀推理的新手",
+    "몇 번 해본 적 있는 '경험자'": "玩过几次的有经验玩家",
+    "추리에 자신 있는 '고인물'": "对推理有信心的资深玩家",
+    "단서를 모아 범인을 추리하는 과정이 재밌었어요":
+      "收集线索并推理凶手的过程很有趣。",
+    "캐릭터가 되어 연기하고 대화하는 롤플레이가 재밌었어요":
+      "扮演角色并进行对话的过程很有趣。",
+    [CHARM_POINT_OTHER_VALUE]: "填写其他回答",
+    "네 무조건 플레이하고 싶습니다.": "是的，一定想玩。",
+    "주제나 스토리를 보고 결정할 것 같습니다.":
+      "会根据主题或故事再决定。",
+    "아니요, 이번 경험으로 충분합니다.": "不了，这次体验已经足够。",
   },
 };
 
@@ -478,6 +597,10 @@ function localPreviewContext(language: ReviewLanguage): ReviewContext {
     ja: {
       title: "記憶の中の君 3447",
       nickname: "プレビュープレイヤー",
+    },
+    zh: {
+      title: "记忆中的你 3447",
+      nickname: "预览玩家",
     },
   }[language];
 
@@ -602,9 +725,15 @@ function QuestionShell({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-3">
-      <p className="text-xs font-bold uppercase text-[#b875ff]">{questionNumber}</p>
-      <h3 className="text-sm font-bold leading-6 text-white">{label}</h3>
+    <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 md:p-7">
+      <div className="mb-5">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+          {questionNumber}
+        </p>
+        <h3 className="break-keep text-xl font-semibold leading-7 text-white md:text-2xl md:leading-8">
+          {label}
+        </h3>
+      </div>
       {children}
     </section>
   );
@@ -619,7 +748,7 @@ function ChoiceGroup({
 }: ChoiceGroupProps) {
   return (
     <QuestionShell questionNumber={questionNumber} label={label}>
-      <div className="flex flex-wrap gap-2">
+      <div className="grid gap-3 md:grid-cols-2">
         {options.map((option) => {
           const selected = value === option.value;
           return (
@@ -627,10 +756,10 @@ function ChoiceGroup({
               key={option.value}
               type="button"
               onClick={() => onChange(option.value)}
-              className={`min-h-[36px] rounded px-4 py-2 text-left text-xs font-bold leading-5 shadow-sm transition ${
+              className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium leading-6 transition ${
                 selected
-                  ? "bg-[#f3e8ff] text-[#111827] ring-2 ring-[#c084fc]"
-                  : "bg-black text-white hover:bg-[#2f2439]"
+                  ? "border-[#FF7A59] bg-[#FF7A59] text-white shadow-[0_12px_30px_rgba(255,122,89,0.25)]"
+                  : "border-white/15 bg-white/[0.03] text-white/78 hover:border-white/30 hover:bg-white/[0.06]"
               }`}
               aria-pressed={selected}
             >
@@ -663,7 +792,7 @@ function TextAreaField({
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         rows={4}
-        className="w-full resize-y rounded-none border-2 border-[#c084fc] bg-black/20 px-4 py-3 text-[16px] leading-6 text-white outline-none transition placeholder:text-[#c7bdd3] focus:border-[#e9d5ff]"
+        className="min-h-36 w-full resize-y rounded-2xl border border-white/12 bg-black/30 px-4 py-4 text-sm leading-6 text-white outline-none transition placeholder:text-white/28 focus:border-[#FF7A59]"
       />
     </QuestionShell>
   );
@@ -918,45 +1047,75 @@ export default function PlayroomReviewForm({
   );
 
   return (
-    <main className="min-h-screen bg-[#f5f5f0] px-5 py-24 text-[#111827] sm:px-8">
-      <div className="mx-auto max-w-2xl">
-        <header className="mb-8">
-          <p className="mb-2 text-sm font-bold uppercase tracking-[0.16em] text-[#6b7280]">
+    <main className="min-h-screen bg-[#050505] px-5 py-14 text-white sm:px-8 md:py-20">
+      <div className="mx-auto max-w-3xl">
+        <header className="mb-8 rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] md:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#FFB38A]">
             {copy.eyebrow}
           </p>
-          <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
             {copy.title}
           </h1>
+          <p className="mt-4 break-keep text-base leading-7 text-white/72 md:text-lg">
+            {copy.introDescription}
+          </p>
+          {loadState.status === "ready" && !loadState.context.player.isBot && (
+            <div className="mt-6 border-t border-white/10 pt-6">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+                {copy.targetLabel}
+              </p>
+              <h2 className="mt-3 break-keep text-2xl font-semibold leading-8 text-white md:text-3xl">
+                {copy.contextTitle(loadState.context)}
+              </h2>
+              <p className="mt-5 rounded-2xl border border-[#FF7A59]/25 bg-black/25 px-4 py-3 text-sm font-medium leading-6 text-[#FFD3C4]">
+                {copy.rewardNotice}
+              </p>
+              {loadState.context.env === "staging" && (
+                <span className="mt-3 inline-flex rounded-full border border-[#FFB38A]/30 bg-[#FF7A59]/12 px-3 py-1 text-xs font-semibold text-[#FFB38A]">
+                  {copy.environmentBadge}
+                </span>
+              )}
+            </div>
+          )}
         </header>
 
         {loadState.status === "loading" && (
-          <section className="rounded-md border border-[#e5e7eb] bg-white p-6 shadow-sm">
-            <p className="text-sm font-semibold text-[#4b5563]">
+          <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 text-center shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+            <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-2 border-white/10 border-t-[#FF7A59]" />
+            <p className="text-lg font-medium text-white">
               {copy.loading}
             </p>
+            <p className="mt-2 text-sm text-white/55">{copy.loadingHint}</p>
           </section>
         )}
 
         {loadState.status === "error" && (
-          <section className="rounded-md border border-[#fca5a5] bg-white p-6 shadow-sm">
-            <h2 className="mb-2 text-lg font-bold text-[#991b1b]">
+          <section className="rounded-[32px] border border-[#FF7A59]/25 bg-[#120C0A] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+              {copy.unavailableEyebrow}
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">
               {copy.unavailableTitle}
             </h2>
-            <p className="text-sm leading-6 text-[#7f1d1d]">{loadState.message}</p>
+            <p className="mt-4 whitespace-pre-line text-base leading-7 text-white/70">
+              {loadState.message}
+            </p>
           </section>
         )}
 
         {loadState.status === "ready" && loadState.context.player.isBot && (
-          <section className="rounded-md border border-[#fca5a5] bg-white p-6 shadow-sm">
-            <p className="text-sm text-[#6b7280]">{copy.targetLabel}</p>
-            <h2 className="mt-1 text-xl font-bold leading-8 text-[#111827]">
+          <section className="rounded-[32px] border border-[#FF7A59]/25 bg-[#120C0A] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+              {copy.targetLabel}
+            </p>
+            <h2 className="mt-3 break-keep text-2xl font-semibold leading-8 text-white md:text-3xl">
               {copy.contextTitle(loadState.context)}
             </h2>
-            <div className="mt-5 rounded-md bg-[#fef2f2] px-4 py-3">
-              <h3 className="text-base font-bold text-[#991b1b]">
+            <div className="mt-5 rounded-2xl border border-[#FF7A59]/25 bg-black/25 px-4 py-3">
+              <h3 className="text-base font-semibold text-[#FFD3C4]">
                 {copy.botBlockedTitle}
               </h3>
-              <p className="mt-2 text-sm font-semibold leading-6 text-[#b91c1c]">
+              <p className="mt-2 text-sm font-medium leading-6 text-white/70">
                 {copy.botBlockedMessage}
               </p>
             </div>
@@ -964,28 +1123,10 @@ export default function PlayroomReviewForm({
         )}
 
         {loadState.status === "ready" && !loadState.context.player.isBot && (
-          <form
-            onSubmit={handleSubmit}
-            className="overflow-hidden rounded-md border border-[#2f2439] bg-[#111827] text-white shadow-sm"
-          >
-            <section className="border-b border-white/10 bg-[#f8f7f2] p-5 text-[#111827] sm:p-7">
-              <p className="text-sm text-[#6b7280]">{copy.targetLabel}</p>
-              <h2 className="mt-1 text-xl font-bold leading-8">
-                {copy.contextTitle(loadState.context)}
-              </h2>
-              <p className="mt-4 rounded-md bg-[#fff7ed] px-4 py-3 text-sm font-semibold leading-6 text-[#7c2d12]">
-                {copy.rewardNotice}
-              </p>
-              {loadState.context.env === "staging" && (
-                <span className="mt-3 inline-flex rounded-md bg-[#fef3c7] px-3 py-1 text-xs font-bold text-[#92400e]">
-                  staging
-                </span>
-              )}
-            </section>
-
+          <form onSubmit={handleSubmit} className="space-y-5">
             <fieldset
               disabled={submitState.status === "submitting"}
-              className="space-y-8 bg-[radial-gradient(circle_at_45%_20%,rgba(192,132,252,0.20),transparent_30%),linear-gradient(180deg,#17202d_0%,#1f1a27_45%,#15121c_100%)] p-5 disabled:opacity-80 sm:p-7"
+              className="space-y-5 disabled:opacity-80"
             >
               <ChoiceGroup
                 questionNumber="Q1"
@@ -1048,7 +1189,7 @@ export default function PlayroomReviewForm({
                 onChange={(value) => update("sequelInterest", value)}
               />
               <TextAreaField
-                questionNumber="Q7 (선택)"
+                questionNumber={copy.optionalQuestionNumber}
                 label={copy.additionalCommentLabel}
                 value={form.additionalComment}
                 placeholder={copy.additionalCommentPlaceholder}
@@ -1056,11 +1197,11 @@ export default function PlayroomReviewForm({
               />
             </fieldset>
 
-            <div className="flex flex-col gap-3 border-t border-white/10 bg-[#f8f7f2] p-5 sm:p-7">
+            <div className="flex flex-col gap-3">
               <button
                 type="submit"
                 disabled={submitState.status === "submitting"}
-                className="min-h-[52px] rounded-md bg-[#111827] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#374151] disabled:cursor-not-allowed disabled:bg-[#9ca3af]"
+                className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#FF7A59] px-6 text-base font-semibold text-white transition hover:brightness-105 disabled:cursor-wait disabled:bg-[#7F4A3A] disabled:text-white/70"
               >
                 {submitState.status === "submitting"
                   ? copy.submitLoading
@@ -1069,32 +1210,32 @@ export default function PlayroomReviewForm({
                     : copy.submitIdle}
               </button>
               {submitState.status === "submitting" && (
-                <div className="rounded-md border border-[#e5e7eb] bg-white px-4 py-3 text-sm leading-6 text-[#374151]">
-                  <div className="mb-3 h-2 overflow-hidden rounded-full bg-[#e5e7eb]">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-white/70">
+                  <div className="mb-3 h-2 overflow-hidden rounded-full bg-white/10">
                     <div
-                      className="h-full rounded-full bg-[#7c3aed] transition-all duration-300"
+                      className="h-full rounded-full bg-[#FF7A59] transition-all duration-300"
                       style={{
                         width: `${Math.min(92, 18 + submitProgressIndex * 24)}%`,
                       }}
                     />
                   </div>
-                  <p className="font-bold text-[#111827]">
+                  <p className="font-semibold text-white">
                     {copy.submitProgress[submitProgressIndex]}
                   </p>
                   {submitElapsedMs >= 2200 && (
-                    <p className="mt-1 text-xs font-semibold text-[#6b7280]">
+                    <p className="mt-1 text-xs font-medium text-white/50">
                       {copy.submitWaitShort}
                     </p>
                   )}
                   {submitElapsedMs >= 7000 && (
-                    <p className="mt-1 text-xs font-semibold text-[#7c2d12]">
+                    <p className="mt-1 text-xs font-medium text-[#FFD3C4]">
                       {copy.submitWaitLong}
                     </p>
                   )}
                 </div>
               )}
               {submitState.status === "error" && (
-                <p className="rounded-md bg-[#fef2f2] px-4 py-3 text-sm font-semibold text-[#b91c1c]">
+                <p className="whitespace-pre-line rounded-2xl border border-[#FF7A59]/25 bg-[#120C0A] px-4 py-3 text-sm font-medium leading-6 text-[#FFD3C4]">
                   {submitState.message}
                 </p>
               )}
@@ -1104,28 +1245,31 @@ export default function PlayroomReviewForm({
       </div>
       {submitState.status === "success" && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-5"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-5"
           role="dialog"
           aria-modal="true"
           aria-labelledby="review-success-title"
         >
-          <section className="w-full max-w-md rounded-md bg-white p-6 shadow-xl">
+          <section className="w-full max-w-md rounded-[32px] border border-[#FF7A59]/20 bg-[#120C0A] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+              {copy.modalEyebrow}
+            </p>
             <h2
               id="review-success-title"
-              className="text-xl font-bold leading-8 text-[#111827]"
+              className="mt-3 text-2xl font-semibold leading-8 text-white"
             >
               {copy.modalTitle}
             </h2>
-            <p className="mt-3 text-sm font-semibold leading-6 text-[#047857]">
+            <p className="mt-3 text-sm font-semibold leading-6 text-[#FFD3C4]">
               {copy.submitSuccess}
             </p>
-            <p className="mt-3 text-sm leading-6 text-[#374151]">
+            <p className="mt-3 text-sm leading-6 text-white/70">
               {rewardMessage(copy, submitState.reward)}
             </p>
             <button
               type="button"
               onClick={() => setSubmitState({ status: "idle" })}
-              className="mt-6 min-h-[44px] w-full rounded-md bg-[#111827] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#374151]"
+              className="mt-6 min-h-12 w-full rounded-2xl bg-[#FF7A59] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-105"
             >
               {copy.modalClose}
             </button>

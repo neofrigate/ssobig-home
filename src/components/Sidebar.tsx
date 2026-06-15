@@ -26,7 +26,9 @@ const Sidebar: React.FC = () => {
 
   if (
     pathname === "/offline/11namme/apply" ||
-    pathname?.startsWith("/offline/11namme/survey/")
+    pathname?.startsWith("/offline/11namme/survey/") ||
+    pathname === "/playroom/review" ||
+    pathname?.match(/^\/playroom\/[^/]+\/review$/)
   ) {
     return null;
   }

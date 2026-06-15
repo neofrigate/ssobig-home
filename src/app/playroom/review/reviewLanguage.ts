@@ -1,4 +1,4 @@
-export type ReviewLanguage = "ko" | "en" | "ja";
+export type ReviewLanguage = "ko" | "en" | "ja" | "zh";
 
 const REVIEW_LANGUAGE_METADATA: Record<
   ReviewLanguage,
@@ -16,6 +16,10 @@ const REVIEW_LANGUAGE_METADATA: Record<
     title: "SSOBIG プレイレビュー",
     description: "SSOBIG PLAYROOM のゲームレビューを投稿してください。",
   },
+  zh: {
+    title: "SSOBIG 游玩评价",
+    description: "请留下你对 SSOBIG PLAYROOM 游戏的评价。",
+  },
 };
 
 export function normalizeReviewLanguage(
@@ -24,6 +28,7 @@ export function normalizeReviewLanguage(
   const normalized = String(value || "").trim().toLowerCase();
   if (["en", "english"].includes(normalized)) return "en";
   if (["ja", "jp", "japanese"].includes(normalized)) return "ja";
+  if (["zh", "cn", "zh-cn", "chinese"].includes(normalized)) return "zh";
   return "ko";
 }
 
