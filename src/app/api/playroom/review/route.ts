@@ -34,6 +34,7 @@ type ReviewLookup = {
     recordId: string;
     nickname: string;
     number: number | null;
+    isBot: boolean;
     sex: string;
     name: string;
     phoneNumber: string;
@@ -101,6 +102,10 @@ function normalizePhoneNumber(value: unknown) {
   const digits = text.replace(/[^0-9]/g, "");
   if (digits.startsWith("82")) return `0${digits.slice(2)}`;
   return digits || text;
+}
+
+function isBotIdentity(value: unknown) {
+  return firstString(value).toLowerCase().startsWith("bot_");
 }
 
 function base64UrlEncode(input: string | Buffer) {
@@ -308,8 +313,9 @@ function findPlayer(rows: PlayerRow[], playerId: string) {
 
 function buildPlayer(id: string, data: Record<string, unknown>) {
   const number = nullableNumber(data.number);
+  const playerId = firstString(data.originalUserID, data.originalUserId, data.userId, id);
   return {
-    id: firstString(data.originalUserID, data.originalUserId, data.userId, id),
+    id: playerId,
     recordId: id,
     nickname: firstString(
       data.nickname,
@@ -320,6 +326,15 @@ function buildPlayer(id: string, data: Record<string, unknown>) {
       "익명"
     ),
     number,
+    isBot:
+      isBotIdentity(playerId) ||
+      isBotIdentity(id) ||
+      isBotIdentity(data.documentId) ||
+      isBotIdentity(data.nickname) ||
+      isBotIdentity(data.nickName) ||
+      isBotIdentity(data.realName) ||
+      isBotIdentity(data.displayName) ||
+      isBotIdentity(data.email),
     sex: firstString(data.sex, data.gender),
     name: firstString(data.realName, data.displayName, data.name),
     phoneNumber: normalizePhoneNumber(firstString(data.phoneNumber, data.phone, data.mobile)),
@@ -446,6 +461,9 @@ export async function POST(request: Request) {
       { success: false, error: "gameId and playerId are required" },
       400
     );
+  }
+  if (isBotIdentity(playerId)) {
+    return jsonResponse({ success: false, error: "Bot players cannot submit reviews" }, 403);
   }
   if (!SATISFACTION_VALUES.has(satisfaction)) {
     return jsonResponse({ success: false, error: "satisfaction is required" }, 400);

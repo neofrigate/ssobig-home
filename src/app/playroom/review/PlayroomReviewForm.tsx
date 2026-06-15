@@ -21,6 +21,7 @@ type ReviewContext = {
     recordId: string;
     nickname: string;
     number: number | null;
+    isBot: boolean;
     sex: string;
     name: string;
     phoneNumber: string;
@@ -91,6 +92,8 @@ type ReviewCopy = {
   submitInvalid: string;
   submitFailed: string;
   submitFailedShort: string;
+  botBlockedTitle: string;
+  botBlockedMessage: string;
   contextTitle: (context: ReviewContext) => string;
 };
 
@@ -176,6 +179,8 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     submitInvalid: "후기 링크 또는 입력값을 확인해 주세요.",
     submitFailed: "후기 제출 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
     submitFailedShort: "후기를 저장하지 못했습니다.",
+    botBlockedTitle: "후기를 작성할 수 없습니다",
+    botBlockedMessage: "bot 플레이어는 작성할 수 없습니다.",
     contextTitle: (context) =>
       `${context.game.title} / ${numberPrefixKo(context)}${context.player.nickname}`,
   },
@@ -210,6 +215,8 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     submitInvalid: "Please check the review link or your input.",
     submitFailed: "Something went wrong while submitting your review. Please try again shortly.",
     submitFailedShort: "Could not save your review.",
+    botBlockedTitle: "This review cannot be submitted",
+    botBlockedMessage: "Bot players cannot submit reviews.",
     contextTitle: (context) =>
       `${context.game.title} / ${numberPrefixEn(context)}${context.player.nickname}`,
   },
@@ -243,6 +250,8 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     submitInvalid: "レビューリンクまたは入力内容を確認してください。",
     submitFailed: "レビュー送信中に問題が発生しました。しばらくしてからもう一度お試しください。",
     submitFailedShort: "レビューを保存できませんでした。",
+    botBlockedTitle: "レビューを作成できません",
+    botBlockedMessage: "bot プレイヤーはレビューを作成できません。",
     contextTitle: (context) =>
       `${context.game.title} / ${numberPrefixJa(context)}${context.player.nickname}`,
   },
@@ -356,6 +365,7 @@ function localPreviewContext(language: ReviewLanguage): ReviewContext {
       recordId: "preview-player-record",
       nickname: copy.nickname,
       number: 7,
+      isBot: false,
       sex: "",
       name: "",
       phoneNumber: "",
@@ -431,6 +441,10 @@ function contextErrorMessage(copy: ReviewCopy, status: number, serverError?: str
 }
 
 function submitErrorMessage(copy: ReviewCopy, status: number, serverError?: string) {
+  if (status === 403) {
+    return serverError || copy.botBlockedMessage;
+  }
+
   if (status === 502) {
     return copy.submitFailedRetry;
   }
@@ -543,6 +557,13 @@ export default function PlayroomReviewForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loadState.status === "ready" && loadState.context.player.isBot) {
+      setSubmitState({
+        status: "error",
+        message: copy.botBlockedMessage,
+      });
+      return;
+    }
     if (loadState.status !== "ready" || !form.satisfaction) {
       setSubmitState({
         status: "error",
@@ -621,7 +642,24 @@ export default function PlayroomReviewForm({
           </section>
         )}
 
-        {loadState.status === "ready" && (
+        {loadState.status === "ready" && loadState.context.player.isBot && (
+          <section className="rounded-md border border-[#fca5a5] bg-white p-6 shadow-sm">
+            <p className="text-sm text-[#6b7280]">{copy.targetLabel}</p>
+            <h2 className="mt-1 text-xl font-bold leading-8 text-[#111827]">
+              {copy.contextTitle(loadState.context)}
+            </h2>
+            <div className="mt-5 rounded-md bg-[#fef2f2] px-4 py-3">
+              <h3 className="text-base font-bold text-[#991b1b]">
+                {copy.botBlockedTitle}
+              </h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-[#b91c1c]">
+                {copy.botBlockedMessage}
+              </p>
+            </div>
+          </section>
+        )}
+
+        {loadState.status === "ready" && !loadState.context.player.isBot && (
           <form
             onSubmit={handleSubmit}
             className="rounded-md border border-[#e5e7eb] bg-white p-5 shadow-sm sm:p-7"
