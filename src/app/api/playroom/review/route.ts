@@ -49,7 +49,8 @@ const PLAYROOM_REVIEW_SUBMIT_URL =
 const PLAYROOM_REVIEW_SUBMIT_SECRET =
   process.env.PLAYROOM_REVIEW_SUBMIT_SECRET?.trim() || "";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-const FIREBASE_SCOPE = "https://www.googleapis.com/auth/firebase.database";
+const FIREBASE_SCOPE =
+  "https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email";
 const TOKEN_CACHE = new Map<EnvName, AccessTokenCacheEntry>();
 const SATISFACTION_VALUES = new Set([
   "🥰 최고예요",
