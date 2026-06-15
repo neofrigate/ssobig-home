@@ -5,8 +5,8 @@ const REVIEW_LANGUAGE_METADATA: Record<
   { title: string; description: string }
 > = {
   ko: {
-    title: "쏘빅 플레이 후기",
-    description: "쏘빅 플레이룸 게임 후기를 남겨주세요.",
+    title: "쏘빅 플레이 리뷰",
+    description: "쏘빅 플레이룸 게임 리뷰를 남겨주세요.",
   },
   en: {
     title: "SSOBIG Play Review",
