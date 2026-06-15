@@ -54,6 +54,8 @@ type ExistingReview = {
   inflowSourceOther: string;
   recommendationTarget: string;
   charmPoint: string;
+  charmPointChoice?: string;
+  charmPointOther?: string;
   sequelInterest: string;
   additionalComment: string;
 };
@@ -419,6 +421,8 @@ async function fetchExistingReview(
     inflowSourceOther: firstRawString(rawData, "InflowSourceOther", "유입 경로 기타"),
     recommendationTarget: firstString(row.recommendation_target),
     charmPoint: firstString(row.charm_point),
+    charmPointChoice: firstRawString(rawData, "CharmPointChoice", "매력 포인트 선택"),
+    charmPointOther: firstRawString(rawData, "CharmPointOther", "매력 포인트 기타"),
     sequelInterest: firstString(row.sequel_interest),
     additionalComment: firstString(row.additional_comment),
   };
@@ -575,6 +579,8 @@ export async function POST(request: Request) {
         inflowSourceOther: readStringField(body, "inflowSourceOther"),
         recommendationTarget: readStringField(body, "recommendationTarget"),
         charmPoint: readStringField(body, "charmPoint"),
+        charmPointChoice: readStringField(body, "charmPointChoice"),
+        charmPointOther: readStringField(body, "charmPointOther"),
         sequelInterest: readStringField(body, "sequelInterest"),
         additionalComment: readStringField(body, "additionalComment"),
       }),

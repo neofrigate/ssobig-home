@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { FormEvent, ReactNode } from "react";
 import type { ReviewLanguage } from "./reviewLanguage";
 
 type EnvName = "staging" | "production";
@@ -41,6 +42,8 @@ type ExistingReview = {
   inflowSourceOther: string;
   recommendationTarget: string;
   charmPoint: string;
+  charmPointChoice?: string;
+  charmPointOther?: string;
   sequelInterest: string;
   additionalComment: string;
 };
@@ -63,6 +66,7 @@ type FormState = {
   inflowSourceOther: string;
   recommendationTarget: string;
   charmPoint: string;
+  charmPointOther: string;
   sequelInterest: string;
   additionalComment: string;
 };
@@ -79,6 +83,7 @@ type SubmitState =
   | { status: "error"; message: string };
 
 type ChoiceGroupProps = {
+  questionNumber: string;
   label: string;
   value: string;
   options: ChoiceOption[];
@@ -96,13 +101,13 @@ type ReviewCopy = {
   loading: string;
   unavailableTitle: string;
   targetLabel: string;
-  satisfactionLabel: string;
+  rewardNotice: string;
+  satisfactionLabel: (context: ReviewContext) => string;
   playExperienceLabel: string;
   inflowLabel: string;
   inflowOtherLabel: string;
   inflowOtherPlaceholder: string;
   recommendationTargetLabel: string;
-  recommendationTargetPlaceholder: string;
   charmPointLabel: string;
   charmPointPlaceholder: string;
   sequelInterestLabel: string;
@@ -111,6 +116,9 @@ type ReviewCopy = {
   submitIdle: string;
   submitEdit: string;
   submitLoading: string;
+  submitProgress: string[];
+  submitWaitShort: string;
+  submitWaitLong: string;
   submitSuccess: string;
   modalTitle: string;
   modalClose: string;
@@ -140,29 +148,38 @@ const INITIAL_FORM: FormState = {
   inflowSourceOther: "",
   recommendationTarget: "",
   charmPoint: "",
+  charmPointOther: "",
   sequelInterest: "",
   additionalComment: "",
 };
 
 const SATISFACTION_VALUES = ["excellent", "okay", "poor"] as const;
 const PLAY_EXPERIENCE_VALUES = [
-  "처음 플레이했어요",
-  "1~2번 플레이해봤어요",
-  "3번 이상 플레이해봤어요",
-  "자주 플레이해요",
+  "2~5회",
+  "6회~15회",
+  "16~25회",
+  "26회 이상",
 ] as const;
 const INFLOW_VALUES = [
-  "공식 홈페이지/SNS",
+  "온라인 광고",
   "지인 추천",
-  "검색",
-  "커뮤니티",
-  "기타",
+  "텀블벅 펀딩",
+] as const;
+const RECOMMENDATION_TARGET_VALUES = [
+  "머더 미스터리가 처음인 '입문자'",
+  "몇 번 해본 적 있는 '경험자'",
+  "추리에 자신 있는 '고인물'",
+] as const;
+const CHARM_POINT_OTHER_VALUE = "기타 답변 작성하기";
+const CHARM_POINT_VALUES = [
+  "단서를 모아 범인을 추리하는 과정이 재밌었어요",
+  "캐릭터가 되어 연기하고 대화하는 롤플레이가 재밌었어요",
+  CHARM_POINT_OTHER_VALUE,
 ] as const;
 const SEQUEL_VALUES = [
-  "꼭 해보고 싶어요",
-  "관심 있어요",
-  "잘 모르겠어요",
-  "아직은 아니에요",
+  "네 무조건 플레이하고 싶습니다.",
+  "주제나 스토리를 보고 결정할 것 같습니다.",
+  "아니요, 이번 경험으로 충분합니다.",
 ] as const;
 const PREVIEW_GAME_ID = "__preview__";
 const PREVIEW_PLAYER_ID = "__preview__";
@@ -192,21 +209,33 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     loading: "리뷰 작성 정보를 불러오는 중입니다.",
     unavailableTitle: "리뷰를 작성할 수 없습니다",
     targetLabel: "작성 대상",
-    satisfactionLabel: "만족도",
-    playExperienceLabel: "플레이 경험",
-    inflowLabel: "유입 경로",
+    rewardNotice:
+      "리뷰를 작성하시면 쏘빅툴 내 콘텐츠 구매에 사용할 수 있는 30 토큰을 바로 지급합니다.",
+    satisfactionLabel: (context) => `"${context.game.title}"의 플레이는 어떠셨나요?`,
+    playExperienceLabel: "머더 미스터리 게임을 몇 번 정도 해보셨나요?",
+    inflowLabel: "이 게임을 어떻게 알게 되셨나요?",
     inflowOtherLabel: "기타 유입 경로",
     inflowOtherPlaceholder: "어디에서 알게 되었는지 적어주세요.",
-    recommendationTargetLabel: "추천 대상",
-    recommendationTargetPlaceholder: "이 게임을 누구에게 추천하고 싶은지 적어주세요.",
-    charmPointLabel: "매력 포인트",
-    charmPointPlaceholder: "가장 인상 깊었던 장면, 장치, 분위기를 적어주세요.",
-    sequelInterestLabel: "후속작 관심도",
-    additionalCommentLabel: "추가 의견",
-    additionalCommentPlaceholder: "작가에게 남기고 싶은 말을 자유롭게 적어주세요.",
+    recommendationTargetLabel:
+      "친구에게 이 게임을 영업한다면, 누구에게 추천하고 싶나요?",
+    charmPointLabel: "이 게임의 매력은 어디에 있었나요?",
+    charmPointPlaceholder: "기타 답변을 입력해 주세요.",
+    sequelInterestLabel: "다음 작품이 출시된다면 플레이하실 의향이 있으신가요?",
+    additionalCommentLabel:
+      "작가에게 남기고 싶은 한마디나 후기가 있다면 자유롭게 적어주세요.",
+    additionalCommentPlaceholder: "여기 입력하세요",
     submitIdle: "리뷰 남기기",
     submitEdit: "리뷰 수정하기",
     submitLoading: "저장 중",
+    submitProgress: [
+      "리뷰를 저장하고 있어요.",
+      "리뷰 작성 여부를 확인하고 있어요.",
+      "30토큰 지급을 처리하고 있어요.",
+      "거의 완료되었습니다.",
+    ],
+    submitWaitShort:
+      "리뷰 저장과 토큰 지급을 함께 처리하고 있어 조금 걸릴 수 있습니다.",
+    submitWaitLong: "창을 닫지 말고 잠시만 기다려 주세요.",
     submitSuccess: "리뷰가 저장되었습니다.",
     modalTitle: "리뷰 저장 완료",
     modalClose: "확인",
@@ -239,22 +268,32 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     loading: "Loading review details.",
     unavailableTitle: "This review link is unavailable",
     targetLabel: "Reviewing",
-    satisfactionLabel: "Satisfaction",
-    playExperienceLabel: "Play experience",
-    inflowLabel: "How did you find this?",
+    rewardNotice:
+      "Submit a review and receive 30 tokens for SsoBig Tool content purchases.",
+    satisfactionLabel: (context) => `How was your play of "${context.game.title}"?`,
+    playExperienceLabel: "How many murder mystery games have you played?",
+    inflowLabel: "How did you find this game?",
     inflowOtherLabel: "Other source",
     inflowOtherPlaceholder: "Tell us where you found this game.",
-    recommendationTargetLabel: "Who would you recommend it to?",
-    recommendationTargetPlaceholder: "Tell us who you would recommend this game to.",
-    charmPointLabel: "Favorite part",
-    charmPointPlaceholder:
-      "Share the scene, device, or mood that stood out the most.",
-    sequelInterestLabel: "Interest in a sequel",
-    additionalCommentLabel: "Additional comments",
-    additionalCommentPlaceholder: "Leave any message you would like to share.",
+    recommendationTargetLabel: "Who would you recommend this game to?",
+    charmPointLabel: "What was this game's strongest appeal?",
+    charmPointPlaceholder: "Enter your own answer.",
+    sequelInterestLabel: "Would you play the next title if it is released?",
+    additionalCommentLabel:
+      "If you have a message or review for the creator, please write it freely.",
+    additionalCommentPlaceholder: "Enter your message",
     submitIdle: "Submit Review",
     submitEdit: "Edit Review",
     submitLoading: "Saving",
+    submitProgress: [
+      "Saving your review.",
+      "Checking review status.",
+      "Applying the 30-token reward.",
+      "Almost done.",
+    ],
+    submitWaitShort:
+      "Saving the review and applying the token reward can take a moment.",
+    submitWaitLong: "Please keep this window open for a little longer.",
     submitSuccess: "Your review has been saved.",
     modalTitle: "Review Saved",
     modalClose: "OK",
@@ -287,21 +326,32 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     loading: "レビュー作成情報を読み込んでいます。",
     unavailableTitle: "レビューを作成できません",
     targetLabel: "レビュー対象",
-    satisfactionLabel: "満足度",
-    playExperienceLabel: "プレイ経験",
-    inflowLabel: "流入経路",
+    rewardNotice:
+      "レビューを作成すると、SsoBig Tool のコンテンツ購入に使える30トークンをすぐに付与します。",
+    satisfactionLabel: (context) => `「${context.game.title}」のプレイはいかがでしたか？`,
+    playExperienceLabel: "マーダーミステリーゲームを何回くらいプレイしましたか？",
+    inflowLabel: "このゲームをどのように知りましたか？",
     inflowOtherLabel: "その他の流入経路",
     inflowOtherPlaceholder: "どこで知ったか入力してください。",
-    recommendationTargetLabel: "おすすめしたい相手",
-    recommendationTargetPlaceholder: "このゲームを誰におすすめしたいか入力してください。",
-    charmPointLabel: "魅力ポイント",
-    charmPointPlaceholder: "印象に残った場面、仕掛け、雰囲気を入力してください。",
-    sequelInterestLabel: "続編への関心",
-    additionalCommentLabel: "その他のご意見",
-    additionalCommentPlaceholder: "作者に伝えたいことを自由に入力してください。",
+    recommendationTargetLabel: "友人にすすめるなら、誰にすすめたいですか？",
+    charmPointLabel: "このゲームの魅力はどこにありましたか？",
+    charmPointPlaceholder: "その他の回答を入力してください。",
+    sequelInterestLabel: "次回作が発売されたらプレイしたいですか？",
+    additionalCommentLabel:
+      "作者に伝えたい一言やレビューがあれば自由に書いてください。",
+    additionalCommentPlaceholder: "ここに入力してください",
     submitIdle: "レビューを送信",
     submitEdit: "レビューを修正",
     submitLoading: "保存中",
+    submitProgress: [
+      "レビューを保存しています。",
+      "レビュー作成状況を確認しています。",
+      "30トークン特典を処理しています。",
+      "まもなく完了します。",
+    ],
+    submitWaitShort:
+      "レビュー保存とトークン付与を同時に処理しているため、少し時間がかかる場合があります。",
+    submitWaitLong: "この画面を閉じずに、もう少しお待ちください。",
     submitSuccess: "レビューが保存されました。",
     modalTitle: "レビュー保存完了",
     modalClose: "確認",
@@ -330,69 +380,78 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
   },
 };
 
-const CHOICE_LABELS: Record<
-  ReviewLanguage,
-  Record<
-    | (typeof SATISFACTION_VALUES)[number]
-    | (typeof PLAY_EXPERIENCE_VALUES)[number]
-    | (typeof INFLOW_VALUES)[number]
-    | (typeof SEQUEL_VALUES)[number],
-    string
-  >
-> = {
+const CHOICE_LABELS: Record<ReviewLanguage, Record<string, string>> = {
   ko: {
     excellent: "🥰 최고예요",
     okay: "🙂 괜찮아요",
     poor: "🥲 아쉬워요",
-    "처음 플레이했어요": "처음 플레이했어요",
-    "1~2번 플레이해봤어요": "1~2번 플레이해봤어요",
-    "3번 이상 플레이해봤어요": "3번 이상 플레이해봤어요",
-    "자주 플레이해요": "자주 플레이해요",
-    "공식 홈페이지/SNS": "공식 홈페이지/SNS",
+    "2~5회": "2~5회",
+    "6회~15회": "6회~15회",
+    "16~25회": "16~25회",
+    "26회 이상": "26회 이상",
+    "온라인 광고": "온라인 광고",
     "지인 추천": "지인 추천",
-    검색: "검색",
-    커뮤니티: "커뮤니티",
-    기타: "기타",
-    "꼭 해보고 싶어요": "꼭 해보고 싶어요",
-    "관심 있어요": "관심 있어요",
-    "잘 모르겠어요": "잘 모르겠어요",
-    "아직은 아니에요": "아직은 아니에요",
+    "텀블벅 펀딩": "텀블벅 펀딩",
+    "머더 미스터리가 처음인 '입문자'": "머더 미스터리가 처음인 '입문자'",
+    "몇 번 해본 적 있는 '경험자'": "몇 번 해본 적 있는 '경험자'",
+    "추리에 자신 있는 '고인물'": "추리에 자신 있는 '고인물'",
+    "단서를 모아 범인을 추리하는 과정이 재밌었어요":
+      "단서를 모아 범인을 추리하는 과정이 재밌었어요",
+    "캐릭터가 되어 연기하고 대화하는 롤플레이가 재밌었어요":
+      "캐릭터가 되어 연기하고 대화하는 롤플레이가 재밌었어요",
+    [CHARM_POINT_OTHER_VALUE]: "기타 답변 작성하기",
+    "네 무조건 플레이하고 싶습니다.": "네 무조건 플레이하고 싶습니다.",
+    "주제나 스토리를 보고 결정할 것 같습니다.":
+      "주제나 스토리를 보고 결정할 것 같습니다.",
+    "아니요, 이번 경험으로 충분합니다.": "아니요, 이번 경험으로 충분합니다.",
   },
   en: {
     excellent: "🥰 Excellent",
     okay: "🙂 Good",
     poor: "🥲 Not for me",
-    "처음 플레이했어요": "This was my first time",
-    "1~2번 플레이해봤어요": "I have played 1-2 times",
-    "3번 이상 플레이해봤어요": "I have played 3+ times",
-    "자주 플레이해요": "I play often",
-    "공식 홈페이지/SNS": "Official website/SNS",
+    "2~5회": "2-5",
+    "6회~15회": "6-15",
+    "16~25회": "16-25",
+    "26회 이상": "26+",
+    "온라인 광고": "Online ad",
     "지인 추천": "Friend recommendation",
-    검색: "Search",
-    커뮤니티: "Community",
-    기타: "Other",
-    "꼭 해보고 싶어요": "Definitely interested",
-    "관심 있어요": "Interested",
-    "잘 모르겠어요": "Not sure",
-    "아직은 아니에요": "Not yet",
+    "텀블벅 펀딩": "Tumblbug funding",
+    "머더 미스터리가 처음인 '입문자'": "Murder mystery beginners",
+    "몇 번 해본 적 있는 '경험자'": "Players with some experience",
+    "추리에 자신 있는 '고인물'": "Confident deduction fans",
+    "단서를 모아 범인을 추리하는 과정이 재밌었어요":
+      "Collecting clues and deducing the culprit was fun.",
+    "캐릭터가 되어 연기하고 대화하는 롤플레이가 재밌었어요":
+      "Role-playing and talking in character was fun.",
+    [CHARM_POINT_OTHER_VALUE]: "Write another answer",
+    "네 무조건 플레이하고 싶습니다.": "Yes, definitely.",
+    "주제나 스토리를 보고 결정할 것 같습니다.":
+      "I would decide after seeing the theme or story.",
+    "아니요, 이번 경험으로 충분합니다.": "No, this experience was enough.",
   },
   ja: {
     excellent: "🥰 最高です",
     okay: "🙂 よかったです",
     poor: "🥲 惜しかったです",
-    "처음 플레이했어요": "初めてプレイしました",
-    "1~2번 플레이해봤어요": "1〜2回プレイしたことがあります",
-    "3번 이상 플레이해봤어요": "3回以上プレイしたことがあります",
-    "자주 플레이해요": "よくプレイします",
-    "공식 홈페이지/SNS": "公式サイト/SNS",
+    "2~5회": "2〜5回",
+    "6회~15회": "6〜15回",
+    "16~25회": "16〜25回",
+    "26회 이상": "26回以上",
+    "온라인 광고": "オンライン広告",
     "지인 추천": "知人のおすすめ",
-    검색: "検索",
-    커뮤니티: "コミュニティ",
-    기타: "その他",
-    "꼭 해보고 싶어요": "ぜひプレイしたいです",
-    "관심 있어요": "興味があります",
-    "잘 모르겠어요": "まだわかりません",
-    "아직은 아니에요": "今はまだです",
+    "텀블벅 펀딩": "Tumblbugファンディング",
+    "머더 미스터리가 처음인 '입문자'": "マーダーミステリー初心者",
+    "몇 번 해본 적 있는 '경험자'": "何度か遊んだ経験者",
+    "추리에 자신 있는 '고인물'": "推理に自信がある上級者",
+    "단서를 모아 범인을 추리하는 과정이 재밌었어요":
+      "手がかりを集めて犯人を推理する過程が楽しかったです。",
+    "캐릭터가 되어 연기하고 대화하는 롤플레이가 재밌었어요":
+      "キャラクターになって演じ、会話するロールプレイが楽しかったです。",
+    [CHARM_POINT_OTHER_VALUE]: "その他の回答を書く",
+    "네 무조건 플레이하고 싶습니다.": "はい、ぜひプレイしたいです。",
+    "주제나 스토리를 보고 결정할 것 같습니다.":
+      "テーマやストーリーを見て決めたいです。",
+    "아니요, 이번 경험으로 충분합니다.": "いいえ、今回の体験で十分です。",
   },
 };
 
@@ -402,7 +461,7 @@ function buildChoiceOptions<T extends readonly string[]>(
 ): ChoiceOption[] {
   return values.map((value) => ({
     value,
-    label: CHOICE_LABELS[language][value as keyof (typeof CHOICE_LABELS)[ReviewLanguage]],
+    label: CHOICE_LABELS[language][value] || value,
   }));
 }
 
@@ -464,16 +523,57 @@ function normalizeExistingSatisfaction(review: ExistingReview) {
   return "";
 }
 
+function normalizeExistingChoice(
+  value: string,
+  options: readonly string[]
+) {
+  return options.includes(value) ? value : "";
+}
+
+function normalizeExistingCharmPoint(review: ExistingReview) {
+  const savedChoice = review.charmPointChoice || "";
+  const savedOther = review.charmPointOther || "";
+  const savedValue = review.charmPoint || "";
+  if (CHARM_POINT_VALUES.includes(savedChoice as (typeof CHARM_POINT_VALUES)[number])) {
+    return {
+      charmPoint: savedChoice,
+      charmPointOther:
+        savedChoice === CHARM_POINT_OTHER_VALUE ? savedOther || savedValue : "",
+    };
+  }
+  if (CHARM_POINT_VALUES.includes(savedValue as (typeof CHARM_POINT_VALUES)[number])) {
+    return {
+      charmPoint: savedValue,
+      charmPointOther: "",
+    };
+  }
+  if (savedValue) {
+    return {
+      charmPoint: CHARM_POINT_OTHER_VALUE,
+      charmPointOther: savedOther || savedValue,
+    };
+  }
+  return {
+    charmPoint: "",
+    charmPointOther: "",
+  };
+}
+
 function formFromExistingReview(review: ExistingReview | null | undefined): FormState {
   if (!review) return INITIAL_FORM;
+  const charmPoint = normalizeExistingCharmPoint(review);
   return {
     satisfaction: normalizeExistingSatisfaction(review),
-    playExperience: review.playExperience || "",
-    inflowSource: review.inflowSource || "",
+    playExperience: normalizeExistingChoice(review.playExperience, PLAY_EXPERIENCE_VALUES),
+    inflowSource: normalizeExistingChoice(review.inflowSource, INFLOW_VALUES),
     inflowSourceOther: review.inflowSourceOther || "",
-    recommendationTarget: review.recommendationTarget || "",
-    charmPoint: review.charmPoint || "",
-    sequelInterest: review.sequelInterest || "",
+    recommendationTarget: normalizeExistingChoice(
+      review.recommendationTarget,
+      RECOMMENDATION_TARGET_VALUES
+    ),
+    charmPoint: charmPoint.charmPoint,
+    charmPointOther: charmPoint.charmPointOther,
+    sequelInterest: normalizeExistingChoice(review.sequelInterest, SEQUEL_VALUES),
     additionalComment: review.additionalComment || "",
   };
 }
@@ -492,11 +592,34 @@ function rewardMessage(copy: ReviewCopy, reward: RewardResult | null) {
   return copy.rewardSkipped;
 }
 
-function ChoiceGroup({ label, value, options, onChange }: ChoiceGroupProps) {
+function QuestionShell({
+  questionNumber,
+  label,
+  children,
+}: {
+  questionNumber: string;
+  label: string;
+  children: ReactNode;
+}) {
   return (
-    <fieldset className="space-y-3">
-      <legend className="text-sm font-semibold text-[#1f2937]">{label}</legend>
-      <div className="grid gap-2 sm:grid-cols-2">
+    <section className="space-y-3">
+      <p className="text-xs font-bold uppercase text-[#b875ff]">{questionNumber}</p>
+      <h3 className="text-sm font-bold leading-6 text-white">{label}</h3>
+      {children}
+    </section>
+  );
+}
+
+function ChoiceGroup({
+  questionNumber,
+  label,
+  value,
+  options,
+  onChange,
+}: ChoiceGroupProps) {
+  return (
+    <QuestionShell questionNumber={questionNumber} label={label}>
+      <div className="flex flex-wrap gap-2">
         {options.map((option) => {
           const selected = value === option.value;
           return (
@@ -504,10 +627,10 @@ function ChoiceGroup({ label, value, options, onChange }: ChoiceGroupProps) {
               key={option.value}
               type="button"
               onClick={() => onChange(option.value)}
-              className={`min-h-[48px] rounded-md border px-4 py-3 text-left text-sm font-semibold transition ${
+              className={`min-h-[36px] rounded px-4 py-2 text-left text-xs font-bold leading-5 shadow-sm transition ${
                 selected
-                  ? "border-[#111827] bg-[#111827] text-white"
-                  : "border-[#d1d5db] bg-white text-[#374151] hover:border-[#6b7280]"
+                  ? "bg-[#f3e8ff] text-[#111827] ring-2 ring-[#c084fc]"
+                  : "bg-black text-white hover:bg-[#2f2439]"
               }`}
               aria-pressed={selected}
             >
@@ -516,32 +639,33 @@ function ChoiceGroup({ label, value, options, onChange }: ChoiceGroupProps) {
           );
         })}
       </div>
-    </fieldset>
+    </QuestionShell>
   );
 }
 
 function TextAreaField({
+  questionNumber,
   label,
   value,
   placeholder,
   onChange,
 }: {
+  questionNumber: string;
   label: string;
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="block space-y-3">
-      <span className="text-sm font-semibold text-[#1f2937]">{label}</span>
+    <QuestionShell questionNumber={questionNumber} label={label}>
       <textarea
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         rows={4}
-        className="w-full resize-y rounded-md border border-[#d1d5db] bg-white px-4 py-3 text-[16px] leading-6 text-[#111827] outline-none transition placeholder:text-[#9ca3af] focus:border-[#111827]"
+        className="w-full resize-y rounded-none border-2 border-[#c084fc] bg-black/20 px-4 py-3 text-[16px] leading-6 text-white outline-none transition placeholder:text-[#c7bdd3] focus:border-[#e9d5ff]"
       />
-    </label>
+    </QuestionShell>
   );
 }
 
@@ -597,12 +721,21 @@ export default function PlayroomReviewForm({
     () => buildChoiceOptions(INFLOW_VALUES, language),
     [language]
   );
+  const recommendationTargetOptions = useMemo(
+    () => buildChoiceOptions(RECOMMENDATION_TARGET_VALUES, language),
+    [language]
+  );
+  const charmPointOptions = useMemo(
+    () => buildChoiceOptions(CHARM_POINT_VALUES, language),
+    [language]
+  );
   const sequelOptions = useMemo(
     () => buildChoiceOptions(SEQUEL_VALUES, language),
     [language]
   );
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
   const [submitState, setSubmitState] = useState<SubmitState>({ status: "idle" });
+  const [submitElapsedMs, setSubmitElapsedMs] = useState(0);
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [hasExistingReview, setHasExistingReview] = useState(false);
   const isPreview =
@@ -673,11 +806,26 @@ export default function PlayroomReviewForm({
     };
   }, [copy, gameId, isPreview, language, playerId, query]);
 
+  useEffect(() => {
+    if (submitState.status !== "submitting") {
+      setSubmitElapsedMs(0);
+      return;
+    }
+    const startedAt = Date.now();
+    const timer = window.setInterval(() => {
+      setSubmitElapsedMs(Date.now() - startedAt);
+    }, 250);
+    return () => window.clearInterval(timer);
+  }, [submitState.status]);
+
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => {
       const next = { ...current, [key]: value };
       if (key === "inflowSource" && value !== "기타") {
         next.inflowSourceOther = "";
+      }
+      if (key === "charmPoint" && value !== CHARM_POINT_OTHER_VALUE) {
+        next.charmPointOther = "";
       }
       return next;
     });
@@ -701,6 +849,11 @@ export default function PlayroomReviewForm({
       return;
     }
 
+    const resolvedCharmPoint =
+      form.charmPoint === CHARM_POINT_OTHER_VALUE
+        ? form.charmPointOther.trim()
+        : form.charmPoint;
+
     setSubmitState({ status: "submitting" });
     if (isPreview) {
       window.setTimeout(() => {
@@ -718,7 +871,7 @@ export default function PlayroomReviewForm({
             message: null,
           },
         });
-      }, 250);
+      }, 1800);
       return;
     }
 
@@ -733,6 +886,9 @@ export default function PlayroomReviewForm({
           playerId,
           env,
           ...form,
+          charmPoint: resolvedCharmPoint,
+          charmPointChoice: form.charmPoint,
+          charmPointOther: form.charmPointOther,
         }),
       });
       const payload = (await response.json().catch(() => null)) as
@@ -755,6 +911,11 @@ export default function PlayroomReviewForm({
       });
     }
   }
+
+  const submitProgressIndex = Math.min(
+    Math.floor(submitElapsedMs / 1600),
+    copy.submitProgress.length - 1
+  );
 
   return (
     <main className="min-h-screen bg-[#f5f5f0] px-5 py-24 text-[#111827] sm:px-8">
@@ -805,13 +966,16 @@ export default function PlayroomReviewForm({
         {loadState.status === "ready" && !loadState.context.player.isBot && (
           <form
             onSubmit={handleSubmit}
-            className="rounded-md border border-[#e5e7eb] bg-white p-5 shadow-sm sm:p-7"
+            className="overflow-hidden rounded-md border border-[#2f2439] bg-[#111827] text-white shadow-sm"
           >
-            <section className="mb-8 border-b border-[#e5e7eb] pb-5">
+            <section className="border-b border-white/10 bg-[#f8f7f2] p-5 text-[#111827] sm:p-7">
               <p className="text-sm text-[#6b7280]">{copy.targetLabel}</p>
               <h2 className="mt-1 text-xl font-bold leading-8">
                 {copy.contextTitle(loadState.context)}
               </h2>
+              <p className="mt-4 rounded-md bg-[#fff7ed] px-4 py-3 text-sm font-semibold leading-6 text-[#7c2d12]">
+                {copy.rewardNotice}
+              </p>
               {loadState.context.env === "staging" && (
                 <span className="mt-3 inline-flex rounded-md bg-[#fef3c7] px-3 py-1 text-xs font-bold text-[#92400e]">
                   staging
@@ -819,20 +983,26 @@ export default function PlayroomReviewForm({
               )}
             </section>
 
-            <div className="space-y-8">
+            <fieldset
+              disabled={submitState.status === "submitting"}
+              className="space-y-8 bg-[radial-gradient(circle_at_45%_20%,rgba(192,132,252,0.20),transparent_30%),linear-gradient(180deg,#17202d_0%,#1f1a27_45%,#15121c_100%)] p-5 disabled:opacity-80 sm:p-7"
+            >
               <ChoiceGroup
-                label={copy.satisfactionLabel}
+                questionNumber="Q1"
+                label={copy.satisfactionLabel(loadState.context)}
                 value={form.satisfaction}
                 options={satisfactionOptions}
                 onChange={(value) => update("satisfaction", value)}
               />
               <ChoiceGroup
+                questionNumber="Q2"
                 label={copy.playExperienceLabel}
                 value={form.playExperience}
                 options={playExperienceOptions}
                 onChange={(value) => update("playExperience", value)}
               />
               <ChoiceGroup
+                questionNumber="Q3"
                 label={copy.inflowLabel}
                 value={form.inflowSource}
                 options={inflowOptions}
@@ -840,39 +1010,53 @@ export default function PlayroomReviewForm({
               />
               {form.inflowSource === "기타" ? (
                 <TextAreaField
+                  questionNumber="Q3"
                   label={copy.inflowOtherLabel}
                   value={form.inflowSourceOther}
                   placeholder={copy.inflowOtherPlaceholder}
                   onChange={(value) => update("inflowSourceOther", value)}
                 />
               ) : null}
-              <TextAreaField
+              <ChoiceGroup
+                questionNumber="Q4"
                 label={copy.recommendationTargetLabel}
                 value={form.recommendationTarget}
-                placeholder={copy.recommendationTargetPlaceholder}
+                options={recommendationTargetOptions}
                 onChange={(value) => update("recommendationTarget", value)}
               />
-              <TextAreaField
+              <ChoiceGroup
+                questionNumber="Q5"
                 label={copy.charmPointLabel}
                 value={form.charmPoint}
-                placeholder={copy.charmPointPlaceholder}
+                options={charmPointOptions}
                 onChange={(value) => update("charmPoint", value)}
               />
+              {form.charmPoint === CHARM_POINT_OTHER_VALUE ? (
+                <TextAreaField
+                  questionNumber="Q5"
+                  label={copy.charmPointPlaceholder}
+                  value={form.charmPointOther}
+                  placeholder={copy.charmPointPlaceholder}
+                  onChange={(value) => update("charmPointOther", value)}
+                />
+              ) : null}
               <ChoiceGroup
+                questionNumber="Q6"
                 label={copy.sequelInterestLabel}
                 value={form.sequelInterest}
                 options={sequelOptions}
                 onChange={(value) => update("sequelInterest", value)}
               />
               <TextAreaField
+                questionNumber="Q7 (선택)"
                 label={copy.additionalCommentLabel}
                 value={form.additionalComment}
                 placeholder={copy.additionalCommentPlaceholder}
                 onChange={(value) => update("additionalComment", value)}
               />
-            </div>
+            </fieldset>
 
-            <div className="mt-8 flex flex-col gap-3 border-t border-[#e5e7eb] pt-6">
+            <div className="flex flex-col gap-3 border-t border-white/10 bg-[#f8f7f2] p-5 sm:p-7">
               <button
                 type="submit"
                 disabled={submitState.status === "submitting"}
@@ -884,6 +1068,31 @@ export default function PlayroomReviewForm({
                     ? copy.submitEdit
                     : copy.submitIdle}
               </button>
+              {submitState.status === "submitting" && (
+                <div className="rounded-md border border-[#e5e7eb] bg-white px-4 py-3 text-sm leading-6 text-[#374151]">
+                  <div className="mb-3 h-2 overflow-hidden rounded-full bg-[#e5e7eb]">
+                    <div
+                      className="h-full rounded-full bg-[#7c3aed] transition-all duration-300"
+                      style={{
+                        width: `${Math.min(92, 18 + submitProgressIndex * 24)}%`,
+                      }}
+                    />
+                  </div>
+                  <p className="font-bold text-[#111827]">
+                    {copy.submitProgress[submitProgressIndex]}
+                  </p>
+                  {submitElapsedMs >= 2200 && (
+                    <p className="mt-1 text-xs font-semibold text-[#6b7280]">
+                      {copy.submitWaitShort}
+                    </p>
+                  )}
+                  {submitElapsedMs >= 7000 && (
+                    <p className="mt-1 text-xs font-semibold text-[#7c2d12]">
+                      {copy.submitWaitLong}
+                    </p>
+                  )}
+                </div>
+              )}
               {submitState.status === "error" && (
                 <p className="rounded-md bg-[#fef2f2] px-4 py-3 text-sm font-semibold text-[#b91c1c]">
                   {submitState.message}
