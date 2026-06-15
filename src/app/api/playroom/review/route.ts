@@ -41,6 +41,21 @@ type ReviewLookup = {
     email: string;
     age: string;
   };
+  existingReview?: ExistingReview | null;
+};
+
+type ExistingReview = {
+  id: number | string;
+  sentTime: string;
+  satisfaction: string;
+  satisfactionCode: string;
+  playExperience: string;
+  inflowSource: string;
+  inflowSourceOther: string;
+  recommendationTarget: string;
+  charmPoint: string;
+  sequelInterest: string;
+  additionalComment: string;
 };
 
 const PLAYROOM_REVIEW_SUBMIT_URL =
@@ -48,6 +63,12 @@ const PLAYROOM_REVIEW_SUBMIT_URL =
   "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/submit-playroom-review";
 const PLAYROOM_REVIEW_SUBMIT_SECRET =
   process.env.PLAYROOM_REVIEW_SUBMIT_SECRET?.trim() || "";
+const QUALITY_SUPABASE_URL =
+  process.env.QUALITY_SUPABASE_URL?.trim() ||
+  "https://tlyioijsopxeegzfjlqe.supabase.co";
+const QUALITY_SUPABASE_KEY =
+  process.env.QUALITY_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+  "sb_publishable_AdEHgXPGJ2gKGVAjb7RYSg_YzUuT6jB";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const FIREBASE_SCOPE =
   "https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email";
@@ -350,6 +371,59 @@ function buildPlayer(id: string, data: Record<string, unknown>) {
   };
 }
 
+function firstRawString(source: unknown, ...keys: string[]) {
+  if (!source || typeof source !== "object") return "";
+  const record = source as Record<string, unknown>;
+  return firstString(...keys.map((key) => record[key]));
+}
+
+async function fetchExistingReview(
+  gameId: string,
+  ssobigUserId: string
+): Promise<ExistingReview | null> {
+  if (!gameId || !ssobigUserId) return null;
+
+  const params = new URLSearchParams({
+    game_id: `eq.${gameId}`,
+    ssobig_user_id: `eq.${ssobigUserId}`,
+    select:
+      "id,sent_time,satisfaction,satisfaction_code,play_experience,inflow_source,recommendation_target,charm_point,sequel_interest,additional_comment,raw_data",
+    order: "sent_time.desc",
+    limit: "1",
+  });
+  const response = await fetch(
+    `${QUALITY_SUPABASE_URL.replace(/\/+$/, "")}/rest/v1/reviews?${params.toString()}`,
+    {
+      headers: {
+        apikey: QUALITY_SUPABASE_KEY,
+        Authorization: `Bearer ${QUALITY_SUPABASE_KEY}`,
+      },
+      cache: "no-store",
+    }
+  );
+  if (!response.ok) {
+    console.error("[playroom-review] existing review lookup failed", response.status);
+    return null;
+  }
+  const rows = (await response.json().catch(() => [])) as Record<string, unknown>[];
+  const row = rows[0];
+  if (!row) return null;
+  const rawData = row.raw_data;
+  return {
+    id: firstString(row.id),
+    sentTime: firstString(row.sent_time),
+    satisfaction: firstString(row.satisfaction),
+    satisfactionCode: firstString(row.satisfaction_code),
+    playExperience: firstString(row.play_experience),
+    inflowSource: firstString(row.inflow_source),
+    inflowSourceOther: firstRawString(rawData, "InflowSourceOther", "유입 경로 기타"),
+    recommendationTarget: firstString(row.recommendation_target),
+    charmPoint: firstString(row.charm_point),
+    sequelInterest: firstString(row.sequel_interest),
+    additionalComment: firstString(row.additional_comment),
+  };
+}
+
 async function loadReviewLookup(
   env: EnvName,
   gameId: string,
@@ -384,7 +458,8 @@ async function loadReviewLookup(
     throw error;
   }
 
-  return {
+  const builtPlayer = buildPlayer(row.id, row.data);
+  const lookup: ReviewLookup = {
     env,
     gameId,
     playerId,
@@ -395,8 +470,10 @@ async function loadReviewLookup(
       enterCode: firstString(game.enterCode),
       imageUrl: firstString(game.imageUrl, game.backgroundImageUrl),
     },
-    player: buildPlayer(row.id, row.data),
+    player: builtPlayer,
   };
+  lookup.existingReview = await fetchExistingReview(gameId, builtPlayer.id);
+  return lookup;
 }
 
 function readStringField(body: Record<string, unknown>, key: string) {
