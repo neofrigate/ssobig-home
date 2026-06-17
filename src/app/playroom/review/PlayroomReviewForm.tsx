@@ -127,7 +127,6 @@ type ReviewCopy = {
   modalTitle: string;
   modalClose: string;
   optionalQuestionNumber: string;
-  environmentBadge: string;
   rewardSuccess: (previous: number | null, next: number | null, delta: number | null) => string;
   rewardAlready: string;
   rewardSkipped: string;
@@ -224,7 +223,7 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     loadingHint: "잠시만 기다려 주세요.",
     unavailableEyebrow: "리뷰 링크 확인",
     unavailableTitle: "리뷰를 작성할 수 없습니다",
-    targetLabel: "작성 대상",
+    targetLabel: "리뷰할 플레이",
     rewardNotice:
       "리뷰를 작성하시면 쏘빅툴 내 콘텐츠 구매에 사용할 수 있는 30 토큰을 바로 지급합니다.",
     satisfactionLabel: (context) => `"${context.game.title}"의 플레이는 어떠셨나요?`,
@@ -257,7 +256,6 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     modalTitle: "리뷰 저장 완료",
     modalClose: "확인",
     optionalQuestionNumber: "Q7 (선택)",
-    environmentBadge: "테스트",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
         ? `30토큰 보상이 적용되어 보유 토큰이 ${previous} → ${next}로 늘었습니다. 증가량: +${delta ?? 30}토큰`
@@ -290,7 +288,7 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     loadingHint: "Please wait a moment.",
     unavailableEyebrow: "Review Link",
     unavailableTitle: "This review link is unavailable",
-    targetLabel: "Reviewing",
+    targetLabel: "Reviewing This Play",
     rewardNotice:
       "Leave a review and get 30 tokens to use on SsoBig Tool content.",
     satisfactionLabel: (context) => `How was "${context.game.title}"?`,
@@ -322,7 +320,6 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     modalTitle: "Review Saved",
     modalClose: "OK",
     optionalQuestionNumber: "Q7 (Optional)",
-    environmentBadge: "Staging",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
         ? `Your 30-token reward has been added. Your balance is now ${next}, up from ${previous}. +${delta ?? 30} tokens.`
@@ -355,7 +352,7 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     loadingHint: "少々お待ちください。",
     unavailableEyebrow: "レビューリンク確認",
     unavailableTitle: "レビューを作成できません",
-    targetLabel: "レビュー対象",
+    targetLabel: "レビューするプレイ",
     rewardNotice:
       "レビューを作成すると、SsoBig Tool のコンテンツ購入に使える30トークンをすぐに付与します。",
     satisfactionLabel: (context) => `「${context.game.title}」のプレイはいかがでしたか？`,
@@ -387,7 +384,6 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     modalTitle: "レビュー保存完了",
     modalClose: "OK",
     optionalQuestionNumber: "Q7（任意）",
-    environmentBadge: "ステージング",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
         ? `30トークンの特典が適用され、保有トークンが ${previous} → ${next} に増えました。増加量: +${delta ?? 30}トークン`
@@ -420,7 +416,7 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     loadingHint: "请稍候。",
     unavailableEyebrow: "评价链接确认",
     unavailableTitle: "无法填写评价",
-    targetLabel: "评价对象",
+    targetLabel: "本次游玩",
     rewardNotice:
       "提交评价后，将立即发放可用于购买 SsoBig Tool 内容的 30 个代币。",
     satisfactionLabel: (context) => `你觉得《${context.game.title}》的游玩体验如何？`,
@@ -450,7 +446,6 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     modalTitle: "评价保存完成",
     modalClose: "OK",
     optionalQuestionNumber: "Q7（可选）",
-    environmentBadge: "预览环境",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
         ? `30 个代币奖励已发放。你的代币余额从 ${previous} 增加到 ${next}。增加量：+${delta ?? 30} 个代币。`
@@ -1067,14 +1062,9 @@ export default function PlayroomReviewForm({
               <h2 className="mt-3 break-keep text-2xl font-semibold leading-8 text-white md:text-3xl">
                 {copy.contextTitle(loadState.context)}
               </h2>
-              <p className="mt-5 rounded-2xl border border-[#FF7A59]/25 bg-black/25 px-4 py-3 text-sm font-medium leading-6 text-[#FFD3C4]">
+              <p className="mt-5 break-keep text-base font-medium leading-7 text-[#FFD3C4] md:text-lg md:leading-8">
                 {copy.rewardNotice}
               </p>
-              {loadState.context.env === "staging" && (
-                <span className="mt-3 inline-flex rounded-full border border-[#FFB38A]/30 bg-[#FF7A59]/12 px-3 py-1 text-xs font-semibold text-[#FFB38A]">
-                  {copy.environmentBadge}
-                </span>
-              )}
             </div>
           )}
         </header>
