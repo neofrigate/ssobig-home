@@ -1,6 +1,12 @@
 import { createSign } from "node:crypto";
 import { NextResponse } from "next/server";
 
+import {
+  buildPlayroomTemplatesApiUrl,
+  type PlayroomTemplateApiItem,
+} from "@/app/playroom/playroomApi";
+import { getPlayroomTemplateAssetOverride } from "@/app/playroom/playroomTemplateAssets";
+
 type EnvName = "staging" | "production";
 
 type FirebaseServiceAccount = {
@@ -28,6 +34,11 @@ type ReviewLookup = {
     templateId: string;
     enterCode: string;
     imageUrl: string;
+    posterImageUrl: string;
+    backgroundImageUrl: string;
+    logoImageUrl: string;
+    themeColor: string | number | null;
+    isDarkMode: boolean;
   };
   player: {
     id: string;
@@ -379,6 +390,100 @@ function firstRawString(source: unknown, ...keys: string[]) {
   return firstString(...keys.map((key) => record[key]));
 }
 
+function pickTemplateString(...values: Array<string | null | undefined>) {
+  for (const value of values) {
+    const text = String(value || "").trim();
+    if (text) return text;
+  }
+  return "";
+}
+
+function firstThemeColor(...values: unknown[]): string | number | null {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+  }
+  return null;
+}
+
+function firstBoolean(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "boolean") return value;
+  }
+  return null;
+}
+
+function getTemplateGame(item?: PlayroomTemplateApiItem | null) {
+  return item?.game && typeof item.game === "object" ? item.game : {};
+}
+
+async function fetchReviewTemplateAssets(templateId: string, title: string) {
+  const override = getPlayroomTemplateAssetOverride(title);
+  if (!templateId) {
+    return {
+      posterImageUrl: override?.posterImageUrl || "",
+      backgroundImageUrl: override?.backgroundImageUrl || "",
+      logoImageUrl: override?.logoImageUrl || "",
+      themeColor: override?.themeColor ?? null,
+      isDarkMode: override?.isDarkMode ?? true,
+    };
+  }
+
+  const response = await fetch(buildPlayroomTemplatesApiUrl().toString(), {
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    return {
+      posterImageUrl: override?.posterImageUrl || "",
+      backgroundImageUrl: override?.backgroundImageUrl || "",
+      logoImageUrl: override?.logoImageUrl || "",
+      themeColor: override?.themeColor ?? null,
+      isDarkMode: override?.isDarkMode ?? true,
+    };
+  }
+
+  const data = (await response.json().catch(() => null)) as {
+    items?: PlayroomTemplateApiItem[];
+  } | null;
+  const items = Array.isArray(data?.items) ? data.items : [];
+  const item =
+    items.find((candidate) => candidate.ssobig_tool_template_id === templateId) ||
+    items.find((candidate) => candidate.title === title) ||
+    null;
+  const game = getTemplateGame(item);
+  const itemOverride = getPlayroomTemplateAssetOverride(item?.title, title);
+
+  return {
+    posterImageUrl: pickTemplateString(
+      game.imageUrl,
+      item?.imageUrl,
+      item?.card_image_url,
+      itemOverride?.posterImageUrl
+    ),
+    backgroundImageUrl: pickTemplateString(
+      game.backgroundImageUrl,
+      item?.backgroundImageUrl,
+      itemOverride?.backgroundImageUrl
+    ),
+    logoImageUrl: pickTemplateString(
+      game.logoImageUrl,
+      item?.logoImageUrl,
+      itemOverride?.logoImageUrl
+    ),
+    themeColor:
+      game.themeColor ??
+      item?.themeColor ??
+      itemOverride?.themeColor ??
+      null,
+    isDarkMode:
+      firstBoolean(
+        item?.isDarkMode,
+        game.isDarkMode,
+        itemOverride?.isDarkMode
+      ) ?? true,
+  };
+}
+
 async function fetchExistingReview(
   gameId: string,
   ssobigUserId: string
@@ -442,12 +547,21 @@ async function loadReviewLookup(
     error.name = "RoomNotFound";
     throw error;
   }
+  const title = firstString(game.title, game.documentId, gameId);
+  const templateId = firstString(game.templateId);
 
-  const [playersRaw, gamePlayerListRaw] = await Promise.all([
+  const [playersRaw, gamePlayerListRaw, templateAssets] = await Promise.all([
     rtdbQueryByChild(env, "players", "gameId", gameId),
     rtdbRequest(env, `gamePlayerList/${encodeURIComponent(gameId)}.json`).catch(
       () => null
     ),
+    fetchReviewTemplateAssets(templateId, title).catch(() => ({
+      posterImageUrl: "",
+      backgroundImageUrl: "",
+      logoImageUrl: "",
+      themeColor: null,
+      isDarkMode: true,
+    })),
   ]);
   const players = mergePlayerRows(
     normalizeRecordMap(playersRaw),
@@ -469,10 +583,20 @@ async function loadReviewLookup(
     playerId,
     game: {
       id: gameId,
-      title: firstString(game.title, game.documentId, gameId),
-      templateId: firstString(game.templateId),
+      title,
+      templateId,
       enterCode: firstString(game.enterCode),
-      imageUrl: firstString(game.imageUrl, game.backgroundImageUrl),
+      imageUrl: firstString(game.imageUrl, templateAssets.posterImageUrl, game.backgroundImageUrl),
+      posterImageUrl: firstString(templateAssets.posterImageUrl, game.imageUrl),
+      backgroundImageUrl: firstString(
+        game.backgroundImageUrl,
+        templateAssets.backgroundImageUrl
+      ),
+      logoImageUrl: firstString(game.logoImageUrl, templateAssets.logoImageUrl),
+      themeColor: firstThemeColor(game.themeColor, templateAssets.themeColor),
+      isDarkMode:
+        firstBoolean(game.isDarkMode, templateAssets.isDarkMode) ??
+        templateAssets.isDarkMode,
     },
     player: builtPlayer,
   };

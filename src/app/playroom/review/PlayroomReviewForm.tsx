@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import type { FormEvent, ReactNode } from "react";
+import type { CSSProperties, FormEvent, ReactNode } from "react";
 import type { ReviewLanguage } from "./reviewLanguage";
 
 type EnvName = "staging" | "production";
@@ -16,6 +17,11 @@ type ReviewContext = {
     templateId: string;
     enterCode: string;
     imageUrl: string;
+    posterImageUrl: string;
+    backgroundImageUrl: string;
+    logoImageUrl: string;
+    themeColor: string | number | null;
+    isDarkMode: boolean;
   };
   player: {
     id: string;
@@ -81,6 +87,30 @@ type SubmitState =
   | { status: "submitting" }
   | { status: "success"; reward: RewardResult | null }
   | { status: "error"; message: string };
+
+type ReviewThemeStyle = CSSProperties & {
+  "--review-accent": string;
+  "--review-accent-muted": string;
+  "--review-accent-soft": string;
+  "--review-accent-surface": string;
+  "--review-accent-disabled": string;
+  "--review-accent-contrast": string;
+  "--review-text": string;
+  "--review-text-strong": string;
+  "--review-text-muted": string;
+  "--review-text-subtle": string;
+  "--review-panel-bg": string;
+  "--review-panel-border": string;
+  "--review-line": string;
+  "--review-choice-bg": string;
+  "--review-choice-text": string;
+  "--review-choice-hover-bg": string;
+  "--review-choice-hover-border": string;
+  "--review-input-bg": string;
+  "--review-placeholder": string;
+  "--review-page-overlay": string;
+  "--review-modal-overlay": string;
+};
 
 type ChoiceGroupProps = {
   questionNumber: string;
@@ -188,6 +218,11 @@ const SEQUEL_VALUES = [
 ] as const;
 const PREVIEW_GAME_ID = "__preview__";
 const PREVIEW_PLAYER_ID = "__preview__";
+const PREVIEW_LOGO_IMAGE_URL =
+  "https://firebasestorage.googleapis.com/v0/b/ssobig.appspot.com/o/game%2Faaa426a0-97d8-11f0-9ae1-619db627eb2d%2Fuser%2FTJ2QsY6yffc0rQzSr5KZnF7kveh1%2F1758562519740_g6AWsgl2_%EB%A1%9C%EA%B3%A0_%EC%9D%B4%EB%AF%B8%EC%A7%80.png?alt=media&token=00149626-83af-4d64-9058-4c78580370f9";
+const PREVIEW_BACKGROUND_IMAGE_URL =
+  "https://firebasestorage.googleapis.com/v0/b/ssobig.appspot.com/o/game%2Faaa426a0-97d8-11f0-9ae1-619db627eb2d%2Fuser%2FTJ2QsY6yffc0rQzSr5KZnF7kveh1%2F1758562330740_p6RGmlDn_%ED%95%98%EB%8A%983.jpg?alt=media&token=bcc6ddda-3f36-47c3-873b-fcc8e119bf47";
+const DEFAULT_REVIEW_ACCENT = "#FF7A59";
 
 function numberPrefixKo(context: ReviewContext) {
   return typeof context.player.number === "number" && context.player.number > 0
@@ -609,6 +644,11 @@ function localPreviewContext(language: ReviewLanguage): ReviewContext {
       templateId: "preview-template",
       enterCode: "3447",
       imageUrl: "",
+      posterImageUrl: "",
+      backgroundImageUrl: PREVIEW_BACKGROUND_IMAGE_URL,
+      logoImageUrl: PREVIEW_LOGO_IMAGE_URL,
+      themeColor: 4278228616,
+      isDarkMode: false,
     },
     player: {
       id: PREVIEW_PLAYER_ID,
@@ -710,6 +750,161 @@ function rewardMessage(copy: ReviewCopy, reward: RewardResult | null) {
   return copy.rewardSkipped;
 }
 
+function resolveReviewAssetUrl(value?: string | null) {
+  const url = String(value || "").trim();
+  if (!url) return "";
+  if (url.startsWith("/")) return url;
+  if (url.startsWith("ssobig_assets/")) return `/${url}`;
+  return url;
+}
+
+function normalizeThemeColorRaw(value: string | number | null | undefined) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.trunc(value) >>> 0;
+  }
+
+  const text = String(value ?? "").trim();
+  if (!text) return null;
+
+  if (/^0x[0-9a-fA-F]{6,8}$/.test(text)) {
+    const normalized = text.slice(2);
+    const hex = normalized.length === 6 ? `ff${normalized}` : normalized;
+    return Number.parseInt(hex, 16) >>> 0;
+  }
+
+  if (/^#?[0-9a-fA-F]{6,8}$/.test(text)) {
+    const normalized = text.startsWith("#") ? text.slice(1) : text;
+    const hex = normalized.length === 6 ? `ff${normalized}` : normalized;
+    return Number.parseInt(hex, 16) >>> 0;
+  }
+
+  if (/^\d+$/.test(text)) {
+    return Number.parseInt(text, 10) >>> 0;
+  }
+
+  return null;
+}
+
+function resolveReviewAccentColor(value: string | number | null | undefined) {
+  const raw = normalizeThemeColorRaw(value);
+  if (raw == null) return DEFAULT_REVIEW_ACCENT;
+
+  const r = (raw >>> 16) & 255;
+  const g = (raw >>> 8) & 255;
+  const b = raw & 255;
+
+  return `#${[r, g, b]
+    .map((channel) => channel.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase()}`;
+}
+
+function hexToRgb(hex: string) {
+  const value = hex.replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(value)) {
+    return { r: 255, g: 122, b: 89 };
+  }
+  return {
+    r: Number.parseInt(value.slice(0, 2), 16),
+    g: Number.parseInt(value.slice(2, 4), 16),
+    b: Number.parseInt(value.slice(4, 6), 16),
+  };
+}
+
+function relativeLuminance(hex: string) {
+  const { r, g, b } = hexToRgb(hex);
+  const channels = [r, g, b].map((channel) => {
+    const normalized = channel / 255;
+    return normalized <= 0.03928
+      ? normalized / 12.92
+      : ((normalized + 0.055) / 1.055) ** 2.4;
+  });
+  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+}
+
+function buildReviewThemeStyle(
+  value: string | number | null | undefined,
+  isDarkMode: boolean
+): ReviewThemeStyle {
+  const accent = resolveReviewAccentColor(value);
+  const accentContrast = relativeLuminance(accent) > 0.42 ? "#0B1110" : "#FFFFFF";
+  const modeStyle = isDarkMode
+    ? {
+        "--review-accent-muted": `color-mix(in srgb, ${accent} 62%, white)`,
+        "--review-accent-surface": `color-mix(in srgb, ${accent} 12%, #120C0A)`,
+        "--review-text": "#FFFFFF",
+        "--review-text-strong": "#FFFFFF",
+        "--review-text-muted": "rgb(255 255 255 / 0.72)",
+        "--review-text-subtle": "rgb(255 255 255 / 0.55)",
+        "--review-panel-bg": "rgb(0 0 0 / 0.50)",
+        "--review-panel-border": "rgb(255 255 255 / 0.14)",
+        "--review-line": "rgb(255 255 255 / 0.10)",
+        "--review-choice-bg": "rgb(255 255 255 / 0.03)",
+        "--review-choice-text": "rgb(255 255 255 / 0.78)",
+        "--review-choice-hover-bg": "rgb(255 255 255 / 0.06)",
+        "--review-choice-hover-border": "rgb(255 255 255 / 0.30)",
+        "--review-input-bg": "rgb(0 0 0 / 0.30)",
+        "--review-placeholder": "rgb(255 255 255 / 0.28)",
+        "--review-page-overlay": "rgb(0 0 0 / 0.72)",
+        "--review-modal-overlay": "rgb(0 0 0 / 0.70)",
+      }
+    : {
+        "--review-accent-muted": `color-mix(in srgb, ${accent} 70%, #0B1110)`,
+        "--review-accent-surface": `color-mix(in srgb, ${accent} 10%, white)`,
+        "--review-text": "#18211F",
+        "--review-text-strong": "#07110F",
+        "--review-text-muted": "rgb(24 33 31 / 0.72)",
+        "--review-text-subtle": "rgb(24 33 31 / 0.52)",
+        "--review-panel-bg": "rgb(255 255 255 / 0.50)",
+        "--review-panel-border": "rgb(7 17 15 / 0.14)",
+        "--review-line": "rgb(7 17 15 / 0.12)",
+        "--review-choice-bg": "rgb(255 255 255 / 0.64)",
+        "--review-choice-text": "rgb(24 33 31 / 0.84)",
+        "--review-choice-hover-bg": "rgb(255 255 255 / 0.86)",
+        "--review-choice-hover-border": "rgb(7 17 15 / 0.28)",
+        "--review-input-bg": "rgb(255 255 255 / 0.70)",
+        "--review-placeholder": "rgb(24 33 31 / 0.38)",
+        "--review-page-overlay": "rgb(255 255 255 / 0.42)",
+        "--review-modal-overlay": "rgb(0 0 0 / 0.45)",
+      };
+
+  return {
+    "--review-accent": accent,
+    "--review-accent-soft": `color-mix(in srgb, ${accent} 26%, transparent)`,
+    "--review-accent-disabled": `color-mix(in srgb, ${accent} 45%, #171717)`,
+    "--review-accent-contrast": accentContrast,
+    ...modeStyle,
+  };
+}
+
+function buildReviewBackgroundStyle(imageUrl: string): CSSProperties | undefined {
+  if (!imageUrl) return undefined;
+  return {
+    backgroundImage: `url("${imageUrl.replace(/"/g, "%22")}")`,
+  };
+}
+
+function ReviewGameLogo({ context }: { context: ReviewContext }) {
+  const logoImageUrl = resolveReviewAssetUrl(context.game.logoImageUrl);
+  if (!logoImageUrl) return null;
+
+  return (
+    <div className="mb-8 flex justify-center">
+      <div className="relative h-16 w-full max-w-[260px] md:h-20">
+        <Image
+          src={logoImageUrl}
+          alt={`${context.game.title} logo`}
+          fill
+          className="object-contain"
+          sizes="260px"
+          unoptimized={logoImageUrl.startsWith("http")}
+          priority
+        />
+      </div>
+    </div>
+  );
+}
+
 function QuestionShell({
   questionNumber,
   label,
@@ -720,12 +915,12 @@ function QuestionShell({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 md:p-7">
+    <section className="border-b border-[var(--review-line)] py-7 last:border-b-0">
       <div className="mb-5">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--review-accent-muted)]">
           {questionNumber}
         </p>
-        <h3 className="break-keep text-xl font-semibold leading-7 text-white md:text-2xl md:leading-8">
+        <h3 className="break-keep text-xl font-semibold leading-7 text-[var(--review-text-strong)] md:text-2xl md:leading-8">
           {label}
         </h3>
       </div>
@@ -743,7 +938,7 @@ function ChoiceGroup({
 }: ChoiceGroupProps) {
   return (
     <QuestionShell questionNumber={questionNumber} label={label}>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-3">
         {options.map((option) => {
           const selected = value === option.value;
           return (
@@ -753,8 +948,8 @@ function ChoiceGroup({
               onClick={() => onChange(option.value)}
               className={`rounded-2xl border px-4 py-3 text-left text-sm font-medium leading-6 transition ${
                 selected
-                  ? "border-[#FF7A59] bg-[#FF7A59] text-white shadow-[0_12px_30px_rgba(255,122,89,0.25)]"
-                  : "border-white/15 bg-white/[0.03] text-white/78 hover:border-white/30 hover:bg-white/[0.06]"
+                  ? "border-[var(--review-accent)] bg-[var(--review-accent)] text-[var(--review-accent-contrast)] [box-shadow:0_12px_30px_var(--review-accent-soft)]"
+                  : "border-[var(--review-line)] bg-[var(--review-choice-bg)] text-[var(--review-choice-text)] hover:border-[var(--review-choice-hover-border)] hover:bg-[var(--review-choice-hover-bg)]"
               }`}
               aria-pressed={selected}
             >
@@ -787,7 +982,7 @@ function TextAreaField({
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         rows={4}
-        className="min-h-36 w-full resize-y rounded-2xl border border-white/12 bg-black/30 px-4 py-4 text-sm leading-6 text-white outline-none transition placeholder:text-white/28 focus:border-[#FF7A59]"
+        className="min-h-36 w-full resize-y rounded-2xl border border-[var(--review-line)] bg-[var(--review-input-bg)] px-4 py-4 text-sm leading-6 text-[var(--review-text)] outline-none transition placeholder:text-[var(--review-placeholder)] focus:border-[var(--review-accent)]"
       />
     </QuestionShell>
   );
@@ -1040,226 +1235,255 @@ export default function PlayroomReviewForm({
     Math.floor(submitElapsedMs / 1600),
     copy.submitProgress.length - 1
   );
+  const readyContext = loadState.status === "ready" ? loadState.context : null;
+  const canSubmitReview = Boolean(readyContext && !readyContext.player.isBot);
+  const isDarkMode = readyContext?.game.isDarkMode ?? true;
+  const themeStyle = buildReviewThemeStyle(
+    readyContext?.game.themeColor,
+    isDarkMode
+  );
+  const backgroundImageUrl = resolveReviewAssetUrl(
+    readyContext?.game.backgroundImageUrl
+  );
+  const backgroundStyle = buildReviewBackgroundStyle(backgroundImageUrl);
 
   return (
-    <main className="min-h-screen bg-[#050505] px-5 py-14 text-white sm:px-8 md:py-20">
-      <div className="mx-auto max-w-3xl">
-        <header className="mb-8 rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] md:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#FFB38A]">
-            {copy.eyebrow}
-          </p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">
-            {copy.title}
-          </h1>
-          <p className="mt-4 break-keep text-base leading-7 text-white/72 md:text-lg">
-            {copy.introDescription}
-          </p>
-          {loadState.status === "ready" && !loadState.context.player.isBot && (
-            <div className="mt-6 border-t border-white/10 pt-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
-                {copy.targetLabel}
+    <main
+      className="relative min-h-screen overflow-hidden bg-[#050505] px-5 py-14 text-[var(--review-text)] sm:px-8 md:py-20"
+      style={themeStyle}
+    >
+      {backgroundStyle ? (
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+          style={backgroundStyle}
+        />
+      ) : null}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 bg-[var(--review-page-overlay)] backdrop-blur-[2px]"
+      />
+      <div className="relative z-10 mx-auto max-w-3xl">
+        <section className="rounded-[32px] border border-[var(--review-panel-border)] bg-[var(--review-panel-bg)] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.34)] backdrop-blur-[20px] md:p-8">
+          {canSubmitReview && readyContext ? (
+            <ReviewGameLogo context={readyContext} />
+          ) : null}
+
+          <header>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--review-accent-muted)]">
+              {copy.eyebrow}
+            </p>
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[var(--review-text-strong)] md:text-5xl">
+              {copy.title}
+            </h1>
+            <p className="mt-4 break-keep text-base leading-7 text-[var(--review-text-muted)] md:text-lg">
+              {copy.introDescription}
+            </p>
+            {canSubmitReview && readyContext ? (
+              <div className="mt-6 border-t border-[var(--review-line)] pt-6">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--review-accent-muted)]">
+                  {copy.targetLabel}
+                </p>
+                <h2 className="mt-3 break-keep text-2xl font-semibold leading-8 text-[var(--review-text-strong)] md:text-3xl">
+                  {copy.contextTitle(readyContext)}
+                </h2>
+                <p className="mt-5 break-keep text-base font-medium leading-7 text-[var(--review-accent-muted)] md:text-lg md:leading-8">
+                  {copy.rewardNotice}
+                </p>
+              </div>
+            ) : null}
+          </header>
+
+          {loadState.status === "loading" && (
+            <div className="border-t border-[var(--review-line)] py-10 text-center">
+              <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-2 border-[var(--review-line)] border-t-[var(--review-accent)]" />
+              <p className="text-lg font-medium text-[var(--review-text-strong)]">{copy.loading}</p>
+              <p className="mt-2 text-sm text-[var(--review-text-subtle)]">{copy.loadingHint}</p>
+            </div>
+          )}
+
+          {loadState.status === "error" && (
+            <div className="mt-8 border-t border-[var(--review-accent-soft)] pt-7">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--review-accent-muted)]">
+                {copy.unavailableEyebrow}
               </p>
-              <h2 className="mt-3 break-keep text-2xl font-semibold leading-8 text-white md:text-3xl">
-                {copy.contextTitle(loadState.context)}
+              <h2 className="mt-3 text-3xl font-semibold text-[var(--review-text-strong)]">
+                {copy.unavailableTitle}
               </h2>
-              <p className="mt-5 break-keep text-base font-medium leading-7 text-[#FFD3C4] md:text-lg md:leading-8">
-                {copy.rewardNotice}
+              <p className="mt-4 whitespace-pre-line text-base leading-7 text-[var(--review-text-muted)]">
+                {loadState.message}
               </p>
             </div>
           )}
-        </header>
 
-        {loadState.status === "loading" && (
-          <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 text-center shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
-            <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-2 border-white/10 border-t-[#FF7A59]" />
-            <p className="text-lg font-medium text-white">
-              {copy.loading}
-            </p>
-            <p className="mt-2 text-sm text-white/55">{copy.loadingHint}</p>
-          </section>
-        )}
-
-        {loadState.status === "error" && (
-          <section className="rounded-[32px] border border-[#FF7A59]/25 bg-[#120C0A] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
-              {copy.unavailableEyebrow}
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold text-white">
-              {copy.unavailableTitle}
-            </h2>
-            <p className="mt-4 whitespace-pre-line text-base leading-7 text-white/70">
-              {loadState.message}
-            </p>
-          </section>
-        )}
-
-        {loadState.status === "ready" && loadState.context.player.isBot && (
-          <section className="rounded-[32px] border border-[#FF7A59]/25 bg-[#120C0A] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.32)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
-              {copy.targetLabel}
-            </p>
-            <h2 className="mt-3 break-keep text-2xl font-semibold leading-8 text-white md:text-3xl">
-              {copy.contextTitle(loadState.context)}
-            </h2>
-            <div className="mt-5 rounded-2xl border border-[#FF7A59]/25 bg-black/25 px-4 py-3">
-              <h3 className="text-base font-semibold text-[#FFD3C4]">
-                {copy.botBlockedTitle}
-              </h3>
-              <p className="mt-2 text-sm font-medium leading-6 text-white/70">
-                {copy.botBlockedMessage}
+          {readyContext?.player.isBot && (
+            <div className="mt-8 border-t border-[var(--review-accent-soft)] pt-7">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--review-accent-muted)]">
+                {copy.targetLabel}
               </p>
-            </div>
-          </section>
-        )}
-
-        {loadState.status === "ready" && !loadState.context.player.isBot && (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <fieldset
-              disabled={submitState.status === "submitting"}
-              className="space-y-5 disabled:opacity-80"
-            >
-              <ChoiceGroup
-                questionNumber="Q1"
-                label={copy.satisfactionLabel(loadState.context)}
-                value={form.satisfaction}
-                options={satisfactionOptions}
-                onChange={(value) => update("satisfaction", value)}
-              />
-              <ChoiceGroup
-                questionNumber="Q2"
-                label={copy.playExperienceLabel}
-                value={form.playExperience}
-                options={playExperienceOptions}
-                onChange={(value) => update("playExperience", value)}
-              />
-              <ChoiceGroup
-                questionNumber="Q3"
-                label={copy.inflowLabel}
-                value={form.inflowSource}
-                options={inflowOptions}
-                onChange={(value) => update("inflowSource", value)}
-              />
-              {form.inflowSource === "기타" ? (
-                <TextAreaField
-                  questionNumber="Q3"
-                  label={copy.inflowOtherLabel}
-                  value={form.inflowSourceOther}
-                  placeholder={copy.inflowOtherPlaceholder}
-                  onChange={(value) => update("inflowSourceOther", value)}
-                />
-              ) : null}
-              <ChoiceGroup
-                questionNumber="Q4"
-                label={copy.recommendationTargetLabel}
-                value={form.recommendationTarget}
-                options={recommendationTargetOptions}
-                onChange={(value) => update("recommendationTarget", value)}
-              />
-              <ChoiceGroup
-                questionNumber="Q5"
-                label={copy.charmPointLabel}
-                value={form.charmPoint}
-                options={charmPointOptions}
-                onChange={(value) => update("charmPoint", value)}
-              />
-              {form.charmPoint === CHARM_POINT_OTHER_VALUE ? (
-                <TextAreaField
-                  questionNumber="Q5"
-                  label={copy.charmPointPlaceholder}
-                  value={form.charmPointOther}
-                  placeholder={copy.charmPointPlaceholder}
-                  onChange={(value) => update("charmPointOther", value)}
-                />
-              ) : null}
-              <ChoiceGroup
-                questionNumber="Q6"
-                label={copy.sequelInterestLabel}
-                value={form.sequelInterest}
-                options={sequelOptions}
-                onChange={(value) => update("sequelInterest", value)}
-              />
-              <TextAreaField
-                questionNumber={copy.optionalQuestionNumber}
-                label={copy.additionalCommentLabel}
-                value={form.additionalComment}
-                placeholder={copy.additionalCommentPlaceholder}
-                onChange={(value) => update("additionalComment", value)}
-              />
-            </fieldset>
-
-            <div className="flex flex-col gap-3">
-              <button
-                type="submit"
-                disabled={submitState.status === "submitting"}
-                className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#FF7A59] px-6 text-base font-semibold text-white transition hover:brightness-105 disabled:cursor-wait disabled:bg-[#7F4A3A] disabled:text-white/70"
-              >
-                {submitState.status === "submitting"
-                  ? copy.submitLoading
-                  : hasExistingReview
-                    ? copy.submitEdit
-                    : copy.submitIdle}
-              </button>
-              {submitState.status === "submitting" && (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm leading-6 text-white/70">
-                  <div className="mb-3 h-2 overflow-hidden rounded-full bg-white/10">
-                    <div
-                      className="h-full rounded-full bg-[#FF7A59] transition-all duration-300"
-                      style={{
-                        width: `${Math.min(92, 18 + submitProgressIndex * 24)}%`,
-                      }}
-                    />
-                  </div>
-                  <p className="font-semibold text-white">
-                    {copy.submitProgress[submitProgressIndex]}
-                  </p>
-                  {submitElapsedMs >= 2200 && (
-                    <p className="mt-1 text-xs font-medium text-white/50">
-                      {copy.submitWaitShort}
-                    </p>
-                  )}
-                  {submitElapsedMs >= 7000 && (
-                    <p className="mt-1 text-xs font-medium text-[#FFD3C4]">
-                      {copy.submitWaitLong}
-                    </p>
-                  )}
-                </div>
-              )}
-              {submitState.status === "error" && (
-                <p className="whitespace-pre-line rounded-2xl border border-[#FF7A59]/25 bg-[#120C0A] px-4 py-3 text-sm font-medium leading-6 text-[#FFD3C4]">
-                  {submitState.message}
+              <h2 className="mt-3 break-keep text-2xl font-semibold leading-8 text-[var(--review-text-strong)] md:text-3xl">
+                {copy.contextTitle(readyContext)}
+              </h2>
+              <div className="mt-5 rounded-2xl border border-[var(--review-accent-soft)] bg-[var(--review-input-bg)] px-4 py-3">
+                <h3 className="text-base font-semibold text-[var(--review-accent-muted)]">
+                  {copy.botBlockedTitle}
+                </h3>
+                <p className="mt-2 text-sm font-medium leading-6 text-[var(--review-text-muted)]">
+                  {copy.botBlockedMessage}
                 </p>
-              )}
+              </div>
             </div>
-          </form>
-        )}
+          )}
+
+          {canSubmitReview && readyContext ? (
+            <form onSubmit={handleSubmit} className="mt-8 border-t border-[var(--review-line)]">
+              <fieldset
+                disabled={submitState.status === "submitting"}
+                className="disabled:opacity-80"
+              >
+                <ChoiceGroup
+                  questionNumber="Q1"
+                  label={copy.satisfactionLabel(readyContext)}
+                  value={form.satisfaction}
+                  options={satisfactionOptions}
+                  onChange={(value) => update("satisfaction", value)}
+                />
+                <ChoiceGroup
+                  questionNumber="Q2"
+                  label={copy.playExperienceLabel}
+                  value={form.playExperience}
+                  options={playExperienceOptions}
+                  onChange={(value) => update("playExperience", value)}
+                />
+                <ChoiceGroup
+                  questionNumber="Q3"
+                  label={copy.inflowLabel}
+                  value={form.inflowSource}
+                  options={inflowOptions}
+                  onChange={(value) => update("inflowSource", value)}
+                />
+                {form.inflowSource === "기타" ? (
+                  <TextAreaField
+                    questionNumber="Q3"
+                    label={copy.inflowOtherLabel}
+                    value={form.inflowSourceOther}
+                    placeholder={copy.inflowOtherPlaceholder}
+                    onChange={(value) => update("inflowSourceOther", value)}
+                  />
+                ) : null}
+                <ChoiceGroup
+                  questionNumber="Q4"
+                  label={copy.recommendationTargetLabel}
+                  value={form.recommendationTarget}
+                  options={recommendationTargetOptions}
+                  onChange={(value) => update("recommendationTarget", value)}
+                />
+                <ChoiceGroup
+                  questionNumber="Q5"
+                  label={copy.charmPointLabel}
+                  value={form.charmPoint}
+                  options={charmPointOptions}
+                  onChange={(value) => update("charmPoint", value)}
+                />
+                {form.charmPoint === CHARM_POINT_OTHER_VALUE ? (
+                  <TextAreaField
+                    questionNumber="Q5"
+                    label={copy.charmPointPlaceholder}
+                    value={form.charmPointOther}
+                    placeholder={copy.charmPointPlaceholder}
+                    onChange={(value) => update("charmPointOther", value)}
+                  />
+                ) : null}
+                <ChoiceGroup
+                  questionNumber="Q6"
+                  label={copy.sequelInterestLabel}
+                  value={form.sequelInterest}
+                  options={sequelOptions}
+                  onChange={(value) => update("sequelInterest", value)}
+                />
+                <TextAreaField
+                  questionNumber={copy.optionalQuestionNumber}
+                  label={copy.additionalCommentLabel}
+                  value={form.additionalComment}
+                  placeholder={copy.additionalCommentPlaceholder}
+                  onChange={(value) => update("additionalComment", value)}
+                />
+              </fieldset>
+
+              <div className="flex flex-col gap-3 border-t border-[var(--review-line)] pt-6">
+                <button
+                  type="submit"
+                  disabled={submitState.status === "submitting"}
+                  className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[var(--review-accent)] px-6 text-base font-semibold text-[var(--review-accent-contrast)] transition hover:brightness-105 disabled:cursor-wait disabled:bg-[var(--review-accent-disabled)] disabled:text-white/70"
+                >
+                  {submitState.status === "submitting"
+                    ? copy.submitLoading
+                    : hasExistingReview
+                      ? copy.submitEdit
+                      : copy.submitIdle}
+                </button>
+                {submitState.status === "submitting" && (
+                  <div className="rounded-2xl border border-[var(--review-line)] bg-[var(--review-choice-bg)] px-4 py-3 text-sm leading-6 text-[var(--review-text-muted)]">
+                    <div className="mb-3 h-2 overflow-hidden rounded-full bg-[var(--review-line)]">
+                      <div
+                        className="h-full rounded-full bg-[var(--review-accent)] transition-all duration-300"
+                        style={{
+                          width: `${Math.min(92, 18 + submitProgressIndex * 24)}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="font-semibold text-[var(--review-text-strong)]">
+                      {copy.submitProgress[submitProgressIndex]}
+                    </p>
+                    {submitElapsedMs >= 2200 && (
+                      <p className="mt-1 text-xs font-medium text-[var(--review-text-subtle)]">
+                        {copy.submitWaitShort}
+                      </p>
+                    )}
+                    {submitElapsedMs >= 7000 && (
+                      <p className="mt-1 text-xs font-medium text-[var(--review-accent-muted)]">
+                        {copy.submitWaitLong}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {submitState.status === "error" && (
+                  <p className="whitespace-pre-line rounded-2xl border border-[var(--review-accent-soft)] bg-[var(--review-accent-surface)] px-4 py-3 text-sm font-medium leading-6 text-[var(--review-accent-muted)]">
+                    {submitState.message}
+                  </p>
+                )}
+              </div>
+            </form>
+          ) : null}
+        </section>
       </div>
       {submitState.status === "success" && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-5"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--review-modal-overlay)] px-5"
           role="dialog"
           aria-modal="true"
           aria-labelledby="review-success-title"
         >
-          <section className="w-full max-w-md rounded-[32px] border border-[#FF7A59]/20 bg-[#120C0A] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#FFB38A]">
+          <section className="w-full max-w-md rounded-[32px] border border-[var(--review-accent-soft)] bg-[var(--review-accent-surface)] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--review-accent-muted)]">
               {copy.modalEyebrow}
             </p>
             <h2
               id="review-success-title"
-              className="mt-3 text-2xl font-semibold leading-8 text-white"
+              className="mt-3 text-2xl font-semibold leading-8 text-[var(--review-text-strong)]"
             >
               {copy.modalTitle}
             </h2>
-            <p className="mt-3 text-sm font-semibold leading-6 text-[#FFD3C4]">
+            <p className="mt-3 text-sm font-semibold leading-6 text-[var(--review-accent-muted)]">
               {copy.submitSuccess}
             </p>
-            <p className="mt-3 text-sm leading-6 text-white/70">
+            <p className="mt-3 text-sm leading-6 text-[var(--review-text-muted)]">
               {rewardMessage(copy, submitState.reward)}
             </p>
             <button
               type="button"
               onClick={() => setSubmitState({ status: "idle" })}
-              className="mt-6 min-h-12 w-full rounded-2xl bg-[#FF7A59] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-105"
+              className="mt-6 min-h-12 w-full rounded-2xl bg-[var(--review-accent)] px-4 py-3 text-sm font-semibold text-[var(--review-accent-contrast)] transition hover:brightness-105"
             >
               {copy.modalClose}
             </button>
