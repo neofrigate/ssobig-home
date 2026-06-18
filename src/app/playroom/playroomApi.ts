@@ -41,7 +41,7 @@ export interface PlayroomTemplateApiItem {
 }
 
 export function buildPlayroomTemplatesApiUrl(locale?: string) {
-  const url = new URL(`${PLAYROOM_PUBLIC_API_BASE}/playroom-templates`);
+  const url = new URL(`${PLAYROOM_PUBLIC_API_BASE}/playroom-template-summaries`);
   if (locale) {
     url.searchParams.set("locale", locale);
   }
