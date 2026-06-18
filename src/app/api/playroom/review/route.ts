@@ -290,12 +290,6 @@ function playerIdentityTokens(id: string, data: Record<string, unknown>) {
     data.originalUserID,
     data.originalUserId,
     data.userId,
-    data.nickname,
-    data.nickName,
-    data.realName,
-    data.displayName,
-    data.name,
-    data.number,
   ]
     .map((value) => firstString(value).toLowerCase())
     .filter(Boolean);
