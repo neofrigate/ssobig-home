@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 
 import PlayroomHeroActions from "@/app/playroom/PlayroomHeroActions";
 import PlayroomHtmlFrame from "@/app/playroom/PlayroomHtmlFrame";
-import PlayroomReviewComment from "@/app/playroom/PlayroomReviewComment";
+import PlayroomReviewList, {
+  type PlayroomReviewListItem,
+} from "@/app/playroom/PlayroomReviewList";
 import {
   buildPlayroomTemplatesApiUrl,
   buildPlayroomTemplateDetailApiUrl,
@@ -37,6 +39,7 @@ const DETAIL_UI_COPY: Record<
     okay: string;
     notForMe: string;
     noReviews: string;
+    loadingMoreReviews: string;
     share: string;
   }
 > = {
@@ -51,6 +54,7 @@ const DETAIL_UI_COPY: Record<
     okay: "괜찮아요",
     notForMe: "아쉬워요",
     noReviews: "아직 등록된 후기가 없어요.",
+    loadingMoreReviews: "후기를 더 불러오는 중입니다.",
     share: "공유하기",
   },
   en: {
@@ -64,6 +68,7 @@ const DETAIL_UI_COPY: Record<
     okay: "Okay",
     notForMe: "Mixed",
     noReviews: "No reviews yet.",
+    loadingMoreReviews: "Loading more reviews.",
     share: "Share",
   },
   ja: {
@@ -77,6 +82,7 @@ const DETAIL_UI_COPY: Record<
     okay: "普通",
     notForMe: "惜しい",
     noReviews: "まだレビューがありません。",
+    loadingMoreReviews: "レビューをさらに読み込んでいます。",
     share: "共有",
   },
   zh: {
@@ -90,6 +96,7 @@ const DETAIL_UI_COPY: Record<
     okay: "还不错",
     notForMe: "一般",
     noReviews: "还没有评价。",
+    loadingMoreReviews: "正在加载更多评价。",
     share: "分享",
   },
 };
@@ -619,8 +626,7 @@ async function fetchPlayroomReviewSummary(
         record.moderation_status,
       ),
     }))
-    .filter((record) => record.comment)
-    .slice(0, 8);
+    .filter((record) => record.comment);
 
   const recommendationRaw = buildReviewCountMap(
     records,
@@ -1067,6 +1073,22 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
     reviewSummary.quadrant,
     item.locale || summaryItem?.locale || "ko_KR",
   );
+  const reviewListItems: PlayroomReviewListItem[] = reviewSummary.reviews.map(
+    (review) => {
+      const meta = getSatisfactionMeta(review.satisfactionLabel, dt);
+
+      return {
+        id: review.id,
+        nickname: review.nickname,
+        localeLabel: dt.localeLabel,
+        satisfactionText: meta.text,
+        satisfactionEmoji: meta.emoji,
+        dateLabel: formatReviewDate(review.sentTime),
+        comment: review.comment,
+        spoilerHidden: isTemplateReviewSpoilerHidden(review),
+      };
+    },
+  );
   const ctaHref =
     pickTemplateString(item.destination_url, summaryItem?.destination_url) ||
     backHref;
@@ -1267,28 +1289,11 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
                     ) : null}
 
                     {reviewSummary.reviews.length > 0 ? (
-                      <div className="space-y-8 px-1">
-                        {reviewSummary.reviews.map((review, index) => {
-                          const meta = getSatisfactionMeta(
-                            review.satisfactionLabel,
-                            dt,
-                          );
-
-                          return (
-                            <PlayroomReviewComment
-                              key={`${review.id}:${index}`}
-                              nickname={review.nickname}
-                              localeLabel={dt.localeLabel}
-                              satisfactionText={meta.text}
-                              satisfactionEmoji={meta.emoji}
-                              dateLabel={formatReviewDate(review.sentTime)}
-                              comment={review.comment}
-                              spoilerHidden={isTemplateReviewSpoilerHidden(review)}
-                              accentColor={heroAccentColor}
-                            />
-                          );
-                        })}
-                      </div>
+                      <PlayroomReviewList
+                        reviews={reviewListItems}
+                        accentColor={heroAccentColor}
+                        loadMoreLabel={dt.loadingMoreReviews}
+                      />
                     ) : null}
                   </div>
                 </section>
