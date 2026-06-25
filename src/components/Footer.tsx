@@ -132,7 +132,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
                 isLight ? "text-gray-600" : "text-white/60"
               } text-xs leading-relaxed pt-2`}
             >
-              <p className="mb-1">대표자 : 조원철</p>
+              <p className="mb-1">대표자 : 조원철, 김수린</p>
               <p className="mb-1">사업자등록번호 : 140-87-03096</p>
               <p className="mb-1">전화번호 : 02-2635-7942</p>
               <p className="mb-1">E-mail : ssobigstudio@gmail.com</p>
