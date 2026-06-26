@@ -52,7 +52,15 @@ type ReviewLookup = {
     email: string;
     age: string;
   };
+  marketingConsent?: MarketingConsentLookup | null;
   existingReview?: ExistingReview | null;
+};
+
+type MarketingConsentLookup = {
+  found: boolean;
+  marketingOptedIn: boolean;
+  matchedBy: string | null;
+  data: Record<string, unknown> | null;
 };
 
 type ExistingReview = {
@@ -82,6 +90,15 @@ const QUALITY_SUPABASE_URL =
 const QUALITY_SUPABASE_KEY =
   process.env.QUALITY_SUPABASE_PUBLISHABLE_KEY?.trim() ||
   "sb_publishable_AdEHgXPGJ2gKGVAjb7RYSg_YzUuT6jB";
+const ZOMBIE_RUN_MARKETING_CONSENT_API_BASE_URL = (
+  process.env.ZOMBIE_RUN_MARKETING_CONSENT_API_BASE_URL ||
+  process.env.ZOMBIE_RUN_COUPON_API_BASE_URL ||
+  "https://asia-northeast3-zombie-run-ae82c.cloudfunctions.net"
+).trim();
+const ZOMBIE_RUN_COUPON_ADMIN_SECRET =
+  process.env.ZOMBIE_RUN_COUPON_ADMIN_SECRET?.trim() ||
+  process.env.COUPON_ADMIN_SECRET?.trim() ||
+  "";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const FIREBASE_SCOPE =
   "https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email";
@@ -527,6 +544,59 @@ async function fetchExistingReview(
   };
 }
 
+function buildZombieRunAppApiUrl(path: string) {
+  const base = ZOMBIE_RUN_MARKETING_CONSENT_API_BASE_URL.replace(/\/+$/, "");
+  const appBase = base.endsWith("/app") ? base : `${base}/app`;
+  return `${appBase}${path}`;
+}
+
+async function fetchMarketingConsentLookup(
+  player: ReviewLookup["player"]
+): Promise<MarketingConsentLookup | null> {
+  if (!ZOMBIE_RUN_MARKETING_CONSENT_API_BASE_URL || !ZOMBIE_RUN_COUPON_ADMIN_SECRET) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(buildZombieRunAppApiUrl("/marketing-consent/lookup"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${ZOMBIE_RUN_COUPON_ADMIN_SECRET}`,
+        "x-coupon-admin-secret": ZOMBIE_RUN_COUPON_ADMIN_SECRET,
+      },
+      body: JSON.stringify({
+        ssobigUserId: player.id,
+        email: player.email || undefined,
+        phoneNumber: player.phoneNumber || undefined,
+      }),
+      cache: "no-store",
+    });
+    const payload = (await response.json().catch(() => null)) as
+      | {
+        success?: boolean;
+        found?: boolean;
+        marketingOptedIn?: boolean;
+        matchedBy?: string;
+        data?: Record<string, unknown> | null;
+      }
+      | null;
+    if (!response.ok || payload?.success !== true) {
+      console.error("[playroom-review] marketing consent lookup failed", response.status);
+      return null;
+    }
+    return {
+      found: payload.found === true,
+      marketingOptedIn: payload.marketingOptedIn === true,
+      matchedBy: payload.matchedBy || null,
+      data: payload.data || null,
+    };
+  } catch (error) {
+    console.error("[playroom-review] marketing consent lookup error", error);
+    return null;
+  }
+}
+
 async function loadReviewLookup(
   env: EnvName,
   gameId: string,
@@ -595,6 +665,7 @@ async function loadReviewLookup(
     player: builtPlayer,
   };
   lookup.existingReview = await fetchExistingReview(gameId, builtPlayer.id);
+  lookup.marketingConsent = await fetchMarketingConsentLookup(builtPlayer);
   return lookup;
 }
 
@@ -701,6 +772,8 @@ export async function POST(request: Request) {
         charmPointOther: readStringField(body, "charmPointOther"),
         sequelInterest: readStringField(body, "sequelInterest"),
         additionalComment: readStringField(body, "additionalComment"),
+        newsletterConsentOptIn: body.newsletterConsentOptIn === true,
+        pageUrl: readStringField(body, "pageUrl"),
       }),
     });
     const responseBody = (await response.json().catch(() => null)) as

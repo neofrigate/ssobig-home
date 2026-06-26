@@ -35,6 +35,12 @@ type ReviewContext = {
     email: string;
     age: string;
   };
+  marketingConsent?: {
+    found: boolean;
+    marketingOptedIn: boolean;
+    matchedBy: string | null;
+    data: Record<string, unknown> | null;
+  } | null;
   existingReview?: ExistingReview | null;
 };
 
@@ -75,6 +81,7 @@ type FormState = {
   charmPointOther: string;
   sequelInterest: string;
   additionalComment: string;
+  newsletterConsentOptIn: boolean;
 };
 
 type LoadState =
@@ -135,6 +142,9 @@ type ReviewCopy = {
   unavailableTitle: string;
   targetLabel: string;
   rewardNotice: string;
+  newsletterConsentLabel: string;
+  newsletterConsentDescription: string;
+  newsletterAlreadyConsented: string;
   satisfactionLabel: (context: ReviewContext) => string;
   playExperienceLabel: string;
   inflowLabel: string;
@@ -186,6 +196,7 @@ const INITIAL_FORM: FormState = {
   charmPointOther: "",
   sequelInterest: "",
   additionalComment: "",
+  newsletterConsentOptIn: false,
 };
 
 const SATISFACTION_VALUES = ["excellent", "okay", "poor"] as const;
@@ -260,7 +271,12 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     unavailableTitle: "리뷰를 작성할 수 없습니다",
     targetLabel: "리뷰할 플레이",
     rewardNotice:
-      "리뷰를 작성하시면 쏘빅툴 내 콘텐츠 구매에 사용할 수 있는 30 토큰을 바로 지급합니다.",
+      "쏘빅 소식지 및 혜택 알림 수신에 동의하고 리뷰를 작성하면 쏘빅툴에서 사용할 수 있는 30토큰을 지급합니다.",
+    newsletterConsentLabel: "쏘빅 소식지 및 혜택 알림을 받을게요",
+    newsletterConsentDescription:
+      "신규 콘텐츠, 이벤트, 쿠폰 안내를 이메일/문자/카카오톡으로 받을 수 있으며, 동의하지 않아도 리뷰 작성과 서비스 이용은 가능합니다.",
+    newsletterAlreadyConsented:
+      "이미 쏘빅 소식지 및 혜택 알림 수신동의가 확인되어 별도 체크 없이 보상 대상에 포함됩니다.",
     satisfactionLabel: (context) => `"${context.game.title}"의 플레이는 어떠셨나요?`,
     playExperienceLabel: "머더 미스터리 게임을 몇 번 정도 해보셨나요?",
     inflowLabel: "이 게임을 어떻게 알게 되셨나요?",
@@ -325,7 +341,12 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     unavailableTitle: "This review link is unavailable",
     targetLabel: "Reviewing This Play",
     rewardNotice:
-      "Leave a review and get 30 tokens to use on SsoBig Tool content.",
+      "Agree to receive SSOBIG news and benefit updates, then leave a review to receive 30 tokens for SsoBig Tool content.",
+    newsletterConsentLabel: "Send me SSOBIG news and benefit updates",
+    newsletterConsentDescription:
+      "You may receive new content, event, and coupon updates by email, SMS, or KakaoTalk. You can still submit a review without agreeing.",
+    newsletterAlreadyConsented:
+      "Your SSOBIG news and benefit consent is already confirmed, so no extra checkbox is needed for the reward.",
     satisfactionLabel: (context) => `How was "${context.game.title}"?`,
     playExperienceLabel: "How much murder mystery experience do you have?",
     inflowLabel: "How did you hear about this game?",
@@ -389,7 +410,12 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     unavailableTitle: "レビューを作成できません",
     targetLabel: "レビューするプレイ",
     rewardNotice:
-      "レビューを作成すると、SsoBig Tool のコンテンツ購入に使える30トークンをすぐに付与します。",
+      "SSOBIG のニュースと特典案内の受信に同意してレビューを投稿すると、SsoBig Tool で使える30トークンを付与します。",
+    newsletterConsentLabel: "SSOBIG のニュースと特典案内を受け取ります",
+    newsletterConsentDescription:
+      "新作コンテンツ、イベント、クーポン案内をメール/SMS/KakaoTalkで受け取れます。同意しなくてもレビュー投稿とサービス利用は可能です。",
+    newsletterAlreadyConsented:
+      "すでにSSOBIGのニュースと特典案内への同意が確認されているため、追加のチェックなしで特典対象になります。",
     satisfactionLabel: (context) => `「${context.game.title}」のプレイはいかがでしたか？`,
     playExperienceLabel: "マーダーミステリーゲームを何回くらいプレイしましたか？",
     inflowLabel: "このゲームをどのように知りましたか？",
@@ -453,7 +479,12 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     unavailableTitle: "无法填写评价",
     targetLabel: "本次游玩",
     rewardNotice:
-      "提交评价后，将立即发放可用于购买 SsoBig Tool 内容的 30 个代币。",
+      "同意接收 SSOBIG 新闻和福利通知并提交评价后，将发放可用于 SsoBig Tool 内容的 30 个代币。",
+    newsletterConsentLabel: "接收 SSOBIG 新闻和福利通知",
+    newsletterConsentDescription:
+      "你可以通过邮件、短信或 KakaoTalk 接收新内容、活动和优惠券通知。不同意也可以提交评价并使用服务。",
+    newsletterAlreadyConsented:
+      "已确认你同意接收 SSOBIG 新闻和福利通知，无需再次勾选也可计入奖励对象。",
     satisfactionLabel: (context) => `你觉得《${context.game.title}》的游玩体验如何？`,
     playExperienceLabel: "你玩过多少次谋杀推理游戏？",
     inflowLabel: "你是怎么知道这个游戏的？",
@@ -733,6 +764,7 @@ function formFromExistingReview(review: ExistingReview | null | undefined): Form
     charmPointOther: charmPoint.charmPointOther,
     sequelInterest: normalizeExistingChoice(review.sequelInterest, SEQUEL_VALUES),
     additionalComment: review.additionalComment || "",
+    newsletterConsentOptIn: false,
   };
 }
 
@@ -1208,6 +1240,8 @@ export default function PlayroomReviewForm({
           charmPoint: resolvedCharmPoint,
           charmPointChoice: form.charmPoint,
           charmPointOther: form.charmPointOther,
+          newsletterConsentOptIn: form.newsletterConsentOptIn,
+          pageUrl: window.location.href,
         }),
       });
       const payload = (await response.json().catch(() => null)) as
@@ -1237,6 +1271,8 @@ export default function PlayroomReviewForm({
   );
   const readyContext = loadState.status === "ready" ? loadState.context : null;
   const canSubmitReview = Boolean(readyContext && !readyContext.player.isBot);
+  const hasExistingMarketingConsent =
+    readyContext?.marketingConsent?.marketingOptedIn === true;
   const isDarkMode = readyContext?.game.isDarkMode ?? true;
   const themeStyle = buildReviewThemeStyle(
     readyContext?.game.themeColor,
@@ -1408,6 +1444,32 @@ export default function PlayroomReviewForm({
                   placeholder={copy.additionalCommentPlaceholder}
                   onChange={(value) => update("additionalComment", value)}
                 />
+                {hasExistingMarketingConsent ? (
+                  <div className="border-b border-[var(--review-line)] py-6">
+                    <p className="rounded-2xl border border-[var(--review-accent-soft)] bg-[var(--review-accent-surface)] px-4 py-3 text-sm font-medium leading-6 text-[var(--review-accent-muted)]">
+                      {copy.newsletterAlreadyConsented}
+                    </p>
+                  </div>
+                ) : (
+                  <label className="flex gap-3 border-b border-[var(--review-line)] py-6 text-left">
+                    <input
+                      type="checkbox"
+                      checked={form.newsletterConsentOptIn}
+                      onChange={(event) =>
+                        update("newsletterConsentOptIn", event.target.checked)
+                      }
+                      className="mt-1 h-5 w-5 shrink-0 accent-[var(--review-accent)]"
+                    />
+                    <span className="grid gap-1">
+                      <span className="text-base font-semibold leading-6 text-[var(--review-text-strong)]">
+                        {copy.newsletterConsentLabel}
+                      </span>
+                      <span className="text-sm font-medium leading-6 text-[var(--review-text-muted)]">
+                        {copy.newsletterConsentDescription}
+                      </span>
+                    </span>
+                  </label>
+                )}
               </fieldset>
 
               <div className="flex flex-col gap-3 border-t border-[var(--review-line)] pt-6">
