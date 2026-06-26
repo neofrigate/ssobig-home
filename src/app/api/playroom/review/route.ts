@@ -673,6 +673,17 @@ function readStringField(body: Record<string, unknown>, key: string) {
   return typeof body[key] === "string" ? body[key].trim() : "";
 }
 
+function readMarketingConsentField(body: Record<string, unknown>) {
+  const value = body.marketingConsent;
+  if (!value || typeof value !== "object") return null;
+  const consent = value as Record<string, unknown>;
+  return {
+    found: consent.found === true,
+    marketingOptedIn: consent.marketingOptedIn === true,
+    matchedBy: firstString(consent.matchedBy) || null,
+  };
+}
+
 async function parseReviewRequest(request: Request) {
   const body = (await request.json().catch(() => null)) as
     | Record<string, unknown>
@@ -773,6 +784,7 @@ export async function POST(request: Request) {
         sequelInterest: readStringField(body, "sequelInterest"),
         additionalComment: readStringField(body, "additionalComment"),
         newsletterConsentOptIn: body.newsletterConsentOptIn === true,
+        marketingConsent: readMarketingConsentField(body),
         pageUrl: readStringField(body, "pageUrl"),
       }),
     });

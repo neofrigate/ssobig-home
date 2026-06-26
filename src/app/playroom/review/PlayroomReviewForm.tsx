@@ -166,6 +166,11 @@ type ReviewCopy = {
   modalEyebrow: string;
   modalTitle: string;
   modalClose: string;
+  rewardOptOutWarningEyebrow: string;
+  rewardOptOutWarningTitle: string;
+  rewardOptOutWarningMessage: string;
+  rewardOptOutWarningConfirm: string;
+  rewardOptOutWarningCancel: string;
   optionalQuestionNumber: string;
   rewardSuccess: (previous: number | null, next: number | null, delta: number | null) => string;
   rewardAlready: string;
@@ -306,6 +311,12 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     modalEyebrow: "제출 완료",
     modalTitle: "리뷰 저장 완료",
     modalClose: "확인",
+    rewardOptOutWarningEyebrow: "토큰 지급 확인",
+    rewardOptOutWarningTitle: "토큰을 지급받을 수 없습니다",
+    rewardOptOutWarningMessage:
+      "쏘빅 소식지 및 혜택 알림 수신에 동의하지 않으면 리뷰는 제출되지만 30토큰은 지급받을 수 없습니다.",
+    rewardOptOutWarningConfirm: "토큰 지급받지 않고 제출하기",
+    rewardOptOutWarningCancel: "취소",
     optionalQuestionNumber: "Q7 (선택)",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
@@ -375,6 +386,12 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     modalEyebrow: "Submitted",
     modalTitle: "Review Saved",
     modalClose: "OK",
+    rewardOptOutWarningEyebrow: "Token Reward",
+    rewardOptOutWarningTitle: "You will not receive tokens",
+    rewardOptOutWarningMessage:
+      "If you do not agree to receive SSOBIG news and benefit updates, your review will be submitted but the 30-token reward will not be applied.",
+    rewardOptOutWarningConfirm: "Submit without tokens",
+    rewardOptOutWarningCancel: "Cancel",
     optionalQuestionNumber: "Q7 (Optional)",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
@@ -444,6 +461,12 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     modalEyebrow: "送信完了",
     modalTitle: "レビュー保存完了",
     modalClose: "OK",
+    rewardOptOutWarningEyebrow: "トークン特典確認",
+    rewardOptOutWarningTitle: "トークンを受け取れません",
+    rewardOptOutWarningMessage:
+      "SSOBIGのニュースと特典案内の受信に同意しない場合、レビューは送信されますが30トークンの特典は付与されません。",
+    rewardOptOutWarningConfirm: "トークンを受け取らずに送信",
+    rewardOptOutWarningCancel: "キャンセル",
     optionalQuestionNumber: "Q7（任意）",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
@@ -511,6 +534,12 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     modalEyebrow: "提交完成",
     modalTitle: "评价保存完成",
     modalClose: "OK",
+    rewardOptOutWarningEyebrow: "代币奖励确认",
+    rewardOptOutWarningTitle: "将无法获得代币",
+    rewardOptOutWarningMessage:
+      "如果不同意接收 SSOBIG 新闻和福利通知，评价仍会提交，但不会发放 30 个代币奖励。",
+    rewardOptOutWarningConfirm: "不领取代币并提交",
+    rewardOptOutWarningCancel: "取消",
     optionalQuestionNumber: "Q7（可选）",
     rewardSuccess: (previous, next, delta) =>
       previous !== null && next !== null
@@ -1089,6 +1118,7 @@ export default function PlayroomReviewForm({
   const [submitElapsedMs, setSubmitElapsedMs] = useState(0);
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [hasExistingReview, setHasExistingReview] = useState(false);
+  const [showRewardOptOutWarning, setShowRewardOptOutWarning] = useState(false);
   const isPreview =
     (gameId === PREVIEW_GAME_ID && playerId === PREVIEW_PLAYER_ID) ||
     (process.env.NODE_ENV === "development" && (!gameId || !playerId));
@@ -1183,8 +1213,9 @@ export default function PlayroomReviewForm({
     if (submitState.status === "error") setSubmitState({ status: "idle" });
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function submitReview({
+    skipRewardOptOutWarning = false,
+  }: { skipRewardOptOutWarning?: boolean } = {}) {
     if (loadState.status === "ready" && loadState.context.player.isBot) {
       setSubmitState({
         status: "error",
@@ -1199,6 +1230,16 @@ export default function PlayroomReviewForm({
       });
       return;
     }
+    const hasExistingConsent =
+      loadState.context.marketingConsent?.marketingOptedIn === true;
+    if (
+      !skipRewardOptOutWarning &&
+      !hasExistingConsent &&
+      !form.newsletterConsentOptIn
+    ) {
+      setShowRewardOptOutWarning(true);
+      return;
+    }
 
     const resolvedCharmPoint =
       form.charmPoint === CHARM_POINT_OTHER_VALUE
@@ -1207,11 +1248,8 @@ export default function PlayroomReviewForm({
 
     setSubmitState({ status: "submitting" });
     if (isPreview) {
-      window.setTimeout(() => {
-        setHasExistingReview(true);
-        setSubmitState({
-          status: "success",
-          reward: {
+      const previewReward: RewardResult = form.newsletterConsentOptIn
+        ? {
             status: "rewarded",
             campaignId: "review_preview-template",
             couponCode: "PREV-IEW1",
@@ -1220,7 +1258,22 @@ export default function PlayroomReviewForm({
             remainCredit: 40,
             delta: 30,
             message: null,
-          },
+          }
+        : {
+            status: "skipped",
+            campaignId: null,
+            couponCode: null,
+            creditCount: null,
+            previousCredit: null,
+            remainCredit: null,
+            delta: null,
+            message: null,
+          };
+      window.setTimeout(() => {
+        setHasExistingReview(true);
+        setSubmitState({
+          status: "success",
+          reward: previewReward,
         });
       }, 1800);
       return;
@@ -1241,6 +1294,13 @@ export default function PlayroomReviewForm({
           charmPointChoice: form.charmPoint,
           charmPointOther: form.charmPointOther,
           newsletterConsentOptIn: form.newsletterConsentOptIn,
+          marketingConsent: readyContext?.marketingConsent
+            ? {
+                found: readyContext.marketingConsent.found,
+                marketingOptedIn: readyContext.marketingConsent.marketingOptedIn,
+                matchedBy: readyContext.marketingConsent.matchedBy,
+              }
+            : null,
           pageUrl: window.location.href,
         }),
       });
@@ -1263,6 +1323,11 @@ export default function PlayroomReviewForm({
         message: copy.submitFailedShort,
       });
     }
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void submitReview();
   }
 
   const submitProgressIndex = Math.min(
@@ -1519,6 +1584,50 @@ export default function PlayroomReviewForm({
           ) : null}
         </section>
       </div>
+      {showRewardOptOutWarning && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--review-modal-overlay)] px-5"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="review-reward-opt-out-title"
+        >
+          <section className="w-full max-w-md rounded-[32px] border border-[var(--review-accent-soft)] bg-[var(--review-accent-surface)] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--review-accent-muted)]">
+              {copy.rewardOptOutWarningEyebrow}
+            </p>
+            <h2
+              id="review-reward-opt-out-title"
+              className="mt-3 text-2xl font-semibold leading-8 text-[var(--review-text-strong)]"
+            >
+              {copy.rewardOptOutWarningTitle}
+            </h2>
+            <p className="mt-3 break-keep text-sm leading-6 text-[var(--review-text-muted)]">
+              {copy.rewardOptOutWarningMessage}
+            </p>
+            <div className="mt-6 grid gap-3">
+              <button
+                type="button"
+                disabled={submitState.status === "submitting"}
+                onClick={() => {
+                  setShowRewardOptOutWarning(false);
+                  void submitReview({ skipRewardOptOutWarning: true });
+                }}
+                className="min-h-12 w-full rounded-2xl bg-[var(--review-accent)] px-4 py-3 text-center text-sm font-semibold leading-5 text-[var(--review-accent-contrast)] transition hover:brightness-105 disabled:cursor-wait disabled:bg-[var(--review-accent-disabled)] disabled:text-white/70"
+              >
+                {copy.rewardOptOutWarningConfirm}
+              </button>
+              <button
+                type="button"
+                disabled={submitState.status === "submitting"}
+                onClick={() => setShowRewardOptOutWarning(false)}
+                className="min-h-12 w-full rounded-2xl border border-[var(--review-line)] bg-[var(--review-choice-bg)] px-4 py-3 text-center text-sm font-semibold leading-5 text-[var(--review-text-strong)] transition hover:border-[var(--review-choice-hover-border)] hover:bg-[var(--review-choice-hover-bg)] disabled:cursor-wait disabled:opacity-70"
+              >
+                {copy.rewardOptOutWarningCancel}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
       {submitState.status === "success" && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--review-modal-overlay)] px-5"
