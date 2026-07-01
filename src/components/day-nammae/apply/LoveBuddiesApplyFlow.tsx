@@ -169,6 +169,11 @@ function getBlockingReason(stepKey: FlowStepKey) {
   }
 }
 
+interface InvalidFieldTarget {
+  selector: string;
+  message: string;
+}
+
 type ApplyFlowMode = "modal" | "page";
 type CouponValidationStatus = "idle" | "validating" | "valid" | "invalid";
 
@@ -334,6 +339,109 @@ function getCouponTargetScheduleLabel(
 
   return "";
 }
+
+function getFirstProfileInvalidField(
+  formValues: DayNammeFormValues,
+  isSelectedBirthYearAllowed: boolean
+): InvalidFieldTarget | null {
+  if (!formValues.name.trim()) {
+    return {
+      selector: '[name="day_nammae_name"]',
+      message: "이름을 입력해주세요.",
+    };
+  }
+
+  if (!formValues.birthYear || !isSelectedBirthYearAllowed) {
+    return {
+      selector: '[data-day-nammae-field="birthYear"]',
+      message: isSelectedBirthYearAllowed
+        ? "출생연도를 선택해주세요."
+        : "선택한 회차의 참가 가능 연령에 맞는 출생연도를 선택해주세요.",
+    };
+  }
+
+  if (!formValues.height.trim()) {
+    return {
+      selector: '[name="day_nammae_height"]',
+      message: "키를 입력해주세요.",
+    };
+  }
+
+  if (formValues.phone.replace(/\D/g, "").length !== 11) {
+    return {
+      selector: '[name="day_nammae_phone"]',
+      message: "전화번호 11자리를 입력해주세요.",
+    };
+  }
+
+  if (!formValues.traits.trim()) {
+    return {
+      selector: '[name="day_nammae_traits"]',
+      message: "특징을 작성해주세요.",
+    };
+  }
+
+  if (!formValues.acquisitionChannel) {
+    return {
+      selector: '[data-day-nammae-field="acquisitionChannel"]',
+      message: "유입경로를 선택해주세요.",
+    };
+  }
+
+  if (
+    formValues.acquisitionChannel === "기타" &&
+    !formValues.acquisitionChannelOther.trim()
+  ) {
+    return {
+      selector: '[name="day_nammae_acquisition_channel_other"]',
+      message: "기타 경로를 입력해주세요.",
+    };
+  }
+
+  return null;
+}
+
+function getFirstWaitlistContactInvalidField(
+  formValues: DayNammeFormValues
+): InvalidFieldTarget | null {
+  if (!formValues.name.trim()) {
+    return {
+      selector: '[name="day_nammae_waitlist_name"]',
+      message: "이름을 입력해주세요.",
+    };
+  }
+
+  if (formValues.phone.replace(/\D/g, "").length !== 11) {
+    return {
+      selector: '[name="day_nammae_waitlist_phone"]',
+      message: "전화번호 11자리를 입력해주세요.",
+    };
+  }
+
+  return null;
+}
+
+function scrollToInvalidField(selector: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.requestAnimationFrame(() => {
+    const target = document.querySelector<HTMLElement>(selector);
+    if (!target) {
+      return;
+    }
+
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const focusTarget =
+      target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement
+        ? target
+        : target.querySelector<HTMLElement>("button, input, textarea");
+    focusTarget?.focus({ preventScroll: true });
+  });
+}
+
 const MAX_PHOTO_FILE_SIZE_BYTES = 4 * 1024 * 1024;
 const MAX_PHOTO_FILE_SIZE_LABEL = "4MB";
 const MAX_PHOTO_DIMENSION = 1600;
@@ -2934,12 +3042,20 @@ export default function LoveBuddiesApplyFlow({
       (currentStepKey === "profile" || currentStepKey === "waitlist_contact") &&
       !canProceed
     ) {
+      const invalidField =
+        currentStepKey === "profile"
+          ? getFirstProfileInvalidField(formValues, isSelectedBirthYearAllowed)
+          : getFirstWaitlistContactInvalidField(formValues);
       trackApplyAnalyticsEvent("dn_apply_step_blocked", {
         ...buildStepAnalyticsParams(),
         error_reason: getBlockingReason(currentStepKey),
         result: "blocked",
       });
       setShowFieldErrors(true);
+      setFormError(invalidField?.message || "필수 정보를 입력해주세요.");
+      if (invalidField) {
+        scrollToInvalidField(invalidField.selector);
+      }
       return;
     }
 

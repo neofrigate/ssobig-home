@@ -86,7 +86,7 @@ export default function StepProfile({
         )}
       </div>
 
-      <div>
+      <div data-day-nammae-field="birthYear">
         <div className="flex items-center justify-between gap-3">
           <div className="text-sm font-semibold text-white/80">출생연도</div>
           {ageRangeLabel && (
@@ -170,6 +170,7 @@ export default function StepProfile({
           autoCorrect="off"
           autoCapitalize="sentences"
           spellCheck={false}
+          name="day_nammae_traits"
           className={`mt-2 w-full rounded-lg border bg-[#21161a] px-4 py-3 text-base text-white placeholder:text-white/30 outline-none ${
             errors.traits ? "border-red-500" : "border-[#2c2024]"
           }`}
@@ -179,7 +180,7 @@ export default function StepProfile({
         )}
       </div>
 
-      <div>
+      <div data-day-nammae-field="acquisitionChannel">
         <div className="text-sm font-semibold text-white/80">
           일일남매를 어디서 보고 신청하게 되셨나요?
         </div>
@@ -219,6 +220,7 @@ export default function StepProfile({
               autoCorrect="off"
               autoCapitalize="sentences"
               spellCheck={false}
+              name="day_nammae_acquisition_channel_other"
               className={inputClass(errors.acquisitionChannelOther)}
             />
             {errors.acquisitionChannelOther && (
