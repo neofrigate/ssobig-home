@@ -14,6 +14,10 @@ const DEFAULT_WAITLIST_ALERT_API_URL =
   "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-waitlist-alert";
 const DEFAULT_CLIENT_ERROR_MESSAGE =
   "신청서 제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
+const WAITLIST_ALERT_UNAVAILABLE_MESSAGE =
+  "대기 알림 신청이 마감된 일정이에요. 새로고침 후 다른 회차를 선택해주세요.";
+const WAITLIST_ALERT_UNAVAILABLE_EDGE_MESSAGE =
+  "waitlist alert is not available for this schedule";
 const UNSUPPORTED_HEIC_PHOTO_ERROR_MESSAGE =
   "HEIC/HEIF 사진은 자동 변환에 실패해 업로드할 수 없습니다. 사진 앱에서 JPG로 저장한 뒤 다시 시도해주세요.";
 const HEIC_HEIF_MIME_TYPES = new Set([
@@ -238,6 +242,7 @@ function isSafeClientErrorMessage(message: string) {
     message === "이미지 파일만 업로드할 수 있습니다." ||
     message === "유입경로를 선택해주세요." ||
     message === "기타 경로를 입력해주세요." ||
+    message === WAITLIST_ALERT_UNAVAILABLE_MESSAGE ||
     message.startsWith("선택한 회차는 ") ||
     message === UNSUPPORTED_HEIC_PHOTO_ERROR_MESSAGE
   );
@@ -388,6 +393,32 @@ function toObjectRecord(value: unknown) {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : null;
+}
+
+function getEdgeErrorMessage(edgeBody: unknown) {
+  if (typeof edgeBody === "string") {
+    return edgeBody;
+  }
+
+  const edgeBodyRecord = toObjectRecord(edgeBody);
+  const errorMessage =
+    edgeBodyRecord?.error ?? edgeBodyRecord?.message ?? edgeBodyRecord?.reason;
+
+  return typeof errorMessage === "string" ? errorMessage : "";
+}
+
+function getWaitlistAlertSafeClientMessage(edgeBody: unknown) {
+  const edgeErrorMessage = getEdgeErrorMessage(edgeBody).trim().toLowerCase();
+
+  if (edgeErrorMessage === WAITLIST_ALERT_UNAVAILABLE_EDGE_MESSAGE) {
+    return WAITLIST_ALERT_UNAVAILABLE_MESSAGE;
+  }
+
+  return "";
+}
+
+function getClientErrorStatus(status: number) {
+  return status >= 400 && status < 500 ? status : 400;
 }
 
 function getFetchInputUrl(input: Parameters<typeof fetch>[0]) {
@@ -742,6 +773,9 @@ export async function POST(request: Request) {
 
       if (!edgeResponse.ok) {
         currentStage = "edge:request:error";
+        const safeWaitlistAlertMessage =
+          getWaitlistAlertSafeClientMessage(edgeBody);
+
         logSubmitEvent(
           requestId,
           "edge:request:error",
@@ -751,12 +785,27 @@ export async function POST(request: Request) {
             edgeBody,
             applicationMode,
           },
-          "error"
+          safeWaitlistAlertMessage ? "warn" : "error"
         );
+
+        if (safeWaitlistAlertMessage) {
+          return NextResponse.json(
+            {
+              success: false,
+              requestId,
+              clientRequestId,
+              error: "waitlist_alert_unavailable",
+              userMessage: safeWaitlistAlertMessage,
+            },
+            {
+              status: getClientErrorStatus(edgeResponse.status),
+              headers: buildResponseHeaders(requestId, clientRequestId),
+            }
+          );
+        }
+
         throw new Error(
-          typeof edgeBody === "string"
-            ? edgeBody
-            : edgeBody?.error || "대기 알림 신청 요청에 실패했습니다."
+          getEdgeErrorMessage(edgeBody) || "대기 알림 신청 요청에 실패했습니다."
         );
       }
 
