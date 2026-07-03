@@ -32,6 +32,7 @@ const DAY_NAMMAE_AGE_RANGES: Record<string, { min: number; max: number }> = {
   "20_35": { min: 20, max: 35 },
   "20_30": { min: 20, max: 30 },
   "25_35": { min: 25, max: 35 },
+  "30_39": { min: 30, max: 39 },
 };
 const ACQUISITION_CHANNEL_OPTIONS = new Set([
   "공식 인스타그램",
@@ -257,9 +258,24 @@ function getKstCurrentYear() {
   return Number.parseInt(year, 10);
 }
 
-function normalizeDayNammaeAgeRangeKey(value: unknown) {
+function getDayNammaeAgeRange(value: unknown) {
   const key = String(value || "").trim();
-  return DAY_NAMMAE_AGE_RANGES[key] ? key : "20_35";
+  const configuredRange = DAY_NAMMAE_AGE_RANGES[key];
+
+  if (configuredRange) {
+    return configuredRange;
+  }
+
+  const keyRangeMatch = key.match(/^(\d{2})_(\d{2})$/);
+  if (keyRangeMatch) {
+    const min = Number.parseInt(keyRangeMatch[1], 10);
+    const max = Number.parseInt(keyRangeMatch[2], 10);
+    if (Number.isInteger(min) && Number.isInteger(max) && min <= max) {
+      return { min, max };
+    }
+  }
+
+  return DAY_NAMMAE_AGE_RANGES["20_35"];
 }
 
 function parseBirthYear(value: unknown) {
@@ -271,9 +287,7 @@ function parseBirthYear(value: unknown) {
 
 function getBirthYearBounds(ageRangeKey: string) {
   const currentYear = getKstCurrentYear();
-  const range =
-    DAY_NAMMAE_AGE_RANGES[normalizeDayNammaeAgeRangeKey(ageRangeKey)] ||
-    DAY_NAMMAE_AGE_RANGES["20_35"];
+  const range = getDayNammaeAgeRange(ageRangeKey);
 
   return {
     minBirthYear: currentYear - range.max + 1,

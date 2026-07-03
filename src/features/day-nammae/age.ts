@@ -4,6 +4,7 @@ export const DAY_NAMMAE_AGE_RANGE_CONFIG = {
   "20_35": { min: 20, max: 35 },
   "20_30": { min: 20, max: 30 },
   "25_35": { min: 25, max: 35 },
+  "30_39": { min: 30, max: 39 },
 } as const;
 
 export type DayNammeAgeRangeKey = keyof typeof DAY_NAMMAE_AGE_RANGE_CONFIG;
