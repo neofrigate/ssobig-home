@@ -360,11 +360,13 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             <Image
               src="/ssobig_assets/Logo/logo=ssobig, color=white.png"
               alt="쏘빅"
-              width={80}
-              height={29}
-              className="transition-opacity duration-700 h-auto"
+              width={176}
+              height={65}
+              className="transition-opacity duration-700"
               unoptimized
               style={{
+                width: 80,
+                height: (80 * 65) / 176,
                 opacity: useWhiteText ? 1 : 0,
               }}
               suppressHydrationWarning
@@ -373,11 +375,13 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             <Image
               src="/ssobig_assets/Logo/logo=ssobig, color=black.png"
               alt="쏘빅"
-              width={80}
-              height={29}
-              className="transition-opacity duration-700 absolute top-0 left-0 h-auto"
+              width={176}
+              height={65}
+              className="absolute top-0 left-0 transition-opacity duration-700"
               unoptimized
               style={{
+                width: 80,
+                height: (80 * 65) / 176,
                 opacity: useBlackText ? 1 : 0,
               }}
               suppressHydrationWarning
@@ -394,10 +398,10 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
         </div>
 
         {/* 2단: 메뉴 (36px) */}
-        <div className="h-[36px] relative flex items-center justify-start gap-4 px-5">
+        <div className="h-[36px] relative flex items-center justify-start gap-1 px-2 min-[390px]:gap-2 min-[390px]:px-3">
           <Link
             href="/"
-            className="relative h-full flex items-center font-medium text-sm"
+            className="relative h-full flex items-center font-medium text-xs min-[390px]:text-sm"
           >
             <span
               className={`transition-all duration-700 ${
@@ -421,7 +425,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
 
           <Link
             href="/playroom"
-            className="relative h-full flex items-center font-medium text-sm"
+            className="relative h-full flex items-center font-medium text-xs min-[390px]:text-sm"
           >
             <span
               className={`transition-all duration-700 ${
@@ -445,7 +449,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
 
           <Link
             href="/offline"
-            className="relative h-full flex items-center font-medium text-sm"
+            className="relative h-full flex items-center font-medium text-xs min-[390px]:text-sm"
           >
             <span
               className={`transition-all duration-700 ${
@@ -469,7 +473,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
 
           <Link
             href="/project"
-            className="relative h-full flex items-center font-medium text-sm"
+            className="relative h-full flex items-center font-medium text-xs min-[390px]:text-sm"
           >
             <span
               className={`transition-all duration-700 ${
@@ -495,7 +499,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             href="https://tool.ssobig.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className={`ml-auto h-[28px] px-3 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all duration-700 ${
+            className={`ml-auto h-[28px] px-2 min-[390px]:px-3 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all duration-700 ${
               useBlackText
                 ? "bg-gray-900 text-white hover:bg-gray-700"
                 : "bg-white text-gray-900 hover:bg-gray-200"
@@ -520,10 +524,10 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 : "/ssobig_assets/Logo/logo=ssobig, color=white.png"
             }
             alt="쏘빅"
-            width={120}
-            height={44}
+            width={176}
+            height={65}
             unoptimized
-            className="h-auto"
+            style={{ width: 120, height: (120 * 65) / 176 }}
             suppressHydrationWarning
           />
         </Link>

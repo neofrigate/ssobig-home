@@ -656,13 +656,17 @@ interface PlayroomCampaignBannerApiItem {
   mobile_image_url?: string | null;
 }
 
+function getPlayroomAssetPath(filename: string) {
+  return `/ssobig_assets/playroom/${encodeURIComponent(filename)}`;
+}
+
 const FALLBACK_BANNERS: BannerData[] = [
   {
     title1: "한강에서 폭탄이 터졌다.",
     title2: "다리 위엔 현수막, 섬 안엔 용의자.",
     subtitle: "4인용 서사 미스터리 [밤 아일랜드]",
-    bgImage: "/ssobig_assets/playroom/히어로_밤아일랜드_데스크톱.jpg",
-    mobileImage: "/ssobig_assets/playroom/히어로_밤아일랜드_모바일.jpg",
+    bgImage: getPlayroomAssetPath("히어로_밤아일랜드_데스크톱.jpg"),
+    mobileImage: getPlayroomAssetPath("히어로_밤아일랜드_모바일.jpg"),
     bgGradient: "from-green-600 to-emerald-600",
     link: "https://relay.ssobig.com/mlsami",
   },
@@ -671,8 +675,8 @@ const FALLBACK_BANNERS: BannerData[] = [
     title2: "그 원인은 궁 안에 있다.",
     subtitle:
       "사전예약 얼리버드 매진! 7인용 머더 미스터리 [황후마마 살인사건]",
-    bgImage: "/ssobig_assets/playroom/히어로_황후마마_데스크톱.jpg",
-    mobileImage: "/ssobig_assets/playroom/히어로_황후마마_모바일.jpg",
+    bgImage: getPlayroomAssetPath("히어로_황후마마_데스크톱.jpg"),
+    mobileImage: getPlayroomAssetPath("히어로_황후마마_모바일.jpg"),
     bgGradient: "from-red-600 to-pink-600",
     link: "https://tool.ssobig.com/templates/d20f00fd",
   },
@@ -680,8 +684,8 @@ const FALLBACK_BANNERS: BannerData[] = [
     title1: "당신의 선택으로 완성되는",
     title2: "커플 전용 미스터리 게임",
     subtitle: "텀블벅 165% 달성! 기억 속의 너 펀딩 진행중",
-    bgImage: "/ssobig_assets/playroom/히어로_기억 속의 너_데스크톱.jpg",
-    mobileImage: "/ssobig_assets/playroom/히어로_기억 속의 너_모바일.jpg",
+    bgImage: getPlayroomAssetPath("히어로_기억 속의 너_데스크톱.jpg"),
+    mobileImage: getPlayroomAssetPath("히어로_기억 속의 너_모바일.jpg"),
     bgGradient: "from-blue-600 to-cyan-600",
     link: "https://tool.ssobig.com/templates/0bb6fcf7",
   },
@@ -689,8 +693,8 @@ const FALLBACK_BANNERS: BannerData[] = [
     title1: "우주선에 선장이 죽었다",
     title2: "똑같이 생긴 당신은 누구?",
     subtitle: "323% 달성! 4인용 머더 미스터리 도플갱어",
-    bgImage: "/ssobig_assets/playroom/히어로_도플갱어_데스크톱.jpg",
-    mobileImage: "/ssobig_assets/playroom/히어로_도플갱어_모바일.jpg",
+    bgImage: getPlayroomAssetPath("히어로_도플갱어_데스크톱.jpg"),
+    mobileImage: getPlayroomAssetPath("히어로_도플갱어_모바일.jpg"),
     bgGradient: "from-indigo-600 to-purple-600",
     link: "https://tool.ssobig.com/templates/3e7a2f6e",
   },

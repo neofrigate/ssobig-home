@@ -70,11 +70,11 @@ const Sidebar: React.FC = () => {
                 <Image
                   src="/ssobig_assets/Logo/logo=ssobig, color=white.png"
                   alt="쏘빅"
-                  width={80}
-                  height={29}
+                  width={176}
+                  height={65}
                   priority
                   unoptimized
-                  className="h-auto"
+                  style={{ width: 80, height: (80 * 65) / 176 }}
                 />
               </LinkWithUtm>
             </div>
