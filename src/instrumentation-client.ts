@@ -3,6 +3,7 @@ import {
   getClientSentryDebugContext,
   getHydrationDebugContext,
   shouldIgnoreKnownInAppBrowserError,
+  shouldIgnoreSavedPageLinkLoadError,
 } from "@/lib/sentry-debug";
 
 const SENTRY_DSN =
@@ -51,7 +52,10 @@ Sentry.init({
       ...event.extra,
     };
 
-    if (shouldIgnoreKnownInAppBrowserError(event)) {
+    if (
+      shouldIgnoreSavedPageLinkLoadError(event) ||
+      shouldIgnoreKnownInAppBrowserError(event)
+    ) {
       return null;
     }
 

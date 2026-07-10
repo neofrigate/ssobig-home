@@ -77,6 +77,22 @@ function getBrowserContextUserAgent(event: SentryLikeEvent): string | undefined 
   return typeof userAgent === "string" ? userAgent : undefined;
 }
 
+function getSerializedBrowserEvent(event: SentryLikeEvent) {
+  const serialized = event.extra?.__serialized__;
+
+  return serialized && typeof serialized === "object"
+    ? (serialized as Record<string, unknown>)
+    : undefined;
+}
+
+function getEventUrl(event: SentryLikeEvent): string | undefined {
+  if (typeof event.extra?.url === "string") {
+    return event.extra.url;
+  }
+
+  return event.request?.url;
+}
+
 export function getClientSentryDebugContext() {
   if (typeof window === "undefined") {
     return {
@@ -140,6 +156,21 @@ export function getClientSentryDebugContext() {
       normalizedPathnameCandidate: normalizedPathname,
     },
   };
+}
+
+export function shouldIgnoreSavedPageLinkLoadError(event: SentryLikeEvent) {
+  const serialized = getSerializedBrowserEvent(event);
+  const target = serialized?.target;
+  const type = serialized?.type;
+  const url = getEventUrl(event);
+
+  return (
+    type === "error" &&
+    typeof target === "string" &&
+    target.includes("head > link") &&
+    typeof url === "string" &&
+    url.startsWith("file://")
+  );
 }
 
 export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
