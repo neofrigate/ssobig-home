@@ -80,7 +80,7 @@ const TEN_POINT_SCORE_VALUES = Array.from(
 const NAVER_REVIEW_URL = "https://m.place.naver.com/my/timeline";
 const REVIEW_INCENTIVE_THRESHOLD = 7;
 const REVIEW_SCREENSHOT_MESSAGE =
-  "[일일남매] 네이버 리뷰 인증샷 확인 부탁드립니다. 커피 쿠폰 또는 일일남매 30% 할인 쿠폰 신청합니다.";
+  "[일일남매] 네이버 리뷰 인증샷 확인 부탁드립니다. 일일남매 30% 할인 쿠폰 신청합니다.";
 
 const INITIAL_FORM_STATE: FormState = {
   overallSatisfaction: null,
@@ -655,12 +655,12 @@ export default function SurveyPageClient({
                       Review Gift
                     </p>
                     <h3 className="mt-3 break-keep text-2xl font-semibold text-white md:text-3xl">
-                      리뷰 인증하고 커피 쿠폰 받기
+                      리뷰 인증하고 30% 할인 쿠폰 받기
                     </h3>
                     <p className="mt-3 break-keep text-sm leading-6 text-white/68 md:text-base md:leading-7">
                       일일남매가 좋았다면 네이버에 짧은 후기를 남겨주세요.
                       작성 화면을 캡처해 채널톡으로 보내주시면 확인 후
-                      커피 쿠폰 또는 일일남매 30% 할인 쿠폰을 보내드립니다.
+                      일일남매 30% 할인 쿠폰을 보내드립니다.
                     </p>
                   </div>
                 </div>
@@ -697,7 +697,7 @@ export default function SurveyPageClient({
                     onClick={openChannelTalkForReviewScreenshot}
                     className="flex min-h-14 items-center justify-center rounded-2xl border border-white/14 bg-white/[0.05] px-5 text-sm font-semibold text-white transition hover:border-white/28 hover:bg-white/[0.08]"
                   >
-                    인증샷 보내고 쿠폰 받기
+                    인증샷 보내고 30% 할인 쿠폰 받기
                   </button>
                 </div>
               </section>
