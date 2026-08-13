@@ -11,6 +11,11 @@ type SentryLikeEvent = {
     values?: Array<{
       type?: string;
       value?: string;
+      stacktrace?: {
+        frames?: Array<{
+          filename?: string;
+        }>;
+      };
     }>;
   };
   logentry?: {
@@ -33,6 +38,10 @@ const KNOWN_META_WEBVIEW_ERROR_PATTERNS = [
 const KNOWN_META_WEBKIT_BRIDGE_ERROR_PATTERNS = [
   /window\.webkit\.messageHandlers/i,
 ];
+const META_ANDROID_NAVIGATION_LOGGER_FILENAME =
+  "app://navigation_performance_logger_android";
+const META_ANDROID_POST_MESSAGE_ERROR =
+  "Error invoking postMessage: Java exception was raised during method invocation";
 const KNOWN_META_WEBVIEW_NAMES = new Set(["facebook", "instagram"]);
 const KNOWN_PATHNAME_REDIRECTS: Record<string, string> = {
   "/offline/11namme에": "/offline/11namme",
@@ -174,8 +183,22 @@ export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
       )
     );
 
+  // Meta's Android IAB injects this navigation logger. Ignore only its exact
+  // native bridge failure so similarly worded errors from our code stay visible.
+  const isAndroidMetaNavigationLoggerNoise =
+    errorTexts.some(
+      (text) => text.trim() === META_ANDROID_POST_MESSAGE_ERROR
+    ) &&
+    (event.exception?.values ?? []).some((value) =>
+      value.stacktrace?.frames?.some(
+        (frame) =>
+          frame.filename === META_ANDROID_NAVIGATION_LOGGER_FILENAME
+      )
+    );
+
   return (
     isIosMetaWebkitBridgeNoise ||
+    isAndroidMetaNavigationLoggerNoise ||
     errorTexts.some((text) =>
       KNOWN_META_WEBVIEW_ERROR_PATTERNS.some((pattern) => pattern.test(text))
     )
