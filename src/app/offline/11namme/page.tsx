@@ -494,6 +494,9 @@ const ElevenNammePage = () => {
                 <h2 className="text-xl md:text-2xl font-bold text-center text-black mb-4 md:mb-6">
                   💕 일일남매 스케줄
                 </h2>
+                <p className="-mt-2 mb-4 text-center text-xs font-medium text-black/55 md:-mt-4 md:mb-6 md:text-sm">
+                  모임 일정은 오늘 기준 3주 뒤 날짜까지 순차적으로 공개돼요.
+                </p>
 
                 {/* 캘린더 */}
                 <div>
@@ -501,7 +504,7 @@ const ElevenNammePage = () => {
                     <ScheduleLoadingSkeleton />
                   ) : scheduleData.length === 0 ? (
                     <div className="flex items-center justify-center py-6 text-black/60 text-sm md:text-base">
-                      📅 참여하기 버튼을 눌러주세요
+                      📅 현재 공개된 일정이 없어요
                     </div>
                   ) : (
                     <ScheduleSummarySection />

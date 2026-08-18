@@ -37,6 +37,7 @@ export const DAY_NAMMAE_BIRTH_YEARS = getDefaultDayNammeBirthYears();
 
 export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
   {
+    scheduleDate: "2026-03-13",
     schedule: "3/13 (금) 19:30 일일남매",
     maxCapacity: 48,
     exposedTotal: 48,
@@ -45,6 +46,7 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "전체마감",
   },
   {
+    scheduleDate: "2026-03-14",
     schedule: "3/14 (토) 15:00 일일남매",
     maxCapacity: 48,
     exposedTotal: 47,
@@ -53,6 +55,7 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "남자마감",
   },
   {
+    scheduleDate: "2026-03-14",
     schedule: "3/14 (토) 19:00 일일남매",
     maxCapacity: 48,
     exposedTotal: 44,
@@ -61,6 +64,7 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "임박",
   },
   {
+    scheduleDate: "2026-03-20",
     schedule: "3/20 (금) 19:30 일일남매",
     maxCapacity: 48,
     exposedTotal: 48,
@@ -69,6 +73,7 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "전체마감",
   },
   {
+    scheduleDate: "2026-03-21",
     schedule: "3/21 (토) 15:00 일일남매",
     maxCapacity: 48,
     exposedTotal: 41,
@@ -77,6 +82,7 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "여자마감",
   },
   {
+    scheduleDate: "2026-03-21",
     schedule: "3/21 (토) 19:00 일일남매",
     maxCapacity: 48,
     exposedTotal: 39,
@@ -85,6 +91,7 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "임박",
   },
   {
+    scheduleDate: "2026-03-27",
     schedule: "3/27 (금) 19:30 일일남매",
     maxCapacity: 48,
     exposedTotal: 32,
@@ -93,6 +100,7 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "임박",
   },
   {
+    scheduleDate: "2026-03-28",
     schedule: "3/28 (토) 15:00 일일남매",
     maxCapacity: 48,
     exposedTotal: 35,
@@ -101,6 +109,7 @@ export const DAY_NAMMAE_FALLBACK_SCHEDULE = [
     status: "여유",
   },
   {
+    scheduleDate: "2026-03-28",
     schedule: "3/28 (토) 19:00 일일남매",
     maxCapacity: 48,
     exposedTotal: 32,

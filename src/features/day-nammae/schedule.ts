@@ -7,10 +7,13 @@ import {
 import { DayNammeApplicationMode, ScheduleItem } from "./types";
 
 const DAY_NAMMAE_WAITLIST_UI_ENABLED = true;
+export const DAY_NAMMAE_PUBLIC_WINDOW_DAYS = 21;
 
 interface RawScheduleItem {
   staffScheduleId?: string | null;
   staff_schedule_id?: string | null;
+  scheduleDate?: string | null;
+  schedule_date?: string | null;
   schedule: string;
   closeStatus?: string;
   maxCapacity: number;
@@ -70,6 +73,9 @@ export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
         staffScheduleId: String(
           item.staffScheduleId || item.staff_schedule_id || ""
         ).trim(),
+        scheduleDate: String(
+          item.scheduleDate || item.schedule_date || ""
+        ).trim(),
         date: dateStr,
         title: cleanTitle,
         fullLabel: title,
@@ -108,16 +114,53 @@ export function parseDayNammeSchedule(data: RawScheduleItem[]): ScheduleItem[] {
     });
 }
 
-export function getDayNammeFallbackSchedule(): ScheduleItem[] {
-  return parseDayNammeSchedule(DAY_NAMMAE_FALLBACK_SCHEDULE);
+function addIsoDateDays(isoDate: string, days: number) {
+  const match = isoDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return "";
+
+  const date = new Date(
+    Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]) + days)
+  );
+  return date.toISOString().slice(0, 10);
+}
+
+function getTodayKst() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const byType = Object.fromEntries(
+    parts.map((part) => [part.type, part.value])
+  );
+  return `${byType.year}-${byType.month}-${byType.day}`;
+}
+
+export function getDayNammeFallbackSchedule(
+  todayKst = getTodayKst()
+): ScheduleItem[] {
+  return getVisibleDayNammeSchedules(
+    parseDayNammeSchedule(DAY_NAMMAE_FALLBACK_SCHEDULE),
+    todayKst
+  );
 }
 
 export function getDayNammeScheduleLabel(schedule: ScheduleItem) {
   return `${schedule.date} ${schedule.title}`.trim();
 }
 
-export function getVisibleDayNammeSchedules(scheduleData: ScheduleItem[]) {
-  return scheduleData;
+export function getVisibleDayNammeSchedules(
+  scheduleData: ScheduleItem[],
+  todayKst = getTodayKst()
+) {
+  const windowEnd = addIsoDateDays(todayKst, DAY_NAMMAE_PUBLIC_WINDOW_DAYS);
+  if (!windowEnd) return [];
+
+  return scheduleData.filter(
+    (schedule) =>
+      schedule.scheduleDate >= todayKst && schedule.scheduleDate <= windowEnd
+  );
 }
 
 export function getDayNammeBirthYearsForSchedule(

@@ -31,6 +31,10 @@ export default function StepSchedule({
 
   return (
     <div className="space-y-3">
+      <p className="mb-2 text-xs leading-relaxed text-white/50">
+        모임 일정은 오늘 기준 3주 뒤 날짜까지 순차적으로 공개돼요.
+      </p>
+
       {isLoading && (
         <p className="text-sm text-white/40">일정을 불러오는 중...</p>
       )}

@@ -4,6 +4,7 @@ export type DayNammeApplicationMode = "normal" | "waitlist_alert";
 
 export interface ScheduleItem {
   staffScheduleId: string;
+  scheduleDate: string;
   date: string;
   title: string;
   fullLabel: string;

@@ -1,15 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDayNammeFallbackSchedule, parseDayNammeSchedule } from "./schedule";
+import {
+  getDayNammeFallbackSchedule,
+  getVisibleDayNammeSchedules,
+  parseDayNammeSchedule,
+} from "./schedule";
 import { ScheduleItem } from "./types";
 import { getPublicDayNammeSchedulesUrl } from "./upstream";
 
 interface PublicDayNammeSchedulesResponse {
   generatedAt?: string;
+  todayKst?: string;
   schedules?: {
     staffScheduleId?: string | null;
     staff_schedule_id?: string | null;
+    scheduleDate?: string | null;
+    schedule_date?: string | null;
     schedule: string;
     closeStatus: string;
     maxCapacity: number;
@@ -66,11 +73,10 @@ export function useDayNammeSchedule() {
 
         const data =
           (await response.json()) as PublicDayNammeSchedulesResponse;
-        const updatedSchedule = parseDayNammeSchedule(data.schedules || []);
-
-        if (updatedSchedule.length === 0) {
-          throw new Error("빈 데이터");
-        }
+        const updatedSchedule = getVisibleDayNammeSchedules(
+          parseDayNammeSchedule(data.schedules || []),
+          data.todayKst
+        );
 
         setScheduleData(updatedSchedule);
         setLastUpdateTime(formatUpdateTime(data.generatedAt));
