@@ -996,7 +996,7 @@ export default function PlayroomPage({
           title={t.playWithFriends}
           cardSize="small"
           mobileGap={12}
-          imageFit="contain"
+          imageFit="cover"
           items={templateGroups.friends}
         />
       )}
