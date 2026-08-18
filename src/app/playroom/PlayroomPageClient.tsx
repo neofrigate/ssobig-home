@@ -420,6 +420,7 @@ function ContentCard({
             src={image}
             alt={title}
             fill
+            unoptimized
             style={{ objectFit: imageFit }}
             sizes="(max-width: 640px) 40vw, 30vw"
             className="rounded-lg"
@@ -462,6 +463,7 @@ function ContentCard({
             src={image}
             alt={title}
             fill
+            unoptimized
             style={{ objectFit: imageFit }}
             className="transition-transform duration-300 group-hover:scale-110"
             sizes={
