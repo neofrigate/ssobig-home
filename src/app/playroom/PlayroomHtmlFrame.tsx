@@ -19,40 +19,56 @@ function buildSrcDoc(html: string, messageKey: string) {
         margin: 0;
         padding: 0;
         background: transparent;
-        overflow: hidden;
+        min-height: 0;
+        overflow: visible;
       }
       body {
         overflow-x: hidden;
-        overflow-y: hidden;
+      }
+      #playroom-html-content {
+        display: flow-root;
+        width: 100%;
       }
     </style>
   </head>
   <body>
-    ${html}
+    <div id="playroom-html-content">${html}</div>
     <script>
       (function () {
         var key = ${JSON.stringify(messageKey)};
         function sendHeight() {
+          var content = document.getElementById("playroom-html-content");
           var body = document.body;
           var html = document.documentElement;
+          var contentRect = content ? content.getBoundingClientRect() : null;
           var height = Math.max(
+            content ? content.scrollHeight : 0,
+            content ? content.offsetHeight : 0,
+            contentRect ? contentRect.height : 0,
             body ? body.scrollHeight : 0,
             body ? body.offsetHeight : 0,
-            html ? html.clientHeight : 0,
             html ? html.scrollHeight : 0,
             html ? html.offsetHeight : 0
           );
-          parent.postMessage({ type: "playroom-html-height", key: key, height: height }, "*");
+          parent.postMessage(
+            { type: "playroom-html-height", key: key, height: Math.ceil(height) },
+            "*"
+          );
         }
         window.addEventListener("load", sendHeight);
         window.addEventListener("resize", sendHeight);
         if (window.ResizeObserver) {
           var observer = new ResizeObserver(sendHeight);
-          observer.observe(document.body);
+          var observedElement = document.getElementById("playroom-html-content");
+          if (observedElement) observer.observe(observedElement);
+        }
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(sendHeight);
         }
         setTimeout(sendHeight, 0);
         setTimeout(sendHeight, 120);
         setTimeout(sendHeight, 400);
+        setTimeout(sendHeight, 1000);
       })();
     </script>
   </body>

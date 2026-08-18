@@ -1315,7 +1315,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
               color: ctaTextColor,
             }}
           >
-            게임하러 가기
+            바로 게임하러 가기
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="ml-2 h-5 w-5"

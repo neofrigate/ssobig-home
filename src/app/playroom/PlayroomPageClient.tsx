@@ -159,8 +159,7 @@ const PLAYROOM_TRACKING_QUERY_KEYS = [
 ];
 const PLAYROOM_CAMPAIGN_API_URL =
   "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-campaign-banners";
-const PLAYROOM_TEMPLATE_API_URL =
-  "https://tlyioijsopxeegzfjlqe.supabase.co/functions/v1/marketing-management-api/public/playroom-template-summaries";
+const PLAYROOM_TEMPLATE_API_URL = "/api/playroom/public-templates";
 
 function appendPlayroomTrackingParams(url: string): string {
   if (typeof window === "undefined") {
@@ -324,41 +323,9 @@ function TrackedLink({
   );
 }
 
-type PlayroomUICopy = (typeof PLAYROOM_UI_COPY)[PlayroomSiteLocale];
-
-const PRICE_LABEL_KEYS: Record<string, keyof PlayroomUICopy> = {
-  "무료": "free",
-  Free: "free",
-  "無料": "free",
-  "免费": "free",
-  "문의": "inquiry",
-  Inquiry: "inquiry",
-  "お問い合わせ": "inquiry",
-  "咨询": "inquiry",
-  "펀딩 진행중": "fundingInProgress",
-  Funding: "fundingInProgress",
-  "ファンディング中": "fundingInProgress",
-  "众筹进行中": "fundingInProgress",
-  "펀딩 종료": "fundingEnded",
-  "Funding Ended": "fundingEnded",
-  "ファンディング終了": "fundingEnded",
-  "众筹结束": "fundingEnded",
-  "사전예약 진행중": "preRegistration",
-  "Pre-registration": "preRegistration",
-  "事前予約受付中": "preRegistration",
-  "预约进行中": "preRegistration",
-};
-
-function formatPriceLabel(price: string, t: PlayroomUICopy): string {
-  const key = PRICE_LABEL_KEYS[price];
-  if (key) {
-    return t[key] as string;
-  }
-  const tokenMatch = price.match(/^(\d+)\s*(?:토큰|Tokens?|トークン|代币)$/i);
-  if (tokenMatch) {
-    return `${tokenMatch[1]} ${t.tokenSuffix}`;
-  }
-  return price;
+function formatRatingLabel(rating: number | undefined) {
+  if (!rating) return "";
+  return `⭐️${rating.toFixed(1)}`;
 }
 
 // 컨텐츠 카드 컴포넌트
@@ -366,28 +333,32 @@ interface ContentCardProps {
   image: string;
   title: string;
   description: string;
+  rating?: number;
   players?: string;
+  duration?: string;
   price?: string;
   link: string;
   templateId?: string;
   cardSize?: "large" | "small";
   imageFit?: "cover" | "contain";
-  locale?: PlayroomSiteLocale;
 }
 
 function ContentCard({
   image,
   title,
   description,
+  rating,
   players,
+  duration,
   price,
   link,
   templateId,
   cardSize = "large",
   imageFit = "cover",
-  locale = "kr",
 }: ContentCardProps) {
-  const t = PLAYROOM_UI_COPY[locale];
+  const metadata = [formatRatingLabel(rating), players, duration].filter(
+    (value): value is string => Boolean(value),
+  );
   // 모바일/태블릿 너비 계산 (< md)
   // Large: 2.5개 (gap 16px 기준) -> 모바일: calc(40vw - 22px), 태블릿: calc(32vw - 14px)
   // Small: 3.2개 (gap 12px 기준) -> 모바일: calc(31.25vw - 18px), 태블릿: calc(24vw - 10px)
@@ -426,19 +397,16 @@ function ContentCard({
             className="rounded-lg"
           />
         </div>
-        {price && players && (
+        {metadata.length > 0 && (
           <div className="mb-2 w-full text-left flex flex-wrap gap-1">
-            {players.split(", ").map((player, index) => (
+            {metadata.map((label) => (
               <span
-                key={index}
+                key={label}
                 className="inline-block px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] sm:text-xs font-medium"
               >
-                {player}
+                {label}
               </span>
             ))}
-            <span className="inline-block px-2 sm:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] sm:text-xs font-medium">
-              {formatPriceLabel(price, t)}
-            </span>
           </div>
         )}
         <h3 className="text-gray-900 text-base sm:text-lg font-bold mb-1 w-full text-left group-hover:underline">
@@ -474,19 +442,16 @@ function ContentCard({
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
         </div>
-        {price && players && (
+        {metadata.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-1">
-            {players.split(", ").map((player, index) => (
+            {metadata.map((label) => (
               <span
-                key={index}
+                key={label}
                 className="inline-block px-2 md:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] md:text-xs font-medium"
               >
-                {player}
+                {label}
               </span>
             ))}
-            <span className="inline-block px-2 md:px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-[10px] md:text-xs font-medium">
-              {formatPriceLabel(price, t)}
-            </span>
           </div>
         )}
         <h3 className="text-gray-900 font-bold text-base md:text-lg lg:text-xl mb-1 truncate">
@@ -510,7 +475,6 @@ interface ContentRowProps {
   cardSize?: "large" | "small";
   mobileGap?: number;
   imageFit?: "cover" | "contain";
-  locale?: PlayroomSiteLocale;
 }
 
 function ContentRow({
@@ -520,7 +484,6 @@ function ContentRow({
   cardSize = "large",
   mobileGap = 16,
   imageFit = "cover",
-  locale = "kr",
 }: ContentRowProps) {
   return (
     <section className="py-6 md:py-8">
@@ -542,13 +505,14 @@ function ContentRow({
                 image={item.image}
                 title={item.title}
                 description={item.description}
+                rating={item.rating}
                 players={item.players}
+                duration={item.duration}
                 price={item.price}
                 link={item.link}
                 templateId={item.templateId}
                 cardSize={cardSize}
                 imageFit={imageFit}
-                locale={locale}
               />
             ))}
           </div>
@@ -568,13 +532,14 @@ function ContentRow({
                 image={item.image}
                 title={item.title}
                 description={item.description}
+                rating={item.rating}
                 players={item.players}
+                duration={item.duration}
                 price={item.price}
                 link={item.link}
                 templateId={item.templateId}
                 cardSize={cardSize}
                 imageFit={imageFit}
-                locale={locale}
               />
             ))}
           </div>
@@ -723,6 +688,54 @@ function emptyTemplateGroups(): PlayroomTemplateGroups {
   return { story_mystery: [], friends: [] };
 }
 
+function pickTemplateNumber(
+  ...values: Array<string | number | null | undefined>
+) {
+  for (const value of values) {
+    const number = Number(value);
+    if (Number.isFinite(number) && number > 0) return number;
+  }
+  return 0;
+}
+
+function formatCardPlayers(item: PlayroomTemplateApiItem) {
+  const minPlayers = pickTemplateNumber(
+    item.minPlayerCount,
+    item.minPlayers,
+  );
+  const maxPlayers = pickTemplateNumber(
+    item.maxPlayerCount,
+    item.maxPlayers,
+  );
+
+  if (minPlayers && maxPlayers) {
+    return minPlayers === maxPlayers
+      ? `${minPlayers}인`
+      : `${minPlayers}~${maxPlayers}인`;
+  }
+
+  const playerCount = minPlayers || maxPlayers;
+  if (playerCount) return `${playerCount}인`;
+
+  const rangeMatch = item.players_label.match(/(\d+)\s*[~\-]\s*(\d+)\s*인/);
+  if (rangeMatch) return `${rangeMatch[1]}~${rangeMatch[2]}인`;
+  const singleMatch = item.players_label.match(/(\d+)\s*인/);
+  return singleMatch ? `${singleMatch[1]}인` : "";
+}
+
+function formatCardDuration(item: PlayroomTemplateApiItem) {
+  const minutes = pickTemplateNumber(
+    item.maxTimeMinutes,
+    item.minTimeMinutes,
+  );
+  if (minutes) return `${minutes}분`;
+
+  const rangeMatch = item.players_label.match(/(\d+)\s*[~\-]\s*(\d+)\s*분/);
+  if (rangeMatch) return `${rangeMatch[2]}분`;
+  const singleMatch = item.players_label.match(/(\d+)\s*분/);
+  return singleMatch ? `${singleMatch[1]}분` : "";
+}
+
 function mapPlayroomTemplate(
   item: PlayroomTemplateApiItem,
   locale: PlayroomSiteLocale,
@@ -734,7 +747,9 @@ function mapPlayroomTemplate(
     image: item.card_image_url,
     title: item.title,
     description: item.description,
-    players: item.players_label,
+    rating: pickTemplateNumber(item.rating_average) || undefined,
+    players: formatCardPlayers(item),
+    duration: formatCardDuration(item),
     price: item.price_label,
     link: internalDetailPath,
     templateId: item.ssobig_tool_template_id,
@@ -973,7 +988,6 @@ export default function PlayroomPage({
         <ContentRow
           title={t.storyMystery}
           items={templateGroups.story_mystery}
-          locale={locale}
         />
       )}
 
@@ -984,7 +998,6 @@ export default function PlayroomPage({
           mobileGap={12}
           imageFit="contain"
           items={templateGroups.friends}
-          locale={locale}
         />
       )}
 
