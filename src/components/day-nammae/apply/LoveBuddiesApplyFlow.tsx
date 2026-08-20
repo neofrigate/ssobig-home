@@ -1854,6 +1854,11 @@ export default function LoveBuddiesApplyFlow({
   const [waitlistModalSchedule, setWaitlistModalSchedule] =
     useState<ScheduleItem | null>(null);
   const [confirmedWaitlistSchedule, setConfirmedWaitlistSchedule] = useState("");
+  const [inAppBrowserName, setInAppBrowserName] = useState("");
+
+  useEffect(() => {
+    setInAppBrowserName(getCurrentInAppBrowserName());
+  }, []);
 
   const selectedScheduleItem =
     scheduleData.find(
@@ -1895,7 +1900,6 @@ export default function LoveBuddiesApplyFlow({
   const totalSteps = flowSteps.length;
   const displayStep = currentStepIndex + 1;
   const isLastStep = currentStepIndex === totalSteps - 1;
-  const inAppBrowserName = getCurrentInAppBrowserName();
   const flowOpenTrackedRef = useRef(false);
   const lastStepViewSignatureRef = useRef("");
   const flowStartedAtMsRef = useRef(Date.now());
