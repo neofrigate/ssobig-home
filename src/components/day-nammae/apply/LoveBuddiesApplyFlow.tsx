@@ -20,6 +20,13 @@ import {
   DAY_NAMMAE_NOTICE_SECTIONS,
 } from "@/features/day-nammae/constants";
 import {
+  DAY_NAMMAE_APPLICATION_CLOSED_CODE,
+  DAY_NAMMAE_APPLICATION_CLOSED_MESSAGE,
+  DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE,
+  isDayNammaeApplicationErrorCode,
+  type DayNammaeApplicationErrorCode,
+} from "@/features/day-nammae/applicationCutoff";
+import {
   getDayNammeBirthYearsForSchedule,
   isDayNammeBirthYearAllowed,
   getDayNammeScheduleApplicationMode,
@@ -208,6 +215,7 @@ interface SubmitResponseMeta {
   requestId: string;
   clientRequestId: string;
   userMessage: string;
+  errorCode: DayNammaeApplicationErrorCode | "";
   responseStatus: number;
   responseContentType: string;
   responseTextSnippet: string;
@@ -581,6 +589,53 @@ function WaitlistConfirmModal({
             알림신청 진행
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ApplicationBlockedModal({
+  code,
+  onClose,
+}: {
+  code: DayNammaeApplicationErrorCode;
+  onClose: () => void;
+}) {
+  const isClosed = code === DAY_NAMMAE_APPLICATION_CLOSED_CODE;
+  const title = isClosed
+    ? "신청 및 결제가 마감되었습니다"
+    : "일정을 확인할 수 없습니다";
+  const message = isClosed
+    ? DAY_NAMMAE_APPLICATION_CLOSED_MESSAGE
+    : DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-5">
+      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="day-nammae-application-blocked-title"
+        className="relative w-full max-w-[380px] rounded-[28px] bg-[#171113] px-6 py-7 text-center shadow-2xl"
+      >
+        <div className="inline-flex rounded-full bg-[#FF6B9F]/15 px-4 py-1 text-xs font-semibold tracking-[0.16em] text-[#FFB1D4]">
+          CLOSED
+        </div>
+        <h2
+          id="day-nammae-application-blocked-title"
+          className="mt-4 text-2xl font-black text-white"
+        >
+          {title}
+        </h2>
+        <p className="mt-4 text-sm leading-relaxed text-white/75">{message}</p>
+        <button
+          type="button"
+          onClick={onClose}
+          autoFocus
+          className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#FF6B9F] text-base font-bold text-white transition active:scale-[0.98]"
+        >
+          확인
+        </button>
       </div>
     </div>
   );
@@ -1177,6 +1232,12 @@ function getResponseUserMessage(result: unknown) {
   return typeof userMessage === "string" ? userMessage : "";
 }
 
+function getResponseErrorCode(result: unknown): DayNammaeApplicationErrorCode | "" {
+  if (!result || typeof result !== "object") return "";
+  const code = (result as { code?: unknown }).code;
+  return isDayNammaeApplicationErrorCode(code) ? code : "";
+}
+
 function getRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
@@ -1252,6 +1313,7 @@ async function parseSubmitResponse(response: Response): Promise<{
         response.headers.get("x-ssobig-client-request-id") ||
         "",
       userMessage: getResponseUserMessage(result),
+      errorCode: getResponseErrorCode(result),
       responseStatus: response.status,
       responseContentType,
       responseTextSnippet: summarizeResponseText(rawText),
@@ -1280,6 +1342,7 @@ function createHandledSubmitError(
   options: {
     requestId?: string;
     clientRequestId?: string;
+    errorCode?: DayNammaeApplicationErrorCode | "";
     responseStatus?: number;
     responseContentType?: string;
     responseTextSnippet?: string;
@@ -1293,6 +1356,7 @@ function createHandledSubmitError(
     alreadyReported?: boolean;
     requestId?: string;
     clientRequestId?: string;
+    errorCode?: DayNammaeApplicationErrorCode | "";
     responseStatus?: number;
     responseContentType?: string;
     responseTextSnippet?: string;
@@ -1305,6 +1369,7 @@ function createHandledSubmitError(
   error.alreadyReported = Boolean(options.requestId);
   error.requestId = options.requestId || "";
   error.clientRequestId = options.clientRequestId || "";
+  error.errorCode = options.errorCode || "";
   error.responseStatus = options.responseStatus;
   error.responseContentType = options.responseContentType || "";
   error.responseTextSnippet = options.responseTextSnippet || "";
@@ -1321,6 +1386,7 @@ function getHandledSubmitErrorState(error: unknown) {
       alreadyReported: false,
       requestId: "",
       clientRequestId: "",
+      errorCode: "" as DayNammaeApplicationErrorCode | "",
       responseStatus: 0,
       responseContentType: "",
       responseTextSnippet: "",
@@ -1335,6 +1401,7 @@ function getHandledSubmitErrorState(error: unknown) {
     alreadyReported?: boolean;
     requestId?: string;
     clientRequestId?: string;
+    errorCode?: DayNammaeApplicationErrorCode | "";
     responseStatus?: number;
     responseContentType?: string;
     responseTextSnippet?: string;
@@ -1352,6 +1419,9 @@ function getHandledSubmitErrorState(error: unknown) {
       typeof errorWithMeta.clientRequestId === "string"
         ? errorWithMeta.clientRequestId
         : "",
+    errorCode: isDayNammaeApplicationErrorCode(errorWithMeta.errorCode)
+      ? errorWithMeta.errorCode
+      : "",
     responseStatus:
       typeof errorWithMeta.responseStatus === "number"
         ? errorWithMeta.responseStatus
@@ -1853,6 +1923,8 @@ export default function LoveBuddiesApplyFlow({
   const [submitState, setSubmitState] = useState<SubmitState>(INITIAL_SUBMIT_STATE);
   const [waitlistModalSchedule, setWaitlistModalSchedule] =
     useState<ScheduleItem | null>(null);
+  const [applicationBlockedCode, setApplicationBlockedCode] =
+    useState<DayNammaeApplicationErrorCode | null>(null);
   const [confirmedWaitlistSchedule, setConfirmedWaitlistSchedule] = useState("");
   const [inAppBrowserName, setInAppBrowserName] = useState("");
 
@@ -2153,6 +2225,7 @@ export default function LoveBuddiesApplyFlow({
     setValidatedCoupon(null);
     setScheduleLimitedCoupon(null);
     setWaitlistModalSchedule(null);
+    setApplicationBlockedCode(null);
     setConfirmedWaitlistSchedule("");
   };
 
@@ -2182,6 +2255,7 @@ export default function LoveBuddiesApplyFlow({
         channel === "기타" ? current.acquisitionChannelOther : "",
     }));
     setFormError("");
+    setApplicationBlockedCode(null);
   };
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -2833,6 +2907,7 @@ export default function LoveBuddiesApplyFlow({
           throw createHandledSubmitError(userMessage, {
             requestId,
             clientRequestId: meta.clientRequestId || clientRequestId,
+            errorCode: meta.errorCode,
             responseStatus: meta.responseStatus,
             responseContentType: meta.responseContentType,
             responseTextSnippet: meta.responseTextSnippet,
@@ -2936,6 +3011,7 @@ export default function LoveBuddiesApplyFlow({
         alreadyReported,
         requestId,
         clientRequestId: capturedClientRequestId,
+        errorCode,
         responseStatus,
         responseContentType,
         responseTextSnippet,
@@ -3026,10 +3102,22 @@ export default function LoveBuddiesApplyFlow({
 
       trackApplyAnalyticsEvent("dn_apply_submit_error", {
         result: "error",
-        error_reason: stage || submitStage || "unknown",
+        error_reason: errorCode || stage || submitStage || "unknown",
         response_status: responseStatus || 0,
         application_submitted: applicationSubmitted ? "true" : "false",
       });
+
+      if (isDayNammaeApplicationErrorCode(errorCode)) {
+        setSubmitState({
+          status: "idle",
+          message: "",
+          checkout: null,
+          applicationSubmitted,
+          applicationMode: selectedApplicationMode,
+        });
+        setApplicationBlockedCode(errorCode);
+        return;
+      }
 
       setSubmitState({
         status: "error",
@@ -3578,6 +3666,13 @@ export default function LoveBuddiesApplyFlow({
           scheduleLabel={getDayNammeScheduleLabel(waitlistModalSchedule)}
           onClose={() => setWaitlistModalSchedule(null)}
           onConfirm={handleWaitlistConfirm}
+        />
+      )}
+
+      {applicationBlockedCode && (
+        <ApplicationBlockedModal
+          code={applicationBlockedCode}
+          onClose={() => setApplicationBlockedCode(null)}
         />
       )}
     </ApplyStepShell>

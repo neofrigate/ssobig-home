@@ -2,6 +2,16 @@ import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  DAY_NAMMAE_APPLICATION_CLOSED_CODE,
+  DAY_NAMMAE_APPLICATION_CLOSED_MESSAGE,
+  DAY_NAMMAE_SCHEDULE_INVALID_CODE,
+  DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE,
+  evaluateDayNammaeApplicationCutoff,
+  isDayNammaeApplicationErrorCode,
+  isDayNammaeStaffScheduleId,
+  type DayNammaeApplicationErrorCode,
+} from "@/features/day-nammae/applicationCutoff";
 
 const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
@@ -42,6 +52,22 @@ const ACQUISITION_CHANNEL_OPTIONS = new Set([
   "재참여",
   "기타",
 ]);
+
+class DayNammaeApplicationError extends Error {
+  code: DayNammaeApplicationErrorCode;
+  status: 400 | 409;
+
+  constructor(
+    code: DayNammaeApplicationErrorCode,
+    message: string,
+    status: 400 | 409
+  ) {
+    super(message);
+    this.name = "DayNammaeApplicationError";
+    this.code = code;
+    this.status = status;
+  }
+}
 
 function getRequiredString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -301,17 +327,23 @@ function buildAgeRangeErrorMessage(bounds: ReturnType<typeof getBirthYearBounds>
   return `선택한 회차는 ${bounds.ageMin}~${bounds.ageMax}세(${bounds.minBirthYear}년생~${bounds.maxBirthYear}년생)만 신청할 수 있습니다.`;
 }
 
-async function validateBirthYearForSchedule(params: {
+async function validateApplicationScheduleAndBirthYear(params: {
   supabase: SupabaseClient;
   staffScheduleId: string;
   birthYear: string;
 }) {
   const { supabase, staffScheduleId, birthYear } = params;
-  if (!staffScheduleId) return;
+  if (!isDayNammaeStaffScheduleId(staffScheduleId)) {
+    throw new DayNammaeApplicationError(
+      DAY_NAMMAE_SCHEDULE_INVALID_CODE,
+      DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE,
+      400
+    );
+  }
 
   const { data, error } = await supabase
     .from("staff_schedules")
-    .select("age_range_key")
+    .select("age_range_key, schedule_date, time_slot")
     .eq("id", staffScheduleId)
     .maybeSingle();
 
@@ -319,7 +351,38 @@ async function validateBirthYearForSchedule(params: {
     throw error;
   }
 
-  const scheduleRow = data as { age_range_key?: unknown } | null;
+  const scheduleRow = data as {
+    age_range_key?: unknown;
+    schedule_date?: unknown;
+    time_slot?: unknown;
+  } | null;
+  if (!scheduleRow) {
+    throw new DayNammaeApplicationError(
+      DAY_NAMMAE_SCHEDULE_INVALID_CODE,
+      DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE,
+      400
+    );
+  }
+
+  const cutoff = evaluateDayNammaeApplicationCutoff({
+    scheduleDate: scheduleRow.schedule_date,
+    timeSlot: scheduleRow.time_slot,
+  });
+  if (!cutoff.valid) {
+    throw new DayNammaeApplicationError(
+      DAY_NAMMAE_SCHEDULE_INVALID_CODE,
+      DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE,
+      400
+    );
+  }
+  if (cutoff.closed) {
+    throw new DayNammaeApplicationError(
+      DAY_NAMMAE_APPLICATION_CLOSED_CODE,
+      DAY_NAMMAE_APPLICATION_CLOSED_MESSAGE,
+      409
+    );
+  }
+
   const bounds = getBirthYearBounds(String(scheduleRow?.age_range_key || "20_35"));
   const parsedBirthYear = parseBirthYear(birthYear);
   if (
@@ -419,6 +482,26 @@ function getEdgeErrorMessage(edgeBody: unknown) {
     edgeBodyRecord?.error ?? edgeBodyRecord?.message ?? edgeBodyRecord?.reason;
 
   return typeof errorMessage === "string" ? errorMessage : "";
+}
+
+function getDayNammaeApplicationEdgeError(edgeBody: unknown) {
+  const edgeBodyRecord = toObjectRecord(edgeBody);
+  const code = edgeBodyRecord?.code;
+  if (!isDayNammaeApplicationErrorCode(code)) return null;
+
+  const fallbackMessage = code === DAY_NAMMAE_APPLICATION_CLOSED_CODE
+    ? DAY_NAMMAE_APPLICATION_CLOSED_MESSAGE
+    : DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE;
+  const userMessage = typeof edgeBodyRecord?.userMessage === "string" &&
+      edgeBodyRecord.userMessage.trim()
+    ? edgeBodyRecord.userMessage.trim()
+    : fallbackMessage;
+
+  return new DayNammaeApplicationError(
+    code,
+    userMessage,
+    code === DAY_NAMMAE_APPLICATION_CLOSED_CODE ? 409 : 400
+  );
 }
 
 function getWaitlistAlertSafeClientMessage(edgeBody: unknown) {
@@ -787,6 +870,7 @@ export async function POST(request: Request) {
 
       if (!edgeResponse.ok) {
         currentStage = "edge:request:error";
+        const applicationError = getDayNammaeApplicationEdgeError(edgeBody);
         const safeWaitlistAlertMessage =
           getWaitlistAlertSafeClientMessage(edgeBody);
 
@@ -799,8 +883,25 @@ export async function POST(request: Request) {
             edgeBody,
             applicationMode,
           },
-          safeWaitlistAlertMessage ? "warn" : "error"
+          applicationError || safeWaitlistAlertMessage ? "warn" : "error"
         );
+
+        if (applicationError) {
+          return NextResponse.json(
+            {
+              success: false,
+              requestId,
+              clientRequestId,
+              code: applicationError.code,
+              error: applicationError.message,
+              userMessage: applicationError.message,
+            },
+            {
+              status: applicationError.status,
+              headers: buildResponseHeaders(requestId, clientRequestId),
+            }
+          );
+        }
 
         if (safeWaitlistAlertMessage) {
           return NextResponse.json(
@@ -908,8 +1009,8 @@ export async function POST(request: Request) {
       },
     });
 
-    currentStage = "submit:age_range:validate";
-    await validateBirthYearForSchedule({
+    currentStage = "submit:schedule_and_age:validate";
+    await validateApplicationScheduleAndBirthYear({
       supabase,
       staffScheduleId,
       birthYear,
@@ -1089,6 +1190,7 @@ export async function POST(request: Request) {
 
     if (!edgeResponse.ok) {
       currentStage = "edge:request:error";
+      const applicationError = getDayNammaeApplicationEdgeError(edgeBody);
       logSubmitEvent(
         requestId,
         "edge:request:error",
@@ -1101,7 +1203,7 @@ export async function POST(request: Request) {
           edge_request_ms: edgeRequestMs,
           total_api_ms: Date.now() - apiStartedAt,
         },
-        "error"
+        applicationError ? "warn" : "error"
       );
 
       if (edgeBodyRecord?.applicationSubmitted === true) {
@@ -1132,6 +1234,9 @@ export async function POST(request: Request) {
         client: supabase,
       });
       uploadedPath = "";
+      if (applicationError) {
+        throw applicationError;
+      }
       throw new Error(
         typeof edgeBody === "string"
           ? edgeBody
@@ -1174,9 +1279,13 @@ export async function POST(request: Request) {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "신청서를 제출하지 못했습니다.";
-    const safeClientMessage = isSafeClientErrorMessage(errorMessage)
+    const applicationError = error instanceof DayNammaeApplicationError
+      ? error
+      : null;
+    const safeClientMessage = applicationError?.message ||
+      (isSafeClientErrorMessage(errorMessage)
       ? errorMessage
-      : undefined;
+      : undefined);
 
     logSubmitEvent(
       requestId,
@@ -1195,7 +1304,7 @@ export async function POST(request: Request) {
         total_api_ms: Date.now() - apiStartedAt,
         storageUploadErrorContext,
       },
-      "error"
+      applicationError ? "warn" : "error"
     );
 
     if (!safeClientMessage) {
@@ -1321,11 +1430,12 @@ export async function POST(request: Request) {
       {
         requestId,
         clientRequestId,
+        ...(applicationError ? { code: applicationError.code } : {}),
         error: safeClientMessage || "신청서 제출 처리 중 내부 오류가 발생했습니다.",
         userMessage: buildClientErrorMessage(requestId, safeClientMessage),
       },
       {
-        status: safeClientMessage ? 400 : 500,
+        status: applicationError?.status || (safeClientMessage ? 400 : 500),
         headers: buildResponseHeaders(requestId, clientRequestId),
       }
     );
