@@ -12,14 +12,17 @@ import {
   isDayNammaeStaffScheduleId,
   type DayNammaeApplicationErrorCode,
 } from "@/features/day-nammae/applicationCutoff";
+import {
+  resolveDayNammaeDuplicateUpload,
+  sanitizeDayNammaeSentryContext,
+} from "@/lib/day-nammae-application-integrity";
 
 const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
 const MARKETING_SUPABASE_URL = "https://flpcungrkapftfkbhxkm.supabase.co";
 const MARKETING_SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_IGB_G9pJ3Prdz_by7xK44g_wx6GkEFu";
-const DAY_NAMMAE_CAPI_RELAY_URL =
-  `${MARKETING_SUPABASE_URL}/functions/v1/meta-day-nammae-conversions`;
+const DAY_NAMMAE_CAPI_RELAY_URL = `${MARKETING_SUPABASE_URL}/functions/v1/meta-day-nammae-conversions`;
 const DEFAULT_WAITLIST_ALERT_API_URL =
   "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-waitlist-alert";
 const DEFAULT_CLIENT_ERROR_MESSAGE =
@@ -60,7 +63,7 @@ class DayNammaeApplicationError extends Error {
   constructor(
     code: DayNammaeApplicationErrorCode,
     message: string,
-    status: 400 | 409
+    status: 400 | 409,
   ) {
     super(message);
     this.name = "DayNammaeApplicationError";
@@ -120,7 +123,10 @@ function createRequestId() {
   return `dn-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
-function createFallbackMetaEventId(eventName: "CompleteRegistration", requestId: string) {
+function createFallbackMetaEventId(
+  eventName: "CompleteRegistration",
+  requestId: string,
+) {
   return `day-nammae:${eventName}:server:${requestId}`;
 }
 
@@ -184,7 +190,8 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
   fbp: string;
   fbc: string;
 }) {
-  const eventId = params.eventId ||
+  const eventId =
+    params.eventId ||
     createFallbackMetaEventId("CompleteRegistration", params.requestId);
 
   const clientIp = getClientIp(params.request.headers);
@@ -243,7 +250,7 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
         hasFbc: Boolean(params.fbc),
         responseBody,
       },
-      response.ok ? "log" : "error"
+      response.ok ? "log" : "error",
     );
   } catch (error) {
     logSubmitEvent(
@@ -257,7 +264,7 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
         eventIdSource: params.eventId ? "client" : "server_fallback",
         error: error instanceof Error ? error.message : String(error),
       },
-      "error"
+      "error",
     );
   }
 }
@@ -323,7 +330,9 @@ function getBirthYearBounds(ageRangeKey: string) {
   };
 }
 
-function buildAgeRangeErrorMessage(bounds: ReturnType<typeof getBirthYearBounds>) {
+function buildAgeRangeErrorMessage(
+  bounds: ReturnType<typeof getBirthYearBounds>,
+) {
   return `선택한 회차는 ${bounds.ageMin}~${bounds.ageMax}세(${bounds.minBirthYear}년생~${bounds.maxBirthYear}년생)만 신청할 수 있습니다.`;
 }
 
@@ -337,7 +346,7 @@ async function validateApplicationScheduleAndBirthYear(params: {
     throw new DayNammaeApplicationError(
       DAY_NAMMAE_SCHEDULE_INVALID_CODE,
       DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE,
-      400
+      400,
     );
   }
 
@@ -360,7 +369,7 @@ async function validateApplicationScheduleAndBirthYear(params: {
     throw new DayNammaeApplicationError(
       DAY_NAMMAE_SCHEDULE_INVALID_CODE,
       DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE,
-      400
+      400,
     );
   }
 
@@ -372,18 +381,20 @@ async function validateApplicationScheduleAndBirthYear(params: {
     throw new DayNammaeApplicationError(
       DAY_NAMMAE_SCHEDULE_INVALID_CODE,
       DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE,
-      400
+      400,
     );
   }
   if (cutoff.closed) {
     throw new DayNammaeApplicationError(
       DAY_NAMMAE_APPLICATION_CLOSED_CODE,
       DAY_NAMMAE_APPLICATION_CLOSED_MESSAGE,
-      409
+      409,
     );
   }
 
-  const bounds = getBirthYearBounds(String(scheduleRow?.age_range_key || "20_35"));
+  const bounds = getBirthYearBounds(
+    String(scheduleRow?.age_range_key || "20_35"),
+  );
   const parsedBirthYear = parseBirthYear(birthYear);
   if (
     parsedBirthYear !== null &&
@@ -429,7 +440,7 @@ function logSubmitEvent(
   requestId: string,
   stage: string,
   details: Record<string, unknown> = {},
-  level: "log" | "warn" | "error" = "log"
+  level: "log" | "warn" | "error" = "log",
 ) {
   const prefix = `[day-nammae/apply][${requestId}][${stage}]`;
 
@@ -484,23 +495,47 @@ function getEdgeErrorMessage(edgeBody: unknown) {
   return typeof errorMessage === "string" ? errorMessage : "";
 }
 
+function summarizeEdgeResponse(edgeBody: unknown) {
+  const record = toObjectRecord(edgeBody);
+  if (!record) {
+    return {
+      bodyType: typeof edgeBody,
+      message: typeof edgeBody === "string" ? edgeBody.slice(0, 300) : "",
+    };
+  }
+
+  const errorCode = record.errorCode ?? record.code;
+  return {
+    errorCode:
+      typeof errorCode === "string" || typeof errorCode === "number"
+        ? String(errorCode)
+        : "",
+    message: getEdgeErrorMessage(record).slice(0, 300),
+    retryable: record.retryable === true,
+    applicationSubmitted: record.applicationSubmitted === true,
+    duplicate: record.duplicate === true,
+  };
+}
+
 function getDayNammaeApplicationEdgeError(edgeBody: unknown) {
   const edgeBodyRecord = toObjectRecord(edgeBody);
   const code = edgeBodyRecord?.code;
   if (!isDayNammaeApplicationErrorCode(code)) return null;
 
-  const fallbackMessage = code === DAY_NAMMAE_APPLICATION_CLOSED_CODE
-    ? DAY_NAMMAE_APPLICATION_CLOSED_MESSAGE
-    : DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE;
-  const userMessage = typeof edgeBodyRecord?.userMessage === "string" &&
-      edgeBodyRecord.userMessage.trim()
-    ? edgeBodyRecord.userMessage.trim()
-    : fallbackMessage;
+  const fallbackMessage =
+    code === DAY_NAMMAE_APPLICATION_CLOSED_CODE
+      ? DAY_NAMMAE_APPLICATION_CLOSED_MESSAGE
+      : DAY_NAMMAE_SCHEDULE_INVALID_MESSAGE;
+  const userMessage =
+    typeof edgeBodyRecord?.userMessage === "string" &&
+    edgeBodyRecord.userMessage.trim()
+      ? edgeBodyRecord.userMessage.trim()
+      : fallbackMessage;
 
   return new DayNammaeApplicationError(
     code,
     userMessage,
-    code === DAY_NAMMAE_APPLICATION_CLOSED_CODE ? 409 : 400
+    code === DAY_NAMMAE_APPLICATION_CLOSED_CODE ? 409 : 400,
   );
 }
 
@@ -532,7 +567,7 @@ function getFetchInputUrl(input: Parameters<typeof fetch>[0]) {
 
 function getFetchInputMethod(
   input: Parameters<typeof fetch>[0],
-  init?: Parameters<typeof fetch>[1]
+  init?: Parameters<typeof fetch>[1],
 ) {
   if (init?.method) {
     return init.method;
@@ -555,7 +590,8 @@ function summarizeStorageFetchUrl(rawUrl: string) {
     };
   } catch (error) {
     return {
-      storageUrlParseError: error instanceof Error ? error.message : String(error),
+      storageUrlParseError:
+        error instanceof Error ? error.message : String(error),
     };
   }
 }
@@ -591,7 +627,7 @@ function summarizeStorageResponseBody(bodyText: string) {
 }
 
 function createStorageDebugFetch(
-  onStorageHttpError: (context: Record<string, unknown>) => void
+  onStorageHttpError: (context: Record<string, unknown>) => void,
 ): typeof fetch {
   return async (input, init) => {
     const startedAt = Date.now();
@@ -602,7 +638,7 @@ function createStorageDebugFetch(
 
       try {
         responseBodyContext = summarizeStorageResponseBody(
-          await response.clone().text()
+          await response.clone().text(),
         );
       } catch (error) {
         responseBodyContext = {
@@ -677,7 +713,9 @@ function summarizeStorageUploadData(data: unknown) {
   return Object.keys(summary).length > 0 ? summary : null;
 }
 
-function buildStorageUploadFailureMessage(errorSummary: Record<string, unknown>) {
+function buildStorageUploadFailureMessage(
+  errorSummary: Record<string, unknown>,
+) {
   const message =
     typeof errorSummary.message === "string" && errorSummary.message.trim()
       ? errorSummary.message
@@ -714,7 +752,9 @@ async function cleanupUploadedFile(params: {
   client: {
     storage: {
       from: (bucket: string) => {
-        remove: (paths: string[]) => Promise<{ error: { message: string } | null }>;
+        remove: (
+          paths: string[],
+        ) => Promise<{ error: { message: string } | null }>;
       };
     };
   };
@@ -727,7 +767,9 @@ async function cleanupUploadedFile(params: {
     cleanupReason: reason,
   });
 
-  const { error } = await client.storage.from(storageBucket).remove([uploadedPath]);
+  const { error } = await client.storage
+    .from(storageBucket)
+    .remove([uploadedPath]);
 
   if (error) {
     logSubmitEvent(
@@ -739,7 +781,7 @@ async function cleanupUploadedFile(params: {
         cleanupReason: reason,
         error: error.message,
       },
-      "error"
+      "error",
     );
     return false;
   }
@@ -774,8 +816,11 @@ export async function POST(request: Request) {
     logSubmitEvent(
       requestId,
       "submit:failed",
-      { stage: "service_role_check", error: "SUPABASE_SERVICE_ROLE_KEY missing" },
-      "error"
+      {
+        stage: "service_role_check",
+        error: "SUPABASE_SERVICE_ROLE_KEY missing",
+      },
+      "error",
     );
     return NextResponse.json(
       {
@@ -786,7 +831,7 @@ export async function POST(request: Request) {
       {
         status: 500,
         headers: buildResponseHeaders(requestId),
-      }
+      },
     );
   }
 
@@ -803,19 +848,43 @@ export async function POST(request: Request) {
   let storageHttpErrorContext: Record<string, unknown> | null = null;
   let storageUploadMs: number | null = null;
   let edgeRequestMs: number | null = null;
+  let edgeStatus: number | null = null;
+  let edgeContentType = "";
+  let edgeResponseSummary: Record<string, unknown> | null = null;
 
   try {
     currentStage = "submit:parse";
     const formData = await request.formData();
     const gender = getRequiredString(formData, "gender");
     const schedule = getRequiredString(formData, "schedule");
-    const staffScheduleId = getOptionalString(formData, "staffScheduleId") ||
+    const staffScheduleId =
+      getOptionalString(formData, "staffScheduleId") ||
       getOptionalString(formData, "staff_schedule_id");
     const name = getRequiredString(formData, "name");
     const phone = getRequiredString(formData, "phone");
     const applicationMode = getApplicationMode(formData);
     clientRequestId = getOptionalString(formData, "client_request_id");
-    debugClientContext = parseDebugClientContext(formData.get("debug_client_context"));
+    if (clientRequestId.length < 8 || clientRequestId.length > 128) {
+      currentStage = "submit:client_request_id:invalid";
+      return NextResponse.json(
+        {
+          success: false,
+          requestId,
+          clientRequestId,
+          errorCode: "CLIENT_REQUEST_ID_REQUIRED",
+          userMessage: "신청 화면을 새로고침한 뒤 다시 시도해주세요.",
+          applicationSubmitted: false,
+          retryable: false,
+        },
+        {
+          status: 400,
+          headers: buildResponseHeaders(requestId, clientRequestId),
+        },
+      );
+    }
+    debugClientContext = parseDebugClientContext(
+      formData.get("debug_client_context"),
+    );
     const utmSource = (formData.get("utm_source") as string) || "";
     const utmMedium = (formData.get("utm_medium") as string) || "";
     const utmContent = (formData.get("utm_content") as string) || "";
@@ -823,9 +892,12 @@ export async function POST(request: Request) {
     const fbc = getOptionalString(formData, "fbc");
     const metaCompleteRegistrationEventId = getOptionalString(
       formData,
-      "meta_complete_registration_event_id"
+      "meta_complete_registration_event_id",
     );
-    const metaCheckoutEventId = getOptionalString(formData, "meta_checkout_event_id");
+    const metaCheckoutEventId = getOptionalString(
+      formData,
+      "meta_checkout_event_id",
+    );
 
     maskedPhone = maskPhoneNumber(phone);
 
@@ -883,7 +955,7 @@ export async function POST(request: Request) {
             edgeBody,
             applicationMode,
           },
-          applicationError || safeWaitlistAlertMessage ? "warn" : "error"
+          applicationError || safeWaitlistAlertMessage ? "warn" : "error",
         );
 
         if (applicationError) {
@@ -899,7 +971,7 @@ export async function POST(request: Request) {
             {
               status: applicationError.status,
               headers: buildResponseHeaders(requestId, clientRequestId),
-            }
+            },
           );
         }
 
@@ -915,12 +987,13 @@ export async function POST(request: Request) {
             {
               status: getClientErrorStatus(edgeResponse.status),
               headers: buildResponseHeaders(requestId, clientRequestId),
-            }
+            },
           );
         }
 
         throw new Error(
-          getEdgeErrorMessage(edgeBody) || "대기 알림 신청 요청에 실패했습니다."
+          getEdgeErrorMessage(edgeBody) ||
+            "대기 알림 신청 요청에 실패했습니다.",
         );
       }
 
@@ -961,16 +1034,21 @@ export async function POST(request: Request) {
         },
         {
           headers: buildResponseHeaders(requestId, clientRequestId),
-        }
+        },
       );
     }
 
     const birthYear = getRequiredString(formData, "birthYear");
     const height = getRequiredString(formData, "height");
     const traits = getRequiredString(formData, "traits");
-    const acquisitionChannel = getRequiredString(formData, "acquisitionChannel");
-    const acquisitionChannelOther =
-      getOptionalString(formData, "acquisitionChannelOther");
+    const acquisitionChannel = getRequiredString(
+      formData,
+      "acquisitionChannel",
+    );
+    const acquisitionChannelOther = getOptionalString(
+      formData,
+      "acquisitionChannelOther",
+    );
     const photo = formData.get("photo");
     const usedCouponId = getOptionalPositiveInt(formData, "usedCouponId");
     const couponCode = getOptionalString(formData, "couponCode");
@@ -1039,7 +1117,7 @@ export async function POST(request: Request) {
       ? photo.name.slice(photo.name.lastIndexOf("."))
       : ".jpg";
     const sanitizedFileName = sanitizeFileName(
-      photo.name.replace(fileExtension, "")
+      photo.name.replace(fileExtension, ""),
     );
 
     uploadedPath = `day-nammae/${uuid}/${sanitizedFileName || "profile"}${fileExtension}`;
@@ -1075,7 +1153,9 @@ export async function POST(request: Request) {
     if (uploadResult.error) {
       currentStage = "storage:upload:error";
       storageUploadErrorSummary = summarizeUnknownError(uploadResult.error);
-      const storageUploadDataSummary = summarizeStorageUploadData(uploadResult.data);
+      const storageUploadDataSummary = summarizeStorageUploadData(
+        uploadResult.data,
+      );
       storageUploadErrorContext = {
         ...storageUploadContext,
         storage_upload_ms: storageUploadMs,
@@ -1092,10 +1172,10 @@ export async function POST(request: Request) {
         requestId,
         "storage:upload:error",
         storageUploadErrorContext,
-        "error"
+        "error",
       );
       const uploadError = new Error(
-        buildStorageUploadFailureMessage(storageUploadErrorSummary)
+        buildStorageUploadFailureMessage(storageUploadErrorSummary),
       );
       uploadError.name = "DayNammaeStorageUploadError";
       throw uploadError;
@@ -1118,6 +1198,7 @@ export async function POST(request: Request) {
 
     const payload = {
       requestId,
+      clientRequestId,
       _raw: "",
       uuid,
       Email: "",
@@ -1173,18 +1254,22 @@ export async function POST(request: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-      }
+      },
     );
     edgeRequestMs = Date.now() - edgeRequestStartedAt;
+    edgeStatus = edgeResponse.status;
+    edgeContentType = edgeResponse.headers.get("content-type") || "";
 
     const edgeBody = await parseEdgeFunctionResponse(edgeResponse);
     const edgeBodyRecord = toObjectRecord(edgeBody);
+    edgeResponseSummary = summarizeEdgeResponse(edgeBody);
 
     logSubmitEvent(requestId, "edge:request:complete", {
       clientRequestId,
       uuid,
       edgeStatus: edgeResponse.status,
       edgeSuccess: edgeResponse.ok,
+      edgeContentType,
       edge_request_ms: edgeRequestMs,
     });
 
@@ -1203,7 +1288,7 @@ export async function POST(request: Request) {
           edge_request_ms: edgeRequestMs,
           total_api_ms: Date.now() - apiStartedAt,
         },
-        applicationError ? "warn" : "error"
+        applicationError ? "warn" : "error",
       );
 
       if (edgeBodyRecord?.applicationSubmitted === true) {
@@ -1222,70 +1307,124 @@ export async function POST(request: Request) {
           {
             status: edgeResponse.status,
             headers: buildResponseHeaders(requestId, clientRequestId),
-          }
+          },
         );
       }
 
-      await cleanupUploadedFile({
+      const edgeFailureCleanupSucceeded = await cleanupUploadedFile({
         requestId,
         storageBucket,
         uploadedPath,
         reason: "edge_response_not_ok",
         client: supabase,
       });
-      uploadedPath = "";
+      if (edgeFailureCleanupSucceeded) {
+        uploadedPath = "";
+      }
       if (applicationError) {
         throw applicationError;
       }
       throw new Error(
         typeof edgeBody === "string"
           ? edgeBody
-          : edgeBody?.error || "Edge Function 요청에 실패했습니다."
+          : edgeBody?.error || "Edge Function 요청에 실패했습니다.",
       );
+    }
+
+    const { persistedUuid, duplicate, shouldCleanupUpload } =
+      resolveDayNammaeDuplicateUpload({
+        edgeBody: edgeBodyRecord,
+        currentUuid: uuid,
+        uploadedPath,
+      });
+
+    let duplicateUploadCleanupPending = false;
+    if (shouldCleanupUpload) {
+      let duplicateCleanupSucceeded = await cleanupUploadedFile({
+        requestId,
+        storageBucket,
+        uploadedPath,
+        reason: "duplicate_application_retry",
+        client: supabase,
+      });
+      if (!duplicateCleanupSucceeded) {
+        duplicateCleanupSucceeded = await cleanupUploadedFile({
+          requestId,
+          storageBucket,
+          uploadedPath,
+          reason: "duplicate_application_retry_second_attempt",
+          client: supabase,
+        });
+      }
+      if (duplicateCleanupSucceeded) {
+        uploadedPath = "";
+      } else {
+        duplicateUploadCleanupPending = true;
+        Sentry.withScope((scope) => {
+          scope.setTag("feature", "day-nammae-apply");
+          scope.setTag("request_id", requestId);
+          scope.setTag("client_request_id", clientRequestId);
+          scope.setTag("cleanup_reason", "duplicate_application_retry");
+          scope.setContext("day_nammae_duplicate_cleanup", {
+            currentUuid: uuid,
+            persistedUuid,
+            storageBucket,
+          });
+          Sentry.captureMessage(
+            "Day Nammae duplicate upload cleanup failed",
+            "warning",
+          );
+        });
+      }
     }
 
     currentStage = "submit:success";
     logSubmitEvent(requestId, "submit:success", {
-      uuid,
-      uploadedPath,
+      uuid: persistedUuid,
+      duplicate,
+      duplicateUploadCleanupPending,
       storage_upload_ms: storageUploadMs,
       edge_request_ms: edgeRequestMs,
       total_api_ms: Date.now() - apiStartedAt,
     });
 
-    await sendDayNammaeCompleteRegistrationCapi({
-      request,
-      requestId,
-      clientRequestId,
-      eventId: metaCompleteRegistrationEventId,
-      uuid,
-      name,
-      phone,
-      gender,
-      schedule,
-      fbp,
-      fbc,
-    });
+    if (!duplicate) {
+      await sendDayNammaeCompleteRegistrationCapi({
+        request,
+        requestId,
+        clientRequestId,
+        eventId: metaCompleteRegistrationEventId,
+        uuid: persistedUuid,
+        name,
+        phone,
+        gender,
+        schedule,
+        fbp,
+        fbc,
+      });
+    }
 
-    return NextResponse.json({
-      success: true,
-      requestId,
-      clientRequestId,
-      payload,
-      edgeBody,
-    }, {
-      headers: buildResponseHeaders(requestId, clientRequestId),
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        requestId,
+        clientRequestId,
+        payload,
+        edgeBody,
+        duplicateUploadCleanupPending,
+      },
+      {
+        headers: buildResponseHeaders(requestId, clientRequestId),
+      },
+    );
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "신청서를 제출하지 못했습니다.";
-    const applicationError = error instanceof DayNammaeApplicationError
-      ? error
-      : null;
-    const safeClientMessage = applicationError?.message ||
-      (isSafeClientErrorMessage(errorMessage)
-      ? errorMessage
-      : undefined);
+    const applicationError =
+      error instanceof DayNammaeApplicationError ? error : null;
+    const safeClientMessage =
+      applicationError?.message ||
+      (isSafeClientErrorMessage(errorMessage) ? errorMessage : undefined);
 
     logSubmitEvent(
       requestId,
@@ -1301,10 +1440,13 @@ export async function POST(request: Request) {
         error: errorMessage,
         storage_upload_ms: storageUploadMs,
         edge_request_ms: edgeRequestMs,
+        edge_status: edgeStatus,
+        edge_content_type: edgeContentType,
+        edge_response: edgeResponseSummary,
         total_api_ms: Date.now() - apiStartedAt,
         storageUploadErrorContext,
       },
-      applicationError ? "warn" : "error"
+      applicationError ? "warn" : "error",
     );
 
     if (!safeClientMessage) {
@@ -1315,6 +1457,16 @@ export async function POST(request: Request) {
           scope.setTag("client_request_id", clientRequestId);
         }
         scope.setTag("submit_stage", currentStage);
+        if (edgeStatus !== null) {
+          scope.setTag("edge_status", String(edgeStatus));
+        }
+        if (edgeContentType) {
+          scope.setTag("edge_content_type", edgeContentType.slice(0, 100));
+        }
+        const edgeErrorCode = edgeResponseSummary?.errorCode;
+        if (typeof edgeErrorCode === "string" && edgeErrorCode) {
+          scope.setTag("edge_error_code", edgeErrorCode);
+        }
         if (storageUploadErrorSummary) {
           const storageUploadStatus =
             storageUploadErrorSummary.status ??
@@ -1324,10 +1476,7 @@ export async function POST(request: Request) {
             typeof storageUploadStatus === "string" ||
             typeof storageUploadStatus === "number"
           ) {
-            scope.setTag(
-              "storage_upload_status",
-              String(storageUploadStatus)
-            );
+            scope.setTag("storage_upload_status", String(storageUploadStatus));
           }
 
           if (
@@ -1336,14 +1485,14 @@ export async function POST(request: Request) {
           ) {
             scope.setTag(
               "storage_upload_code",
-              String(storageUploadErrorSummary.code)
+              String(storageUploadErrorSummary.code),
             );
           }
 
           if (typeof storageUploadErrorSummary.name === "string") {
             scope.setTag(
               "storage_upload_error_name",
-              storageUploadErrorSummary.name
+              storageUploadErrorSummary.name,
             );
           }
         }
@@ -1357,7 +1506,7 @@ export async function POST(request: Request) {
           }
 
           const storageResponseBody = toObjectRecord(
-            storageHttpErrorContext.storageResponseBody
+            storageHttpErrorContext.storageResponseBody,
           );
           const storageResponseBodyCode =
             storageResponseBody?.code ?? storageResponseBody?.statusCode;
@@ -1368,23 +1517,36 @@ export async function POST(request: Request) {
           ) {
             scope.setTag(
               "storage_response_body_code",
-              String(storageResponseBodyCode)
+              String(storageResponseBodyCode),
             );
           }
         }
         scope.setContext("day_nammae_submit", {
           clientRequestId,
           uuid,
-          uploadedPath,
-          phoneMasked: maskedPhone,
-          ...photoContext,
-          debugClientContext,
+          ...sanitizeDayNammaeSentryContext({
+            debugClientContext,
+            photoContext,
+          }),
+          edgeStatus,
+          edgeContentType,
+          edgeRequestMs,
+          edgeResponseSummary,
         });
         if (storageUploadErrorContext) {
-          scope.setContext("storage_upload", storageUploadErrorContext);
+          scope.setContext("storage_upload", {
+            storageBucket,
+            storageUploadMs,
+            storageUploadErrorSummary,
+            storageHttpStatus: storageHttpErrorContext?.storageHttpStatus,
+            storageHttpStatusText:
+              storageHttpErrorContext?.storageHttpStatusText,
+            storageResponseContentType:
+              storageHttpErrorContext?.storageResponseContentType,
+          });
         }
         Sentry.captureException(
-          error instanceof Error ? error : new Error(errorMessage)
+          error instanceof Error ? error : new Error(errorMessage),
         );
       });
     }
@@ -1399,7 +1561,7 @@ export async function POST(request: Request) {
               persistSession: false,
               autoRefreshToken: false,
             },
-          }
+          },
         );
         await cleanupUploadedFile({
           requestId,
@@ -1421,7 +1583,7 @@ export async function POST(request: Request) {
                 ? cleanupError.message
                 : String(cleanupError),
           },
-          "error"
+          "error",
         );
       }
     }
@@ -1431,13 +1593,14 @@ export async function POST(request: Request) {
         requestId,
         clientRequestId,
         ...(applicationError ? { code: applicationError.code } : {}),
-        error: safeClientMessage || "신청서 제출 처리 중 내부 오류가 발생했습니다.",
+        error:
+          safeClientMessage || "신청서 제출 처리 중 내부 오류가 발생했습니다.",
         userMessage: buildClientErrorMessage(requestId, safeClientMessage),
       },
       {
         status: applicationError?.status || (safeClientMessage ? 400 : 500),
         headers: buildResponseHeaders(requestId, clientRequestId),
-      }
+      },
     );
   }
 }
