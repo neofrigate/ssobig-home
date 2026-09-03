@@ -126,7 +126,6 @@ const ElevenNammePage = () => {
   const { scheduleData, isLoading, lastUpdateTime } = useDayNammeSchedule();
   const [isApplyOpen, setIsApplyOpen] = useState(false);
   const [initialCouponCode, setInitialCouponCode] = useState("");
-  const [showAllSchedules, setShowAllSchedules] = useState(false);
 
   // 스케줄 아이템 컴포넌트
   useEffect(() => {
@@ -369,11 +368,6 @@ const ElevenNammePage = () => {
   }, [scheduleData]);
 
   const ScheduleSummarySection = () => {
-    const visibleSchedules = showAllSchedules
-      ? upcomingSchedules
-      : upcomingSchedules.slice(0, 6);
-    const hasMoreSchedules = upcomingSchedules.length > 6;
-
     return (
       <div className="mt-6 space-y-5">
         <div className="text-center">
@@ -390,27 +384,15 @@ const ElevenNammePage = () => {
         </div>
 
         <div className="mt-4 border-t border-black/8">
-            {visibleSchedules.map(({ schedule }, index) => (
-              <div
-                key={`${schedule.staffScheduleId || schedule.fullLabel}`}
-                className={index > 0 ? "border-t border-black/8" : ""}
-              >
-                <ScheduleRow schedule={schedule} />
-              </div>
-            ))}
-        </div>
-
-        {hasMoreSchedules ? (
-          <div className="flex justify-center pt-1">
-            <button
-              type="button"
-              onClick={() => setShowAllSchedules((prev) => !prev)}
-              className="rounded-full border border-black/15 bg-white px-4 py-2 text-sm font-extrabold text-black/75"
+          {upcomingSchedules.map(({ schedule }, index) => (
+            <div
+              key={`${schedule.staffScheduleId || schedule.fullLabel}`}
+              className={index > 0 ? "border-t border-black/8" : ""}
             >
-              {showAllSchedules ? "일정 접기" : "일정 전체 보기"}
-            </button>
-          </div>
-        ) : null}
+              <ScheduleRow schedule={schedule} />
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
