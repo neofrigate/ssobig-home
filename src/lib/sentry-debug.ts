@@ -1,4 +1,5 @@
 const IN_APP_BROWSER_PATTERNS: Array<[string, RegExp]> = [
+  ["threads", /\b(?:Barcelona|Threads)\b/i],
   ["instagram", /Instagram/i],
   ["facebook", /FBAN|FBAV|FB_IAB|FB4A|FBIOS/i],
   ["kakao", /KAKAOTALK/i],
@@ -156,6 +157,22 @@ export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
     typeof event.tags?.in_app_browser_name === "string"
       ? event.tags.in_app_browser_name
       : undefined;
+
+  // Threads uses the Barcelona UA marker. Limit its filter to the observed
+  // iOS bridge exception; do not inherit the other Meta browser filters.
+  if (browserName === "threads") {
+    const userAgent = getBrowserContextUserAgent(event);
+    return (
+      typeof userAgent === "string" &&
+      IOS_WEBKIT_USER_AGENT_PATTERN.test(userAgent) &&
+      (event.exception?.values ?? []).some(
+        (value) =>
+          value.type === "TypeError" &&
+          value.value ===
+            "undefined is not an object (evaluating 'window.webkit.messageHandlers')"
+      )
+    );
+  }
 
   if (!browserName || !KNOWN_META_WEBVIEW_NAMES.has(browserName)) {
     return false;
