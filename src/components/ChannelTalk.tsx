@@ -80,7 +80,7 @@ export default function ChannelTalk() {
     window.ChannelIO?.("boot", {
       pluginKey: CHANNEL_TALK_PLUGIN_KEY,
       language: channelLanguage,
-      hideChannelButtonOnBoot: true,
+      hideChannelButtonOnBoot: false,
     });
     window.ChannelIO?.("updateUser", {
       language: channelLanguage,
