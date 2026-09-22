@@ -189,6 +189,7 @@ interface LoveBuddiesApplyFlowProps {
   scheduleData: ScheduleItem[];
   isLoadingSchedules: boolean;
   initialCouponCode?: string;
+  initialReferralCode?: string;
   onClose?: () => void;
 }
 
@@ -1892,6 +1893,7 @@ export default function LoveBuddiesApplyFlow({
   scheduleData,
   isLoadingSchedules,
   initialCouponCode,
+  initialReferralCode,
   onClose,
 }: LoveBuddiesApplyFlowProps) {
   const router = useRouter();
@@ -1906,6 +1908,21 @@ export default function LoveBuddiesApplyFlow({
   const shouldShowCouponChoiceStep = Boolean(initialCouponCodeSuffix);
   const initialFormValues = createInitialFormValues(initialCouponCodeSuffix);
   const [formValues, setFormValues] = useState(initialFormValues);
+  const [referralCode, setReferralCode] = useState("");
+  const [hasReferralCode, setHasReferralCode] = useState(false);
+  const referralInitialized = useRef(false);
+  useEffect(() => {
+    if (!initialReferralCode || referralInitialized.current) return;
+    referralInitialized.current = true;
+    if (formValues.acquisitionChannel || formValues.hasCoupon) {
+      setFormError("추천 링크로 들어오셨습니다. 기존 입력을 유지합니다. 지인 추천을 선택하고 코드 " + initialReferralCode + "를 입력하면 적용할 수 있습니다.");
+      return;
+    }
+    setHasReferralCode(true);
+    setReferralCode(initialReferralCode);
+    setFormValues(current => ({...current, acquisitionChannel:"지인 추천"}));
+  }, [initialReferralCode, formValues.acquisitionChannel, formValues.hasCoupon]);
+  const activeReferralCode = formValues.acquisitionChannel === "지인 추천" && hasReferralCode && !formValues.hasCoupon ? referralCode : "";
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
   const [photoNotice, setPhotoNotice] = useState("");
   const [isOptimizingPhoto, setIsOptimizingPhoto] = useState(false);
@@ -2248,6 +2265,10 @@ export default function LoveBuddiesApplyFlow({
     };
 
   const handleAcquisitionChannelSelect = (channel: string) => {
+    if (channel !== "지인 추천") {
+      setHasReferralCode(false);
+      setReferralCode("");
+    }
     setFormValues((current) => ({
       ...current,
       acquisitionChannel: channel,
@@ -2469,6 +2490,7 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const handleCouponChoice = (nextValue: boolean) => {
+    if (nextValue && activeReferralCode) { setFormError("추천 할인을 먼저 해제한 뒤 쿠폰을 선택해 주세요."); return; }
     setFormValues((current) => ({
       ...current,
       hasCoupon: nextValue,
@@ -2837,6 +2859,7 @@ export default function LoveBuddiesApplyFlow({
           requestBody.append("birthYear", formValues.birthYear);
           requestBody.append("height", formValues.height.trim());
           requestBody.append("traits", formValues.traits.trim());
+          requestBody.append("referralCode", activeReferralCode);
           requestBody.append("acquisitionChannel", formValues.acquisitionChannel);
           requestBody.append(
             "acquisitionChannelOther",
@@ -2971,6 +2994,9 @@ export default function LoveBuddiesApplyFlow({
         return;
       }
 
+      if (getEdgeBody(submitResult)?.referralCode) {
+        checkoutSource = {discount_type:"percent",discount_value:30,discount_label:"지인 추천 30% 할인"};
+      }
       if (!couponRequiresPayment(checkoutSource)) {
         trackApplyAnalyticsEvent("dn_apply_complete_without_payment", {
           result: "success",
@@ -3618,6 +3644,7 @@ export default function LoveBuddiesApplyFlow({
       )}
 
       {currentStepKey === "profile" && (
+        <>
         <StepProfile
           formValues={formValues}
           onValueChange={handleValueChange}
@@ -3627,6 +3654,26 @@ export default function LoveBuddiesApplyFlow({
           ageRangeLabel={selectedAgeRangeLabel}
           showErrors={showFieldErrors}
         />
+        {formValues.acquisitionChannel === "지인 추천" && <div className="mt-4 space-y-2">
+          <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-white/90">
+            <input type="checkbox" checked={hasReferralCode} disabled={formValues.hasCoupon === true}
+              onChange={e => {
+                setHasReferralCode(e.target.checked);
+                if (!e.target.checked) setReferralCode("");
+              }} className="h-4 w-4 accent-[#FF6B9F]" />
+            지인추천 코드가 있습니다
+          </label>
+          {hasReferralCode && !formValues.hasCoupon && <>
+            <label htmlFor="referral-code" className="block text-sm text-white/80">추천 코드</label>
+            <input id="referral-code" maxLength={6} value={referralCode}
+              onChange={e => setReferralCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,""))}
+              placeholder="K7M4XP" className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white" />
+            <p className="text-xs leading-relaxed text-white/60">유효한 추천 코드가 확인되면 최초 1회 30% 할인이 적용됩니다. 코드를 입력하지 않으면 추천 할인 없이 신청됩니다.</p>
+          </>}
+          {!hasReferralCode && <p className="text-xs leading-relaxed text-white/60">추천 코드가 없어도 신청할 수 있습니다. 추천 할인은 적용되지 않습니다.</p>}
+          {formValues.hasCoupon && <p className="text-xs leading-relaxed text-white/60">쿠폰 적용 중에는 추천 할인을 사용할 수 없습니다. 쿠폰을 먼저 해제해 주세요.</p>}
+        </div>}
+        </>
       )}
 
       {currentStepKey === "photo" && (

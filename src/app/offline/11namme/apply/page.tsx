@@ -14,9 +14,12 @@ import { getSafeSearchParams } from "@/utils/utm";
 export default function DayNammeApplyPage() {
   const { scheduleData, isLoading } = useDayNammeSchedule();
   const [initialCouponCode, setInitialCouponCode] = useState("");
+  const [initialReferralCode, setInitialReferralCode] = useState("");
 
   useEffect(() => {
     document.body.classList.add("day-nammae-apply-page");
+    const ref = getSafeSearchParams(window.location.search).get("ref")?.trim().toUpperCase() || "";
+    setInitialReferralCode(/^[A-Z0-9]{6}$/.test(ref) ? ref : "");
     setInitialCouponCode(
       getDayNammeCouponSuffixFromSearchParam(
         getSafeSearchParams(window.location.search).get("coupon")
@@ -41,6 +44,7 @@ export default function DayNammeApplyPage() {
         mode="page"
         scheduleData={scheduleData}
         isLoadingSchedules={isLoading}
+        initialReferralCode={initialReferralCode}
         initialCouponCode={initialCouponCode}
       />
     </>

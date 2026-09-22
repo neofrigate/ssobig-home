@@ -1232,6 +1232,7 @@ export async function POST(request: Request) {
       "[일일남매] 일정 선택": schedule,
       staffScheduleId,
       usedCouponId,
+      referralCode: getOptionalString(formData,"referralCode").toUpperCase(),
       couponCode,
       freeCouponNoShowAgreement,
       applicationMode,
@@ -1320,6 +1321,9 @@ export async function POST(request: Request) {
       });
       if (edgeFailureCleanupSucceeded) {
         uploadedPath = "";
+      }
+      if (edgeBodyRecord?.errorCode === "REFERRAL_REJECTED") {
+        return NextResponse.json({success:false, applicationSubmitted:false, userMessage:edgeBodyRecord.reason, error:edgeBodyRecord.reason, errorCode:"REFERRAL_REJECTED"}, {status:409,headers:buildResponseHeaders(requestId,clientRequestId)});
       }
       if (applicationError) {
         throw applicationError;
