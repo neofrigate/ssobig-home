@@ -1,5 +1,6 @@
 "use client";
 
+import { referralFailureMessage, referralInputMessage, REFERRAL_NETWORK_MESSAGE } from "@/features/day-nammae/referral";
 import * as Sentry from "@sentry/nextjs";
 import { useRouter } from "next/navigation";
 import {
@@ -216,7 +217,7 @@ interface SubmitResponseMeta {
   requestId: string;
   clientRequestId: string;
   userMessage: string;
-  errorCode: DayNammaeApplicationErrorCode | "";
+  errorCode: SubmitFailureCode | "";
   responseStatus: number;
   responseContentType: string;
   responseTextSnippet: string;
@@ -792,7 +793,7 @@ function buildTransportFailureMessage(
   inAppBrowserName: string
 ) {
   const guidance = inAppBrowserName
-    ? `${getInAppBrowserLabel(inAppBrowserName)} 앱 안 브라우저에서는 사진 업로드가 중간에 끊길 수 있어요. 우측 상단 메뉴에서 외부 브라우저로 열어 다시 시도해주세요.`
+    ? `${getInAppBrowserLabel(inAppBrowserName)} 앱 안 브라우저에서는 사진 업로드가 중간에 끊길 수 있어요. 같은 화면에서 먼저 재시도하고, 접수 여부가 불확실하면 채널톡으로 문의해 주세요.`
     : "";
 
   if (failureKind === "abort") {
@@ -807,7 +808,7 @@ function buildTransportFailureMessage(
 
   if (failureKind === "network" || failureKind === "timeout") {
     return [
-      "네트워크 연결 문제로 제출을 완료하지 못했습니다.",
+      "네트워크 연결 문제로 접수 결과를 확인하지 못했습니다.",
       guidance,
       supportCode ? `문의 코드: ${supportCode}` : "",
     ]
@@ -1233,10 +1234,16 @@ function getResponseUserMessage(result: unknown) {
   return typeof userMessage === "string" ? userMessage : "";
 }
 
-function getResponseErrorCode(result: unknown): DayNammaeApplicationErrorCode | "" {
+type SubmitFailureCode = DayNammaeApplicationErrorCode | "REFERRAL_REJECTED";
+function isSubmitFailureCode(value: unknown): value is SubmitFailureCode {
+  return value === "REFERRAL_REJECTED" || isDayNammaeApplicationErrorCode(value);
+}
+
+function getResponseErrorCode(result: unknown): SubmitFailureCode | "" {
   if (!result || typeof result !== "object") return "";
-  const code = (result as { code?: unknown }).code;
-  return isDayNammaeApplicationErrorCode(code) ? code : "";
+  const record = result as { code?: unknown; errorCode?: unknown };
+  const code = record.errorCode || record.code;
+  return isSubmitFailureCode(code) ? code : "";
 }
 
 function getRecord(value: unknown): Record<string, unknown> | null {
@@ -1343,7 +1350,7 @@ function createHandledSubmitError(
   options: {
     requestId?: string;
     clientRequestId?: string;
-    errorCode?: DayNammaeApplicationErrorCode | "";
+    errorCode?: SubmitFailureCode | "";
     responseStatus?: number;
     responseContentType?: string;
     responseTextSnippet?: string;
@@ -1357,7 +1364,7 @@ function createHandledSubmitError(
     alreadyReported?: boolean;
     requestId?: string;
     clientRequestId?: string;
-    errorCode?: DayNammaeApplicationErrorCode | "";
+    errorCode?: SubmitFailureCode | "";
     responseStatus?: number;
     responseContentType?: string;
     responseTextSnippet?: string;
@@ -1387,7 +1394,7 @@ function getHandledSubmitErrorState(error: unknown) {
       alreadyReported: false,
       requestId: "",
       clientRequestId: "",
-      errorCode: "" as DayNammaeApplicationErrorCode | "",
+      errorCode: "" as SubmitFailureCode | "",
       responseStatus: 0,
       responseContentType: "",
       responseTextSnippet: "",
@@ -1402,7 +1409,7 @@ function getHandledSubmitErrorState(error: unknown) {
     alreadyReported?: boolean;
     requestId?: string;
     clientRequestId?: string;
-    errorCode?: DayNammaeApplicationErrorCode | "";
+    errorCode?: SubmitFailureCode | "";
     responseStatus?: number;
     responseContentType?: string;
     responseTextSnippet?: string;
@@ -1420,7 +1427,7 @@ function getHandledSubmitErrorState(error: unknown) {
       typeof errorWithMeta.clientRequestId === "string"
         ? errorWithMeta.clientRequestId
         : "",
-    errorCode: isDayNammaeApplicationErrorCode(errorWithMeta.errorCode)
+    errorCode: isSubmitFailureCode(errorWithMeta.errorCode)
       ? errorWithMeta.errorCode
       : "",
     responseStatus:
@@ -1505,7 +1512,8 @@ async function requestCouponValidation(code: string, staffScheduleId: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ code, staffScheduleId }),
-  });
+    signal: AbortSignal.timeout(10000),
+  }).catch(() => { throw new Error("쿠폰 확인 서버에 연결하지 못했습니다. 입력한 코드는 유지됩니다. 연결을 확인한 뒤 ‘쿠폰 확인’을 다시 눌러 주세요."); });
 
   const payload = await parseJsonResponse<CouponValidationResult | Record<string, unknown>>(
     response
@@ -1545,7 +1553,8 @@ async function requestCouponScheduleLookup(code: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ code }),
-  });
+    signal: AbortSignal.timeout(10000),
+  }).catch(() => { throw new Error("쿠폰 확인 서버에 연결하지 못했습니다. 입력한 코드는 유지됩니다. 연결을 확인한 뒤 ‘쿠폰 확인’을 다시 눌러 주세요."); });
 
   const payload = await parseJsonResponse<
     CouponScheduleLookupResult | Record<string, unknown>
@@ -1923,6 +1932,39 @@ export default function LoveBuddiesApplyFlow({
     setFormValues(current => ({...current, acquisitionChannel:"지인 추천"}));
   }, [initialReferralCode, formValues.acquisitionChannel, formValues.hasCoupon]);
   const activeReferralCode = formValues.acquisitionChannel === "지인 추천" && hasReferralCode && !formValues.hasCoupon ? referralCode : "";
+  const referralPhone = formValues.phone.replace(/\D/g, "");
+  const referralKey = JSON.stringify([referralCode, referralPhone, hasReferralCode, formValues.hasCoupon, formValues.acquisitionChannel]);
+  const [referralCheck, setReferralCheck] = useState({ key: "", status: "idle", message: "" });
+  const [referralRetry, setReferralRetry] = useState(0);
+  const referralInputError = referralInputMessage(referralCode, referralPhone);
+  const referralValid = referralCheck.key === referralKey && referralCheck.status === "valid";
+  const referralMessage = referralInputError || (referralCheck.key === referralKey ? referralCheck.message : "추천 할인을 확인하고 있습니다. 잠시 기다려 주세요.");
+  const submissionIdRef = useRef("");
+  const submittingRef = useRef(false);
+  useEffect(() => {
+    if (!hasReferralCode || formValues.hasCoupon || referralInputError) return;
+    const controller = new AbortController();
+    let current = true;
+    setReferralCheck({ key: referralKey, status: "checking", message: "추천 할인을 확인하고 있습니다. 잠시 기다려 주세요." });
+    const timer = setTimeout(async () => {
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      try {
+        const response = await fetch("/api/offline/day-nammae/referral/validate", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: referralCode, phone: referralPhone, hasCoupon: formValues.hasCoupon }),
+          signal: controller.signal,
+        });
+        const result = await response.json();
+        if (!current) return;
+        const valid = response.ok && result.success === true;
+        if (valid) setSubmitState(previous => previous.status === "error" && !previous.applicationSubmitted ? { ...previous, status: "idle", message: "" } : previous);
+        setReferralCheck({ key: referralKey, status: valid ? "valid" : "invalid", message: typeof result.message === "string" ? result.message : REFERRAL_NETWORK_MESSAGE });
+      } catch {
+        if (current) setReferralCheck({ key: referralKey, status: "invalid", message: REFERRAL_NETWORK_MESSAGE });
+      } finally { clearTimeout(timeout); }
+    }, 450);
+    return () => { current = false; clearTimeout(timer); controller.abort(); };
+  }, [referralKey, referralCode, referralPhone, hasReferralCode, formValues.hasCoupon, referralInputError, referralRetry]);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
   const [photoNotice, setPhotoNotice] = useState("");
   const [isOptimizingPhoto, setIsOptimizingPhoto] = useState(false);
@@ -2227,6 +2269,10 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const resetFlow = () => {
+    submissionIdRef.current = "";
+    setHasReferralCode(false);
+    setReferralCode("");
+    setReferralCheck({ key: "", status: "idle", message: "" });
     flowStartedAtMsRef.current = Date.now();
     flowOpenTrackedRef.current = false;
     lastStepViewSignatureRef.current = "";
@@ -2265,9 +2311,9 @@ export default function LoveBuddiesApplyFlow({
     };
 
   const handleAcquisitionChannelSelect = (channel: string) => {
-    if (channel !== "지인 추천") {
-      setHasReferralCode(false);
-      setReferralCode("");
+    if (channel !== "지인 추천" && hasReferralCode) {
+      setFormError("추천 할인 사용을 선택하셨습니다. 아래에서 ‘추천 할인 해제’를 누른 뒤 유입경로를 변경해 주세요.");
+      return;
     }
     setFormValues((current) => ({
       ...current,
@@ -2490,7 +2536,7 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const handleCouponChoice = (nextValue: boolean) => {
-    if (nextValue && activeReferralCode) { setFormError("추천 할인을 먼저 해제한 뒤 쿠폰을 선택해 주세요."); return; }
+    if (nextValue && hasReferralCode) { setFormError("추천 할인을 먼저 해제한 뒤 쿠폰을 선택해 주세요."); return; }
     setFormValues((current) => ({
       ...current,
       hasCoupon: nextValue,
@@ -2662,6 +2708,7 @@ export default function LoveBuddiesApplyFlow({
         return freeCouponNoticeAgreed;
       case "profile":
         return (
+          (!hasReferralCode || (referralValid && !formValues.hasCoupon && formValues.acquisitionChannel === "지인 추천")) &&
           formValues.name.trim() !== "" &&
           formValues.birthYear !== "" &&
           isSelectedBirthYearAllowed &&
@@ -2737,6 +2784,7 @@ export default function LoveBuddiesApplyFlow({
     ) {
       return "profile";
     }
+    if (hasReferralCode && (!referralValid || formValues.hasCoupon || !activeReferralCode)) return "profile";
     if (!formValues.photo || isOptimizingPhoto) return "photo";
     if (!agreements[0]) return "approval";
     if (!agreements[1]) return "marketing";
@@ -2745,6 +2793,7 @@ export default function LoveBuddiesApplyFlow({
   };
 
   const handleSubmit = async () => {
+    if (submittingRef.current) return;
     const wantsCoupon = !isWaitlistApplication && formValues.hasCoupon === true;
     const normalizedCouponCode = buildDayNammeCouponCode(
       normalizeDayNammeCouponCode(formValues.couponCode)
@@ -2810,6 +2859,7 @@ export default function LoveBuddiesApplyFlow({
       step_total: totalSteps,
     });
 
+    submittingRef.current = true;
     setSubmitState((current) => ({
       ...current,
       status: "submitting",
@@ -2819,7 +2869,8 @@ export default function LoveBuddiesApplyFlow({
     }));
     setFormError("");
 
-    const clientRequestId = createClientRequestId();
+    const clientRequestId = submissionIdRef.current || createClientRequestId();
+    submissionIdRef.current = clientRequestId;
     const completeRegistrationEventId = buildDayNammaeMetaEventId(
       "CompleteRegistration",
       clientRequestId
@@ -2860,6 +2911,7 @@ export default function LoveBuddiesApplyFlow({
           requestBody.append("height", formValues.height.trim());
           requestBody.append("traits", formValues.traits.trim());
           requestBody.append("referralCode", activeReferralCode);
+          requestBody.append("referralRequested", String(hasReferralCode));
           requestBody.append("acquisitionChannel", formValues.acquisitionChannel);
           requestBody.append(
             "acquisitionChannelOther",
@@ -3133,6 +3185,10 @@ export default function LoveBuddiesApplyFlow({
         application_submitted: applicationSubmitted ? "true" : "false",
       });
 
+      if (errorCode === "REFERRAL_REJECTED") {
+        setReferralCheck({ key: referralKey, status: "invalid", message: referralFailureMessage(errorMessage) });
+        goToStep("profile");
+      }
       if (isDayNammaeApplicationErrorCode(errorCode)) {
         setSubmitState({
           status: "idle",
@@ -3147,11 +3203,13 @@ export default function LoveBuddiesApplyFlow({
 
       setSubmitState({
         status: "error",
-        message: errorMessage,
+        message: errorCode === "REFERRAL_REJECTED" ? referralFailureMessage(errorMessage) : errorMessage,
         checkout: null,
         applicationSubmitted,
         applicationMode: selectedApplicationMode,
       });
+    } finally {
+      submittingRef.current = false;
     }
   };
 
@@ -3170,7 +3228,8 @@ export default function LoveBuddiesApplyFlow({
         result: "blocked",
       });
       setShowFieldErrors(true);
-      setFormError(invalidField?.message || "필수 정보를 입력해주세요.");
+      setFormError(invalidField?.message || (hasReferralCode && !referralValid ? referralMessage : "필수 정보를 입력해주세요."));
+      if (!invalidField && hasReferralCode) scrollToInvalidField("#referral-code");
       if (invalidField) {
         scrollToInvalidField(invalidField.selector);
       }
@@ -3522,7 +3581,7 @@ export default function LoveBuddiesApplyFlow({
       )}
 
       {formError && (
-        <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div role="alert" className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {formError}
         </div>
       )}
@@ -3534,8 +3593,9 @@ export default function LoveBuddiesApplyFlow({
       )}
 
       {submitState.status === "error" && (
-        <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div role="alert" className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {submitState.message}
+          <p className="mt-2">입력한 내용과 사진은 이 화면에 유지됩니다. 연결을 확인한 뒤 같은 화면에서 다시 시도해 주세요. 접수 여부가 불확실하면 새 신청을 만들지 말고 채널톡으로 문의해 주세요.</p>
         </div>
       )}
 
@@ -3656,19 +3716,22 @@ export default function LoveBuddiesApplyFlow({
         />
         {formValues.acquisitionChannel === "지인 추천" && <div className="mt-4 space-y-2">
           <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-white/90">
-            <input type="checkbox" checked={hasReferralCode} disabled={formValues.hasCoupon === true}
+            <input type="checkbox" checked={hasReferralCode} disabled={formValues.hasCoupon === true || hasReferralCode}
               onChange={e => {
                 setHasReferralCode(e.target.checked);
-                if (!e.target.checked) setReferralCode("");
+                setFormError("");
               }} className="h-4 w-4 accent-[#FF6B9F]" />
             지인추천 코드가 있습니다
           </label>
           {hasReferralCode && !formValues.hasCoupon && <>
             <label htmlFor="referral-code" className="block text-sm text-white/80">추천 코드</label>
-            <input id="referral-code" maxLength={6} value={referralCode}
+            <input id="referral-code" aria-describedby="referral-feedback" aria-invalid={!referralValid} maxLength={6} value={referralCode}
               onChange={e => setReferralCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,""))}
               placeholder="K7M4XP" className="w-full rounded-lg border border-white/10 bg-white/5 p-3 text-white" />
-            <p className="text-xs leading-relaxed text-white/60">유효한 추천 코드가 확인되면 최초 1회 30% 할인이 적용됩니다. 코드를 입력하지 않으면 추천 할인 없이 신청됩니다.</p>
+            <p id="referral-feedback" role="status" aria-live="polite" className={`text-sm leading-relaxed ${referralValid ? "text-emerald-200" : "text-amber-200"}`}>{referralMessage}</p>
+            <p className="text-xs leading-relaxed text-white/60">추천 할인은 최초 1회 30%이며 쿠폰과 중복 사용할 수 없습니다. 확인에 실패하면 다음 단계로 넘어가지 않습니다.</p>
+            {!referralInputError && !referralValid && <button type="button" className="min-h-11 rounded-lg border border-white/30 px-4 text-sm text-white" onClick={() => { setReferralCheck({ key: "", status: "idle", message: "" }); setReferralRetry(n => n + 1); }}>추천 코드 다시 확인</button>}
+            <button type="button" className="block min-h-11 text-sm text-white/80 underline" onClick={() => { setHasReferralCode(false); setReferralCheck({ key: "", status: "idle", message: "" }); setFormError(""); }}>추천 할인 해제 · 정상가로 계속</button>
           </>}
           {!hasReferralCode && <p className="text-xs leading-relaxed text-white/60">추천 코드가 없어도 신청할 수 있습니다. 추천 할인은 적용되지 않습니다.</p>}
           {formValues.hasCoupon && <p className="text-xs leading-relaxed text-white/60">쿠폰 적용 중에는 추천 할인을 사용할 수 없습니다. 쿠폰을 먼저 해제해 주세요.</p>}

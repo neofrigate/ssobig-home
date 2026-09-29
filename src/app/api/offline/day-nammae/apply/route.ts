@@ -1,3 +1,4 @@
+import { referralFailureMessage } from "@/features/day-nammae/referral";
 import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -882,6 +883,15 @@ export async function POST(request: Request) {
         },
       );
     }
+    // Explicit intent prevents an empty/missing code from silently becoming full price.
+    if (getOptionalString(formData, "referralRequested") === "true" &&
+        (!/^[A-Z0-9]{6}$/.test(getOptionalString(formData, "referralCode").toUpperCase()) ||
+         getOptionalString(formData, "usedCouponId") || getOptionalString(formData, "couponCode"))) {
+      return NextResponse.json({ success: false, applicationSubmitted: false,
+        errorCode: "REFERRAL_REJECTED", requestId, clientRequestId,
+        userMessage: "추천 코드 6자리를 확인해 주세요. 쿠폰과 추천 할인은 함께 사용할 수 없습니다. 추천 할인 없이 신청하려면 추천 할인을 직접 해제해 주세요." },
+        { status: 409, headers: buildResponseHeaders(requestId, clientRequestId) });
+    }
     debugClientContext = parseDebugClientContext(
       formData.get("debug_client_context"),
     );
@@ -1323,7 +1333,7 @@ export async function POST(request: Request) {
         uploadedPath = "";
       }
       if (edgeBodyRecord?.errorCode === "REFERRAL_REJECTED") {
-        return NextResponse.json({success:false, applicationSubmitted:false, userMessage:edgeBodyRecord.reason, error:edgeBodyRecord.reason, errorCode:"REFERRAL_REJECTED"}, {status:409,headers:buildResponseHeaders(requestId,clientRequestId)});
+        return NextResponse.json({success:false, applicationSubmitted:false, userMessage:referralFailureMessage(edgeBodyRecord.reason), error:referralFailureMessage(edgeBodyRecord.reason), errorCode:"REFERRAL_REJECTED"}, {status:409,headers:buildResponseHeaders(requestId,clientRequestId)});
       }
       if (applicationError) {
         throw applicationError;
@@ -1427,6 +1437,9 @@ export async function POST(request: Request) {
     const applicationError =
       error instanceof DayNammaeApplicationError ? error : null;
     const safeClientMessage =
+      (currentStage.startsWith("storage:")
+        ? "사진 업로드에 실패해 신청이 접수되지 않았습니다. 입력과 사진은 그대로 유지됩니다. 연결을 확인한 뒤 다시 시도하거나 JPG·PNG 사진을 다시 선택해 주세요."
+        : undefined) ||
       applicationError?.message ||
       (isSafeClientErrorMessage(errorMessage) ? errorMessage : undefined);
 
