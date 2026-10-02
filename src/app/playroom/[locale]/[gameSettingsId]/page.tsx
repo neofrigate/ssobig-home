@@ -995,7 +995,14 @@ function RecommendationQuadrantChart({
 }
 
 export default async function PlayroomGameDetailPage({ params }: PageProps) {
-  const { locale, gameSettingsId } = await params;
+  const { locale, gameSettingsId: routeGameSettingsId } = await params;
+  // Route params retain URL encoding, while the API expects the original work ID.
+  let gameSettingsId: string;
+  try {
+    gameSettingsId = decodeURIComponent(routeGameSettingsId);
+  } catch {
+    notFound();
+  }
   const normalizedLocale = normalizePlayroomSiteLocale(locale);
   if (!normalizedLocale) {
     notFound();
