@@ -77,6 +77,7 @@ type ExistingReview = {
   charmPointOther?: string;
   sequelInterest: string;
   additionalComment: string;
+  containsSpoilers: boolean;
 };
 
 const PLAYROOM_REVIEW_SUBMIT_URL =
@@ -541,6 +542,9 @@ async function fetchExistingReview(
     charmPointOther: firstRawString(rawData, "CharmPointOther", "매력 포인트 기타"),
     sequelInterest: firstString(row.sequel_interest),
     additionalComment: firstString(row.additional_comment),
+    containsSpoilers:
+      typeof rawData === "object" && rawData !== null &&
+      (rawData as Record<string, unknown>).ContainsSpoilers === true,
   };
 }
 
@@ -783,6 +787,9 @@ export async function POST(request: Request) {
         charmPointOther: readStringField(body, "charmPointOther"),
         sequelInterest: readStringField(body, "sequelInterest"),
         additionalComment: readStringField(body, "additionalComment"),
+        ...(typeof body.containsSpoilers === "boolean"
+          ? { containsSpoilers: body.containsSpoilers }
+          : {}),
         newsletterConsentOptIn: body.newsletterConsentOptIn === true,
         marketingConsent: readMarketingConsentField(body),
         pageUrl: readStringField(body, "pageUrl"),

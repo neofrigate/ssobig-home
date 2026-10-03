@@ -58,6 +58,7 @@ type ExistingReview = {
   charmPointOther?: string;
   sequelInterest: string;
   additionalComment: string;
+  containsSpoilers: boolean;
 };
 
 type RewardResult = {
@@ -81,6 +82,7 @@ type FormState = {
   charmPointOther: string;
   sequelInterest: string;
   additionalComment: string;
+  containsSpoilers: boolean;
   newsletterConsentOptIn: boolean;
 };
 
@@ -156,6 +158,8 @@ type ReviewCopy = {
   sequelInterestLabel: string;
   additionalCommentLabel: string;
   additionalCommentPlaceholder: string;
+  containsSpoilersLabel: string;
+  containsSpoilersDescription: string;
   submitIdle: string;
   submitEdit: string;
   submitLoading: string;
@@ -201,6 +205,7 @@ const INITIAL_FORM: FormState = {
   charmPointOther: "",
   sequelInterest: "",
   additionalComment: "",
+  containsSpoilers: false,
   newsletterConsentOptIn: false,
 };
 
@@ -295,6 +300,9 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     additionalCommentLabel:
       "작가에게 남기고 싶은 한마디나 후기가 있다면 자유롭게 적어주세요.",
     additionalCommentPlaceholder: "여기 입력하세요",
+    containsSpoilersLabel: "스포일러 포함",
+    containsSpoilersDescription:
+      "범인, 결말, 반전 등 스포일러가 있다면 체크해 주세요. 공개 후기에서는 내용을 가려서 표시합니다.",
     submitIdle: "리뷰 남기기",
     submitEdit: "리뷰 수정하기",
     submitLoading: "저장 중",
@@ -370,6 +378,9 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     additionalCommentLabel:
       "Anything else you would like to tell the creator?",
     additionalCommentPlaceholder: "Share any extra thoughts here.",
+    containsSpoilersLabel: "Contains spoilers",
+    containsSpoilersDescription:
+      "Check this if your review reveals the culprit, ending, or a twist. Your review text will be hidden until readers choose to reveal it.",
     submitIdle: "Submit Review",
     submitEdit: "Edit Review",
     submitLoading: "Saving",
@@ -445,6 +456,9 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     additionalCommentLabel:
       "作者に伝えたい一言やレビューがあれば自由に書いてください。",
     additionalCommentPlaceholder: "ここに入力してください",
+    containsSpoilersLabel: "ネタバレを含む",
+    containsSpoilersDescription:
+      "犯人、結末、どんでん返しなどのネタバレがある場合はチェックしてください。公開レビューでは本文を隠して表示します。",
     submitIdle: "レビューを送信",
     submitEdit: "レビューを修正",
     submitLoading: "保存中",
@@ -519,6 +533,9 @@ const REVIEW_COPY: Record<ReviewLanguage, ReviewCopy> = {
     sequelInterestLabel: "如果推出下一部作品，你愿意游玩吗？",
     additionalCommentLabel: "如果有想对作者说的话或评价，请自由填写。",
     additionalCommentPlaceholder: "请在这里输入",
+    containsSpoilersLabel: "包含剧透",
+    containsSpoilersDescription:
+      "如果评价透露了凶手、结局或反转，请勾选此项。公开评价中的内容会被隐藏，读者可以选择查看。",
     submitIdle: "提交评价",
     submitEdit: "修改评价",
     submitLoading: "保存中",
@@ -793,6 +810,7 @@ function formFromExistingReview(review: ExistingReview | null | undefined): Form
     charmPointOther: charmPoint.charmPointOther,
     sequelInterest: normalizeExistingChoice(review.sequelInterest, SEQUEL_VALUES),
     additionalComment: review.additionalComment || "",
+    containsSpoilers: review.containsSpoilers === true,
     newsletterConsentOptIn: false,
   };
 }
@@ -1509,6 +1527,24 @@ export default function PlayroomReviewForm({
                   placeholder={copy.additionalCommentPlaceholder}
                   onChange={(value) => update("additionalComment", value)}
                 />
+                <label className="flex gap-3 border-b border-[var(--review-line)] py-6 text-left">
+                  <input
+                    type="checkbox"
+                    checked={form.containsSpoilers}
+                    onChange={(event) =>
+                      update("containsSpoilers", event.target.checked)
+                    }
+                    className="mt-1 h-5 w-5 shrink-0 accent-[var(--review-accent)]"
+                  />
+                  <span className="grid gap-1">
+                    <span className="text-base font-semibold leading-6 text-[var(--review-text-strong)]">
+                      {copy.containsSpoilersLabel}
+                    </span>
+                    <span className="text-sm font-medium leading-6 text-[var(--review-text-muted)]">
+                      {copy.containsSpoilersDescription}
+                    </span>
+                  </span>
+                </label>
                 {hasExistingMarketingConsent ? (
                   <div className="border-b border-[var(--review-line)] py-6">
                     <p className="rounded-2xl border border-[var(--review-accent-soft)] bg-[var(--review-accent-surface)] px-4 py-3 text-sm font-medium leading-6 text-[var(--review-accent-muted)]">
