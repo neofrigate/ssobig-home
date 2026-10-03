@@ -1047,12 +1047,14 @@ function TextAreaField({
   value,
   placeholder,
   onChange,
+  children,
 }: {
   questionNumber: string;
   label: string;
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
+  children?: ReactNode;
 }) {
   return (
     <QuestionShell questionNumber={questionNumber} label={label}>
@@ -1063,6 +1065,7 @@ function TextAreaField({
         rows={4}
         className="min-h-36 w-full resize-y rounded-2xl border border-[var(--review-line)] bg-[var(--review-input-bg)] px-4 py-4 text-sm leading-6 text-[var(--review-text)] outline-none transition placeholder:text-[var(--review-placeholder)] focus:border-[var(--review-accent)]"
       />
+      {children}
     </QuestionShell>
   );
 }
@@ -1526,25 +1529,26 @@ export default function PlayroomReviewForm({
                   value={form.additionalComment}
                   placeholder={copy.additionalCommentPlaceholder}
                   onChange={(value) => update("additionalComment", value)}
-                />
-                <label className="flex gap-3 border-b border-[var(--review-line)] py-6 text-left">
-                  <input
-                    type="checkbox"
-                    checked={form.containsSpoilers}
-                    onChange={(event) =>
-                      update("containsSpoilers", event.target.checked)
-                    }
-                    className="mt-1 h-5 w-5 shrink-0 accent-[var(--review-accent)]"
-                  />
-                  <span className="grid gap-1">
-                    <span className="text-base font-semibold leading-6 text-[var(--review-text-strong)]">
-                      {copy.containsSpoilersLabel}
+                >
+                  <label className="mt-5 flex gap-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={form.containsSpoilers}
+                      onChange={(event) =>
+                        update("containsSpoilers", event.target.checked)
+                      }
+                      className="mt-1 h-5 w-5 shrink-0 accent-[var(--review-accent)]"
+                    />
+                    <span className="grid gap-1">
+                      <span className="text-base font-semibold leading-6 text-[var(--review-text-strong)]">
+                        {copy.containsSpoilersLabel}
+                      </span>
+                      <span className="text-sm font-medium leading-6 text-[var(--review-text-muted)]">
+                        {copy.containsSpoilersDescription}
+                      </span>
                     </span>
-                    <span className="text-sm font-medium leading-6 text-[var(--review-text-muted)]">
-                      {copy.containsSpoilersDescription}
-                    </span>
-                  </span>
-                </label>
+                  </label>
+                </TextAreaField>
                 {hasExistingMarketingConsent ? (
                   <div className="border-b border-[var(--review-line)] py-6">
                     <p className="rounded-2xl border border-[var(--review-accent-soft)] bg-[var(--review-accent-surface)] px-4 py-3 text-sm font-medium leading-6 text-[var(--review-accent-muted)]">
