@@ -1,3 +1,8 @@
+import {
+  WAITLIST_ALERT_ALREADY_APPROVED_CODE,
+  WAITLIST_ALERT_ALREADY_APPROVED_EDGE_MESSAGE,
+  WAITLIST_ALERT_ALREADY_APPROVED_MESSAGE,
+} from "@/features/day-nammae/waitlistAlertErrors";
 import { referralFailureMessage } from "@/features/day-nammae/referral";
 import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
@@ -547,6 +552,10 @@ function getWaitlistAlertSafeClientMessage(edgeBody: unknown) {
     return WAITLIST_ALERT_UNAVAILABLE_MESSAGE;
   }
 
+  if (edgeErrorMessage === WAITLIST_ALERT_ALREADY_APPROVED_EDGE_MESSAGE) {
+    return WAITLIST_ALERT_ALREADY_APPROVED_MESSAGE;
+  }
+
   return "";
 }
 
@@ -992,6 +1001,9 @@ export async function POST(request: Request) {
               requestId,
               clientRequestId,
               error: "waitlist_alert_unavailable",
+              ...(safeWaitlistAlertMessage === WAITLIST_ALERT_ALREADY_APPROVED_MESSAGE
+                ? { code: WAITLIST_ALERT_ALREADY_APPROVED_CODE }
+                : {}),
               userMessage: safeWaitlistAlertMessage,
             },
             {

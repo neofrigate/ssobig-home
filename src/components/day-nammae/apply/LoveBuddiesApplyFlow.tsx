@@ -1,5 +1,6 @@
 "use client";
 
+import { WAITLIST_ALERT_ALREADY_APPROVED_CODE } from "@/features/day-nammae/waitlistAlertErrors";
 import { referralFailureMessage, referralInputMessage, REFERRAL_NETWORK_MESSAGE } from "@/features/day-nammae/referral";
 import * as Sentry from "@sentry/nextjs";
 import { useRouter } from "next/navigation";
@@ -1234,9 +1235,11 @@ function getResponseUserMessage(result: unknown) {
   return typeof userMessage === "string" ? userMessage : "";
 }
 
-type SubmitFailureCode = DayNammaeApplicationErrorCode | "REFERRAL_REJECTED";
+type SubmitFailureCode = DayNammaeApplicationErrorCode | "REFERRAL_REJECTED"
+  | typeof WAITLIST_ALERT_ALREADY_APPROVED_CODE;
 function isSubmitFailureCode(value: unknown): value is SubmitFailureCode {
-  return value === "REFERRAL_REJECTED" || isDayNammaeApplicationErrorCode(value);
+  return value === "REFERRAL_REJECTED" || value === WAITLIST_ALERT_ALREADY_APPROVED_CODE
+    || isDayNammaeApplicationErrorCode(value);
 }
 
 function getResponseErrorCode(result: unknown): SubmitFailureCode | "" {
@@ -2966,7 +2969,9 @@ export default function LoveBuddiesApplyFlow({
             applicationSubmitted = true;
           }
 
-          console.error("[day-nammae submit failed]", {
+          const logFailure = meta.errorCode === WAITLIST_ALERT_ALREADY_APPROVED_CODE
+            ? console.warn : console.error;
+          logFailure("[day-nammae submit failed]", {
             clientRequestId,
             requestId,
             submitStage,
@@ -3100,7 +3105,7 @@ export default function LoveBuddiesApplyFlow({
       } = getHandledSubmitErrorState(error);
       const supportCode = requestId || capturedClientRequestId || clientRequestId;
 
-      if (!alreadyReported) {
+      if (!alreadyReported && errorCode !== WAITLIST_ALERT_ALREADY_APPROVED_CODE) {
         Sentry.withScope((scope) => {
           scope.setTag("feature", "day-nammae-apply");
           scope.setTag("submit_stage", stage || submitStage);
