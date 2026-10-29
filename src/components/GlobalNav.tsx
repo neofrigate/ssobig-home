@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useSiteLocale } from "../utils/siteLocale";
 
 // 햄버거 아이콘 컴포넌트 (모바일용)
 const HamburgerIcon = ({ isWhiteBg }: { isWhiteBg: boolean }) => (
@@ -57,7 +59,13 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
     pathname.startsWith("/playroom/form/playtest/en") ||
     pathname.startsWith("/playroom/form/playtest/ja") ||
     pathname.startsWith("/playroom/form/playtest/zh");
-  const toolLinkLabel = isNonKoreanPlaytestFormPage ? "ssobig tool" : "쏘빅툴";
+  // 플레이테스트 신청서는 자체 언어 전환(진행 내용 확인 팝업)이 있어 GNB 언어 메뉴를 숨긴다
+  const isPlaytestFormPage = pathname.startsWith("/playroom/form/playtest");
+  const [siteLocale] = useSiteLocale();
+  const toolLinkLabel =
+    isNonKoreanPlaytestFormPage || (!isPlaytestFormPage && siteLocale !== "ko")
+      ? "ssobig tool"
+      : "쏘빅툴";
 
   // 초기 상태를 false로 설정하여 서버/클라이언트 hydration 일치
   const [isScrolled, setIsScrolled] = useState(false);
@@ -388,13 +396,18 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             />
           </Link>
 
-          <button
-            aria-label="메뉴 열기"
-            className="p-2"
-            onClick={toggleSidebar}
-          >
-            <HamburgerIcon isWhiteBg={useBlackText} />
-          </button>
+          <div className="flex items-center">
+            {!isPlaytestFormPage && (
+              <LanguageSwitcher variant="mobile" isLight={useBlackText} />
+            )}
+            <button
+              aria-label="메뉴 열기"
+              className="p-2"
+              onClick={toggleSidebar}
+            >
+              <HamburgerIcon isWhiteBg={useBlackText} />
+            </button>
+          </div>
         </div>
 
         {/* 2단: 메뉴 (36px) */}
@@ -622,6 +635,18 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               />
             )}
           </Link>
+
+          {!isPlaytestFormPage && (
+            <>
+              <span
+                aria-hidden="true"
+                className={`h-3.5 w-px transition-colors duration-700 ${
+                  useBlackText ? "bg-gray-300" : "bg-white/30"
+                }`}
+              />
+              <LanguageSwitcher variant="desktop" isLight={useBlackText} />
+            </>
+          )}
 
           <a
             href="https://tool.ssobig.com/"

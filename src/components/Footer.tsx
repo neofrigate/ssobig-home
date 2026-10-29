@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { FOOTER_COPY, getLegalUrl, useSiteLocale } from "../utils/siteLocale";
 
 interface FooterProps {
   mode?: "dark" | "light";
@@ -21,6 +23,13 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
   }, []);
 
   const isLight = mode === "light";
+  const [locale] = useSiteLocale();
+  const copy = FOOTER_COPY[locale];
+  const legalLinks = [
+    { doc: "privacy_policy", label: copy.privacy },
+    { doc: "terms_of_service", label: copy.terms },
+    { doc: "refund_policy", label: copy.refund },
+  ] as const;
 
   return (
     <footer
@@ -44,7 +53,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
                   isLight ? "text-gray-900" : "text-white/90"
                 }`}
               >
-                주식회사 쏘빅
+                {copy.company}
               </p>
               <button
                 onClick={() => setIsFooterOpen(!isFooterOpen)}
@@ -53,7 +62,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
                     ? "text-gray-600 hover:text-gray-900"
                     : "text-white/60 hover:text-white/80"
                 } transition-colors`}
-                aria-label="사업자 정보 토글"
+                aria-label={copy.businessInfoToggle}
               >
                 <svg
                   className={`w-4 h-4 transition-transform duration-200 ${
@@ -146,71 +155,52 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
             </div>
           </div>
 
-          {/* 약관 링크 + 앱 다운로드 */}
-          <div className={`${isLight ? "text-gray-400" : "text-white/40"} pt-3 flex items-center justify-between`}>
+          {/* 약관 링크 + 언어 선택 + 앱 다운로드 */}
+          <div className={`${isLight ? "text-gray-400" : "text-white/40"} pt-3 flex flex-wrap items-center justify-between gap-3`}>
             <p>
-              <a href="/ssobig-tool.html" className="underline">쏘빅툴 소개</a>
-              <span className="mx-2">|</span>
-              <Link
-                href="https://www.ssobig.com/privacy_policy.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`underline ${
-                  isLight
-                    ? "hover:text-gray-600"
-                    : "hover:text-white/60"
-                }`}
-              >
-                개인정보 처리방침
-              </Link>
-              <span className="mx-2">|</span>
-              <Link
-                href="https://www.ssobig.com/terms_of_service.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`underline ${
-                  isLight
-                    ? "hover:text-gray-600"
-                    : "hover:text-white/60"
-                }`}
-              >
-                이용약관
-              </Link>
-              <span className="mx-2">|</span>
-              <Link
-                href="https://www.ssobig.com/refund_policy.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`underline ${
-                  isLight
-                    ? "hover:text-gray-600"
-                    : "hover:text-white/60"
-                }`}
-              >
-                환불 정책
-              </Link>
+              <a href="/ssobig-tool.html" className="underline">{copy.toolIntro}</a>
+              {legalLinks.map(({ doc, label }) => (
+                <span key={doc}>
+                  <span className="mx-2">|</span>
+                  <Link
+                    href={getLegalUrl(doc, locale)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`underline ${
+                      isLight
+                        ? "hover:text-gray-600"
+                        : "hover:text-white/60"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                </span>
+              ))}
             </p>
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isLight
-                  ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  : "bg-white/10 text-white/60 hover:bg-white/20"
-              }`}
-              onClick={() => {
-                window.open("/app", "_blank");
-              }}
-            >
-              {platform === "android" ? (
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-1.707l2.585 1.497a1 1 0 010 1.006l-2.585 1.497-2.537-2.537 2.537-2.463zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/>
-                </svg>
-              ) : (
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                </svg>
-              )}
-              {platform === "android" ? "Google Play" : platform === "ios" ? "App Store" : "앱 다운로드"}
-            </button>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher variant="footer" isLight={isLight} />
+              <button
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isLight
+                    ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : "bg-white/10 text-white/60 hover:bg-white/20"
+                }`}
+                onClick={() => {
+                  window.open("/app", "_blank");
+                }}
+              >
+                {platform === "android" ? (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-1.707l2.585 1.497a1 1 0 010 1.006l-2.585 1.497-2.537-2.537 2.537-2.463zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/>
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                  </svg>
+                )}
+                {platform === "android" ? "Google Play" : platform === "ios" ? "App Store" : copy.appDownload}
+              </button>
+            </div>
           </div>
         </div>
       </div>
