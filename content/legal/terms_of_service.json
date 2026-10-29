@@ -3,942 +3,1099 @@
     "ko": "이용약관",
     "en": "Terms of Service",
     "ja": "利用規約",
-    "zh": "服务条款"
+    "zh": "服务条款",
+    "es": "Condiciones de uso"
   },
   {
     "ko": "제1조 (목적)",
     "en": "Article 1 (Purpose)",
     "ja": "第1条（目的）",
-    "zh": "第1条（目的）"
+    "zh": "第1条（目的）",
+    "es": "Artículo 1 (Objeto)"
   },
   {
     "ko": "이 약관은 주식회사 쏘빅(이하 \"회사\")이 운영하는 쏘빅툴(이하 \"툴\")에서 제공하는 오프라인 모임 진행 지원 서비스(이하 \"서비스\")를 이용함에 있어 회사와 이용자의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.",
     "en": "These Terms define the rights, obligations and responsibilities of SsoBig Co., Ltd. (the “Company”) and users in using the offline gathering facilitation service (the “Service”) provided through SsoBig Tool (the “Tool”), operated by the Company.",
     "ja": "本規約は、株式会社SsoBig（以下「会社」）が運営するSsoBig Tool（以下「ツール」）で提供するオフラインの集まりの進行支援サービス（以下「サービス」）の利用における、会社と利用者の権利・義務および責任事項を定めることを目的とします。",
-    "zh": "本条款旨在规定用户使用SsoBig股份有限公司（以下简称“公司”）运营的SsoBig Tool（以下简称“工具”）所提供的线下聚会主持辅助服务（以下简称“服务”）时，公司与用户的权利、义务及责任。"
+    "zh": "本条款旨在规定用户使用SsoBig股份有限公司（以下简称“公司”）运营的SsoBig Tool（以下简称“工具”）所提供的线下聚会主持辅助服务（以下简称“服务”）时，公司与用户的权利、义务及责任。",
+    "es": "Estas Condiciones regulan los derechos, obligaciones y responsabilidades de SsoBig Co., Ltd. (la «Empresa») y los usuarios al utilizar el servicio de apoyo a la conducción de reuniones presenciales (el «Servicio») ofrecido mediante SsoBig Tool (la «Herramienta»), operado por la Empresa."
   },
   {
     "ko": "제2조 (정의)",
     "en": "Article 2 (Definitions)",
     "ja": "第2条（定義）",
-    "zh": "第2条（定义）"
+    "zh": "第2条（定义）",
+    "es": "Artículo 2 (Definiciones)"
   },
   {
     "ko": "\"서비스\"란 회사가 제공하는 오프라인 모임 진행을 위한 실시간 인터랙티브 서비스로, 호스트가 생성한 방에서 게스트들이 투표, 설문, 매칭 등 다양한 상호작용을 할 수 있는 모든 기능을 포함합니다.",
     "en": "“Service” means the real-time interactive service for offline gatherings provided by the Company, including all features that enable guests to interact through voting, surveys, matching and more in rooms created by hosts.",
     "ja": "「サービス」とは、会社が提供するオフラインの集まりのためのリアルタイム双方向サービスであり、ホストが作成したルームでゲストが投票、アンケート、マッチングなどの交流を行うためのすべての機能を含みます。",
-    "zh": "“服务”指公司提供的用于线下聚会的实时互动服务，包括嘉宾在主持人创建的房间内进行投票、问卷、配对等各种互动的所有功能。"
+    "zh": "“服务”指公司提供的用于线下聚会的实时互动服务，包括嘉宾在主持人创建的房间内进行投票、问卷、配对等各种互动的所有功能。",
+    "es": "«Servicio» es el servicio interactivo en tiempo real que la Empresa presta para reuniones presenciales e incluye todas las funciones que permiten a los invitados interactuar mediante votaciones, encuestas, emparejamientos y otras actividades en salas creadas por anfitriones."
   },
   {
     "ko": "\"이용자\"란 본 서비스를 이용하는 호스트와 게스트를 통칭합니다.",
     "en": "“User” refers collectively to hosts and guests who use the Service.",
     "ja": "「利用者」とは、本サービスを利用するホストおよびゲストの総称です。",
-    "zh": "“用户”统指使用本服务的主持人和嘉宾。"
+    "zh": "“用户”统指使用本服务的主持人和嘉宾。",
+    "es": "«Usuario» designa conjuntamente a los anfitriones e invitados que utilizan el Servicio."
   },
   {
     "ko": "\"호스트\"란 서비스 내에서 방을 생성하고 관리하며, 게스트들의 참여를 이끌어가는 권한을 가진 회원을 말합니다.",
     "en": "“Host” means a member authorized to create and manage rooms in the Service and lead guest participation.",
     "ja": "「ホスト」とは、サービス内でルームを作成・管理し、ゲストの参加を進行する権限を持つ会員をいいます。",
-    "zh": "“主持人”指有权在服务内创建和管理房间、引导嘉宾参与的会员。"
+    "zh": "“主持人”指有权在服务内创建和管理房间、引导嘉宾参与的会员。",
+    "es": "«Anfitrión» es un miembro autorizado para crear y gestionar salas en el Servicio y dirigir la participación de los invitados."
   },
   {
     "ko": "\"게스트\"란 호스트가 생성한 방에 참여하여 서비스를 이용하는 자를 말합니다.",
     "en": "“Guest” means a person who uses the Service by joining a room created by a host.",
     "ja": "「ゲスト」とは、ホストが作成したルームに参加してサービスを利用する者をいいます。",
-    "zh": "“嘉宾”指加入主持人创建的房间并使用服务的人。"
+    "zh": "“嘉宾”指加入主持人创建的房间并使用服务的人。",
+    "es": "«Invitado» es quien utiliza el Servicio participando en una sala creada por un anfitrión."
   },
   {
     "ko": "\"회원\"이란 서비스에 회원가입을 하고 계속적으로 서비스를 이용할 수 있는 자를 말합니다.",
     "en": "“Member” means a person who has registered for the Service and may use it on an ongoing basis.",
     "ja": "「会員」とは、サービスに会員登録し、継続してサービスを利用できる者をいいます。",
-    "zh": "“会员”指已注册服务并可持续使用服务的人。"
+    "zh": "“会员”指已注册服务并可持续使用服务的人。",
+    "es": "«Miembro» es quien se ha registrado en el Servicio y puede utilizarlo de forma continuada."
   },
   {
     "ko": "\"비회원\"이란 회원가입 없이 게스트로서 서비스를 일시적으로 이용하는 자를 말합니다.",
     "en": "“Non-member” means a person who temporarily uses the Service as a guest without registering.",
     "ja": "「非会員」とは、会員登録をせずにゲストとして一時的にサービスを利用する者をいいます。",
-    "zh": "“非会员”指未注册会员，以嘉宾身份临时使用服务的人。"
+    "zh": "“非会员”指未注册会员，以嘉宾身份临时使用服务的人。",
+    "es": "«No miembro» es quien utiliza temporalmente el Servicio como invitado sin registrarse."
   },
   {
     "ko": "제3조 (약관 등의 명시와 설명 및 개정)",
     "en": "Article 3 (Disclosure, Explanation and Amendment of Terms)",
     "ja": "第3条（規約等の明示・説明および改定）",
-    "zh": "第3条（条款等的公示、说明及修订）"
+    "zh": "第3条（条款等的公示、说明及修订）",
+    "es": "Artículo 3 (Publicación, explicación y modificación de las Condiciones)"
   },
   {
     "ko": "\"회사\"는 이 약관의 내용과 상호 및 대표자 성명, 영업소 소재지 주소(이용자의 불만을 처리할 수 있는 곳의 주소를 포함), 전화번호, 전자우편주소, 사업자등록번호, 개인정보 관리 책임자 등을 이용자가 쉽게 알 수 있도록 서비스의 초기 화면에 게시합니다. 다만, 약관의 내용은 이용자가 연결화면을 통하여 볼 수 있도록 할 수 있습니다.",
     "en": "The Company displays these Terms, its business name, representative’s name, business address (including an address for handling user complaints), telephone number, email address, business registration number and privacy officer on the Service’s initial screen so users can easily find them. The Terms may instead be made available through a linked page.",
     "ja": "会社は、本規約の内容、商号、代表者氏名、営業所所在地（利用者の苦情を処理できる住所を含む）、電話番号、メールアドレス、事業者登録番号、個人情報管理責任者等を利用者が容易に確認できるよう、サービスの初期画面に掲載します。ただし、規約の内容はリンク先の画面で閲覧できるようにすることもできます。",
-    "zh": "公司在服务初始页面公示本条款内容、商号、代表人姓名、营业地址（包括可处理用户投诉的地址）、电话号码、电子邮箱、营业登记号及个人信息管理负责人等，便于用户了解。但条款内容可通过链接页面提供。"
+    "zh": "公司在服务初始页面公示本条款内容、商号、代表人姓名、营业地址（包括可处理用户投诉的地址）、电话号码、电子邮箱、营业登记号及个人信息管理负责人等，便于用户了解。但条款内容可通过链接页面提供。",
+    "es": "La Empresa publica estas Condiciones, su denominación comercial, el nombre de su representante, la dirección de su establecimiento (incluida una dirección donde se atiendan reclamaciones), su teléfono, correo electrónico, número de registro empresarial y responsable de datos personales en la pantalla inicial del Servicio para facilitar su consulta. Las Condiciones pueden ofrecerse mediante una página enlazada."
   },
   {
     "ko": "\"회사\"는 이용자가 약관에 동의하기에 앞서 개인정보 처리방침등과 같은 중요한 내용을 이용자가 이해할 수 있도록 별도의 연결화면 또는 팝업화면 등을 제공하여 이용자의 확인을 구하여야 합니다.",
     "en": "Before a user agrees to the Terms, the Company must provide a separate linked page or pop-up so the user can understand and confirm important matters such as the Privacy Policy.",
     "ja": "会社は、利用者が規約に同意する前に、プライバシーポリシー等の重要な内容を理解できるよう、別のリンク先画面やポップアップ画面等を提供し、利用者の確認を求めなければなりません。",
-    "zh": "在用户同意条款前，公司应提供单独的链接页面或弹窗等，使用户理解隐私政策等重要内容，并请用户确认。"
+    "zh": "在用户同意条款前，公司应提供单独的链接页面或弹窗等，使用户理解隐私政策等重要内容，并请用户确认。",
+    "es": "Antes de que el usuario acepte las Condiciones, la Empresa debe proporcionar una página enlazada o una ventana emergente para que comprenda y confirme aspectos importantes, como la Política de privacidad."
   },
   {
     "ko": "\"회사\"는 \"정보통신망 이용촉진 및 정보보호 등에 관한 법률\", \"개인정보보호법\", \"약관의 규제에 관한 법률\", \"전자문서 및 전자거래 기본법\", \"소비자기본법\" 등 관련 법을 위배하지 않는 범위에서 이 약관을 개정할 수 있습니다.",
     "en": "The Company may amend these Terms within the limits of applicable laws, including Korea’s Act on Promotion of Information and Communications Network Utilization and Information Protection, Personal Information Protection Act, Act on the Regulation of Terms and Conditions, Framework Act on Electronic Documents and Transactions, and Framework Act on Consumers.",
     "ja": "会社は、韓国の「情報通信網利用促進および情報保護等に関する法律」「個人情報保護法」「約款の規制に関する法律」「電子文書および電子取引基本法」「消費者基本法」等の関連法に違反しない範囲で、本規約を改定できます。",
-    "zh": "公司可在不违反韩国《信息通信网利用促进及信息保护等相关法律》《个人信息保护法》《格式条款规制法》《电子文书及电子交易基本法》《消费者基本法》等相关法律的范围内修订本条款。"
+    "zh": "公司可在不违反韩国《信息通信网利用促进及信息保护等相关法律》《个人信息保护法》《格式条款规制法》《电子文书及电子交易基本法》《消费者基本法》等相关法律的范围内修订本条款。",
+    "es": "La Empresa puede modificar estas Condiciones sin infringir la legislación aplicable de Corea, incluida la Ley de Promoción del Uso de Redes de Información y Comunicaciones y Protección de la Información, la Ley de Protección de Datos Personales, la Ley de Regulación de Condiciones Generales, la Ley Marco de Documentos y Transacciones Electrónicos y la Ley Marco de los Consumidores."
   },
   {
     "ko": "\"회사\"가 약관을 개정할 경우에는 적용 일자 및 개정 사유를 명시하여 현행약관과 함께 서비스 초기화면에 그 적용 일자 7일 이전부터 적용 일자 전일까지 공지합니다. 다만, 이용자에게 불리하게 약관 내용을 변경하는 경우에는 최소한 30일 이상의 사전 유예기간을 두고 공지합니다. 이 경우 \"회사\"는 개정 전 내용과 개정 후 내용을 명확하게 비교하여 이용자가 알기 쉽도록 표시합니다.",
     "en": "When amending the Terms, the Company announces the effective date and reasons together with the current Terms on the Service’s initial screen from 7 days before the effective date until the day before it. Changes unfavorable to users require at least 30 days’ advance notice. The Company clearly compares the old and new provisions so users can easily understand the changes.",
     "ja": "会社が規約を改定する場合、適用日および改定理由を明示し、現行規約とともにサービスの初期画面で適用日の7日前から前日まで告知します。利用者に不利な変更は、少なくとも30日以上の事前猶予期間を設けて告知します。この場合、改定前後の内容を明確に比較し、利用者に分かりやすく表示します。",
-    "zh": "修订条款时，公司应注明生效日期及修订原因，并将其与现行条款一起在服务初始页面自生效前7日至前一日公示。对用户不利的变更应至少提前30日公示，并明确对比修订前后内容，便于用户理解。"
+    "zh": "修订条款时，公司应注明生效日期及修订原因，并将其与现行条款一起在服务初始页面自生效前7日至前一日公示。对用户不利的变更应至少提前30日公示，并明确对比修订前后内容，便于用户理解。",
+    "es": "Al modificar las Condiciones, la Empresa anuncia la fecha de entrada en vigor y los motivos, junto con las Condiciones vigentes, en la pantalla inicial del Servicio desde 7 días antes de dicha fecha hasta el día anterior. Las modificaciones desfavorables para los usuarios requieren un aviso previo de al menos 30 días. La Empresa compara claramente el texto anterior y el nuevo para facilitar su comprensión."
   },
   {
     "ko": "이 약관에서 정하지 아니한 사항과 이 약관의 해석에 관하여는 \"정보통신망 이용촉진 및 정보보호 등에 관한 법률\", \"개인정보보호법\", \"약관의 규제 등에 관한 법률\" 및 관계법령 또는 상관례에 따릅니다.",
     "en": "Matters not specified in these Terms and their interpretation are governed by Korea’s Act on Promotion of Information and Communications Network Utilization and Information Protection, Personal Information Protection Act, laws regulating terms and conditions, other applicable laws or commercial practices.",
     "ja": "本規約に定めのない事項および本規約の解釈は、韓国の「情報通信網利用促進および情報保護等に関する法律」「個人情報保護法」、約款の規制に関する法律、その他の関連法令または商慣習に従います。",
-    "zh": "本条款未规定的事项及条款解释，依照韩国《信息通信网利用促进及信息保护等相关法律》《个人信息保护法》、有关格式条款规制的法律及相关法令或商业惯例处理。"
+    "zh": "本条款未规定的事项及条款解释，依照韩国《信息通信网利用促进及信息保护等相关法律》《个人信息保护法》、有关格式条款规制的法律及相关法令或商业惯例处理。",
+    "es": "Las cuestiones no previstas y la interpretación de estas Condiciones se rigen por la Ley de Promoción del Uso de Redes de Información y Comunicaciones y Protección de la Información de Corea, la Ley de Protección de Datos Personales, la legislación sobre condiciones generales, otras normas aplicables o los usos comerciales."
   },
   {
     "ko": "제4조 (서비스의 제공 및 변경)",
     "en": "Article 4 (Provision and Changes to the Service)",
     "ja": "第4条（サービスの提供および変更）",
-    "zh": "第4条（服务的提供及变更）"
+    "zh": "第4条（服务的提供及变更）",
+    "es": "Artículo 4 (Prestación y modificación del Servicio)"
   },
   {
     "ko": "\"회사\"는 다음과 같은 서비스를 제공합니다.",
     "en": "The Company provides the following services:",
     "ja": "会社は、次のサービスを提供します。",
-    "zh": "公司提供以下服务："
+    "zh": "公司提供以下服务：",
+    "es": "La Empresa presta los siguientes servicios:"
   },
   {
     "ko": "오프라인 모임을 위한 실시간 인터랙티브 기능 제공",
     "en": "Real-time interactive features for offline gatherings",
     "ja": "オフラインの集まりのためのリアルタイム双方向機能",
-    "zh": "线下聚会实时互动功能"
+    "zh": "线下聚会实时互动功能",
+    "es": "Funciones interactivas en tiempo real para reuniones presenciales"
   },
   {
     "ko": "호스트의 방 생성 및 관리 기능 제공",
     "en": "Room creation and management features for hosts",
     "ja": "ホストによるルーム作成・管理機能",
-    "zh": "主持人创建及管理房间功能"
+    "zh": "主持人创建及管理房间功能",
+    "es": "Funciones de creación y gestión de salas para anfitriones"
   },
   {
     "ko": "게스트의 방 참여 및 상호작용 기능 제공",
     "en": "Room participation and interaction features for guests",
     "ja": "ゲストによるルーム参加・交流機能",
-    "zh": "嘉宾加入房间及互动功能"
+    "zh": "嘉宾加入房间及互动功能",
+    "es": "Funciones de participación e interacción en salas para invitados"
   },
   {
     "ko": "기타 \"회사\"가 정하는 부가 서비스",
     "en": "Other additional services designated by the Company",
     "ja": "その他、会社が定める付加サービス",
-    "zh": "公司规定的其他附加服务"
+    "zh": "公司规定的其他附加服务",
+    "es": "Otros servicios complementarios que determine la Empresa"
   },
   {
     "ko": "\"회사\"는 기술적 사양의 변경 등의 사유로 서비스의 내용을 변경할 수 있습니다. 이 경우에는 변경된 서비스의 내용 및 제공일자를 명시하여 서비스 초기화면에 즉시 공지합니다.",
     "en": "The Company may change the Service due to changes in technical specifications or similar reasons. It will immediately announce the changed service details and provision date on the Service’s initial screen.",
     "ja": "会社は、技術仕様の変更等の理由でサービス内容を変更できます。その場合、変更後の内容および提供日を明示し、サービスの初期画面で直ちに告知します。",
-    "zh": "公司可因技术规格变更等原因变更服务内容，并立即在服务初始页面明确公示变更后的服务内容及提供日期。"
+    "zh": "公司可因技术规格变更等原因变更服务内容，并立即在服务初始页面明确公示变更后的服务内容及提供日期。",
+    "es": "La Empresa puede modificar el Servicio por cambios en las especificaciones técnicas u otros motivos similares. En ese caso, anunciará inmediatamente en la pantalla inicial el contenido modificado y su fecha de prestación."
   },
   {
     "ko": "\"회사\"가 서비스의 내용을 변경할 경우에는 그 사유를 이용자에게 이메일 등 통지 가능한 수단으로 즉시 통지합니다.",
     "en": "When changing the Service, the Company immediately notifies users of the reasons by email or other available means.",
     "ja": "会社がサービス内容を変更する場合、その理由をメール等の通知可能な手段で利用者に直ちに通知します。",
-    "zh": "变更服务内容时，公司应通过电子邮件等可用方式立即向用户通知原因。"
+    "zh": "变更服务内容时，公司应通过电子邮件等可用方式立即向用户通知原因。",
+    "es": "Cuando modifique el Servicio, la Empresa notificará inmediatamente a los usuarios los motivos por correo electrónico u otros medios disponibles."
   },
   {
     "ko": "전항의 경우 \"회사\"는 이로 인하여 이용자가 입은 손해를 배상합니다. 다만, \"회사\"가 고의 또는 과실이 없음을 입증하는 경우에는 그러하지 아니합니다.",
     "en": "In the preceding case, the Company compensates users for resulting damage, unless it proves that it acted without intent or negligence.",
     "ja": "前項の場合、会社はこれにより利用者が被った損害を賠償します。ただし、会社が故意または過失のないことを立証した場合は、この限りではありません。",
-    "zh": "前款情况下，公司应赔偿因此给用户造成的损失，但公司证明其无故意或过失的除外。"
+    "zh": "前款情况下，公司应赔偿因此给用户造成的损失，但公司证明其无故意或过失的除外。",
+    "es": "En el supuesto anterior, la Empresa indemniza a los usuarios por los daños resultantes, salvo que demuestre que no actuó con dolo ni negligencia."
   },
   {
     "ko": "제5조 (서비스의 중단)",
     "en": "Article 5 (Service Suspension)",
     "ja": "第5条（サービスの中断）",
-    "zh": "第5条（服务中断）"
+    "zh": "第5条（服务中断）",
+    "es": "Artículo 5 (Interrupción del Servicio)"
   },
   {
     "ko": "\"회사\"는 다음 각 호의 경우 서비스 제공을 일시적으로 중단할 수 있습니다.",
     "en": "The Company may temporarily suspend the Service in any of the following cases:",
     "ja": "会社は、次の場合にサービスの提供を一時的に中断できます。",
-    "zh": "出现以下情形时，公司可暂时中断服务："
+    "zh": "出现以下情形时，公司可暂时中断服务：",
+    "es": "La Empresa puede interrumpir temporalmente el Servicio en los siguientes casos:"
   },
   {
     "ko": "시스템 점검, 유지보수, 교체 등이 필요한 경우",
     "en": "System inspection, maintenance or replacement is required",
     "ja": "システムの点検、保守、交換等が必要な場合",
-    "zh": "需要进行系统检查、维护、更换等"
+    "zh": "需要进行系统检查、维护、更换等",
+    "es": "Cuando se requiera inspeccionar, mantener o sustituir sistemas"
   },
   {
     "ko": "통신회선의 장애가 발생한 경우",
     "en": "Communication line failures occur",
     "ja": "通信回線に障害が発生した場合",
-    "zh": "通信线路发生故障"
+    "zh": "通信线路发生故障",
+    "es": "Cuando se produzcan fallos en las líneas de comunicación"
   },
   {
     "ko": "천재지변, 정전, 이용량의 폭주 등으로 정상적인 서비스 제공이 어려운 경우",
     "en": "Natural disasters, power outages or excessive traffic make normal service provision difficult",
     "ja": "天災、停電、利用の集中等により正常なサービス提供が困難な場合",
-    "zh": "自然灾害、停电、使用量激增等导致无法正常提供服务"
+    "zh": "自然灾害、停电、使用量激增等导致无法正常提供服务",
+    "es": "Cuando catástrofes naturales, cortes de electricidad o un exceso de tráfico dificulten la prestación normal"
   },
   {
     "ko": "기타 불가항력적 사유가 발생한 경우",
     "en": "Other events of force majeure occur",
     "ja": "その他の不可抗力が発生した場合",
-    "zh": "发生其他不可抗力事件"
+    "zh": "发生其他不可抗力事件",
+    "es": "Cuando se produzcan otros supuestos de fuerza mayor"
   },
   {
     "ko": "\"회사\"는 제1항의 사유로 서비스 제공이 일시적으로 중단됨으로 인하여 이용자 또는 제3자가 입은 손해에 대하여 배상합니다. 단, \"회사\"가 고의 또는 과실이 없음을 입증하는 경우에는 그러하지 아니합니다.",
     "en": "The Company compensates users or third parties for damage caused by a temporary suspension under paragraph 1, unless it proves that it acted without intent or negligence.",
     "ja": "会社は、第1項の理由による一時的なサービス中断で利用者または第三者が被った損害を賠償します。ただし、会社が故意または過失のないことを立証した場合は、この限りではありません。",
-    "zh": "因第1款所述原因暂时中断服务而给用户或第三方造成损失的，公司应予赔偿，但公司证明其无故意或过失的除外。"
+    "zh": "因第1款所述原因暂时中断服务而给用户或第三方造成损失的，公司应予赔偿，但公司证明其无故意或过失的除外。",
+    "es": "La Empresa indemniza a los usuarios o terceros por los daños ocasionados por una interrupción temporal debida a los motivos del apartado 1, salvo que demuestre que no actuó con dolo ni negligencia."
   },
   {
     "ko": "\"회사\"가 사업종목의 전환, 사업의 포기, 업체 간의 통합 등의 이유로 서비스를 제공할 수 없게 되는 경우에는 제8조에 정한 방법으로 이용자에게 통지합니다.",
     "en": "If the Company can no longer provide the Service due to a change of business, closure, merger or similar reason, it notifies users as set out in Article 8.",
     "ja": "会社が業種の変更、事業の廃止、企業間の統合等によりサービスを提供できなくなる場合、第8条の方法で利用者に通知します。",
-    "zh": "因业务转型、停止经营、企业合并等原因无法继续提供服务时，公司应按第8条规定的方式通知用户。"
+    "zh": "因业务转型、停止经营、企业合并等原因无法继续提供服务时，公司应按第8条规定的方式通知用户。",
+    "es": "Si la Empresa no puede seguir prestando el Servicio por un cambio de actividad, cese, fusión u otros motivos similares, lo notificará a los usuarios conforme al artículo 8."
   },
   {
     "ko": "제6조 (회원가입)",
     "en": "Article 6 (Membership Registration)",
     "ja": "第6条（会員登録）",
-    "zh": "第6条（会员注册）"
+    "zh": "第6条（会员注册）",
+    "es": "Artículo 6 (Registro como miembro)"
   },
   {
     "ko": "이용자는 \"회사\"가 정한 가입 양식에 따라 회원 정보를 기입한 후 이 약관에 동의한다는 의사표시를 함으로써 회원가입을 신청합니다.",
     "en": "Users apply for membership by entering their information in the Company’s registration form and indicating agreement to these Terms.",
     "ja": "利用者は、会社所定の登録フォームに会員情報を記入し、本規約に同意する意思を示すことで会員登録を申請します。",
-    "zh": "用户按公司规定的注册表填写会员信息，并表示同意本条款，即可申请注册会员。"
+    "zh": "用户按公司规定的注册表填写会员信息，并表示同意本条款，即可申请注册会员。",
+    "es": "El usuario solicita el registro cumplimentando el formulario establecido por la Empresa y manifestando su aceptación de estas Condiciones."
   },
   {
     "ko": "\"회사\"는 제1항과 같이 회원으로 가입할 것을 신청한 이용자 중 다음 각 호에 해당하지 않는 한 회원으로 등록합니다.",
     "en": "The Company registers applicants under paragraph 1 unless any of the following applies:",
     "ja": "会社は、第1項に従って申請した利用者について、次のいずれかに該当しない限り会員として登録します。",
-    "zh": "对于按第1款申请注册的用户，除以下情形外，公司将其登记为会员："
+    "zh": "对于按第1款申请注册的用户，除以下情形外，公司将其登记为会员：",
+    "es": "La Empresa registra a los solicitantes del apartado 1 salvo en los siguientes casos:"
   },
   {
     "ko": "가입 신청자가 이 약관 제7조 제3항에 의하여 이전에 회원자격을 상실한 적이 있는 경우",
     "en": "The applicant previously lost membership under Article 7, paragraph 3 of these Terms",
     "ja": "申請者が過去に本規約第7条第3項により会員資格を失ったことがある場合",
-    "zh": "申请人曾依本条款第7条第3款丧失会员资格"
+    "zh": "申请人曾依本条款第7条第3款丧失会员资格",
+    "es": "El solicitante perdió anteriormente la condición de miembro conforme al artículo 7, apartado 3, de estas Condiciones"
   },
   {
     "ko": "등록 내용에 허위, 기재누락, 오기가 있는 경우",
     "en": "The registration contains false information, omissions or errors",
     "ja": "登録内容に虚偽、記入漏れ、誤記がある場合",
-    "zh": "注册内容存在虚假、遗漏或错误"
+    "zh": "注册内容存在虚假、遗漏或错误",
+    "es": "Los datos de registro contienen falsedades, omisiones o errores"
   },
   {
     "ko": "기타 회원으로 등록하는 것이 \"회사\"의 기술상 현저히 지장이 있다고 판단되는 경우",
     "en": "Registration is otherwise judged to cause a significant technical impediment to the Company",
     "ja": "その他、会員登録が会社にとって技術上著しい支障となると判断される場合",
-    "zh": "其他被认为会给公司的技术运营造成重大障碍的情形"
+    "zh": "其他被认为会给公司的技术运营造成重大障碍的情形",
+    "es": "Se considera que el registro causaría otro impedimento técnico significativo a la Empresa"
   },
   {
     "ko": "회원가입 계약의 성립 시기는 \"회사\"의 승낙이 회원에게 도달한 시점으로 합니다.",
     "en": "The membership agreement takes effect when the Company’s acceptance reaches the member.",
     "ja": "会員登録契約は、会社の承諾が会員に到達した時点で成立します。",
-    "zh": "会员注册合同自公司的承诺到达会员时成立。"
+    "zh": "会员注册合同自公司的承诺到达会员时成立。",
+    "es": "El contrato de registro se formaliza cuando la aceptación de la Empresa llega al miembro."
   },
   {
     "ko": "회원은 회원가입 시 등록한 사항에 변경이 있는 경우, 즉시 \"회사\"에 대하여 회원정보 수정 등의 방법으로 그 변경사항을 알려야 합니다.",
     "en": "Members must immediately inform the Company of changes to their registered information by updating their profile or other means.",
     "ja": "登録事項に変更があった場合、会員は会員情報の修正等により直ちに会社へ変更内容を通知しなければなりません。",
-    "zh": "注册信息发生变化时，会员应立即通过修改会员信息等方式通知公司。"
+    "zh": "注册信息发生变化时，会员应立即通过修改会员信息等方式通知公司。",
+    "es": "Si cambian los datos registrados, el miembro debe comunicarlo inmediatamente a la Empresa mediante la actualización de sus datos u otros medios."
   },
   {
     "ko": "제7조 (회원 탈퇴 및 자격 상실 등)",
     "en": "Article 7 (Withdrawal and Loss of Membership)",
     "ja": "第7条（退会および資格喪失等）",
-    "zh": "第7条（注销会员及资格丧失等）"
+    "zh": "第7条（注销会员及资格丧失等）",
+    "es": "Artículo 7 (Baja y pérdida de la condición de miembro)"
   },
   {
     "ko": "회원은 \"회사\"에 언제든지 탈퇴를 요청할 수 있으며 \"회사\"는 즉시 회원탈퇴를 처리합니다.",
     "en": "Members may request withdrawal at any time, and the Company processes it immediately.",
     "ja": "会員はいつでも退会を申請でき、会社は直ちに退会手続きを行います。",
-    "zh": "会员可随时申请注销，公司将立即办理。"
+    "zh": "会员可随时申请注销，公司将立即办理。",
+    "es": "El miembro puede solicitar su baja en cualquier momento y la Empresa la tramita inmediatamente."
   },
   {
     "ko": "회원이 다음 각 호의 사유에 해당하는 경우, \"회사\"는 회원자격을 제한 및 정지시킬 수 있습니다.",
     "en": "The Company may restrict or suspend membership in the following cases:",
     "ja": "会員が次のいずれかに該当する場合、会社は会員資格を制限または停止できます。",
-    "zh": "会员存在以下情形时，公司可限制或暂停其会员资格："
+    "zh": "会员存在以下情形时，公司可限制或暂停其会员资格：",
+    "es": "La Empresa puede limitar o suspender la condición de miembro en los siguientes casos:"
   },
   {
     "ko": "가입 신청 시에 허위 내용을 등록한 경우",
     "en": "Providing false information when applying",
     "ja": "登録申請時に虚偽の内容を登録した場合",
-    "zh": "注册申请时填写虚假内容"
+    "zh": "注册申请时填写虚假内容",
+    "es": "Registrar información falsa al solicitar el alta"
   },
   {
     "ko": "다른 이용자의 서비스 이용을 방해하거나 정보를 도용하는 경우",
     "en": "Interfering with other users’ use of the Service or misappropriating their information",
     "ja": "他の利用者のサービス利用を妨害し、または情報を盗用した場合",
-    "zh": "妨碍其他用户使用服务或盗用其信息"
+    "zh": "妨碍其他用户使用服务或盗用其信息",
+    "es": "Impedir que otros usuarios utilicen el Servicio o apropiarse indebidamente de sus datos"
   },
   {
     "ko": "서비스를 이용하여 법령 또는 이 약관이 금지하거나 공서양속에 반하는 행위를 하는 경우",
     "en": "Using the Service for acts prohibited by law or these Terms, or contrary to public order and morals",
     "ja": "サービスを利用して、法令もしくは本規約で禁止される行為、または公序良俗に反する行為をした場合",
-    "zh": "利用服务从事法律或本条款禁止的行为，或违反公序良俗的行为"
+    "zh": "利用服务从事法律或本条款禁止的行为，或违反公序良俗的行为",
+    "es": "Utilizar el Servicio para actos prohibidos por la ley o estas Condiciones, o contrarios al orden público y las buenas costumbres"
   },
   {
     "ko": "게스트들의 개인정보를 무단으로 수집, 저장, 공개하는 경우",
     "en": "Collecting, storing or disclosing guests’ personal information without authorization",
     "ja": "ゲストの個人情報を無断で収集・保存・公開した場合",
-    "zh": "擅自收集、保存、公开嘉宾的个人信息"
+    "zh": "擅自收集、保存、公开嘉宾的个人信息",
+    "es": "Recopilar, almacenar o divulgar datos personales de invitados sin autorización"
   },
   {
     "ko": "서비스의 운영을 고의로 방해하는 경우",
     "en": "Intentionally interfering with operation of the Service",
     "ja": "サービスの運営を故意に妨害した場合",
-    "zh": "故意妨碍服务运营"
+    "zh": "故意妨碍服务运营",
+    "es": "Obstaculizar intencionadamente el funcionamiento del Servicio"
   },
   {
     "ko": "기타 관련 법령에 위배되는 행위를 하는 경우",
     "en": "Other violations of applicable laws",
     "ja": "その他の関連法令に違反した場合",
-    "zh": "其他违反相关法律法规的行为"
+    "zh": "其他违反相关法律法规的行为",
+    "es": "Realizar otros actos contrarios a la legislación aplicable"
   },
   {
     "ko": "\"회사\"가 회원 자격을 제한, 정지시킨 후, 동일한 행위가 2회 이상 반복되거나 30일 이내에 그 사유가 시정되지 아니하는 경우 \"회사\"는 회원자격을 상실시킬 수 있습니다.",
     "en": "After restricting or suspending membership, the Company may revoke it if the same conduct recurs 2 or more times or the cause is not corrected within 30 days.",
     "ja": "会社が会員資格を制限・停止した後、同じ行為が2回以上繰り返されるか、30日以内にその原因が是正されない場合、会社は会員資格を喪失させることができます。",
-    "zh": "会员资格被限制或暂停后，如相同行为再次发生2次以上，或30日内未纠正相关原因，公司可取消其会员资格。"
+    "zh": "会员资格被限制或暂停后，如相同行为再次发生2次以上，或30日内未纠正相关原因，公司可取消其会员资格。",
+    "es": "Tras limitar o suspender la condición de miembro, la Empresa puede revocarla si la misma conducta se repite 2 o más veces o si no se corrige la causa en un plazo de 30 días."
   },
   {
     "ko": "\"회사\"가 회원자격을 상실시키는 경우에는 회원등록을 말소합니다. 이 경우 회원에게 이를 통지하고, 회원등록 말소 전에 최소한 30일 이상의 기간을 정하여 소명할 기회를 부여합니다.",
     "en": "When revoking membership, the Company cancels the registration, notifies the member and provides at least 30 days to present an explanation before cancellation.",
     "ja": "会社が会員資格を喪失させる場合、会員登録を抹消します。その際、会員に通知し、抹消前に少なくとも30日以上の期間を設けて弁明の機会を与えます。",
-    "zh": "公司取消会员资格时，将注销其会员登记。公司应通知会员，并在注销前给予至少30日的申辩机会。"
+    "zh": "公司取消会员资格时，将注销其会员登记。公司应通知会员，并在注销前给予至少30日的申辩机会。",
+    "es": "Al revocar la condición de miembro, la Empresa cancela el registro, lo notifica al miembro y le concede al menos 30 días para presentar explicaciones antes de la cancelación."
   },
   {
     "ko": "제8조 (회원에 대한 통지)",
     "en": "Article 8 (Notices to Members)",
     "ja": "第8条（会員への通知）",
-    "zh": "第8条（向会员发出通知）"
+    "zh": "第8条（向会员发出通知）",
+    "es": "Artículo 8 (Notificaciones a los miembros)"
   },
   {
     "ko": "\"회사\"가 회원에 대해 통지를 하는 경우, 회원이 제공한 전자우편 주소나 휴대전화번호로 할 수 있습니다.",
     "en": "The Company may send notices to the email address or mobile phone number supplied by the member.",
     "ja": "会社は、会員が提供したメールアドレスまたは携帯電話番号に通知を送ることができます。",
-    "zh": "公司可通过会员提供的电子邮箱或手机号码发送通知。"
+    "zh": "公司可通过会员提供的电子邮箱或手机号码发送通知。",
+    "es": "La Empresa puede enviar notificaciones al correo electrónico o número de teléfono móvil facilitado por el miembro."
   },
   {
     "ko": "\"회사\"는 불특정 다수 회원에 대한 통지의 경우 1주일 이상 서비스 내 공지사항에 게시함으로써 개별 통지에 갈음할 수 있습니다. 다만, 회원 본인의 서비스 이용과 관련하여 중대한 영향을 미치는 사항에 대하여는 개별통지를 합니다.",
     "en": "For notices to an unspecified group of members, the Company may post an announcement within the Service for at least 1 week instead of notifying each member. Matters significantly affecting an individual member’s use of the Service are notified individually.",
     "ja": "不特定多数の会員への通知は、サービス内のお知らせに1週間以上掲載することで個別通知に代えることができます。ただし、会員本人のサービス利用に重大な影響を及ぼす事項は個別に通知します。",
-    "zh": "向不特定多数会员发出通知时，公司可在服务内公告至少1周，以代替逐一通知。但对会员本人使用服务有重大影响的事项，应单独通知。"
+    "zh": "向不特定多数会员发出通知时，公司可在服务内公告至少1周，以代替逐一通知。但对会员本人使用服务有重大影响的事项，应单独通知。",
+    "es": "Para notificaciones a un grupo indeterminado de miembros, la Empresa puede sustituir las comunicaciones individuales por un anuncio dentro del Servicio durante al menos 1 semana. Los asuntos que afecten significativamente al uso del Servicio por un miembro se notifican individualmente."
   },
   {
     "ko": "제9조 (서비스 이용 및 개인정보 제공 동의 등)",
     "en": "Article 9 (Service Use and Consent to Provide Personal Information)",
     "ja": "第9条（サービス利用および個人情報提供への同意等）",
-    "zh": "第9条（服务使用及个人信息提供同意等）"
+    "zh": "第9条（服务使用及个人信息提供同意等）",
+    "es": "Artículo 9 (Uso del Servicio y consentimiento para facilitar datos personales)"
   },
   {
     "ko": "\"회사\"는 서비스 이용에 있어 다음의 내용을 이용자가 알기 쉽게 제공해야 합니다.",
     "en": "The Company must clearly provide users with the following information about using the Service:",
     "ja": "会社は、サービスの利用に際し、次の内容を利用者に分かりやすく提供しなければなりません。",
-    "zh": "公司应就服务使用向用户清晰提供以下内容："
+    "zh": "公司应就服务使用向用户清晰提供以下内容：",
+    "es": "La Empresa debe proporcionar claramente a los usuarios la siguiente información sobre el uso del Servicio:"
   },
   {
     "ko": "서비스의 주요 기능과 이용 방법",
     "en": "Key features and instructions for using the Service",
     "ja": "サービスの主な機能および利用方法",
-    "zh": "服务的主要功能及使用方法"
+    "zh": "服务的主要功能及使用方法",
+    "es": "Funciones principales e instrucciones de uso"
   },
   {
     "ko": "개인정보 수집 항목 (닉네임, 전화번호 등)",
     "en": "Personal information collected (nickname, phone number, etc.)",
     "ja": "収集する個人情報の項目（ニックネーム、電話番号等）",
-    "zh": "收集的个人信息项目（昵称、电话号码等）"
+    "zh": "收集的个人信息项目（昵称、电话号码等）",
+    "es": "Datos personales recopilados (apodo, teléfono, etc.)"
   },
   {
     "ko": "약관 내용, 서비스 이용 제한사항에 대한 확인",
     "en": "Confirmation of the Terms and service restrictions",
     "ja": "規約内容およびサービス利用制限の確認",
-    "zh": "确认条款内容及服务使用限制"
+    "zh": "确认条款内容及服务使用限制",
+    "es": "Confirmación del contenido de las Condiciones y de las restricciones de uso"
   },
   {
     "ko": "이 약관에 동의하고 위 사항을 확인하거나 거부하는 의사표시",
     "en": "An indication of agreement to these Terms and confirmation or rejection of the above matters",
     "ja": "本規約への同意および上記事項の確認または拒否の意思表示",
-    "zh": "表示同意本条款，并确认或拒绝上述事项"
+    "zh": "表示同意本条款，并确认或拒绝上述事项",
+    "es": "Manifestación de aceptación de estas Condiciones y confirmación o rechazo de los aspectos anteriores"
   },
   {
     "ko": "\"회사\"가 제3자에게 이용자의 개인정보를 제공할 필요가 있는 경우 다음 각 호의 사항을 이용자에게 알리고 동의를 받아야 합니다.",
     "en": "If the Company needs to provide personal information to a third party, it must inform users of the following and obtain consent:",
     "ja": "会社が第三者に利用者の個人情報を提供する必要がある場合、次の事項を通知し、同意を得なければなりません。",
-    "zh": "公司需要向第三方提供用户个人信息时，应告知以下事项并取得同意："
+    "zh": "公司需要向第三方提供用户个人信息时，应告知以下事项并取得同意：",
+    "es": "Si necesita facilitar datos personales a un tercero, la Empresa debe informar al usuario de los siguientes aspectos y obtener su consentimiento:"
   },
   {
     "ko": "개인정보를 제공받는 자",
     "en": "The recipient of the personal information",
     "ja": "個人情報の提供先",
-    "zh": "个人信息接收方"
+    "zh": "个人信息接收方",
+    "es": "Destinatario de los datos personales"
   },
   {
     "ko": "개인정보를 제공받는 자의 개인정보 이용목적",
     "en": "The recipient’s purpose for using the personal information",
     "ja": "提供先の個人情報の利用目的",
-    "zh": "接收方使用个人信息的目的"
+    "zh": "接收方使用个人信息的目的",
+    "es": "Finalidad de uso de los datos por el destinatario"
   },
   {
     "ko": "제공하는 개인정보의 항목",
     "en": "The personal information items provided",
     "ja": "提供する個人情報の項目",
-    "zh": "提供的个人信息项目"
+    "zh": "提供的个人信息项目",
+    "es": "Datos personales que se facilitan"
   },
   {
     "ko": "개인정보를 제공받는 자의 개인정보 보유 및 이용 기간",
     "en": "The recipient’s retention and use period",
     "ja": "提供先の個人情報の保有・利用期間",
-    "zh": "接收方保留及使用个人信息的期限"
+    "zh": "接收方保留及使用个人信息的期限",
+    "es": "Plazo de conservación y uso de los datos por el destinatario"
   },
   {
     "ko": "\"회사\"는 실시간으로 수집되는 이용자의 서비스 이용 데이터에 대해 수집 범위와 이용 목적을 명확히 고지해야 합니다.",
     "en": "The Company must clearly disclose the scope and purposes of real-time collection of service usage data.",
     "ja": "会社は、リアルタイムで収集される利用者のサービス利用データについて、収集範囲および利用目的を明確に告知しなければなりません。",
-    "zh": "公司应明确告知实时收集的用户服务使用数据的收集范围及使用目的。"
+    "zh": "公司应明确告知实时收集的用户服务使用数据的收集范围及使用目的。",
+    "es": "La Empresa debe informar claramente del alcance y las finalidades de la recopilación en tiempo real de los datos de uso del Servicio."
   },
   {
     "ko": "제10조 (서비스 이용의 성립)",
     "en": "Article 10 (Establishment of Service Use)",
     "ja": "第10条（サービス利用の成立）",
-    "zh": "第10条（服务使用的成立）"
+    "zh": "第10条（服务使用的成立）",
+    "es": "Artículo 10 (Establecimiento del uso del Servicio)"
   },
   {
     "ko": "\"회사\"는 다음 각 호에 해당하면 서비스 이용을 제한할 수 있습니다.",
     "en": "The Company may restrict service use in the following cases:",
     "ja": "会社は、次の場合にサービス利用を制限できます。",
-    "zh": "公司可在以下情形限制服务使用："
+    "zh": "公司可在以下情形限制服务使用：",
+    "es": "La Empresa puede limitar el uso del Servicio en los siguientes casos:"
   },
   {
     "ko": "신청 내용에 허위, 기재누락, 오기가 있는 경우",
     "en": "The application contains false information, omissions or errors",
     "ja": "申請内容に虚偽、記入漏れ、誤記がある場合",
-    "zh": "申请内容存在虚假、遗漏或错误"
+    "zh": "申请内容存在虚假、遗漏或错误",
+    "es": "La solicitud contiene falsedades, omisiones o errores"
   },
   {
     "ko": "타인의 권리를 침해하거나 도용하는 경우",
     "en": "Infringement or misappropriation of another person’s rights",
     "ja": "他人の権利を侵害または盗用する場合",
-    "zh": "侵害或盗用他人权利"
+    "zh": "侵害或盗用他人权利",
+    "es": "Se vulneran o usurpan derechos de otras personas"
   },
   {
     "ko": "기타 서비스 제공에 기술상 현저한 지장이 있다고 판단되는 경우",
     "en": "Other circumstances judged to significantly impede technical provision of the Service",
     "ja": "その他、サービスの提供に技術上著しい支障があると判断される場合",
-    "zh": "其他被认为会给服务提供造成重大技术障碍的情形"
+    "zh": "其他被认为会给服务提供造成重大技术障碍的情形",
+    "es": "Se considera que existen otros impedimentos técnicos significativos para prestar el Servicio"
   },
   {
     "ko": "미성년자가 서비스를 이용하는 경우에는 법정대리인의 동의를 얻어야 하며, 이를 얻지 못한 경우 미성년자 본인 또는 법정대리인이 이용 계약을 취소할 수 있습니다.",
     "en": "Minors must obtain their legal representative’s consent to use the Service. Without that consent, the minor or legal representative may cancel the service agreement.",
     "ja": "未成年者がサービスを利用する場合、法定代理人の同意が必要です。同意が得られていない場合、未成年者本人または法定代理人は利用契約を取り消すことができます。",
-    "zh": "未成年人使用服务应取得法定代理人的同意。未取得同意的，未成年人本人或法定代理人可撤销使用合同。"
+    "zh": "未成年人使用服务应取得法定代理人的同意。未取得同意的，未成年人本人或法定代理人可撤销使用合同。",
+    "es": "Los menores deben obtener el consentimiento de su representante legal para utilizar el Servicio. Sin él, el menor o su representante legal puede anular el contrato de uso."
   },
   {
     "ko": "제11조 (멤버십 및 토큰의 구매)",
     "en": "Article 11 (Purchasing Memberships and Tokens)",
     "ja": "第11条（メンバーシップおよびトークンの購入）",
-    "zh": "第11条（会员资格及代币的购买）"
+    "zh": "第11条（会员资格及代币的购买）",
+    "es": "Artículo 11 (Compra de membresías y tokens)"
   },
   {
     "ko": "\"회사\"의 서비스 중 일부는 멤버십 또는 토큰 구매를 통해 이용할 수 있으며, 결제 방법은 다음 각 호와 같습니다.",
     "en": "Some services require purchasing a membership or tokens. Payment methods are as follows:",
     "ja": "会社のサービスの一部は、メンバーシップまたはトークンの購入により利用でき、支払方法は次のとおりです。",
-    "zh": "部分服务需购买会员资格或代币后使用，付款方式如下："
+    "zh": "部分服务需购买会员资格或代币后使用，付款方式如下：",
+    "es": "Algunos servicios requieren la compra de una membresía o tokens. Los medios de pago son los siguientes:"
   },
   {
     "ko": "신용카드 결제",
     "en": "Credit card",
     "ja": "クレジットカード決済",
-    "zh": "信用卡付款"
+    "zh": "信用卡付款",
+    "es": "Tarjeta de crédito"
   },
   {
     "ko": "계좌이체",
     "en": "Bank transfer",
     "ja": "銀行振込",
-    "zh": "银行转账"
+    "zh": "银行转账",
+    "es": "Transferencia bancaria"
   },
   {
     "ko": "휴대폰 결제",
     "en": "Mobile phone billing",
     "ja": "携帯電話決済",
-    "zh": "手机账单付款"
+    "zh": "手机账单付款",
+    "es": "Facturación a través del teléfono móvil"
   },
   {
     "ko": "기타 \"회사\"가 정한 전자적 지급방법",
     "en": "Other electronic payment methods designated by the Company",
     "ja": "その他、会社が定める電子的支払方法",
-    "zh": "公司规定的其他电子支付方式"
+    "zh": "公司规定的其他电子支付方式",
+    "es": "Otros medios de pago electrónicos establecidos por la Empresa"
   },
   {
     "ko": "\"회사\"는 이용자의 결제 방법에 대해 어떠한 명목의 수수료도 추가 징수하지 않습니다.",
     "en": "The Company does not charge any additional fee, under any name, for the user’s payment method.",
     "ja": "会社は、利用者の支払方法について、いかなる名目の手数料も追加で徴収しません。",
-    "zh": "公司不会就用户的付款方式以任何名义加收手续费。"
+    "zh": "公司不会就用户的付款方式以任何名义加收手续费。",
+    "es": "La Empresa no cobra comisiones adicionales, bajo ningún concepto, por el medio de pago elegido por el usuario."
   },
   {
     "ko": "멤버십과 토큰의 유효기간, 사용 조건, 환불 기준 등에 대해서는 각 상품 구매 시 별도로 고지합니다.",
     "en": "Validity periods, conditions of use and refund criteria for memberships and tokens are separately disclosed at the time of purchase.",
     "ja": "メンバーシップおよびトークンの有効期間、利用条件、返金基準等は、各商品の購入時に別途告知します。",
-    "zh": "会员资格和代币的有效期限、使用条件及退款标准等，将在购买各商品时另行告知。"
+    "zh": "会员资格和代币的有效期限、使用条件及退款标准等，将在购买各商品时另行告知。",
+    "es": "Los períodos de validez, las condiciones de uso y los criterios de reembolso de membresías y tokens se comunican por separado al comprar cada producto."
   },
   {
     "ko": "충전된 토큰의 이용기간과 환불가능기간은 결제시점으로부터 1년 이내로 제한됩니다.",
     "en": "The use period and refund eligibility period for purchased tokens are limited to within 1 year of payment.",
     "ja": "チャージしたトークンの利用期間および返金可能期間は、決済時点から1年以内に限定されます。",
-    "zh": "充值代币的使用期限及可退款期限均限制在付款之时起1年以内。"
+    "zh": "充值代币的使用期限及可退款期限均限制在付款之时起1年以内。",
+    "es": "El período de uso y el plazo durante el cual puede solicitarse el reembolso de los tokens adquiridos se limitan a 1 año desde el momento del pago."
   },
   {
     "ko": "미성년자가 멤버십이나 토큰을 구매하는 경우, 법정대리인의 동의를 얻어야 하며, 동의 없이 구매한 경우 미성년자 본인 또는 법정대리인은 구매를 취소할 수 있습니다.",
     "en": "Minors must obtain their legal representative’s consent to buy memberships or tokens. If purchased without consent, the minor or legal representative may cancel the purchase.",
     "ja": "未成年者がメンバーシップやトークンを購入する場合、法定代理人の同意が必要です。同意なく購入した場合、未成年者本人または法定代理人は購入を取り消すことができます。",
-    "zh": "未成年人购买会员资格或代币应取得法定代理人的同意。未经同意购买的，未成年人本人或法定代理人可撤销购买。"
+    "zh": "未成年人购买会员资格或代币应取得法定代理人的同意。未经同意购买的，未成年人本人或法定代理人可撤销购买。",
+    "es": "Los menores deben obtener el consentimiento de su representante legal para comprar membresías o tokens. Si compran sin él, el menor o su representante legal puede anular la compra."
   },
   {
     "ko": "멤버십과 토큰은 \"회사\"가 정한 목적과 기준에 따라서만 사용할 수 있으며, 이를 제3자에게 양도하거나 현금으로 환전할 수 없습니다.",
     "en": "Memberships and tokens may be used only for the purposes and under the criteria set by the Company and cannot be transferred to third parties or exchanged for cash.",
     "ja": "メンバーシップおよびトークンは、会社が定める目的および基準に従ってのみ利用でき、第三者への譲渡や現金への換金はできません。",
-    "zh": "会员资格和代币仅可按公司规定的目的及标准使用，不得转让给第三方或兑换现金。"
+    "zh": "会员资格和代币仅可按公司规定的目的及标准使用，不得转让给第三方或兑换现金。",
+    "es": "Las membresías y los tokens solo pueden utilizarse para las finalidades y según los criterios establecidos por la Empresa, y no pueden transferirse a terceros ni canjearse por dinero en efectivo."
   },
   {
     "ko": "제12조 (멤버십 및 토큰의 구매 확인)",
     "en": "Article 12 (Purchase Confirmation)",
     "ja": "第12条（メンバーシップおよびトークンの購入確認）",
-    "zh": "第12条（会员资格及代币的购买确认）"
+    "zh": "第12条（会员资格及代币的购买确认）",
+    "es": "Artículo 12 (Confirmación de compra de membresías y tokens)"
   },
   {
     "ko": "\"회사\"는 이용자의 멤버십 또는 토큰 구매 신청이 있는 경우 이용자에게 구매 확인 통지를 합니다.",
     "en": "The Company sends a purchase confirmation when a user applies to purchase a membership or tokens.",
     "ja": "会社は、利用者からメンバーシップまたはトークンの購入申込みを受けた場合、購入確認を通知します。",
-    "zh": "用户申请购买会员资格或代币时，公司将向用户发送购买确认通知。"
+    "zh": "用户申请购买会员资格或代币时，公司将向用户发送购买确认通知。",
+    "es": "La Empresa envía una confirmación cuando el usuario solicita comprar una membresía o tokens."
   },
   {
     "ko": "구매 확인 통지를 받은 이용자는 내용의 불일치 등이 있는 경우 즉시 구매 취소를 요청할 수 있으며, \"회사\"는 멤버십 또는 토큰이 사용되지 않은 경우 지체 없이 그 요청에 따라 처리합니다.",
     "en": "A user who receives a purchase confirmation may immediately request cancellation if there is a discrepancy or similar issue. The Company processes the request without delay if the membership or tokens have not been used.",
     "ja": "購入確認を受けた利用者は、内容の不一致等がある場合、直ちに購入取消しを申請できます。会社は、メンバーシップまたはトークンが未使用の場合、遅滞なく申請に従って処理します。",
-    "zh": "用户收到购买确认通知后，如发现内容不符等问题，可立即申请取消购买。会员资格或代币尚未使用的，公司将及时按申请处理。"
+    "zh": "用户收到购买确认通知后，如发现内容不符等问题，可立即申请取消购买。会员资格或代币尚未使用的，公司将及时按申请处理。",
+    "es": "El usuario que reciba una confirmación puede solicitar inmediatamente la cancelación si existe alguna discrepancia u otro problema similar. La Empresa tramita la solicitud sin demora si la membresía o los tokens no se han utilizado."
   },
   {
     "ko": "제13조 (멤버십 및 토큰의 제공)",
     "en": "Article 13 (Provision of Memberships and Tokens)",
     "ja": "第13条（メンバーシップおよびトークンの提供）",
-    "zh": "第13条（会员资格及代币的提供）"
+    "zh": "第13条（会员资格及代币的提供）",
+    "es": "Artículo 13 (Entrega de membresías y tokens)"
   },
   {
     "ko": "\"회사\"는 이용자가 구매한 멤버십 또는 토큰을 결제 완료 즉시 이용할 수 있도록 제공합니다.",
     "en": "The Company makes purchased memberships or tokens available immediately upon completion of payment.",
     "ja": "会社は、購入されたメンバーシップまたはトークンを決済完了後すぐに利用できるよう提供します。",
-    "zh": "公司在付款完成后立即提供所购会员资格或代币供用户使用。"
+    "zh": "公司在付款完成后立即提供所购会员资格或代币供用户使用。",
+    "es": "La Empresa pone las membresías o tokens comprados a disposición del usuario inmediatamente después de completarse el pago."
   },
   {
     "ko": "\"회사\"는 전산장애 등의 사유로 즉시 제공이 어려운 경우, 그 사유와 제공 예정 시점을 이용자에게 통지합니다.",
     "en": "If immediate provision is difficult due to a system failure or similar reason, the Company notifies users of the reason and expected provision time.",
     "ja": "システム障害等により即時提供が困難な場合、会社はその理由と提供予定時期を利用者に通知します。",
-    "zh": "因系统故障等原因无法立即提供时，公司应向用户通知原因及预计提供时间。"
+    "zh": "因系统故障等原因无法立即提供时，公司应向用户通知原因及预计提供时间。",
+    "es": "Si no puede entregarlos de inmediato por un fallo del sistema u otro motivo similar, la Empresa comunica al usuario el motivo y el momento previsto de entrega."
   },
   {
     "ko": "제14조 (환급)",
     "en": "Article 14 (Reimbursement)",
     "ja": "第14条（払戻し）",
-    "zh": "第14条（退还款项）"
+    "zh": "第14条（退还款项）",
+    "es": "Artículo 14 (Devolución de importes)"
   },
   {
     "ko": "\"회사\"는 다음 각 호의 경우 이용자가 지불한 대금을 환급합니다.",
     "en": "The Company reimburses the amount paid in the following cases:",
     "ja": "会社は、次の場合に利用者が支払った代金を払い戻します。",
-    "zh": "出现以下情形时，公司退还用户支付的款项："
+    "zh": "出现以下情形时，公司退还用户支付的款项：",
+    "es": "La Empresa devuelve el importe pagado en los siguientes casos:"
   },
   {
     "ko": "시스템 오류로 멤버십 또는 토큰이 제공되지 않은 경우",
     "en": "A membership or tokens were not provided due to a system error",
     "ja": "システムエラーによりメンバーシップまたはトークンが提供されなかった場合",
-    "zh": "系统错误导致未提供会员资格或代币"
+    "zh": "系统错误导致未提供会员资格或代币",
+    "es": "La membresía o los tokens no se entregaron por un error del sistema"
   },
   {
     "ko": "서비스 중단으로 구매한 멤버십을 사용할 수 없게 된 경우",
     "en": "A purchased membership becomes unusable because the Service is suspended",
     "ja": "サービスの中断により購入したメンバーシップを利用できなくなった場合",
-    "zh": "服务中断导致所购会员资格无法使用"
+    "zh": "服务中断导致所购会员资格无法使用",
+    "es": "La membresía comprada deja de poder utilizarse por una interrupción del Servicio"
   },
   {
     "ko": "기타 \"회사\"의 귀책사유로 서비스를 제공할 수 없는 경우",
     "en": "Other circumstances attributable to the Company prevent provision of the Service",
     "ja": "その他、会社の責めに帰すべき事由によりサービスを提供できない場合",
-    "zh": "因其他可归责于公司的原因无法提供服务"
+    "zh": "因其他可归责于公司的原因无法提供服务",
+    "es": "Otros motivos imputables a la Empresa impiden prestar el Servicio"
   },
   {
     "ko": "환급은 대금을 받은 날로부터 3영업일 이내에 이루어지며, 환급이 지연될 경우 관련 법령에 따른 지연이자를 함께 지급합니다.",
     "en": "Reimbursement is made within 3 business days of receiving payment. If delayed, interest for the delay is paid in accordance with applicable laws.",
     "ja": "払戻しは代金を受け取った日から3営業日以内に行い、遅延した場合は関連法令に基づく遅延利息を併せて支払います。",
-    "zh": "退款应在收到款项之日起3个工作日内完成。逾期退款时，应按相关法律支付逾期利息。"
+    "zh": "退款应在收到款项之日起3个工作日内完成。逾期退款时，应按相关法律支付逾期利息。",
+    "es": "La devolución se realiza dentro de los 3 días hábiles siguientes a la recepción del pago. En caso de retraso, se abonan también los intereses de demora previstos en la legislación aplicable."
   },
   {
     "ko": "제15조 (청약 철회 및 환불)",
     "en": "Article 15 (Withdrawal and Refunds)",
     "ja": "第15条（申込みの撤回および返金）",
-    "zh": "第15条（撤回购买及退款）"
+    "zh": "第15条（撤回购买及退款）",
+    "es": "Artículo 15 (Desistimiento y reembolsos)"
   },
   {
     "ko": "이용자는 구매한 멤버십 또는 토큰을 사용하지 않은 경우, 구매일로부터 7일 이내에 청약 철회를 할 수 있습니다.",
     "en": "Users may withdraw from a purchase within 7 days of purchase if the membership or tokens have not been used.",
     "ja": "利用者は、購入したメンバーシップまたはトークンを使用していない場合、購入日から7日以内に申込みを撤回できます。",
-    "zh": "所购会员资格或代币未使用的，用户可在购买之日起7日内撤回购买。"
+    "zh": "所购会员资格或代币未使用的，用户可在购买之日起7日内撤回购买。",
+    "es": "El usuario puede desistir de la compra dentro de los 7 días siguientes a su fecha si no ha utilizado la membresía o los tokens."
   },
   {
     "ko": "다음 각 호의 경우에는 청약 철회가 제한될 수 있습니다.",
     "en": "Withdrawal may be restricted in the following cases:",
     "ja": "次の場合、申込みの撤回が制限されることがあります。",
-    "zh": "以下情形可能限制撤回购买："
+    "zh": "以下情形可能限制撤回购买：",
+    "es": "El desistimiento puede limitarse en los siguientes casos:"
   },
   {
     "ko": "멤버십 또는 토큰의 사용이 개시된 경우",
     "en": "Use of the membership or tokens has begun",
     "ja": "メンバーシップまたはトークンの使用が開始された場合",
-    "zh": "已开始使用会员资格或代币"
+    "zh": "已开始使用会员资格或代币",
+    "es": "Ha comenzado el uso de la membresía o los tokens"
   },
   {
     "ko": "이용자의 귀책사유로 멤버십 또는 토큰이 손실된 경우",
     "en": "The membership or tokens were lost for reasons attributable to the user",
     "ja": "利用者の責めに帰すべき事由によりメンバーシップまたはトークンが失われた場合",
-    "zh": "因可归责于用户的原因造成会员资格或代币损失"
+    "zh": "因可归责于用户的原因造成会员资格或代币损失",
+    "es": "La membresía o los tokens se han perdido por motivos imputables al usuario"
   },
   {
     "ko": "그 밖에 거래의 안전을 위하여 법령으로 정하는 경우",
     "en": "Other cases prescribed by law to ensure transaction security",
     "ja": "その他、取引の安全のために法令で定められた場合",
-    "zh": "法律为保障交易安全规定的其他情形"
+    "zh": "法律为保障交易安全规定的其他情形",
+    "es": "Otros supuestos previstos por la ley para garantizar la seguridad de las transacciones"
   },
   {
     "ko": "청약 철회 시 환불은 이용자가 사용한 결제수단에 따라 다음과 같이 처리됩니다.",
     "en": "Refunds upon withdrawal are processed according to the payment method used:",
     "ja": "申込み撤回時の返金は、利用者が使用した支払方法に応じて次のとおり処理します。",
-    "zh": "撤回购买时，退款按用户所用付款方式处理如下："
+    "zh": "撤回购买时，退款按用户所用付款方式处理如下：",
+    "es": "En caso de desistimiento, el reembolso se tramita según el medio de pago utilizado:"
   },
   {
     "ko": "신용카드: 결제 취소",
     "en": "Credit card: cancellation of payment",
     "ja": "クレジットカード：決済取消し",
-    "zh": "信用卡：取消付款"
+    "zh": "信用卡：取消付款",
+    "es": "Tarjeta de crédito: cancelación del pago"
   },
   {
     "ko": "계좌이체: 환불계좌로 입금",
     "en": "Bank transfer: deposit into the refund account",
     "ja": "銀行振込：返金口座への入金",
-    "zh": "银行转账：汇入退款账户"
+    "zh": "银行转账：汇入退款账户",
+    "es": "Transferencia bancaria: ingreso en la cuenta de reembolso"
   },
   {
     "ko": "휴대폰 결제: 이동통신사 결제 취소 또는 환불계좌로 입금",
     "en": "Mobile phone billing: cancellation through the carrier or deposit into the refund account",
     "ja": "携帯電話決済：携帯電話会社による決済取消し、または返金口座への入金",
-    "zh": "手机账单付款：通过运营商取消付款或汇入退款账户"
+    "zh": "手机账单付款：通过运营商取消付款或汇入退款账户",
+    "es": "Facturación móvil: cancelación del pago mediante el operador o ingreso en la cuenta de reembolso"
   },
   {
     "ko": "제16조 (개인정보보호)",
     "en": "Article 16 (Protection of Personal Information)",
     "ja": "第16条（個人情報の保護）",
-    "zh": "第16条（个人信息保护）"
+    "zh": "第16条（个人信息保护）",
+    "es": "Artículo 16 (Protección de datos personales)"
   },
   {
     "ko": "\"회사\"는 이용자의 개인정보 수집시 서비스 제공을 위하여 필요한 범위에서 최소한의 개인정보를 수집합니다. 특히 오프라인 모임 서비스의 특성을 고려하여 이용자의 실시간 참여 정보와 상호작용 데이터를 수집할 수 있습니다.",
     "en": "The Company collects only the minimum personal information necessary to provide the Service. Given the nature of offline gathering services, it may collect users’ real-time participation information and interaction data.",
     "ja": "会社は、サービス提供に必要な範囲で最小限の個人情報を収集します。特に、オフラインの集まりのサービスという特性を考慮し、利用者のリアルタイムの参加情報および交流データを収集することがあります。",
-    "zh": "公司仅在提供服务所需范围内收集最少量的个人信息。考虑到线下聚会服务的特性，可收集用户的实时参与信息及互动数据。"
+    "zh": "公司仅在提供服务所需范围内收集最少量的个人信息。考虑到线下聚会服务的特性，可收集用户的实时参与信息及互动数据。",
+    "es": "La Empresa recopila únicamente los datos personales mínimos necesarios para prestar el Servicio. Dada la naturaleza de los servicios de reuniones presenciales, puede recopilar información de participación en tiempo real y datos de interacción de los usuarios."
   },
   {
     "ko": "\"회사\"는 이용자의 개인정보를 수집·이용하는 때에는 이용자에게 그 목적을 고지하고 동의를 받습니다.",
     "en": "When collecting and using personal information, the Company informs users of the purpose and obtains consent.",
     "ja": "会社は、利用者の個人情報を収集・利用する際、その目的を告知し、同意を得ます。",
-    "zh": "公司收集、使用个人信息时，应告知用户目的并取得同意。"
+    "zh": "公司收集、使用个人信息时，应告知用户目的并取得同意。",
+    "es": "Al recopilar y utilizar datos personales, la Empresa informa al usuario de la finalidad y obtiene su consentimiento."
   },
   {
     "ko": "\"회사\"는 수집된 개인정보를 목적 외의 용도로 이용할 수 없으며, 새로운 이용목적이 발생하거나 제3자에게 제공하는 경우에는 이용자에게 그 목적을 고지하고 동의를 받습니다.",
     "en": "The Company may not use collected personal information for other purposes. If a new purpose arises or information is provided to a third party, it informs users of the purpose and obtains consent.",
     "ja": "会社は、収集した個人情報を目的外に利用できません。新たな利用目的が生じた場合や第三者に提供する場合、その目的を告知し、同意を得ます。",
-    "zh": "公司不得将收集的个人信息用于目的以外的用途。出现新用途或向第三方提供时，应告知用户目的并取得同意。"
+    "zh": "公司不得将收集的个人信息用于目的以外的用途。出现新用途或向第三方提供时，应告知用户目的并取得同意。",
+    "es": "La Empresa no puede utilizar los datos recopilados para finalidades distintas. Si surge una nueva finalidad o se facilitan datos a terceros, informa al usuario de la finalidad y obtiene su consentimiento."
   },
   {
     "ko": "\"회사\"는 이용자의 동의를 받는 경우 다음 사항을 이용자에게 고지합니다.",
     "en": "When obtaining consent, the Company informs users of:",
     "ja": "会社は、同意を得る際に次の事項を利用者に告知します。",
-    "zh": "取得同意时，公司应向用户告知："
+    "zh": "取得同意时，公司应向用户告知：",
+    "es": "Al obtener el consentimiento, la Empresa informa al usuario de:"
   },
   {
     "ko": "개인정보관리 책임자의 신원",
     "en": "The identity of the person responsible for personal information management",
     "ja": "個人情報管理責任者の身元",
-    "zh": "个人信息管理负责人的身份"
+    "zh": "个人信息管理负责人的身份",
+    "es": "La identidad del responsable de la gestión de datos personales"
   },
   {
     "ko": "정보의 수집목적 및 이용목적",
     "en": "The purposes of collection and use",
     "ja": "情報の収集目的および利用目的",
-    "zh": "信息收集及使用目的"
+    "zh": "信息收集及使用目的",
+    "es": "Las finalidades de recopilación y uso"
   },
   {
     "ko": "제3자 제공 시 제공받는 자, 목적, 항목",
     "en": "The recipient, purpose and items when providing information to third parties",
     "ja": "第三者提供時の提供先、目的、項目",
-    "zh": "向第三方提供时的接收方、目的及项目"
+    "zh": "向第三方提供时的接收方、目的及项目",
+    "es": "El destinatario, la finalidad y los datos en caso de comunicación a terceros"
   },
   {
     "ko": "실시간 수집되는 정보의 범위와 보관기간",
     "en": "The scope and retention period of information collected in real time",
     "ja": "リアルタイムで収集する情報の範囲および保管期間",
-    "zh": "实时收集信息的范围及保留期限"
+    "zh": "实时收集信息的范围及保留期限",
+    "es": "El alcance y el plazo de conservación de los datos recopilados en tiempo real"
   },
   {
     "ko": "이용자는 언제든지 자신의 개인정보에 대해 열람 및 오류정정을 요구할 수 있으며, \"회사\"는 지체 없이 필요한 조치를 취합니다.",
     "en": "Users may request access to and correction of their personal information at any time, and the Company takes necessary action without delay.",
     "ja": "利用者はいつでも自身の個人情報の閲覧および誤りの訂正を求めることができ、会社は遅滞なく必要な措置を取ります。",
-    "zh": "用户可随时请求查阅及更正本人的个人信息，公司将及时采取必要措施。"
+    "zh": "用户可随时请求查阅及更正本人的个人信息，公司将及时采取必要措施。",
+    "es": "El usuario puede solicitar en cualquier momento acceso a sus datos y la rectificación de errores, y la Empresa adopta sin demora las medidas necesarias."
   },
   {
     "ko": "\"회사\"는 이용자의 개인정보 보호를 위해 관리 책임자를 두며, 개인정보의 분실, 도난, 유출, 무단 제공, 변조 등으로 인한 이용자의 손해에 대해 책임을 집니다.",
     "en": "The Company appoints a person responsible for personal information protection and is liable for user damage caused by loss, theft, leakage, unauthorized disclosure, alteration or similar incidents involving personal information.",
     "ja": "会社は、個人情報保護の管理責任者を置き、個人情報の紛失、盗難、漏えい、無断提供、改ざん等による利用者の損害に責任を負います。",
-    "zh": "公司设立个人信息保护管理负责人，并对个人信息遗失、被盗、泄露、擅自提供、篡改等给用户造成的损失承担责任。"
+    "zh": "公司设立个人信息保护管理负责人，并对个人信息遗失、被盗、泄露、擅自提供、篡改等给用户造成的损失承担责任。",
+    "es": "La Empresa designa un responsable de protección de datos personales y responde de los daños sufridos por los usuarios por pérdida, robo, filtración, comunicación no autorizada, alteración u otros incidentes relacionados con sus datos."
   },
   {
     "ko": "\"회사\"는 서비스 목적이 달성된 개인정보는 지체 없이 파기합니다.",
     "en": "The Company destroys personal information without delay once its service purpose has been achieved.",
     "ja": "会社は、サービスの目的が達成された個人情報を遅滞なく破棄します。",
-    "zh": "服务目的达成后，公司将及时销毁个人信息。"
+    "zh": "服务目的达成后，公司将及时销毁个人信息。",
+    "es": "La Empresa destruye sin demora los datos personales cuya finalidad de servicio se haya cumplido."
   },
   {
     "ko": "제17조 (\"회사\"의 의무)",
     "en": "Article 17 (Company Obligations)",
     "ja": "第17条（会社の義務）",
-    "zh": "第17条（公司的义务）"
+    "zh": "第17条（公司的义务）",
+    "es": "Artículo 17 (Obligaciones de la Empresa)"
   },
   {
     "ko": "\"회사\"는 관련 법령과 이 약관을 준수하며, 안정적으로 서비스를 제공하는 데 최선을 다합니다.",
     "en": "The Company complies with applicable laws and these Terms and makes every effort to provide a stable service.",
     "ja": "会社は、関連法令および本規約を遵守し、安定したサービスの提供に最善を尽くします。",
-    "zh": "公司遵守相关法律及本条款，尽力提供稳定的服务。"
+    "zh": "公司遵守相关法律及本条款，尽力提供稳定的服务。",
+    "es": "La Empresa cumple la legislación aplicable y estas Condiciones, y hace todo lo posible para prestar un servicio estable."
   },
   {
     "ko": "\"회사\"는 이용자가 안전하게 서비스를 이용할 수 있도록 보안 시스템을 갖추고 개인정보보호를 위해 노력합니다.",
     "en": "The Company maintains security systems so users can use the Service safely and works to protect personal information.",
     "ja": "会社は、利用者が安全にサービスを利用できるようセキュリティシステムを備え、個人情報の保護に努めます。",
-    "zh": "公司建立安全系统，保障用户安全使用服务，并努力保护个人信息。"
+    "zh": "公司建立安全系统，保障用户安全使用服务，并努力保护个人信息。",
+    "es": "La Empresa dispone de sistemas de seguridad para que el usuario utilice el Servicio de forma segura y procura proteger los datos personales."
   },
   {
     "ko": "\"회사\"는 서비스 제공과 관련하여 알게 된 이용자의 정보를 본인의 승낙 없이 제3자에게 제공하거나 누설하지 않습니다.",
     "en": "The Company does not provide or disclose to third parties information about users obtained through service provision without the user’s permission.",
     "ja": "会社は、サービス提供に関連して知り得た利用者の情報を、本人の承諾なく第三者に提供または漏えいしません。",
-    "zh": "未经用户本人同意，公司不得向第三方提供或泄露在提供服务过程中获知的用户信息。"
+    "zh": "未经用户本人同意，公司不得向第三方提供或泄露在提供服务过程中获知的用户信息。",
+    "es": "La Empresa no facilita ni revela a terceros, sin autorización del usuario, la información que conozca sobre él al prestar el Servicio."
   },
   {
     "ko": "\"회사\"는 이용자가 원하지 않는 마케팅 정보를 발송하지 않습니다.",
     "en": "The Company does not send marketing information that users do not want.",
     "ja": "会社は、利用者が望まないマーケティング情報を送信しません。",
-    "zh": "公司不发送用户不希望接收的营销信息。"
+    "zh": "公司不发送用户不希望接收的营销信息。",
+    "es": "La Empresa no envía información comercial que los usuarios no deseen recibir."
   },
   {
     "ko": "제18조 (회원의 계정 관리 의무)",
     "en": "Article 18 (Members’ Account Management Obligations)",
     "ja": "第18条（会員のアカウント管理義務）",
-    "zh": "第18条（会员的账户管理义务）"
+    "zh": "第18条（会员的账户管理义务）",
+    "es": "Artículo 18 (Obligaciones de gestión de cuentas de los miembros)"
   },
   {
     "ko": "ID와 비밀번호에 관한 관리책임은 회원에게 있습니다.",
     "en": "Members are responsible for managing their ID and password.",
     "ja": "IDおよびパスワードの管理責任は会員にあります。",
-    "zh": "会员负责管理本人的ID及密码。"
+    "zh": "会员负责管理本人的ID及密码。",
+    "es": "El miembro es responsable de gestionar su ID y contraseña."
   },
   {
     "ko": "회원은 자신의 ID 및 비밀번호를 제3자에게 제공하거나 이용하게 해서는 안 됩니다.",
     "en": "Members must not provide their ID or password to third parties or allow them to use it.",
     "ja": "会員は、自身のIDおよびパスワードを第三者に提供したり、使用させたりしてはなりません。",
-    "zh": "会员不得向第三方提供自己的ID及密码，或允许第三方使用。"
+    "zh": "会员不得向第三方提供自己的ID及密码，或允许第三方使用。",
+    "es": "El miembro no debe facilitar a terceros su ID o contraseña ni permitir que los utilicen."
   },
   {
     "ko": "회원은 ID 및 비밀번호의 도용이나 제3자 사용을 인지한 경우 즉시 \"회사\"에 통보하고 \"회사\"의 안내에 따라야 합니다.",
     "en": "If members become aware of theft or third-party use of their ID or password, they must immediately notify the Company and follow its instructions.",
     "ja": "IDおよびパスワードの盗用や第三者による使用を認識した場合、会員は直ちに会社に通知し、その案内に従わなければなりません。",
-    "zh": "会员发现ID或密码被盗用或由第三方使用时，应立即通知公司并遵照公司指引。"
+    "zh": "会员发现ID或密码被盗用或由第三方使用时，应立即通知公司并遵照公司指引。",
+    "es": "Si detecta la apropiación indebida o el uso por terceros de su ID o contraseña, el miembro debe avisar inmediatamente a la Empresa y seguir sus indicaciones."
   },
   {
     "ko": "회원은 자신의 계정으로 발생하는 모든 활동에 대해 책임을 집니다.",
     "en": "Members are responsible for all activity on their account.",
     "ja": "会員は、自身のアカウントで行われるすべての活動に責任を負います。",
-    "zh": "会员对其账户发生的所有活动负责。"
+    "zh": "会员对其账户发生的所有活动负责。",
+    "es": "El miembro responde de toda la actividad realizada con su cuenta."
   },
   {
     "ko": "제19조 (이용자의 의무)",
     "en": "Article 19 (User Obligations)",
     "ja": "第19条（利用者の義務）",
-    "zh": "第19条（用户的义务）"
+    "zh": "第19条（用户的义务）",
+    "es": "Artículo 19 (Obligaciones del usuario)"
   },
   {
     "ko": "이용자는 다음 행위를 하여서는 안 됩니다.",
     "en": "Users must not engage in the following:",
     "ja": "利用者は、次の行為をしてはなりません。",
-    "zh": "用户不得从事以下行为："
+    "zh": "用户不得从事以下行为：",
+    "es": "El usuario no debe realizar los siguientes actos:"
   },
   {
     "ko": "회원가입, 정보 변경 시 허위 내용 등록",
     "en": "Registering false information when signing up or changing information",
     "ja": "会員登録や情報変更時に虚偽の内容を登録する行為",
-    "zh": "注册会员或变更信息时填写虚假内容"
+    "zh": "注册会员或变更信息时填写虚假内容",
+    "es": "Registrar información falsa al darse de alta o modificar sus datos"
   },
   {
     "ko": "타인의 정보 도용 또는 무단 사용",
     "en": "Misappropriating or using another person’s information without permission",
     "ja": "他人の情報を盗用または無断で使用する行為",
-    "zh": "盗用或未经许可使用他人信息"
+    "zh": "盗用或未经许可使用他人信息",
+    "es": "Apropiarse de los datos de otra persona o utilizarlos sin autorización"
   },
   {
     "ko": "서비스 내 정보의 무단 변경 또는 삭제",
     "en": "Changing or deleting information within the Service without authorization",
     "ja": "サービス内の情報を無断で変更または削除する行為",
-    "zh": "擅自更改或删除服务内的信息"
+    "zh": "擅自更改或删除服务内的信息",
+    "es": "Modificar o eliminar información del Servicio sin autorización"
   },
   {
     "ko": "악성프로그램의 설치, 배포 또는 서비스의 정상적인 운영을 방해하는 행위",
     "en": "Installing or distributing malware, or interfering with normal service operation",
     "ja": "悪意あるプログラムの設置・配布、またはサービスの正常な運営を妨害する行為",
-    "zh": "安装、传播恶意程序或妨碍服务正常运营"
+    "zh": "安装、传播恶意程序或妨碍服务正常运营",
+    "es": "Instalar o distribuir programas maliciosos u obstaculizar el funcionamiento normal del Servicio"
   },
   {
     "ko": "\"회사\" 및 제3자의 지적재산권 침해",
     "en": "Infringing the intellectual property rights of the Company or third parties",
     "ja": "会社および第三者の知的財産権を侵害する行為",
-    "zh": "侵犯公司或第三方的知识产权"
+    "zh": "侵犯公司或第三方的知识产权",
+    "es": "Vulnerar los derechos de propiedad intelectual de la Empresa o de terceros"
   },
   {
     "ko": "타인의 명예를 손상시키거나 모임 진행을 방해하는 행위",
     "en": "Damaging another person’s reputation or disrupting gatherings",
     "ja": "他人の名誉を傷つけ、または集まりの進行を妨害する行為",
-    "zh": "损害他人名誉或妨碍聚会进行"
+    "zh": "损害他人名誉或妨碍聚会进行",
+    "es": "Dañar la reputación ajena u obstaculizar las reuniones"
   },
   {
     "ko": "외설, 폭력적, 차별적 내용이나 공서양속에 반하는 내용의 정보를 게시하거나 전송하는 행위",
     "en": "Posting or transmitting obscene, violent, discriminatory information or information contrary to public order and morals",
     "ja": "わいせつ、暴力的、差別的、または公序良俗に反する内容の情報を掲載・送信する行為",
-    "zh": "发布或传送淫秽、暴力、歧视性或违反公序良俗的信息"
+    "zh": "发布或传送淫秽、暴力、歧视性或违反公序良俗的信息",
+    "es": "Publicar o transmitir información obscena, violenta, discriminatoria o contraria al orden público y las buenas costumbres"
   },
   {
     "ko": "영리 목적의 광고성 정보를 게시하거나 전송하는 행위",
     "en": "Posting or transmitting advertising for commercial purposes",
     "ja": "営利目的の広告情報を掲載・送信する行為",
-    "zh": "发布或传送以营利为目的的广告信息"
+    "zh": "发布或传送以营利为目的的广告信息",
+    "es": "Publicar o transmitir publicidad con fines lucrativos"
   },
   {
     "ko": "실시간 투표나 설문 결과를 조작하거나 왜곡하는 행위",
     "en": "Manipulating or distorting real-time vote or survey results",
     "ja": "リアルタイムの投票やアンケートの結果を操作・歪曲する行為",
-    "zh": "操纵或歪曲实时投票或问卷结果"
+    "zh": "操纵或歪曲实时投票或问卷结果",
+    "es": "Manipular o distorsionar resultados de votaciones o encuestas en tiempo real"
   },
   {
     "ko": "다른 이용자의 개인정보를 무단으로 수집, 저장, 공개하는 행위",
     "en": "Collecting, storing or disclosing other users’ personal information without authorization",
     "ja": "他の利用者の個人情報を無断で収集・保存・公開する行為",
-    "zh": "擅自收集、保存或公开其他用户的个人信息"
+    "zh": "擅自收集、保存或公开其他用户的个人信息",
+    "es": "Recopilar, almacenar o divulgar datos personales de otros usuarios sin autorización"
   },
   {
     "ko": "오프라인 모임의 안전이나 질서를 해치는 행위",
     "en": "Compromising the safety or order of offline gatherings",
     "ja": "オフラインの集まりの安全や秩序を損なう行為",
-    "zh": "危害线下聚会的安全或秩序"
+    "zh": "危害线下聚会的安全或秩序",
+    "es": "Poner en peligro la seguridad o el orden de las reuniones presenciales"
   },
   {
     "ko": "기타 관련 법령에서 금지하거나 서비스의 정상적인 운영을 방해하는 행위",
     "en": "Other acts prohibited by law or interfering with normal service operation",
     "ja": "その他、関連法令で禁止される行為、またはサービスの正常な運営を妨害する行為",
-    "zh": "其他法律禁止或妨碍服务正常运营的行为"
+    "zh": "其他法律禁止或妨碍服务正常运营的行为",
+    "es": "Otros actos prohibidos por la legislación aplicable o que obstaculicen el funcionamiento normal del Servicio"
   },
   {
     "ko": "제20조 (저작권의 귀속 및 이용 제한)",
     "en": "Article 20 (Copyright Ownership and Usage Restrictions)",
     "ja": "第20条（著作権の帰属および利用制限）",
-    "zh": "第20条（著作权归属及使用限制）"
+    "zh": "第20条（著作权归属及使用限制）",
+    "es": "Artículo 20 (Titularidad de derechos de autor y restricciones de uso)"
   },
   {
     "ko": "\"회사\"가 제작한 서비스 내 콘텐츠에 대한 저작권 및 기타 지적재산권은 \"회사\"에 귀속됩니다.",
     "en": "Copyright and other intellectual property rights in service content created by the Company belong to the Company.",
     "ja": "会社が制作したサービス内のコンテンツに関する著作権およびその他の知的財産権は、会社に帰属します。",
-    "zh": "公司制作的服务内内容的著作权及其他知识产权归公司所有。"
+    "zh": "公司制作的服务内内容的著作权及其他知识产权归公司所有。",
+    "es": "Los derechos de autor y demás derechos de propiedad intelectual sobre los contenidos del Servicio creados por la Empresa pertenecen a esta."
   },
   {
     "ko": "이용자가 서비스 내에서 작성한 콘텐츠의 저작권은 이용자에게 귀속됩니다. 다만, \"회사\"는 서비스의 운영, 전시, 홍보, 서비스 개선 등을 위해 이용자의 콘텐츠를 무상으로 사용할 수 있습니다.",
     "en": "Users retain copyright in content they create within the Service. However, the Company may use that content free of charge for operating, displaying, promoting or improving the Service and similar purposes.",
     "ja": "利用者がサービス内で作成したコンテンツの著作権は利用者に帰属します。ただし、会社は、サービスの運営、展示、広報、改善等のため、利用者のコンテンツを無償で使用できます。",
-    "zh": "用户在服务内创作的内容，其著作权归用户所有。但公司可为服务运营、展示、宣传、改进等目的免费使用该内容。"
+    "zh": "用户在服务内创作的内容，其著作权归用户所有。但公司可为服务运营、展示、宣传、改进等目的免费使用该内容。",
+    "es": "Los derechos de autor sobre los contenidos creados por los usuarios dentro del Servicio pertenecen a estos. No obstante, la Empresa puede utilizarlos gratuitamente para operar, exhibir, promocionar o mejorar el Servicio, entre otras finalidades similares."
   },
   {
     "ko": "이용자는 \"회사\"의 서비스를 통해 얻은 정보를 \"회사\"의 사전 승낙 없이 복제, 송신, 출판, 배포, 방송 기타 방법에 의하여 영리 목적으로 이용하거나 제3자에게 이용하게 해서는 안 됩니다.",
     "en": "Without the Company’s prior permission, users must not commercially exploit information obtained through the Service by reproduction, transmission, publication, distribution, broadcasting or other means, or allow third parties to do so.",
     "ja": "利用者は、会社の事前承諾なく、サービスを通じて得た情報を複製、送信、出版、配布、放送その他の方法で営利目的に利用し、または第三者に利用させてはなりません。",
-    "zh": "未经公司事先同意，用户不得通过复制、传送、出版、分发、广播或其他方式，将通过服务获得的信息用于营利目的，或允许第三方如此使用。"
+    "zh": "未经公司事先同意，用户不得通过复制、传送、出版、分发、广播或其他方式，将通过服务获得的信息用于营利目的，或允许第三方如此使用。",
+    "es": "Sin autorización previa de la Empresa, el usuario no debe explotar comercialmente la información obtenida mediante el Servicio por reproducción, transmisión, publicación, distribución, radiodifusión u otros medios, ni permitir que terceros lo hagan."
   },
   {
     "ko": "제21조 (분쟁 해결)",
     "en": "Article 21 (Dispute Resolution)",
     "ja": "第21条（紛争解決）",
-    "zh": "第21条（争议解决）"
+    "zh": "第21条（争议解决）",
+    "es": "Artículo 21 (Resolución de controversias)"
   },
   {
     "ko": "\"회사\"는 이용자가 제기하는 정당한 의견이나 불만을 반영하고 그 피해를 보상 처리하기 위하여 고객센터를 운영합니다.",
     "en": "The Company operates Customer Support to address legitimate opinions and complaints from users and arrange compensation for damage.",
     "ja": "会社は、利用者の正当な意見や苦情を反映し、その被害の補償を処理するため、カスタマーサポートを運営します。",
-    "zh": "公司设立客服中心，以处理用户提出的合理意见或投诉，并办理损害赔偿事宜。"
+    "zh": "公司设立客服中心，以处理用户提出的合理意见或投诉，并办理损害赔偿事宜。",
+    "es": "La Empresa mantiene un servicio de atención al cliente para atender las opiniones y reclamaciones legítimas de los usuarios y gestionar la indemnización por daños."
   },
   {
     "ko": "\"회사\"는 이용자로부터 제출되는 불만 사항 및 의견을 우선적으로 처리합니다. 다만, 신속한 처리가 곤란한 경우에는 이용자에게 그 사유와 처리 일정을 즉시 통보합니다.",
     "en": "The Company prioritizes complaints and opinions submitted by users. If prompt handling is difficult, it immediately informs the user of the reason and handling schedule.",
     "ja": "会社は、利用者から提出された苦情や意見を優先的に処理します。迅速な処理が難しい場合、その理由および処理予定を直ちに利用者へ通知します。",
-    "zh": "公司优先处理用户提交的投诉及意见。如难以及时处理，应立即告知用户原因及处理安排。"
+    "zh": "公司优先处理用户提交的投诉及意见。如难以及时处理，应立即告知用户原因及处理安排。",
+    "es": "La Empresa da prioridad a las reclamaciones y opiniones de los usuarios. Si resulta difícil atenderlas con rapidez, informa inmediatamente al usuario del motivo y del calendario de tramitación."
   },
   {
     "ko": "\"회사\"와 이용자 간에 발생한 분쟁과 관련하여 이용자의 피해구제신청이 있는 경우에는 관련 법령에 따른 분쟁조정기관의 조정에 따를 수 있습니다.",
     "en": "If a user applies for redress concerning a dispute with the Company, the parties may follow mediation by a dispute resolution body under applicable laws.",
     "ja": "会社と利用者の間の紛争について利用者から被害救済の申請があった場合、関連法令に基づく紛争調整機関の調整に従うことができます。",
-    "zh": "用户就与公司之间的争议申请救济时，可依相关法律接受争议调解机构的调解。"
+    "zh": "用户就与公司之间的争议申请救济时，可依相关法律接受争议调解机构的调解。",
+    "es": "Si un usuario solicita reparación por una controversia con la Empresa, las partes pueden someterse a la mediación de un organismo de resolución de controversias conforme a la legislación aplicable."
   },
   {
     "ko": "제22조 (재판권 및 준거법)",
     "en": "Article 22 (Jurisdiction and Governing Law)",
     "ja": "第22条（裁判管轄および準拠法）",
-    "zh": "第22条（司法管辖及适用法律）"
+    "zh": "第22条（司法管辖及适用法律）",
+    "es": "Artículo 22 (Jurisdicción y legislación aplicable)"
   },
   {
     "ko": "\"회사\"와 이용자 간에 발생한 분쟁에 관한 소송은 제소 당시 이용자의 주소에 의하고, 주소가 없는 경우에는 거소를 관할하는 지방법원의 전속관할로 합니다. 다만, 제소 당시 이용자의 주소 또는 거소가 분명하지 않거나 외국 거주자의 경우에는 민사소송법상의 관할법원에 제기합니다.",
     "en": "Lawsuits concerning disputes between the Company and users are subject to the exclusive jurisdiction of the district court for the user’s address at the time of filing, or their place of residence if they have no address. If the address or residence is unclear or the user resides abroad, the suit is filed with the court having jurisdiction under Korea’s Civil Procedure Act.",
     "ja": "会社と利用者の間の紛争に関する訴訟は、提訴時の利用者の住所を管轄する地方裁判所、住所がない場合は居所を管轄する地方裁判所の専属管轄とします。ただし、提訴時の住所・居所が不明な場合、または海外居住者の場合は、韓国の民事訴訟法に基づく管轄裁判所に提起します。",
-    "zh": "公司与用户之间争议的诉讼，由起诉时用户住所所在地的地方法院专属管辖；无住所的，由居所所在地地方法院管辖。但起诉时住所或居所不明，或用户居住在国外的，应向韩国《民事诉讼法》规定的管辖法院提起诉讼。"
+    "zh": "公司与用户之间争议的诉讼，由起诉时用户住所所在地的地方法院专属管辖；无住所的，由居所所在地地方法院管辖。但起诉时住所或居所不明，或用户居住在国外的，应向韩国《民事诉讼法》规定的管辖法院提起诉讼。",
+    "es": "Los litigios entre la Empresa y los usuarios se someten exclusivamente al tribunal de distrito correspondiente al domicilio del usuario al presentar la demanda o, si carece de domicilio, a su lugar de residencia. Si el domicilio o la residencia no están claros, o el usuario reside en el extranjero, la demanda se presenta ante el tribunal competente conforme a la Ley de Enjuiciamiento Civil de Corea."
   },
   {
     "ko": "\"회사\"와 이용자 간에 제기된 소송에는 대한민국 법을 적용합니다.",
     "en": "Lawsuits between the Company and users are governed by the laws of the Republic of Korea.",
     "ja": "会社と利用者の間の訴訟には、大韓民国の法律を適用します。",
-    "zh": "公司与用户之间的诉讼适用大韩民国法律。"
+    "zh": "公司与用户之间的诉讼适用大韩民国法律。",
+    "es": "Los litigios entre la Empresa y los usuarios se rigen por las leyes de la República de Corea."
   },
   {
     "ko": "제23조 (알림톡 등 메시지 발송에 관한 내용)",
     "en": "Article 23 (Sending Alimtalk and Other Messages)",
     "ja": "第23条（Alimtalk等のメッセージ送信）",
-    "zh": "第23条（Alimtalk等消息发送）"
+    "zh": "第23条（Alimtalk等消息发送）",
+    "es": "Artículo 23 (Envío de Alimtalk y otros mensajes)"
   },
   {
     "ko": "\"회사\"는 서비스 운영과 관련된 안내, 통지사항, 모임 참여 정보 등을 카카오톡 알림톡으로 발송할 수 있으며, 알림톡 수신이 불가능하거나 수신 차단된 경우에는 문자 메시지로 발송합니다. 이동통신망으로 접속 시 메시지 수신 중 데이터 요금이 발생할 수 있습니다. 알림톡 수신을 원하지 않는 경우 알림톡을 차단하거나 \"회사\"에 다른 방식의 정보 수신을 요청할 수 있습니다.",
     "en": "The Company may send service-related guidance, notices and gathering participation information through KakaoTalk Alimtalk. If Alimtalk cannot be received or is blocked, messages are sent by SMS. Data charges may apply when receiving messages over a mobile network. Users who do not wish to receive Alimtalk may block it or ask the Company to provide information through another method.",
     "ja": "会社は、サービス運営に関する案内、通知、集まりへの参加情報等をKakaoTalkのAlimtalkで送信できます。Alimtalkを受信できない場合やブロックされている場合は、SMSで送信します。モバイル通信網で受信する際、データ通信料が発生することがあります。Alimtalkの受信を希望しない場合、ブロックするか、別の方法での情報受信を会社に依頼できます。",
-    "zh": "公司可通过KakaoTalk Alimtalk发送服务运营指引、通知及聚会参与信息等。如无法接收Alimtalk或已屏蔽，将通过短信发送。通过移动网络接收消息时可能产生流量费。不希望接收Alimtalk的用户可将其屏蔽，或要求公司通过其他方式提供信息。"
+    "zh": "公司可通过KakaoTalk Alimtalk发送服务运营指引、通知及聚会参与信息等。如无法接收Alimtalk或已屏蔽，将通过短信发送。通过移动网络接收消息时可能产生流量费。不希望接收Alimtalk的用户可将其屏蔽，或要求公司通过其他方式提供信息。",
+    "es": "La Empresa puede enviar orientaciones, avisos e información sobre participación en reuniones relacionados con el Servicio mediante KakaoTalk Alimtalk. Si no es posible recibir Alimtalk o está bloqueado, los mensajes se envían por SMS. La recepción mediante una red móvil puede generar cargos por datos. Quien no desee recibir Alimtalk puede bloquearlo o solicitar a la Empresa otro medio para recibir la información."
   },
   {
     "ko": "부칙",
     "en": "Supplementary Provisions",
     "ja": "附則",
-    "zh": "附则"
+    "zh": "附则",
+    "es": "Disposiciones adicionales"
   },
   {
     "ko": "이 약관은 2024.12.4 부터 시행합니다.",
     "en": "These Terms take effect on December 4, 2024.",
     "ja": "本規約は2024年12月4日から施行します。",
-    "zh": "本条款自2024年12月4日起施行。"
+    "zh": "本条款自2024年12月4日起施行。",
+    "es": "Estas Condiciones entran en vigor el 4 de diciembre de 2024."
   }
 ]

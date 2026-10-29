@@ -13,7 +13,7 @@ test('All languages preserve document structure, contacts and local navigation d
   for (const doc of docs) {
     const original = strip(readFileSync(`public/${doc}.html`, 'utf8'));
     const rows = JSON.parse(readFileSync(`content/legal/${doc}.json`, 'utf8'));
-    for (const lang of ['ko','en','ja','zh']) {
+    for (const lang of ['ko','en','ja','zh','es']) {
       const path = lang === 'ko' ? `public/${doc}.html` : `public/legal/${lang}/${doc}.html`;
       const html = readFileSync(path,'utf8');
       const tags = s => strip(s).match(/<\/?(?:h[123]|p|ul|ol|li|br)\b[^>]*>/g);
@@ -25,7 +25,7 @@ test('All languages preserve document structure, contacts and local navigation d
         for (const contact of row.ko.match(/\b[\w.-]+@[\w.-]+\.[a-z]+|\b\d{2,4}-\d{3,4}-\d{4}\b/g) || []) assert.ok(row[lang].includes(contact), contact);
         // Retention periods, thresholds and article references retain their digits.
         // English dates and 'once' are explicitly checked below.
-        if (!(lang === 'en' && (/시행|적용됩니다|최초 1회/.test(row.ko)))) {
+        if (!(['en', 'es'].includes(lang) && (/시행|적용됩니다|최초 1회/.test(row.ko)))) {
           assert.deepEqual((row[lang].replaceAll("제3자", "제삼자").match(/\d+/g) || []).sort(), (row.ko.replaceAll("제3자", "제삼자").match(/\d+/g) || []).sort(), `${doc}/${lang}: ${row.ko}`);
         }
       }
@@ -42,6 +42,7 @@ test('Legacy locale parameters resolve correctly without loops or external redir
     ['/terms_of_service.html?locale=ja_JP', '/legal/ja/terms_of_service.html?locale=ja_JP'],
     ['/refund_policy.html?language=zh-CN', '/legal/zh/refund_policy.html?language=zh-CN'],
     ['/legal/en/privacy_policy.html?lang=kr', '/privacy_policy.html?lang=kr'],
+    ['/privacy_policy.html?lang=es_ES', '/legal/es/privacy_policy.html?lang=es_ES'],
     ['/privacy_policy.html?lang=fr', null],
     ['/privacy_policy.html', null],
     ['/legal/en/privacy_policy.html?lang=en', null],

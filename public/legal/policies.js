@@ -5,7 +5,7 @@
   const requested = params.get('lang') || params.get('locale') || params.get('language');
   if (!requested) return;
   const code = requested.trim().toLowerCase().replaceAll('_', '-').split('-')[0];
-  const locale = ({ ko: 'ko', kr: 'ko', en: 'en', ja: 'ja', jp: 'ja', zh: 'zh', cn: 'zh' })[code];
+  const locale = ({ ko: 'ko', kr: 'ko', en: 'en', es: 'es', ja: 'ja', jp: 'ja', zh: 'zh', cn: 'zh' })[code];
   const match = location.pathname.match(/\/(privacy_policy|terms_of_service|refund_policy)\.html$/);
   if (!locale || !match) return;
   const path = `${locale === 'ko' ? '' : `/legal/${locale}`}/${match[1]}.html`;
