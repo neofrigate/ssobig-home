@@ -1,0 +1,182 @@
+[
+  {
+    "ko": "환불 정책",
+    "en": "Refund Policy",
+    "ja": "返金ポリシー",
+    "zh": "退款政策"
+  },
+  {
+    "ko": "1. 환불 요청 가능 기간",
+    "en": "1. Refund request period",
+    "ja": "1. 返金申請期間",
+    "zh": "1. 退款申请期限"
+  },
+  {
+    "ko": "모든 결제에 대해 결제일로부터 7일 이내에 환불을 요청할 수 있습니다.",
+    "en": "For all payments, you may request a refund within 7 days of the payment date.",
+    "ja": "すべてのお支払いについて、決済日から7日以内に返金を申請できます。",
+    "zh": "所有付款均可在付款之日起7日内申请退款。"
+  },
+  {
+    "ko": "단, 해당 기간 내에 일부라도 토큰을 사용했거나 프로 멤버십 혜택을 이용한 경우에는 환불되지 않습니다.",
+    "en": "However, no refund is available if you have used any tokens or Pro membership benefits during that period.",
+    "ja": "ただし、その期間内にトークンを一部でも使用した場合、またはProメンバーシップの特典を利用した場合は返金されません。",
+    "zh": "但在该期间内，只要使用过任何代币或Pro会员权益，即不予退款。"
+  },
+  {
+    "ko": "2. 디지털 상품 특성",
+    "en": "2. Nature of digital products",
+    "ja": "2. デジタル商品の特性",
+    "zh": "2. 数字商品的特性"
+  },
+  {
+    "ko": "본 서비스의 토큰 및 멤버십은 무형의 디지털 상품으로, 결제 후 즉시 사용 가능한 특성을 지니고 있습니다.",
+    "en": "The tokens and memberships offered by this service are intangible digital products available for use immediately after payment.",
+    "ja": "本サービスのトークンおよびメンバーシップは、決済後すぐに利用できる無形のデジタル商品です。",
+    "zh": "本服务的代币和会员资格属于无形数字商品，付款后即可立即使用。"
+  },
+  {
+    "ko": "결제 후 사용이 개시된 경우에는 전액 환불이 어려울 수 있으므로, 구매 전에 신중히 결정하시기 바랍니다.",
+    "en": "Once use has begun after payment, a full refund may be difficult. Please consider your purchase carefully.",
+    "ja": "決済後に利用を開始した場合、全額返金が難しくなることがありますので、購入前に慎重にご判断ください。",
+    "zh": "付款后如已开始使用，可能难以获得全额退款，请在购买前慎重决定。"
+  },
+  {
+    "ko": "3. 토큰 환불 규정",
+    "en": "3. Token refunds",
+    "ja": "3. トークンの返金規定",
+    "zh": "3. 代币退款规则"
+  },
+  {
+    "ko": "미사용 토큰 전액 환불: 결제일로부터 7일 이내에 토큰 사용 기록이 전혀 없을 경우 전액 환불 가능합니다.",
+    "en": "Full refund for unused tokens: A full refund is available within 7 days of payment if there is no record of any token use.",
+    "ja": "未使用トークンの全額返金：決済日から7日以内で、トークンの使用履歴が一切ない場合は全額返金が可能です。",
+    "zh": "未使用代币全额退款：付款之日起7日内，如完全没有代币使用记录，可获得全额退款。"
+  },
+  {
+    "ko": "부분 사용 후 환불: 부분 사용후에는 환불되지 않습니다.",
+    "en": "Refund after partial use: No refund is available after partial use.",
+    "ja": "一部使用後の返金：一部でも使用した後は返金されません。",
+    "zh": "部分使用后退款：部分使用后不予退款。"
+  },
+  {
+    "ko": "4. 프로 멤버십 환불 규정",
+    "en": "4. Pro membership refunds",
+    "ja": "4. Proメンバーシップの返金規定",
+    "zh": "4. Pro会员退款规则"
+  },
+  {
+    "ko": "7일 이내 전혀 사용 기록 없음: 멤버십 결제일로부터 7일 이내에 어떠한 혜택도 사용하지 않았다면 전액 환불 가능합니다.",
+    "en": "No use within 7 days: A full refund is available if no benefits have been used within 7 days of the membership payment date.",
+    "ja": "7日以内で利用履歴が一切ない場合：メンバーシップの決済日から7日以内で、いかなる特典も利用していない場合は全額返金が可能です。",
+    "zh": "7日内完全没有使用记录：会员付款之日起7日内，如未使用任何权益，可获得全额退款。"
+  },
+  {
+    "ko": "부분 사용 후 환불: 멤버십 시작 날짜로부터 1일이 지났거나, 멤버십 구매후, 멤버십 혜택을 이용한 경우에는 환불되지 않습니다.",
+    "en": "Refund after partial use: No refund is available if 1 day has passed since the membership start date or if any membership benefits have been used after purchase.",
+    "ja": "一部利用後の返金：メンバーシップの開始日から1日が経過した場合、または購入後にメンバーシップの特典を利用した場合は返金されません。",
+    "zh": "部分使用后退款：自会员开始日期起已过1日，或购买后使用过会员权益的，不予退款。"
+  },
+  {
+    "ko": "프로모션/할인 적용 결제: 환불 시에는 정상가 기준으로 환불액을 재산정할 수 있습니다.",
+    "en": "Promotional or discounted payments: The refund amount may be recalculated using the regular price.",
+    "ja": "プロモーション・割引が適用された決済：返金額は通常価格を基準に再計算されることがあります。",
+    "zh": "促销或折扣付款：退款时可能按原价重新计算退款金额。"
+  },
+  {
+    "ko": "5. 환불 절차",
+    "en": "5. Refund procedure",
+    "ja": "5. 返金手続き",
+    "zh": "5. 退款流程"
+  },
+  {
+    "ko": "전혀 사용 기록이 없는 경우(7일 이내)",
+    "en": "No use at all (within 7 days)",
+    "ja": "利用履歴が一切ない場合（7日以内）",
+    "zh": "完全没有使用记录（7日内）"
+  },
+  {
+    "ko": "결제내역 > 해당 결제 아이템 선택 > 환불 신청하기 메뉴에서 직접 환불 신청 가능",
+    "en": "You can request a refund directly via Payment history > Select the payment item > Request a refund.",
+    "ja": "「決済履歴」>「該当する決済項目を選択」>「返金申請」メニューから直接申請できます。",
+    "zh": "可通过“付款记录”>“选择相应付款项目”>“申请退款”菜单直接申请。"
+  },
+  {
+    "ko": "기타 이해가능한 사유에 의해 환불을 요청하는 경우",
+    "en": "Refund requests for other understandable reasons",
+    "ja": "その他の理解可能な理由による返金申請",
+    "zh": "因其他可理解的原因申请退款"
+  },
+  {
+    "ko": "마이페이지 > 고객센터를 통해 환불 요청을 접수",
+    "en": "Submit your refund request via My Page > Customer Support.",
+    "ja": "「マイページ」>「カスタマーサポート」から返金を申請してください。",
+    "zh": "通过“我的页面”>“客服中心”提交退款申请。"
+  },
+  {
+    "ko": "6. 환불 불가 항목",
+    "en": "6. Non-refundable items",
+    "ja": "6. 返金対象外の項目",
+    "zh": "6. 不予退款的项目"
+  },
+  {
+    "ko": "무료로 지급된 토큰 및 프로모션으로 획득한 추가 혜택",
+    "en": "Tokens granted free of charge and additional promotional benefits",
+    "ja": "無料で付与されたトークンおよびプロモーションで獲得した追加特典",
+    "zh": "免费发放的代币及通过促销获得的额外权益"
+  },
+  {
+    "ko": "그 외, 회사에서 환불 불가 대상으로 지정한 혜택(사전에 고지된 경우)",
+    "en": "Other benefits designated by the Company as non-refundable, where disclosed in advance",
+    "ja": "その他、会社が返金対象外と指定した特典（事前に告知された場合）",
+    "zh": "公司指定为不可退款的其他权益（已事先告知的情况）"
+  },
+  {
+    "ko": "7. 문의 및 고객센터",
+    "en": "7. Inquiries and customer support",
+    "ja": "7. お問い合わせ・カスタマーサポート",
+    "zh": "7. 咨询与客服中心"
+  },
+  {
+    "ko": "환불과 관련한 문의는 아래 고객센터로 연락해주시기 바랍니다.",
+    "en": "For refund inquiries, please contact Customer Support below.",
+    "ja": "返金に関するお問い合わせは、下記のカスタマーサポートまでご連絡ください。",
+    "zh": "有关退款的问题，请联系以下客服中心。"
+  },
+  {
+    "ko": "고객센터 전화번호: 02-2645-7942",
+    "en": "Customer Support phone: 02-2645-7942",
+    "ja": "カスタマーサポート電話番号：02-2645-7942",
+    "zh": "客服中心电话：02-2645-7942"
+  },
+  {
+    "ko": "8. 약관 동의",
+    "en": "8. Agreement to the terms",
+    "ja": "8. 規約への同意",
+    "zh": "8. 同意条款"
+  },
+  {
+    "ko": "본 서비스를 이용하고 결제함으로써 위 약관 및 환불 정책에 동의한 것으로 간주됩니다.",
+    "en": "By using this service and making a payment, you are deemed to have agreed to the above terms and refund policy.",
+    "ja": "本サービスを利用し決済することにより、上記の規約および返金ポリシーに同意したものとみなされます。",
+    "zh": "使用本服务并付款，即视为同意上述条款及退款政策。"
+  },
+  {
+    "ko": "9. 유의사항",
+    "en": "9. Important notes",
+    "ja": "9. 注意事項",
+    "zh": "9. 注意事项"
+  },
+  {
+    "ko": "충전된 토큰 이용기간과 환불가능기간은 결제시점으로부터 1년 이내로 제한됩니다.",
+    "en": "The use period and refund eligibility period for purchased tokens are limited to within 1 year of payment.",
+    "ja": "チャージしたトークンの利用期間および返金可能期間は、決済時点から1年以内に限定されます。",
+    "zh": "充值代币的使用期限及可退款期限均限制在付款之时起1年以内。"
+  },
+  {
+    "ko": "충전된 토큰 사용자 간 양도가 불가합니다.",
+    "en": "Purchased tokens cannot be transferred between users.",
+    "ja": "チャージしたトークンをユーザー間で譲渡することはできません。",
+    "zh": "充值代币不可在用户之间转让。"
+  }
+]

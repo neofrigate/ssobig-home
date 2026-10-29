@@ -114,12 +114,6 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source:
-          "/:locale(en|ja|zh)/:doc(privacy_policy|terms_of_service|refund_policy)",
-        destination: "/:locale/:doc.html",
-        permanent: true,
-      },
-      {
         source: "/brand/love_buddies",
         destination: "/socialing/love-buddies",
         permanent: true,

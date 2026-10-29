@@ -1,0 +1,10 @@
+body { overflow-wrap: anywhere; }
+.legal-languages, .legal-related { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 16px; border-bottom: 1px solid #ddd; }
+.legal-related { border-top: 1px solid #ddd; border-bottom: 0; margin-top: 24px; }
+.legal-languages a, .legal-related a { color: #165ac5; text-underline-offset: 4px; padding: 4px 0; }
+.legal-languages a[aria-current="page"] { color: #222; font-weight: bold; }
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  .privacy-policy, .terms-of-service, .refund-policy { padding: 8px; }
+  h1 { font-size: 1.8rem; }
+}

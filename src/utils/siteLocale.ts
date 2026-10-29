@@ -17,7 +17,6 @@ export const SITE_LOCALES: {
   { code: "zh", label: "简体中文", short: "ZH", htmlLang: "zh-Hans" },
 ];
 
-// 정적 약관 페이지(public/*.html)의 언어 탭도 같은 키를 쓴다
 const STORAGE_KEY = "ssobig_locale";
 const CHANGE_EVENT = "ssobig:locale-change";
 
@@ -81,11 +80,12 @@ export const useSiteLocale = (): [SiteLocale, (locale: SiteLocale) => void] => {
 
 export type LegalDoc = "privacy_policy" | "terms_of_service" | "refund_policy";
 
-// 한국어 주소는 구글 OAuth·결제사에 등록돼 있어 그대로 두고, 다른 언어는 /{locale}/ 아래에 둔다
+// 번역본은 scripts/generate-legal-pages.mjs가 public/legal/{locale}/에 만든다.
+// 한국어 주소는 구글 OAuth·결제사에 등록돼 있어 그대로 둔다
 export const getLegalUrl = (doc: LegalDoc, locale: SiteLocale) =>
   locale === "ko"
     ? `https://www.ssobig.com/${doc}.html`
-    : `https://www.ssobig.com/${locale}/${doc}.html`;
+    : `https://www.ssobig.com/legal/${locale}/${doc}.html`;
 
 export const FOOTER_COPY: Record<
   SiteLocale,
@@ -109,7 +109,7 @@ export const FOOTER_COPY: Record<
     businessInfoToggle: "사업자 정보 토글",
   },
   en: {
-    company: "SSOBIG Inc.",
+    company: "SsoBig Co., Ltd.",
     toolIntro: "About SsoBig Tool",
     privacy: "Privacy Policy",
     terms: "Terms of Service",
@@ -118,7 +118,7 @@ export const FOOTER_COPY: Record<
     businessInfoToggle: "Toggle business information",
   },
   ja: {
-    company: "株式会社SSOBIG",
+    company: "株式会社SsoBig",
     toolIntro: "SsoBig Toolについて",
     privacy: "プライバシーポリシー",
     terms: "利用規約",
@@ -127,7 +127,7 @@ export const FOOTER_COPY: Record<
     businessInfoToggle: "事業者情報を表示",
   },
   zh: {
-    company: "SSOBIG株式会社",
+    company: "SsoBig股份有限公司",
     toolIntro: "关于SsoBig Tool",
     privacy: "隐私政策",
     terms: "服务条款",
