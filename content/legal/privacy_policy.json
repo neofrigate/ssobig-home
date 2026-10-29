@@ -1,0 +1,830 @@
+[
+  {
+    "ko": "개인정보 처리방침",
+    "en": "Privacy Policy",
+    "ja": "プライバシーポリシー",
+    "zh": "隐私政策"
+  },
+  {
+    "ko": "쏘빅(이하 \"회사\")은 개인정보 보호법 제30조에 따라 정보 주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보 처리 방침을 수립하여 공개합니다.",
+    "en": "SsoBig (the “Company”) establishes and publishes this Privacy Policy under Article 30 of Korea’s Personal Information Protection Act to protect data subjects’ personal information and promptly and smoothly handle related complaints.",
+    "ja": "SsoBig（以下「会社」）は、韓国の個人情報保護法第30条に基づき、情報主体の個人情報を保護し、関連する苦情を迅速かつ円滑に処理するため、次のプライバシーポリシーを定め、公表します。",
+    "zh": "SsoBig（以下简称“公司”）依据韩国《个人信息保护法》第30条，为保护信息主体的个人信息并及时、顺畅地处理相关投诉，制定并公布本隐私政策。"
+  },
+  {
+    "ko": "제1조 (개인정보의 처리 목적)",
+    "en": "Article 1 (Purposes of Processing Personal Information)",
+    "ja": "第1条（個人情報の処理目的）",
+    "zh": "第1条（个人信息处理目的）"
+  },
+  {
+    "ko": "회사는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.",
+    "en": "The Company processes personal information for the following purposes only. If the purposes change, it will take necessary measures, such as obtaining separate consent, under Article 18 of Korea’s Personal Information Protection Act.",
+    "ja": "会社は、次の目的のために個人情報を処理します。これらの目的以外には利用せず、利用目的を変更する場合は、韓国の個人情報保護法第18条に基づき、別途同意を得るなど必要な措置を講じます。",
+    "zh": "公司仅为以下目的处理个人信息。如使用目的发生变更，将依据韩国《个人信息保护法》第18条采取另行取得同意等必要措施。"
+  },
+  {
+    "ko": "1. 회원 가입 및 관리",
+    "en": "1. Membership registration and management",
+    "ja": "1. 会員登録および管理",
+    "zh": "1. 会员注册及管理"
+  },
+  {
+    "ko": "회원 가입 의사 확인",
+    "en": "Confirming the intention to register",
+    "ja": "会員登録の意思の確認",
+    "zh": "确认注册意愿"
+  },
+  {
+    "ko": "회원제 서비스 제공에 따른 본인 식별 및 인증",
+    "en": "Identifying and authenticating users for membership services",
+    "ja": "会員制サービス提供に伴う本人の識別・認証",
+    "zh": "为提供会员制服务进行身份识别及认证"
+  },
+  {
+    "ko": "회원 자격 유지 및 관리",
+    "en": "Maintaining and managing membership status",
+    "ja": "会員資格の維持・管理",
+    "zh": "维护及管理会员资格"
+  },
+  {
+    "ko": "제한적 본인 확인제 시행에 따른 본인 확인",
+    "en": "Identity verification under the limited identity verification system",
+    "ja": "制限的本人確認制度の実施に伴う本人確認",
+    "zh": "根据有限实名验证制度进行身份核实"
+  },
+  {
+    "ko": "서비스 부정 이용 방지",
+    "en": "Preventing misuse of the Service",
+    "ja": "サービスの不正利用防止",
+    "zh": "防止服务被滥用"
+  },
+  {
+    "ko": "만 14세 미만 아동의 개인정보 처리 시 법정대리인의 동의 여부 확인",
+    "en": "Verifying legal representative consent when processing personal information of children under 14",
+    "ja": "満14歳未満の児童の個人情報を処理する際の法定代理人の同意確認",
+    "zh": "处理未满14周岁儿童的个人信息时，核实法定代理人的同意"
+  },
+  {
+    "ko": "각종 고지 및 통지",
+    "en": "Sending various notices and notifications",
+    "ja": "各種告知・通知",
+    "zh": "发送各类告知及通知"
+  },
+  {
+    "ko": "고충 처리",
+    "en": "Handling complaints",
+    "ja": "苦情の処理",
+    "zh": "处理投诉"
+  },
+  {
+    "ko": "2. 모임/이벤트 서비스 제공",
+    "en": "2. Providing gathering/event services",
+    "ja": "2. 集まり・イベントサービスの提供",
+    "zh": "2. 提供聚会／活动服务"
+  },
+  {
+    "ko": "모임 개설 및 참여",
+    "en": "Creating and participating in gatherings",
+    "ja": "集まりの作成・参加",
+    "zh": "创建及参与聚会"
+  },
+  {
+    "ko": "실시간 투표 및 설문 서비스 제공",
+    "en": "Providing real-time voting and survey services",
+    "ja": "リアルタイムの投票・アンケートサービスの提供",
+    "zh": "提供实时投票及问卷服务"
+  },
+  {
+    "ko": "참여자 매칭 서비스 제공",
+    "en": "Providing participant matching services",
+    "ja": "参加者のマッチングサービスの提供",
+    "zh": "提供参与者配对服务"
+  },
+  {
+    "ko": "QR코드 기반 상호작용 서비스 제공",
+    "en": "Providing QR code-based interaction services",
+    "ja": "QRコードを利用した交流サービスの提供",
+    "zh": "提供基于二维码的互动服务"
+  },
+  {
+    "ko": "채팅 및 쪽지 서비스 제공",
+    "en": "Providing chat and private messaging services",
+    "ja": "チャット・メッセージサービスの提供",
+    "zh": "提供聊天及私信服务"
+  },
+  {
+    "ko": "맞춤형 콘텐츠 제공",
+    "en": "Providing personalized content",
+    "ja": "利用者に合わせたコンテンツの提供",
+    "zh": "提供个性化内容"
+  },
+  {
+    "ko": "본인 인증",
+    "en": "Identity verification",
+    "ja": "本人認証",
+    "zh": "身份认证"
+  },
+  {
+    "ko": "연령 인증",
+    "en": "Age verification",
+    "ja": "年齢認証",
+    "zh": "年龄认证"
+  },
+  {
+    "ko": "3. 마케팅 정보 안내 및 혜택 제공",
+    "en": "3. Marketing communications and benefits",
+    "ja": "3. マーケティング情報の案内および特典の提供",
+    "zh": "3. 营销信息通知及权益提供"
+  },
+  {
+    "ko": "선택적으로 동의한 이용자에게 이벤트, 혜택, 쿠폰, 신규 콘텐츠 등 광고성 정보 안내",
+    "en": "Sending advertising information about events, benefits, coupons and new content to users who have optionally consented",
+    "ja": "任意に同意した利用者へのイベント、特典、クーポン、新規コンテンツ等の広告情報の案内",
+    "zh": "向自愿同意的用户发送活动、权益、优惠券、新内容等广告信息"
+  },
+  {
+    "ko": "문자, 카카오톡, 이메일 등을 통한 마케팅 정보 발송",
+    "en": "Sending marketing information by SMS, KakaoTalk, email and other means",
+    "ja": "SMS、KakaoTalk、メール等によるマーケティング情報の送信",
+    "zh": "通过短信、KakaoTalk、电子邮件等发送营销信息"
+  },
+  {
+    "ko": "마케팅 수신동의 여부 및 철회 이력 관리",
+    "en": "Managing marketing consent status and withdrawal history",
+    "ja": "マーケティング受信同意の有無および撤回履歴の管理",
+    "zh": "管理营销接收同意状态及撤回记录"
+  },
+  {
+    "ko": "마케팅 수신동의에 따른 쿠폰 또는 토큰 혜택 지급 및 중복 지급 방지",
+    "en": "Granting coupon or token benefits for marketing consent and preventing duplicate grants",
+    "ja": "マーケティング受信同意に伴うクーポンまたはトークン特典の付与および重複付与の防止",
+    "zh": "因营销接收同意而发放优惠券或代币权益，并防止重复发放"
+  },
+  {
+    "ko": "제2조 (개인정보의 처리 및 보유 기간)",
+    "en": "Article 2 (Processing and Retention Periods)",
+    "ja": "第2条（個人情報の処理および保有期間）",
+    "zh": "第2条（个人信息处理及保留期限）"
+  },
+  {
+    "ko": "회사는 법령에 따른 개인정보 보유 및 이용 기간 또는 정보 주체로부터 개인정보를 수집 시에 동의받은 개인정보 보유 및 이용 기간 내에서 개인정보를 처리하고 보유합니다.",
+    "en": "The Company processes and retains personal information within the retention and use periods prescribed by law or consented to by the data subject when the information was collected.",
+    "ja": "会社は、法令に定められた保有・利用期間、または収集時に情報主体から同意を得た保有・利用期間内で、個人情報を処理・保有します。",
+    "zh": "公司在法律规定或收集个人信息时经信息主体同意的保留及使用期限内，处理并保留个人信息。"
+  },
+  {
+    "ko": "1. 처리 및 보유 원칙",
+    "en": "1. Processing and retention principles",
+    "ja": "1. 処理および保有の原則",
+    "zh": "1. 处理及保留原则"
+  },
+  {
+    "ko": "회사는 다음의 사유에 해당하는 경우에는 해당 사유 종료 시까지 개인정보를 이용하거나 제공하지 않습니다.",
+    "en": "In the following cases, the Company does not use or provide personal information until the relevant circumstances end.",
+    "ja": "次の事由に該当する場合、会社はその事由が終了するまで個人情報を利用または提供しません。",
+    "zh": "出现以下情形时，公司在相关事由结束前不使用或提供个人信息。"
+  },
+  {
+    "ko": "관계 법령 위반에 따른 수사, 조사 등이 진행 중인 경우",
+    "en": "An investigation or inquiry into a violation of applicable laws is ongoing",
+    "ja": "関連法令違反に関する捜査・調査等が進行中の場合",
+    "zh": "因违反相关法律而进行的侦查、调查等尚在进行中"
+  },
+  {
+    "ko": "서비스 이용에 따른 채권 및 채무 관계 잔존 시",
+    "en": "Claims or debts arising from service use remain outstanding",
+    "ja": "サービス利用に伴う債権・債務関係が残っている場合",
+    "zh": "因使用服务产生的债权债务关系尚未结清"
+  },
+  {
+    "ko": "2. 개인정보 처리 및 보유 기간",
+    "en": "2. Personal information processing and retention periods",
+    "ja": "2. 個人情報の処理および保有期間",
+    "zh": "2. 个人信息处理及保留期限"
+  },
+  {
+    "ko": "1) 회원 가입 및 관리: 회원 탈퇴 시까지 - 단, 다음의 사유에 해당하는 경우에는 해당 사유 종료 시까지",
+    "en": "1) Membership registration and management: Until withdrawal from membership, except in the following cases, when retention continues until the circumstances end",
+    "ja": "1）会員登録および管理：退会時まで。ただし、次の事由に該当する場合は、その事由が終了するまで",
+    "zh": "1）会员注册及管理：截至注销会员时。但存在以下情形的，保留至相关事由结束时"
+  },
+  {
+    "ko": "* 관계 법령 위반에 따른 수사, 조사 등이 진행 중인 경우",
+    "en": "* An investigation or inquiry into a violation of applicable laws is ongoing",
+    "ja": "* 関連法令違反に関する捜査・調査等が進行中の場合",
+    "zh": "* 因违反相关法律而进行的侦查、调查等尚在进行中"
+  },
+  {
+    "ko": "* 서비스 이용에 따른 채권 및 채무 관계 잔존 시",
+    "en": "* Claims or debts arising from service use remain outstanding",
+    "ja": "* サービス利用に伴う債権・債務関係が残っている場合",
+    "zh": "* 因使用服务产生的债权债务关系尚未结清"
+  },
+  {
+    "ko": "2) 모임/이벤트 서비스 관련 기록: 모임 종료 후 3개월까지",
+    "en": "2) Gathering/event service records: Until 3 months after the gathering ends",
+    "ja": "2）集まり・イベントサービス関連の記録：集まりの終了後3か月まで",
+    "zh": "2）聚会／活动服务相关记录：截至聚会结束后3个月"
+  },
+  {
+    "ko": "3) 마케팅 정보 안내 및 혜택 제공 관련 기록: 수신동의 철회 또는 회원 탈퇴 시까지. 단, 쿠폰 또는 토큰 혜택의 중복 지급 방지, 동의 이력 증빙, 분쟁 대응을 위해 필요한 기록은 관련 법령 및 내부 보존 기준에 따라 필요한 기간 동안 보관할 수 있습니다.",
+    "en": "3) Marketing communications and benefits records: Until withdrawal of consent or membership. Records needed to prevent duplicate coupon or token benefits, prove consent history or address disputes may be retained for the necessary period under applicable laws and internal retention standards.",
+    "ja": "3）マーケティング情報の案内および特典提供に関する記録：受信同意の撤回または退会時まで。ただし、クーポン・トークン特典の重複付与防止、同意履歴の証明、紛争対応に必要な記録は、関連法令および社内の保存基準に従い、必要な期間保管することがあります。",
+    "zh": "3）营销信息通知及权益提供相关记录：截至撤回接收同意或注销会员时。但为防止优惠券或代币权益重复发放、证明同意记录及应对争议所需的记录，可依据相关法律及内部保存标准保留必要期限。"
+  },
+  {
+    "ko": "제3조 (개인정보 처리의 위탁)",
+    "en": "Article 3 (Outsourcing of Personal Information Processing)",
+    "ja": "第3条（個人情報処理の委託）",
+    "zh": "第3条（个人信息处理的委托）"
+  },
+  {
+    "ko": "회사는 원활한 개인정보 업무 처리를 위하여 다음과 같이 개인정보 처리 업무를 위탁하고 있습니다.",
+    "en": "The Company outsources personal information processing as follows to facilitate its operations.",
+    "ja": "会社は、個人情報に関する業務を円滑に処理するため、次のとおり業務を委託しています。",
+    "zh": "为顺畅开展个人信息相关业务，公司按以下方式委托处理个人信息。"
+  },
+  {
+    "ko": "- 수탁자: 카카오(주)",
+    "en": "- Processor: Kakao Corp.",
+    "ja": "- 委託先：Kakao Corp.",
+    "zh": "- 受托方：Kakao Corp."
+  },
+  {
+    "ko": "- 위탁 업무 내용: 카카오톡 기반 알림톡 및 메시지 발송",
+    "en": "- Outsourced work: Sending KakaoTalk Alimtalk and messages",
+    "ja": "- 委託業務：KakaoTalkによるAlimtalkおよびメッセージの送信",
+    "zh": "- 委托业务：发送基于KakaoTalk的Alimtalk通知及消息"
+  },
+  {
+    "ko": "- 수탁자: 문자 및 이메일 발송 서비스 제공사",
+    "en": "- Processors: SMS and email delivery service providers",
+    "ja": "- 委託先：SMSおよびメール配信サービス事業者",
+    "zh": "- 受托方：短信及电子邮件发送服务商"
+  },
+  {
+    "ko": "- 위탁 업무 내용: 문자, 이메일 등 안내 및 광고성 정보 발송",
+    "en": "- Outsourced work: Sending notices and advertising information by SMS, email and other means",
+    "ja": "- 委託業務：SMS、メール等による案内および広告情報の送信",
+    "zh": "- 委托业务：通过短信、电子邮件等发送通知及广告信息"
+  },
+  {
+    "ko": "2. 위탁 계약 관리",
+    "en": "2. Management of outsourcing agreements",
+    "ja": "2. 委託契約の管理",
+    "zh": "2. 委托合同管理"
+  },
+  {
+    "ko": "회사는 위탁 계약 체결 시 개인정보 보호법 제25조에 따라 다음 사항을 문서화하여 관리합니다.",
+    "en": "When entering into outsourcing agreements, the Company documents and manages the following matters under Article 25 of Korea’s Personal Information Protection Act.",
+    "ja": "会社は、委託契約の締結時に、韓国の個人情報保護法第25条に基づき、次の事項を文書化して管理します。",
+    "zh": "签订委托合同时，公司依据韩国《个人信息保护法》第25条，将以下事项形成书面文件并管理。"
+  },
+  {
+    "ko": "위탁 업무 수행 목적 외 개인정보 처리 금지",
+    "en": "Prohibition on processing personal information for purposes other than the outsourced work",
+    "ja": "委託業務の遂行目的以外の個人情報処理の禁止",
+    "zh": "禁止为委托业务目的以外的用途处理个人信息"
+  },
+  {
+    "ko": "기술적 및 관리적 보호 조치",
+    "en": "Technical and administrative safeguards",
+    "ja": "技術的・管理的保護措置",
+    "zh": "技术及管理保护措施"
+  },
+  {
+    "ko": "재위탁 제한",
+    "en": "Restrictions on subcontracting",
+    "ja": "再委託の制限",
+    "zh": "转委托限制"
+  },
+  {
+    "ko": "수탁자에 대한 관리 및 감독",
+    "en": "Management and supervision of processors",
+    "ja": "委託先の管理・監督",
+    "zh": "对受托方的管理及监督"
+  },
+  {
+    "ko": "손해 배상 등 책임에 관한 사항",
+    "en": "Liability, including compensation for damage",
+    "ja": "損害賠償等の責任に関する事項",
+    "zh": "损害赔偿等责任事项"
+  },
+  {
+    "ko": "3. 위탁 업무 변경 고지",
+    "en": "3. Notice of changes to outsourced work",
+    "ja": "3. 委託業務変更の告知",
+    "zh": "3. 委托业务变更告知"
+  },
+  {
+    "ko": "위탁 업무의 내용이나 수탁자가 변경될 경우에는 지체 없이 본 개인정보 처리 방침을 통하여 공개하도록 하겠습니다.",
+    "en": "Changes to the outsourced work or processors will be disclosed without delay through this Privacy Policy.",
+    "ja": "委託業務の内容または委託先が変更された場合、本ポリシーを通じて遅滞なく公表します。",
+    "zh": "委托业务内容或受托方发生变更时，将通过本隐私政策及时公布。"
+  },
+  {
+    "ko": "제4조 (정보 주체와 법정대리인의 권리 및 의무, 행사 방법)",
+    "en": "Article 4 (Rights and Obligations of Data Subjects and Legal Representatives, and How to Exercise Them)",
+    "ja": "第4条（情報主体と法定代理人の権利・義務および行使方法）",
+    "zh": "第4条（信息主体及法定代理人的权利、义务与行使方法）"
+  },
+  {
+    "ko": "정보 주체는 회사에 대해 언제든지 다음 각 호의 개인정보 보호 관련 권리를 행사할 수 있습니다.",
+    "en": "Data subjects may exercise the following personal information protection rights against the Company at any time.",
+    "ja": "情報主体は、会社に対していつでも次の個人情報保護に関する権利を行使できます。",
+    "zh": "信息主体可随时向公司行使以下个人信息保护相关权利。"
+  },
+  {
+    "ko": "개인정보 열람 요구",
+    "en": "Request access to personal information",
+    "ja": "個人情報の閲覧請求",
+    "zh": "请求查阅个人信息"
+  },
+  {
+    "ko": "오류 등이 있을 경우 정정 요구",
+    "en": "Request correction of errors",
+    "ja": "誤り等がある場合の訂正請求",
+    "zh": "存在错误等情况时请求更正"
+  },
+  {
+    "ko": "삭제 요구",
+    "en": "Request deletion",
+    "ja": "削除請求",
+    "zh": "请求删除"
+  },
+  {
+    "ko": "처리 정지 요구",
+    "en": "Request suspension of processing",
+    "ja": "処理停止の請求",
+    "zh": "请求停止处理"
+  },
+  {
+    "ko": "제1항에 따른 권리 행사는 다음 방법으로 하실 수 있습니다.",
+    "en": "The rights in paragraph 1 may be exercised through:",
+    "ja": "第1項の権利は、次の方法で行使できます。",
+    "zh": "第1款规定的权利可通过以下方式行使："
+  },
+  {
+    "ko": "서면",
+    "en": "Written request",
+    "ja": "書面",
+    "zh": "书面"
+  },
+  {
+    "ko": "전화",
+    "en": "Telephone",
+    "ja": "電話",
+    "zh": "电话"
+  },
+  {
+    "ko": "전자우편",
+    "en": "Email",
+    "ja": "メール",
+    "zh": "电子邮件"
+  },
+  {
+    "ko": "모사전송(FAX)",
+    "en": "Fax",
+    "ja": "ファクス（FAX）",
+    "zh": "传真（FAX）"
+  },
+  {
+    "ko": "정보 주체가 개인정보의 오류 등에 대한 정정 또는 삭제를 요구한 경우, 회사는 정정 또는 삭제를 완료할 때까지 해당 개인정보를 이용하거나 제공하지 않습니다.",
+    "en": "If a data subject requests correction or deletion of personal information, the Company does not use or provide that information until the correction or deletion is complete.",
+    "ja": "情報主体が個人情報の誤り等の訂正または削除を求めた場合、会社は訂正または削除が完了するまで、その個人情報を利用または提供しません。",
+    "zh": "信息主体请求更正或删除个人信息时，公司在更正或删除完成前不使用或提供相关个人信息。"
+  },
+  {
+    "ko": "권리 행사는 정보 주체의 법정대리인이나 위임을 받은 자 등 대리인을 통하여 하실 수 있습니다. 이 경우 개인정보 보호법 시행 규칙 별지 제11호 서식에 따른 위임장을 제출해야 합니다.",
+    "en": "Rights may be exercised through a legal representative or another authorized agent. In that case, a power of attorney in the form prescribed in Annex Form No. 11 of the Enforcement Rule of Korea’s Personal Information Protection Act must be submitted.",
+    "ja": "権利は、情報主体の法定代理人や委任を受けた者等の代理人を通じて行使できます。この場合、韓国の個人情報保護法施行規則の別紙第11号様式に従った委任状を提出する必要があります。",
+    "zh": "可通过信息主体的法定代理人或受委托人等代理人行使权利。此时须提交符合韩国《个人信息保护法施行规则》附件第11号格式的授权委托书。"
+  },
+  {
+    "ko": "정보 주체는 관련 법령을 위반하여 회사가 처리하고 있는 정보 주체 본인이나 타인의 개인정보 및 사생활을 침해해서는 안 됩니다.",
+    "en": "Data subjects must not violate applicable laws by infringing their own or another person’s personal information or privacy processed by the Company.",
+    "ja": "情報主体は、関連法令に違反して、会社が処理している本人または他人の個人情報およびプライバシーを侵害してはなりません。",
+    "zh": "信息主体不得违反相关法律，侵害公司所处理的本人或他人的个人信息及隐私。"
+  },
+  {
+    "ko": "제5조 (마케팅 정보 수신동의 및 철회)",
+    "en": "Article 5 (Marketing Consent and Withdrawal)",
+    "ja": "第5条（マーケティング情報の受信同意および撤回）",
+    "zh": "第5条（营销信息接收同意及撤回）"
+  },
+  {
+    "ko": "회사는 이용자가 선택적으로 동의한 경우에 한하여 이벤트, 혜택, 쿠폰, 신규 콘텐츠 등 광고성 정보를 문자, 카카오톡, 이메일 등으로 안내할 수 있습니다.",
+    "en": "Only when users optionally consent may the Company send advertising information about events, benefits, coupons and new content by SMS, KakaoTalk, email or other means.",
+    "ja": "会社は、利用者が任意に同意した場合に限り、イベント、特典、クーポン、新規コンテンツ等の広告情報をSMS、KakaoTalk、メール等で案内できます。",
+    "zh": "仅在用户自愿同意的情况下，公司才可通过短信、KakaoTalk、电子邮件等发送活动、权益、优惠券及新内容等广告信息。"
+  },
+  {
+    "ko": "마케팅 정보 수신동의는 선택사항이며, 동의하지 않더라도 서비스 이용에는 제한이 없습니다. 이용자는 앱 내 마이페이지 또는 개인정보 보호 담당자 연락처를 통해 언제든지 수신동의를 철회할 수 있습니다.",
+    "en": "Marketing consent is optional, and refusing it does not restrict service use. Users may withdraw consent at any time through My Page in the app or by contacting the person responsible for personal information protection.",
+    "ja": "マーケティング情報の受信同意は任意であり、同意しなくてもサービスの利用は制限されません。利用者は、アプリ内のマイページまたは個人情報保護担当者の連絡先を通じて、いつでも同意を撤回できます。",
+    "zh": "营销信息接收同意为可选项，不同意也不会限制服务使用。用户可随时通过应用内“我的页面”或联系个人信息保护负责人撤回同意。"
+  },
+  {
+    "ko": "마케팅 수신동의에 따른 쿠폰 또는 토큰 혜택은 캠페인별 최초 1회에 한해 지급되며, 수신동의를 철회한 뒤 다시 동의하더라도 동일 혜택은 중복 지급되지 않습니다.",
+    "en": "Coupon or token benefits for marketing consent are granted only once per campaign. Withdrawing and later giving consent again does not result in the same benefit being granted again.",
+    "ja": "マーケティング受信同意によるクーポンまたはトークンの特典は、キャンペーンごとに初回の1回のみ付与されます。同意を撤回した後に再度同意しても、同じ特典は重複付与されません。",
+    "zh": "因营销接收同意而发放的优惠券或代币权益，每项活动仅首次发放1次。撤回同意后再次同意，也不会重复发放相同权益。"
+  },
+  {
+    "ko": "제6조 (처리하는 개인정보 항목)",
+    "en": "Article 6 (Personal Information Processed)",
+    "ja": "第6条（処理する個人情報の項目）",
+    "zh": "第6条（处理的个人信息项目）"
+  },
+  {
+    "ko": "회원 가입 및 관리 필수 항목:",
+    "en": "Required information for membership registration and management:",
+    "ja": "会員登録および管理の必須項目：",
+    "zh": "会员注册及管理的必填信息："
+  },
+  {
+    "ko": "사용자 ID",
+    "en": "User ID",
+    "ja": "ユーザーID",
+    "zh": "用户ID"
+  },
+  {
+    "ko": "이메일 주소",
+    "en": "Email address",
+    "ja": "メールアドレス",
+    "zh": "电子邮箱"
+  },
+  {
+    "ko": "휴대전화 번호",
+    "en": "Mobile phone number",
+    "ja": "携帯電話番号",
+    "zh": "手机号码"
+  },
+  {
+    "ko": "실명",
+    "en": "Real name",
+    "ja": "実名",
+    "zh": "真实姓名"
+  },
+  {
+    "ko": "성별",
+    "en": "Gender",
+    "ja": "性別",
+    "zh": "性别"
+  },
+  {
+    "ko": "생년월일",
+    "en": "Date of birth",
+    "ja": "生年月日",
+    "zh": "出生日期"
+  },
+  {
+    "ko": "서비스 이용 관련 정보 필수 항목:",
+    "en": "Required service usage information:",
+    "ja": "サービス利用に関する必須情報：",
+    "zh": "服务使用相关必需信息："
+  },
+  {
+    "ko": "모임 참여 기록",
+    "en": "Gathering participation records",
+    "ja": "集まりへの参加記録",
+    "zh": "聚会参与记录"
+  },
+  {
+    "ko": "투표/설문 응답 데이터",
+    "en": "Voting/survey response data",
+    "ja": "投票・アンケート回答データ",
+    "zh": "投票／问卷回答数据"
+  },
+  {
+    "ko": "매칭 기록",
+    "en": "Matching records",
+    "ja": "マッチング記録",
+    "zh": "配对记录"
+  },
+  {
+    "ko": "QR코드 스캔 기록",
+    "en": "QR code scan records",
+    "ja": "QRコードのスキャン記録",
+    "zh": "二维码扫描记录"
+  },
+  {
+    "ko": "채팅/쪽지 내용",
+    "en": "Chat/private message content",
+    "ja": "チャット・メッセージの内容",
+    "zh": "聊天／私信内容"
+  },
+  {
+    "ko": "마케팅 정보 안내 및 혜택 제공 관련 항목:",
+    "en": "Information related to marketing communications and benefits:",
+    "ja": "マーケティング情報の案内および特典提供に関する項目：",
+    "zh": "营销信息通知及权益提供相关信息："
+  },
+  {
+    "ko": "이름",
+    "en": "Name",
+    "ja": "氏名",
+    "zh": "姓名"
+  },
+  {
+    "ko": "이메일 주소",
+    "en": "Email address",
+    "ja": "メールアドレス",
+    "zh": "电子邮箱"
+  },
+  {
+    "ko": "휴대전화 번호",
+    "en": "Mobile phone number",
+    "ja": "携帯電話番号",
+    "zh": "手机号码"
+  },
+  {
+    "ko": "사용자 ID",
+    "en": "User ID",
+    "ja": "ユーザーID",
+    "zh": "用户ID"
+  },
+  {
+    "ko": "마케팅 수신동의 여부",
+    "en": "Marketing consent status",
+    "ja": "マーケティング受信同意の有無",
+    "zh": "营销接收同意状态"
+  },
+  {
+    "ko": "마케팅 수신동의 또는 철회 일시",
+    "en": "Date and time of marketing consent or withdrawal",
+    "ja": "マーケティング受信同意または撤回の日時",
+    "zh": "营销接收同意或撤回的日期及时间"
+  },
+  {
+    "ko": "마케팅 수신동의 또는 철회 경로",
+    "en": "Channel used to give or withdraw marketing consent",
+    "ja": "マーケティング受信同意または撤回の経路",
+    "zh": "营销接收同意或撤回的渠道"
+  },
+  {
+    "ko": "마케팅 수신동의 문구 및 문구 버전",
+    "en": "Marketing consent wording and its version",
+    "ja": "マーケティング受信同意の文言およびそのバージョン",
+    "zh": "营销接收同意的文本及版本"
+  },
+  {
+    "ko": "마케팅 수신동의 혜택 지급 여부 및 지급 이력",
+    "en": "Status and history of benefits granted for marketing consent",
+    "ja": "マーケティング受信同意特典の付与有無および付与履歴",
+    "zh": "营销接收同意权益的发放状态及记录"
+  },
+  {
+    "ko": "자동 생성 정보 서비스 이용 과정에서 자동으로 생성되어 수집되는 정보:",
+    "en": "Automatically generated information collected during service use:",
+    "ja": "サービス利用の過程で自動的に生成・収集される情報：",
+    "zh": "使用服务过程中自动生成并收集的信息："
+  },
+  {
+    "ko": "IP 주소",
+    "en": "IP address",
+    "ja": "IPアドレス",
+    "zh": "IP地址"
+  },
+  {
+    "ko": "접속 로그",
+    "en": "Access logs",
+    "ja": "アクセスログ",
+    "zh": "访问日志"
+  },
+  {
+    "ko": "서비스 이용 기록",
+    "en": "Service usage records",
+    "ja": "サービス利用記録",
+    "zh": "服务使用记录"
+  },
+  {
+    "ko": "불량 이용 기록",
+    "en": "Misuse records",
+    "ja": "不正利用記録",
+    "zh": "违规使用记录"
+  },
+  {
+    "ko": "제7조 (개인정보의 파기)",
+    "en": "Article 7 (Destruction of Personal Information)",
+    "ja": "第7条（個人情報の破棄）",
+    "zh": "第7条（个人信息的销毁）"
+  },
+  {
+    "ko": "회사는 개인정보 보유 기간의 경과, 처리 목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.",
+    "en": "The Company destroys personal information without delay when it is no longer needed, such as when the retention period expires or its processing purpose has been achieved.",
+    "ja": "会社は、保有期間の経過や処理目的の達成等により個人情報が不要になった場合、遅滞なく破棄します。",
+    "zh": "保留期限届满或处理目的达成等导致个人信息不再需要时，公司将及时销毁。"
+  },
+  {
+    "ko": "예외적 보존 정보 주체로부터 동의받은 개인정보 보유 기간이 경과하거나 처리 목적이 달성되었음에도 불구하고 다른 법령에 따라 개인정보를 계속 보존해야 하는 경우에는, 해당 개인정보를 별도의 데이터베이스(DB)로 옮기거나 보관 장소를 달리하여 보존합니다.",
+    "en": "Exceptional retention: If another law requires continued retention after the consented retention period expires or the processing purpose has been achieved, the information is moved to a separate database or stored in a separate location.",
+    "ja": "例外的な保存：同意を得た保有期間が経過した場合や処理目的が達成された場合でも、他の法令に基づき保存を継続する必要がある情報は、別のデータベースに移すか、保管場所を分けて保存します。",
+    "zh": "例外保留：即使经同意的保留期限已届满或处理目的已达成，如其他法律要求继续保存，公司将该信息转移至单独的数据库或另行存放。"
+  },
+  {
+    "ko": "파기 절차 및 방법 1) 파기 절차 - 파기 사유가 발생한 개인정보 선정 - 개인정보 보호 책임자의 승인 - 개인정보 파기 실행",
+    "en": "Destruction procedures and methods — 1) Procedure: Select information for which a destruction reason has arisen; obtain approval from the privacy officer; destroy the information.",
+    "ja": "破棄の手順および方法 — 1）手順：破棄事由が生じた個人情報の選定、個人情報保護責任者の承認、個人情報の破棄。",
+    "zh": "销毁程序及方法——1）程序：选定已产生销毁事由的个人信息；获得个人信息保护负责人批准；执行销毁。"
+  },
+  {
+    "ko": "2) 파기 방법 - 전자적 파일: 기록을 재생할 수 없도록 파기 - 종이 문서: 분쇄기로 분쇄하거나 소각",
+    "en": "2) Methods: Electronic files are destroyed so records cannot be recovered. Paper documents are shredded or incinerated.",
+    "ja": "2）方法：電子ファイルは記録を復元できないように破棄し、紙の文書はシュレッダーで裁断するか焼却します。",
+    "zh": "2）方法：电子文件以无法恢复记录的方式销毁；纸质文件使用碎纸机粉碎或焚烧。"
+  },
+  {
+    "ko": "제8조 (개인정보의 안전성 확보 조치)",
+    "en": "Article 8 (Security Measures for Personal Information)",
+    "ja": "第8条（個人情報の安全性確保措置）",
+    "zh": "第8条（个人信息安全保障措施）"
+  },
+  {
+    "ko": "회사는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 하고 있습니다.",
+    "en": "The Company takes the following measures to ensure the security of personal information.",
+    "ja": "会社は、個人情報の安全性を確保するため、次の措置を講じています。",
+    "zh": "公司采取以下措施保障个人信息安全。"
+  },
+  {
+    "ko": "관리적 조치 - 정보 보호 관리 체계 수립 및 운영 - 개인정보 취급자 최소화 및 정기 교육 실시 - 내부 관리 계획 수립 및 정기적 검토/갱신",
+    "en": "Administrative measures: Establishing and operating an information security management system; minimizing personnel handling personal information and training them regularly; establishing and periodically reviewing/updating internal management plans.",
+    "ja": "管理的措置：情報保護管理体制の構築・運用、個人情報取扱者の最小化および定期教育、内部管理計画の策定および定期的な見直し・更新。",
+    "zh": "管理措施：建立并运行信息安全管理体系；尽量减少个人信息处理人员并定期培训；制定内部管理计划并定期审查、更新。"
+  },
+  {
+    "ko": "기술적 조치 - 개인정보 암호화 저장 및 관리 - 접근 권한 제한 및 접근 통제 시스템 운영 - 개인정보 처리 시스템 접속 기록 보관 및 위/변조 방지 - HTTPS 보안 프로토콜 사용 - 백신 등 보안 프로그램 설치 및 운영",
+    "en": "Technical measures: Encrypted storage and management; restricting access privileges and operating access controls; retaining access logs for processing systems and preventing forgery or alteration; using HTTPS; installing and operating antivirus and other security software.",
+    "ja": "技術的措置：個人情報の暗号化保存・管理、アクセス権限の制限およびアクセス制御システムの運用、処理システムのアクセス記録の保管および偽造・改ざん防止、HTTPSの利用、ウイルス対策等のセキュリティソフトの導入・運用。",
+    "zh": "技术措施：加密存储及管理个人信息；限制访问权限并运行访问控制系统；保存处理系统访问记录并防止伪造、篡改；使用HTTPS；安装并运行杀毒等安全软件。"
+  },
+  {
+    "ko": "물리적 조치 - 클라우드 서버 접근 통제 - 개인정보 저장 시스템에 대한 접근 권한 관리",
+    "en": "Physical measures: Controlling access to cloud servers and managing access privileges for personal information storage systems.",
+    "ja": "物理的措置：クラウドサーバーへのアクセス制御、個人情報保存システムへのアクセス権限管理。",
+    "zh": "物理措施：控制云服务器访问；管理个人信息存储系统的访问权限。"
+  },
+  {
+    "ko": "제9조 (개인정보 자동 수집 장치의 설치 및 운영, 거부에 관한 사항)",
+    "en": "Article 9 (Installation, Operation and Rejection of Automatic Collection Technologies)",
+    "ja": "第9条（個人情報の自動収集装置の設置・運用および拒否）",
+    "zh": "第9条（个人信息自动收集装置的安装、运行及拒绝）"
+  },
+  {
+    "ko": "회사는 이용자에게 개별적인 맞춤 서비스를 제공하기 위해 이용 정보를 저장하고 수시로 불러오는 '쿠키(cookie)'를 사용합니다.",
+    "en": "The Company uses cookies, which store and retrieve usage information, to provide personalized services.",
+    "ja": "会社は、利用者ごとに最適化されたサービスを提供するため、利用情報を保存し随時読み出す「Cookie」を使用します。",
+    "zh": "公司使用保存并随时读取使用信息的Cookie，为用户提供个性化服务。"
+  },
+  {
+    "ko": "쿠키는 웹사이트를 운영하는 데 이용되는 서버(http)가 이용자의 컴퓨터 브라우저에 보내는 소량의 정보이며 이용자들의 PC 컴퓨터 내의 하드디스크에 저장되기도 합니다.",
+    "en": "Cookies are small pieces of information sent by the server (HTTP) operating a website to a user’s computer browser and may be stored on the computer’s hard disk.",
+    "ja": "Cookieとは、ウェブサイトを運営するサーバー（HTTP）が利用者のコンピューターのブラウザーに送信する少量の情報で、コンピューターのハードディスクに保存されることもあります。",
+    "zh": "Cookie是运营网站的服务器（HTTP）向用户电脑浏览器发送的少量信息，也可能存储在电脑硬盘中。"
+  },
+  {
+    "ko": "쿠키 관련 상세 정보",
+    "en": "Cookie details",
+    "ja": "Cookieに関する詳細",
+    "zh": "Cookie详细信息"
+  },
+  {
+    "ko": "1) 쿠키의 사용 목적 - 로그인 상태 유지 - 이용자의 모임 참여 정보 및 설정 유지 - 서비스 이용 형태 파악 - 이용자에게 최적화된 정보 제공",
+    "en": "1) Purposes: Maintaining login status; retaining gathering participation information and settings; understanding service usage patterns; providing optimized information.",
+    "ja": "1）利用目的：ログイン状態の維持、集まりへの参加情報・設定の保持、サービス利用形態の把握、利用者に最適な情報の提供。",
+    "zh": "1）使用目的：保持登录状态；保存聚会参与信息及设置；了解服务使用模式；提供适合用户的信息。"
+  },
+  {
+    "ko": "2) 쿠키의 설치 및 운영, 거부 이용자는 웹 브라우저에서 옵션을 설정함으로써 쿠키 저장을 거부할 수 있습니다.",
+    "en": "2) Installation, operation and rejection: Users may reject cookie storage through their web browser settings.",
+    "ja": "2）設置・運用および拒否：利用者は、ウェブブラウザーの設定でCookieの保存を拒否できます。",
+    "zh": "2）安装、运行及拒绝：用户可通过浏览器选项设置拒绝保存Cookie。"
+  },
+  {
+    "ko": "- Chrome: 설정 → 개인정보 및 보안 → 쿠키 및 기타 사이트 데이터",
+    "en": "- Chrome: Settings → Privacy and security → Cookies and other site data",
+    "ja": "- Chrome：設定 → プライバシーとセキュリティ → Cookieと他のサイトデータ",
+    "zh": "- Chrome：设置 → 隐私和安全 → Cookie及其他网站数据"
+  },
+  {
+    "ko": "- Safari: 환경설정 → 개인정보 → 쿠키 및 웹 사이트 데이터",
+    "en": "- Safari: Preferences → Privacy → Cookies and website data",
+    "ja": "- Safari：環境設定 → プライバシー → CookieとWebサイトのデータ",
+    "zh": "- Safari：偏好设置 → 隐私 → Cookie和网站数据"
+  },
+  {
+    "ko": "3) 쿠키 거부 시 제한사항 쿠키 저장을 거부할 경우 로그인 필요한 서비스 이용에 어려움이 발생할 수 있습니다.",
+    "en": "3) Restrictions when rejecting cookies: Rejecting cookie storage may make services requiring login difficult to use.",
+    "ja": "3）拒否時の制限：Cookieの保存を拒否すると、ログインが必要なサービスの利用が難しくなることがあります。",
+    "zh": "3）拒绝Cookie的限制：拒绝保存Cookie可能导致需要登录的服务难以使用。"
+  },
+  {
+    "ko": "제10조 (개인정보 보호 책임자)",
+    "en": "Article 10 (Privacy Officer)",
+    "ja": "第10条（個人情報保護責任者）",
+    "zh": "第10条（个人信息保护负责人）"
+  },
+  {
+    "ko": "회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보 주체의 불만 처리 및 피해 구제 등을 위하여 아래와 같이 개인정보 보호 책임자를 지정하고 있습니다.",
+    "en": "The Company appoints the following privacy officer to oversee personal information processing and handle data subjects’ complaints and remedies relating to that processing.",
+    "ja": "会社は、個人情報処理業務を統括し、情報主体の苦情処理や被害救済等に対応するため、次の個人情報保護責任者を指定しています。",
+    "zh": "公司指定以下个人信息保护负责人，统筹个人信息处理业务，并处理信息主体的投诉及损害救济等事项。"
+  },
+  {
+    "ko": "개인정보 보호 책임자 - 성명: 조원철 - 직책: CTO - 연락처: 010-2821-9669, wonchul@ssobig.com (개인정보 보호 담당 부서로 연결됩니다)",
+    "en": "Privacy officer — Name: Wonchul Jo; Position: CTO; Contact: 010-2821-9669, wonchul@ssobig.com (connects to the department responsible for personal information protection).",
+    "ja": "個人情報保護責任者 — 氏名：Wonchul Jo、役職：CTO、連絡先：010-2821-9669、wonchul@ssobig.com（個人情報保護担当部署につながります）。",
+    "zh": "个人信息保护负责人——姓名：Wonchul Jo；职务：CTO；联系方式：010-2821-9669、wonchul@ssobig.com（将接通个人信息保护负责部门）。"
+  },
+  {
+    "ko": "개인정보 보호 담당 부서 - 부서명: 개발팀 - 담당자: 조원철 - 연락처: 010-2821-9669, wonchul@ssobig.com",
+    "en": "Personal information protection department — Department: Development Team; Contact person: Wonchul Jo; Contact: 010-2821-9669, wonchul@ssobig.com.",
+    "ja": "個人情報保護担当部署 — 部署名：開発チーム、担当者：Wonchul Jo、連絡先：010-2821-9669、wonchul@ssobig.com。",
+    "zh": "个人信息保护负责部门——部门：开发团队；联系人：Wonchul Jo；联系方式：010-2821-9669、wonchul@ssobig.com。"
+  },
+  {
+    "ko": "회사는 정보 주체의 문의에 대해 지체 없이 답변 및 처리해 드릴 것입니다.",
+    "en": "The Company will respond to and handle inquiries from data subjects without delay.",
+    "ja": "会社は、情報主体からのお問い合わせに遅滞なく回答し、対応します。",
+    "zh": "公司将及时回复并处理信息主体的咨询。"
+  },
+  {
+    "ko": "제11조 (개인정보 열람 청구)",
+    "en": "Article 11 (Requests for Access to Personal Information)",
+    "ja": "第11条（個人情報の閲覧請求）",
+    "zh": "第11条（个人信息查阅请求）"
+  },
+  {
+    "ko": "정보 주체는 개인정보 보호법 제35조에 따른 개인정보의 열람 청구를 아래의 부서에 할 수 있습니다. 회사는 정보 주체의 개인정보 열람 청구가 신속하게 처리되도록 노력하겠습니다.",
+    "en": "Data subjects may request access under Article 35 of Korea’s Personal Information Protection Act from the department below. The Company will endeavor to process requests promptly.",
+    "ja": "情報主体は、韓国の個人情報保護法第35条に基づく閲覧請求を、次の部署に行うことができます。会社は、請求が迅速に処理されるよう努めます。",
+    "zh": "信息主体可依据韩国《个人信息保护法》第35条，向以下部门提出查阅请求。公司将努力及时处理。"
+  },
+  {
+    "ko": "개인정보 열람 청구 접수 및 처리 부서 - 부서명: 개발팀 - 담당자: 조원철 - 연락처: 010-2821-9669, wonchul@ssobig.com",
+    "en": "Department receiving and processing access requests — Department: Development Team; Contact person: Wonchul Jo; Contact: 010-2821-9669, wonchul@ssobig.com.",
+    "ja": "閲覧請求の受付・処理部署 — 部署名：開発チーム、担当者：Wonchul Jo、連絡先：010-2821-9669、wonchul@ssobig.com。",
+    "zh": "查阅请求受理及处理部门——部门：开发团队；联系人：Wonchul Jo；联系方式：010-2821-9669、wonchul@ssobig.com。"
+  },
+  {
+    "ko": "제12조 (권익 침해 구제 방법)",
+    "en": "Article 12 (Remedies for Infringement of Rights)",
+    "ja": "第12条（権益侵害の救済方法）",
+    "zh": "第12条（权益侵害救济方法）"
+  },
+  {
+    "ko": "정보 주체는 아래의 기관에 대해 개인정보 침해에 대한 피해 구제, 상담 등을 문의하실 수 있습니다.",
+    "en": "Data subjects may contact the following organizations for remedies or consultation concerning personal information infringements.",
+    "ja": "情報主体は、個人情報侵害の被害救済や相談等について、次の機関に問い合わせることができます。",
+    "zh": "信息主体可就个人信息侵害的损害救济及咨询等事项联系以下机构。"
+  },
+  {
+    "ko": "1. 개인정보 침해 신고 센터 (한국 인터넷 진흥원 운영) - 소관 업무: 개인정보 침해 사실 신고, 상담 신청 - 홈페이지: privacy.kisa.or.kr - 전화: (국번 없이) 118 - 주소: (58324) 전남 나주시 진흥길 9 (빛가람동 301-2) 3층 개인정보 침해 신고 센터",
+    "en": "1. Personal Information Infringement Report Center (operated by the Korea Internet & Security Agency) — Services: Reporting infringements and requesting consultation; Website: privacy.kisa.or.kr; Phone: 118 (no area code); Address: Personal Information Infringement Report Center, 3rd floor, 9 Jinheung-gil, Naju-si, Jeollanam-do (301-2 Bitgaram-dong), 58324, Korea.",
+    "ja": "1. 個人情報侵害申告センター（韓国インターネット振興院が運営）— 業務：個人情報侵害の申告、相談受付。ウェブサイト：privacy.kisa.or.kr、電話：局番なし118、住所：〒58324 韓国・全羅南道羅州市振興ギル9（ピッカラム洞301-2）3階 個人情報侵害申告センター。",
+    "zh": "1. 个人信息侵害举报中心（由韩国互联网振兴院运营）——业务：受理个人信息侵害举报及咨询；网站：privacy.kisa.or.kr；电话：118（无需区号）；地址：韩国全罗南道罗州市振兴路9号（光加蓝洞301-2）3层个人信息侵害举报中心，邮编58324。"
+  },
+  {
+    "ko": "2. 개인정보 분쟁 조정 위원회 - 소관 업무: 개인정보 분쟁 조정 신청, 집단 분쟁 조정 (민사적 해결) - 홈페이지: www.kopico.go.kr - 전화: (국번 없이) 1833-6972 - 주소: (03171) 서울특별시 종로구 세종대로 209 정부 서울 청사 4층",
+    "en": "2. Personal Information Dispute Mediation Committee — Services: Individual and collective personal information dispute mediation (civil resolution); Website: www.kopico.go.kr; Phone: 1833-6972 (no area code); Address: 4th floor, Government Seoul Complex, 209 Sejong-daero, Jongno-gu, Seoul, 03171, Korea.",
+    "ja": "2. 個人情報紛争調整委員会 — 業務：個人情報紛争調整の申請、集団紛争調整（民事的解決）。ウェブサイト：www.kopico.go.kr、電話：局番なし1833-6972、住所：〒03171 韓国・ソウル特別市鍾路区世宗大路209 政府ソウル庁舎4階。",
+    "zh": "2. 个人信息争议调解委员会——业务：个人信息争议调解申请、集体争议调解（民事解决）；网站：www.kopico.go.kr；电话：1833-6972（无需区号）；地址：韩国首尔特别市钟路区世宗大路209号政府首尔办公楼4层，邮编03171。"
+  },
+  {
+    "ko": "3. 수사 기관 - 대검찰청 사이버 범죄 수사단 * 전화: 02-3480-3573 * 홈페이지: www.spo.go.kr - 경찰청 사이버 안전국 * 전화: 182 * 홈페이지: http://cyberbureau.police.go.kr",
+    "en": "3. Investigative authorities — Supreme Prosecutors’ Office Cyber Crime Investigation Unit: Phone 02-3480-3573, website www.spo.go.kr; Korean National Police Agency Cyber Safety Bureau: Phone 182, website http://cyberbureau.police.go.kr.",
+    "ja": "3. 捜査機関 — 大検察庁サイバー犯罪捜査団：電話02-3480-3573、ウェブサイトwww.spo.go.kr。警察庁サイバー安全局：電話182、ウェブサイトhttp://cyberbureau.police.go.kr。",
+    "zh": "3. 侦查机关——大检察厅网络犯罪侦查团：电话02-3480-3573，网站www.spo.go.kr；警察厅网络安全局：电话182，网站http://cyberbureau.police.go.kr。"
+  },
+  {
+    "ko": "제13조 (계정 및 개인정보 삭제 요청)",
+    "en": "Article 13 (Requests to Delete Accounts and Personal Information)",
+    "ja": "第13条（アカウントおよび個人情報の削除請求）",
+    "zh": "第13条（账户及个人信息删除请求）"
+  },
+  {
+    "ko": "이용자는 앱 내 마이페이지의 계정 삭제 기능 또는 개인정보 보호 담당자 이메일(wonchul@ssobig.com)을 통해 계정 및 관련 개인정보 삭제를 요청할 수 있습니다.",
+    "en": "Users may request deletion of their account and related personal information through the account deletion feature in My Page in the app or by emailing the privacy contact at wonchul@ssobig.com.",
+    "ja": "利用者は、アプリ内のマイページのアカウント削除機能、または個人情報保護担当者のメール（wonchul@ssobig.com）を通じて、アカウントおよび関連する個人情報の削除を請求できます。",
+    "zh": "用户可通过应用内“我的页面”的账户删除功能，或向个人信息保护负责人发送邮件（wonchul@ssobig.com），申请删除账户及相关个人信息。"
+  },
+  {
+    "ko": "회사는 법령상 보관 의무가 있거나 정산, 분쟁 대응, 부정 이용 방지, 혜택 중복 지급 방지 등 정당한 보관 사유가 있는 정보를 제외하고 지체 없이 삭제합니다. 보관이 필요한 정보는 해당 목적에 필요한 기간 동안 별도로 보관한 뒤 파기합니다.",
+    "en": "The Company deletes information without delay except where retention is legally required or justified for settlement, dispute handling, misuse prevention or prevention of duplicate benefits. Information requiring retention is stored separately for the period necessary for that purpose and then destroyed.",
+    "ja": "会社は、法令上の保管義務、精算、紛争対応、不正利用防止、特典の重複付与防止等の正当な保管理由がある情報を除き、遅滞なく削除します。保管が必要な情報は、目的に必要な期間、別途保管した後に破棄します。",
+    "zh": "除法律要求保留，或因结算、争议处理、防止滥用、防止权益重复发放等正当原因需要保留的信息外，公司将及时删除。需保留的信息将单独保存至相应目的所需期限届满后销毁。"
+  },
+  {
+    "ko": "제14조 (개인정보 처리 방침 시행 및 변경)",
+    "en": "Article 14 (Effective Date and Changes)",
+    "ja": "第14条（プライバシーポリシーの施行および変更）",
+    "zh": "第14条（隐私政策的实施及变更）"
+  },
+  {
+    "ko": "이 개인정보 처리 방침은 2026년 6월 25일부터 적용됩니다.",
+    "en": "This Privacy Policy applies from June 25, 2026.",
+    "ja": "本プライバシーポリシーは、2026年6月25日から適用されます。",
+    "zh": "本隐私政策自2026年6月25日起适用。"
+  }
+]

@@ -1106,7 +1106,7 @@ export default function PlayroomPage({
             {/* 약관 링크 - 항상 표시 */}
             <p className="text-gray-400 pt-3">
               <Link
-                href="https://www.ssobig.com/privacy_policy.html"
+                href={locale === "kr" ? "/privacy_policy.html" : `/legal/${locale}/privacy_policy.html`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
@@ -1115,7 +1115,7 @@ export default function PlayroomPage({
               </Link>
               <span className="mx-2">|</span>
               <Link
-                href="https://www.ssobig.com/terms_of_service.html"
+                href={locale === "kr" ? "/terms_of_service.html" : `/legal/${locale}/terms_of_service.html`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
@@ -1124,7 +1124,7 @@ export default function PlayroomPage({
               </Link>
               <span className="mx-2">|</span>
               <Link
-                href="https://www.ssobig.com/refund_policy.html"
+                href={locale === "kr" ? "/refund_policy.html" : `/legal/${locale}/refund_policy.html`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gray-600 underline"
