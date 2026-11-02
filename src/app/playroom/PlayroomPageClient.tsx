@@ -34,6 +34,8 @@ const PLAYROOM_UI_COPY: Record<
     privacyPolicy: string;
     termsOfService: string;
     refundPolicy: string;
+    previousBanner: string;
+    nextBanner: string;
     bannerIndicator: (n: number) => string;
     instagram: string;
     youtube: string;
@@ -60,6 +62,8 @@ const PLAYROOM_UI_COPY: Record<
     privacyPolicy: "개인정보 처리방침",
     termsOfService: "이용약관",
     refundPolicy: "환불 정책",
+    previousBanner: "이전 캠페인",
+    nextBanner: "다음 캠페인",
     bannerIndicator: (n) => `${n}번 배너로 이동`,
     instagram: "인스타그램",
     youtube: "유튜브",
@@ -85,6 +89,8 @@ const PLAYROOM_UI_COPY: Record<
     privacyPolicy: "Privacy Policy",
     termsOfService: "Terms of Service",
     refundPolicy: "Refund Policy",
+    previousBanner: "Previous campaign",
+    nextBanner: "Next campaign",
     bannerIndicator: (n) => `Go to banner ${n}`,
     instagram: "Instagram",
     youtube: "YouTube",
@@ -110,6 +116,8 @@ const PLAYROOM_UI_COPY: Record<
     privacyPolicy: "プライバシーポリシー",
     termsOfService: "利用規約",
     refundPolicy: "返金ポリシー",
+    previousBanner: "前のキャンペーン",
+    nextBanner: "次のキャンペーン",
     bannerIndicator: (n) => `バナー${n}へ移動`,
     instagram: "Instagram",
     youtube: "YouTube",
@@ -134,6 +142,8 @@ const PLAYROOM_UI_COPY: Record<
     privacyPolicy: "隐私政策",
     termsOfService: "使用条款",
     refundPolicy: "退款政策",
+    previousBanner: "上一个活动",
+    nextBanner: "下一个活动",
     bannerIndicator: (n) => `前往第${n}个横幅`,
     instagram: "Instagram",
     youtube: "YouTube",
@@ -966,6 +976,20 @@ export default function PlayroomPage({
                   </div>
                 </div>
               </TrackedLink>
+            ))}
+
+            {banners.length > 1 && [-1, 1].map((step) => (
+              <button
+                key={step}
+                type="button"
+                aria-label={step < 0 ? t.previousBanner : t.nextBanner}
+                onClick={() => setCurrentBannerIndex((index) => (index + step + banners.length) % banners.length)}
+                className={`absolute top-1/2 z-20 hidden size-12 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:pointer-fine:flex ${step < 0 ? "left-4" : "right-4"}`}
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="size-6">
+                  <path d={step < 0 ? "m15 5-7 7 7 7" : "m9 5 7 7-7 7"} />
+                </svg>
+              </button>
             ))}
 
             {/* 인디케이터 */}
