@@ -1,5 +1,7 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
+import { normalizePlayroomSiteLocale } from "@/app/playroom/playroomSiteLocale";
 import { useCallback, useEffect, useState } from "react";
 
 // 사이트 언어 선택 (GNB·푸터 언어 메뉴, 약관 링크)
@@ -41,11 +43,15 @@ const storeLocale = (locale: SiteLocale) => {
   } catch {
     // 저장이 막힌 브라우저에서는 이번 페이지에서만 적용
   }
+  document.cookie = `${STORAGE_KEY}=${locale}; Path=/; Max-Age=31536000; SameSite=Lax`;
   window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: locale }));
 };
 
-// 서버 렌더와 첫 클라이언트 렌더는 항상 "ko"로 맞추고, 마운트 후 저장값을 반영한다
 export const useSiteLocale = (): [SiteLocale, (locale: SiteLocale) => void] => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const playroomPath = pathname?.match(/^\/playroom\/([^/]+)\/?$/);
+  const routeLocale = normalizePlayroomSiteLocale(playroomPath?.[1]);
   const [locale, setLocaleState] = useState<SiteLocale>("ko");
 
   useEffect(() => {
@@ -73,9 +79,13 @@ export const useSiteLocale = (): [SiteLocale, (locale: SiteLocale) => void] => {
   const setLocale = useCallback((next: SiteLocale) => {
     setLocaleState(next);
     storeLocale(next);
-  }, []);
+    const target = next === "ko" ? "kr" : next;
+    if (routeLocale && routeLocale !== target) {
+      router.push(`/playroom/${target}${window.location.search}${window.location.hash}`);
+    }
+  }, [routeLocale, router]);
 
-  return [locale, setLocale];
+  return [routeLocale === "kr" ? "ko" : routeLocale ?? locale, setLocale];
 };
 
 export type LegalDoc = "privacy_policy" | "terms_of_service" | "refund_policy";

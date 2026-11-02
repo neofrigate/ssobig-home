@@ -98,5 +98,5 @@ export default async function PlayroomLocalePage({ params }: PageProps) {
     redirect(localeToCanonicalPath(normalizedLocale));
   }
 
-  return <PlayroomPageClient locale={normalizedLocale} />;
+  return <PlayroomPageClient key={normalizedLocale} locale={normalizedLocale} />;
 }

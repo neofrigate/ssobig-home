@@ -8,6 +8,7 @@ import { safeFbq } from "../../utils/metaPixel";
 import type { PlayroomTemplateApiItem } from "./playroomApi";
 import {
   buildPlayroomDetailPath,
+  localeToTemplateLocale,
   type PlayroomSiteLocale,
 } from "./playroomSiteLocale";
 
@@ -615,6 +616,7 @@ interface BannerData {
 }
 
 interface PlayroomCampaignBannerApiItem {
+  locale: string;
   title_line_1: string;
   title_line_2: string;
   subtitle: string;
@@ -698,7 +700,8 @@ function pickTemplateNumber(
   return 0;
 }
 
-function formatCardPlayers(item: PlayroomTemplateApiItem) {
+function formatCardPlayers(item: PlayroomTemplateApiItem, locale: PlayroomSiteLocale) {
+  const unit = { kr: "인", ja: "人", en: " players", zh: "人" }[locale];
   const minPlayers = pickTemplateNumber(
     item.minPlayerCount,
     item.minPlayers,
@@ -710,30 +713,31 @@ function formatCardPlayers(item: PlayroomTemplateApiItem) {
 
   if (minPlayers && maxPlayers) {
     return minPlayers === maxPlayers
-      ? `${minPlayers}인`
-      : `${minPlayers}~${maxPlayers}인`;
+      ? `${minPlayers}${unit}`
+      : `${minPlayers}~${maxPlayers}${unit}`;
   }
 
   const playerCount = minPlayers || maxPlayers;
-  if (playerCount) return `${playerCount}인`;
+  if (playerCount) return `${playerCount}${unit}`;
 
   const rangeMatch = item.players_label.match(/(\d+)\s*[~\-]\s*(\d+)\s*인/);
-  if (rangeMatch) return `${rangeMatch[1]}~${rangeMatch[2]}인`;
+  if (rangeMatch) return `${rangeMatch[1]}~${rangeMatch[2]}${unit}`;
   const singleMatch = item.players_label.match(/(\d+)\s*인/);
-  return singleMatch ? `${singleMatch[1]}인` : "";
+  return singleMatch ? `${singleMatch[1]}${unit}` : "";
 }
 
-function formatCardDuration(item: PlayroomTemplateApiItem) {
+function formatCardDuration(item: PlayroomTemplateApiItem, locale: PlayroomSiteLocale) {
+  const unit = { kr: "분", ja: "分", en: " min", zh: "分钟" }[locale];
   const minutes = pickTemplateNumber(
     item.maxTimeMinutes,
     item.minTimeMinutes,
   );
-  if (minutes) return `${minutes}분`;
+  if (minutes) return `${minutes}${unit}`;
 
   const rangeMatch = item.players_label.match(/(\d+)\s*[~\-]\s*(\d+)\s*분/);
-  if (rangeMatch) return `${rangeMatch[2]}분`;
+  if (rangeMatch) return `${rangeMatch[2]}${unit}`;
   const singleMatch = item.players_label.match(/(\d+)\s*분/);
-  return singleMatch ? `${singleMatch[1]}분` : "";
+  return singleMatch ? `${singleMatch[1]}${unit}` : "";
 }
 
 function mapPlayroomTemplate(
@@ -748,8 +752,8 @@ function mapPlayroomTemplate(
     title: item.title,
     description: item.description,
     rating: pickTemplateNumber(item.rating_average) || undefined,
-    players: formatCardPlayers(item),
-    duration: formatCardDuration(item),
+    players: formatCardPlayers(item, locale),
+    duration: formatCardDuration(item, locale),
     price: item.price_label,
     link: internalDetailPath,
     templateId: item.ssobig_tool_template_id,
@@ -781,7 +785,8 @@ export default function PlayroomPage({
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [isFooterOpen, setIsFooterOpen] = useState(false);
-  const [banners, setBanners] = useState<BannerData[]>(FALLBACK_BANNERS);
+  const [campaigns, setCampaigns] = useState<{ locale: PlayroomSiteLocale; banners: BannerData[] }>();
+  const banners = campaigns?.locale === locale ? campaigns.banners : locale === "kr" ? FALLBACK_BANNERS : [];
   const [templateGroups, setTemplateGroups] =
     useState<PlayroomTemplateGroups>(emptyTemplateGroups);
   const [isTemplateLoading, setIsTemplateLoading] = useState(true);
@@ -801,9 +806,11 @@ export default function PlayroomPage({
         const data = (await response.json()) as {
           items?: PlayroomCampaignBannerApiItem[];
         };
-        const nextBanners = (data.items || []).map(mapCampaignBanner);
-        if (isMounted && nextBanners.length > 0) {
-          setBanners(nextBanners);
+        const nextBanners = (data.items || [])
+          .filter((item) => item.locale === localeToTemplateLocale(locale))
+          .map(mapCampaignBanner);
+        if (isMounted) {
+          setCampaigns({ locale, banners: nextBanners });
           setCurrentBannerIndex(0);
         }
       } catch (error) {
@@ -877,6 +884,7 @@ export default function PlayroomPage({
 
   // 자동 슬라이드
   useEffect(() => {
+    if (banners.length < 2) return;
     const interval = setInterval(() => {
       setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
     }, 7000);
@@ -886,7 +894,7 @@ export default function PlayroomPage({
   return (
     <div className="min-h-screen bg-white">
       {/* 배너 섹션 - 슬라이드 */}
-      <section className="pt-4 md:pt-6 pb-8 md:pb-12">
+      {banners.length > 0 && <section className="pt-4 md:pt-6 pb-8 md:pb-12">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8">
           <div
             className="relative h-[350px] sm:h-[375px] md:h-[400px] lg:h-[450px] rounded-2xl md:rounded-3xl overflow-hidden"
@@ -980,7 +988,7 @@ export default function PlayroomPage({
             </div>
           </div>
         </div>
-      </section>
+      </section>}
 
       {isTemplateLoading && <TemplateRowLoading locale={locale} />}
 

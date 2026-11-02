@@ -138,13 +138,13 @@ const LanguageSwitcher = ({ variant, isLight }: LanguageSwitcherProps) => {
 
   const handleSelect = (next: SiteLocale) => {
     setIsOpen(false);
+    setLocale(next);
     if (next === locale) return;
     trackGAEvent("language_change", {
       from_locale: locale,
       to_locale: next,
       switcher_location: variant,
     });
-    setLocale(next);
   };
 
   const navToneClass = isLight
