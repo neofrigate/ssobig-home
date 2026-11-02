@@ -20,12 +20,14 @@ export type PlayroomReviewListItem = {
 type PlayroomReviewListProps = {
   reviews: PlayroomReviewListItem[];
   accentColor: string;
+  spoilerLabel: string;
   loadMoreLabel: string;
 };
 
 export default function PlayroomReviewList({
   reviews,
   accentColor,
+  spoilerLabel,
   loadMoreLabel,
 }: PlayroomReviewListProps) {
   const [visibleCount, setVisibleCount] = useState(REVIEW_BATCH_SIZE);
@@ -76,6 +78,7 @@ export default function PlayroomReviewList({
           comment={review.comment}
           spoilerHidden={review.spoilerHidden}
           accentColor={accentColor}
+          spoilerLabel={spoilerLabel}
         />
       ))}
 

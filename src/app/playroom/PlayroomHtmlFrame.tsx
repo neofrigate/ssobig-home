@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 
 type PlayroomHtmlFrameProps = {
   html: string;
+  lang: string;
   messageKey: string;
   title: string;
 };
 
-function buildSrcDoc(html: string, messageKey: string) {
+function buildSrcDoc(html: string, messageKey: string, lang: string) {
   return `<!DOCTYPE html>
-<html lang="ko">
+<html lang="${lang}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -78,6 +79,7 @@ function buildSrcDoc(html: string, messageKey: string) {
 export default function PlayroomHtmlFrame({
   html,
   messageKey,
+  lang,
   title,
 }: PlayroomHtmlFrameProps) {
   const [height, setHeight] = useState(640);
@@ -103,7 +105,7 @@ export default function PlayroomHtmlFrame({
     return () => window.removeEventListener("message", handleMessage);
   }, [messageKey]);
 
-  const srcDoc = useMemo(() => buildSrcDoc(html, messageKey), [html, messageKey]);
+  const srcDoc = useMemo(() => buildSrcDoc(html, messageKey, lang), [html, messageKey, lang]);
 
   return (
     <iframe

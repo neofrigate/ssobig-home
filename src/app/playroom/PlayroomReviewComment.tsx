@@ -11,6 +11,7 @@ type PlayroomReviewCommentProps = {
   comment: string;
   spoilerHidden: boolean;
   accentColor: string;
+  spoilerLabel: string;
 };
 
 export default function PlayroomReviewComment({
@@ -22,6 +23,7 @@ export default function PlayroomReviewComment({
   comment,
   spoilerHidden,
   accentColor,
+  spoilerLabel,
 }: PlayroomReviewCommentProps) {
   const [isRevealed, setIsRevealed] = useState(false);
   const shouldBlur = spoilerHidden && !isRevealed;
@@ -80,7 +82,7 @@ export default function PlayroomReviewComment({
             setIsRevealed((current) => !current);
           }}
         >
-          스포일러 보기
+          {spoilerLabel}
         </button>
       ) : null}
     </article>

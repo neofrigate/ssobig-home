@@ -50,7 +50,7 @@ const storeLocale = (locale: SiteLocale) => {
 export const useSiteLocale = (): [SiteLocale, (locale: SiteLocale) => void] => {
   const router = useRouter();
   const pathname = usePathname();
-  const playroomPath = pathname?.match(/^\/playroom\/([^/]+)\/?$/);
+  const playroomPath = pathname?.match(/^\/playroom\/([^/]+)(?:\/(?!review(?:\/|$))[^/]+)?\/?$/);
   const routeLocale = normalizePlayroomSiteLocale(playroomPath?.[1]);
   const [locale, setLocaleState] = useState<SiteLocale>("ko");
 
@@ -146,3 +146,11 @@ export const FOOTER_COPY: Record<
     businessInfoToggle: "显示企业信息",
   },
 };
+
+
+export const NAV_COPY = {
+  ko: { open: "메뉴 열기", close: "메뉴 닫기", tool: "쏘빅툴 바로가기", android: "Google Play에서 다운로드", ios: "App Store에서 다운로드" },
+  ja: { open: "メニューを開く", close: "メニューを閉じる", tool: "ssobig toolを開く", android: "Google Playでダウンロード", ios: "App Storeでダウンロード" },
+  en: { open: "Open menu", close: "Close menu", tool: "Open ssobig tool", android: "Get it on Google Play", ios: "Download on the App Store" },
+  zh: { open: "打开菜单", close: "关闭菜单", tool: "打开 ssobig tool", android: "在 Google Play 下载", ios: "在 App Store 下载" },
+} satisfies Record<SiteLocale, Record<string, string>>;

@@ -3,10 +3,13 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import LinkWithUtm from "./LinkWithUtm";
+import { FOOTER_COPY, NAV_COPY, useSiteLocale } from "@/utils/siteLocale";
 import GlobalNav from "./GlobalNav";
 import { usePathname } from "next/navigation";
 
 const Sidebar: React.FC = () => {
+  const [locale] = useSiteLocale();
+  const copy = NAV_COPY[locale];
   const [isOpen, setIsOpen] = useState(false);
   const [platform, setPlatform] = useState<"ios" | "android" | "other">("other");
   const pathname = usePathname() ?? "/";
@@ -69,7 +72,7 @@ const Sidebar: React.FC = () => {
               >
                 <Image
                   src="/ssobig_assets/Logo/logo=ssobig, color=white.png"
-                  alt="쏘빅"
+                  alt="ssobig"
                   width={176}
                   height={65}
                   priority
@@ -79,7 +82,7 @@ const Sidebar: React.FC = () => {
               </LinkWithUtm>
             </div>
             <button
-              aria-label="메뉴 닫기"
+              aria-label={copy.close}
               className="p-2 text-white"
               onClick={toggleSidebar}
             >
@@ -201,7 +204,7 @@ const Sidebar: React.FC = () => {
               className="flex items-center justify-center gap-2 h-[48px] w-full rounded-lg bg-white text-black font-bold text-base hover:bg-gray-200 transition-colors"
               onClick={toggleSidebar}
             >
-              쏘빅툴 바로가기
+              {copy.tool}
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
               </svg>
@@ -222,7 +225,7 @@ const Sidebar: React.FC = () => {
                   <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                 </svg>
               )}
-              {platform === "android" ? "Google Play에서 다운로드" : platform === "ios" ? "App Store에서 다운로드" : "앱 다운로드"}
+              {platform === "other" ? FOOTER_COPY[locale].appDownload : copy[platform]}
             </button>
           </div>
         </div>

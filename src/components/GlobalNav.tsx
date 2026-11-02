@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { useSiteLocale } from "../utils/siteLocale";
+import { NAV_COPY, useSiteLocale } from "../utils/siteLocale";
 
 // 햄버거 아이콘 컴포넌트 (모바일용)
 const HamburgerIcon = ({ isWhiteBg }: { isWhiteBg: boolean }) => (
@@ -367,7 +367,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             {/* 흰색 로고 */}
             <Image
               src="/ssobig_assets/Logo/logo=ssobig, color=white.png"
-              alt="쏘빅"
+              alt="ssobig"
               width={176}
               height={65}
               className="transition-opacity duration-700"
@@ -382,7 +382,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
             {/* 검은색 로고 */}
             <Image
               src="/ssobig_assets/Logo/logo=ssobig, color=black.png"
-              alt="쏘빅"
+              alt="ssobig"
               width={176}
               height={65}
               className="absolute top-0 left-0 transition-opacity duration-700"
@@ -401,7 +401,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
               <LanguageSwitcher variant="mobile" isLight={useBlackText} />
             )}
             <button
-              aria-label="메뉴 열기"
+              aria-label={NAV_COPY[siteLocale].open}
               className="p-2"
               onClick={toggleSidebar}
             >
@@ -536,7 +536,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
                 ? "/ssobig_assets/Logo/logo=ssobig, color=black.png"
                 : "/ssobig_assets/Logo/logo=ssobig, color=white.png"
             }
-            alt="쏘빅"
+            alt="ssobig"
             width={176}
             height={65}
             unoptimized

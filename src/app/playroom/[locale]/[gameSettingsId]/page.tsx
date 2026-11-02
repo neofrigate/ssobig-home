@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -31,6 +32,13 @@ const DETAIL_UI_COPY: Record<
   {
     backToList: string;
     playNow: string;
+    players: (count: string) => string;
+    minutes: (count: string) => string;
+    noRecommendation: string;
+    showSpoiler: string;
+    anonymous: string;
+    free: string;
+    tokens: (count: string) => string;
     detailSuffix: string;
     satisfactionTitle: string;
     reviewTitle: string;
@@ -45,7 +53,14 @@ const DETAIL_UI_COPY: Record<
 > = {
   kr: {
     backToList: "목록으로 돌아가기",
-    playNow: "플레이하러 가기",
+    playNow: "바로 게임하러 가기",
+    players: (count) => `${count}인`,
+    minutes: (count) => `${count}분`,
+    noRecommendation: "추천 대상 데이터가 아직 부족해요.",
+    showSpoiler: "스포일러 보기",
+    anonymous: "익명",
+    free: "무료",
+    tokens: (count) => `${count}토큰`,
     detailSuffix: "상세 설명",
     satisfactionTitle: "만족도",
     reviewTitle: "후기",
@@ -60,6 +75,13 @@ const DETAIL_UI_COPY: Record<
   en: {
     backToList: "Back to List",
     playNow: "Play Now",
+    players: (count) => `${count} ${count === "1" ? "player" : "players"}`,
+    minutes: (count) => `${count} min`,
+    noRecommendation: "Not enough data for a recommendation yet.",
+    showSpoiler: "Show spoiler",
+    anonymous: "Anonymous",
+    free: "Free",
+    tokens: (count) => `${count} ${count === "1" ? "token" : "tokens"}`,
     detailSuffix: "Details",
     satisfactionTitle: "Satisfaction",
     reviewTitle: "Reviews",
@@ -74,6 +96,13 @@ const DETAIL_UI_COPY: Record<
   ja: {
     backToList: "一覧に戻る",
     playNow: "プレイする",
+    players: (count) => `${count}人`,
+    minutes: (count) => `${count}分`,
+    noRecommendation: "おすすめのプレイヤー層を表示するには、まだ回答が足りません。",
+    showSpoiler: "ネタバレを見る",
+    anonymous: "匿名",
+    free: "無料",
+    tokens: (count) => `${count}トークン`,
     detailSuffix: "詳細説明",
     satisfactionTitle: "満足度",
     reviewTitle: "レビュー",
@@ -88,6 +117,13 @@ const DETAIL_UI_COPY: Record<
   zh: {
     backToList: "返回列表",
     playNow: "开始游戏",
+    players: (count) => `${count}人`,
+    minutes: (count) => `${count}分钟`,
+    noRecommendation: "推荐数据暂时不足。",
+    showSpoiler: "查看剧透",
+    anonymous: "匿名",
+    free: "免费",
+    tokens: (count) => `${count}代币`,
     detailSuffix: "详细说明",
     satisfactionTitle: "满意度",
     reviewTitle: "评价",
@@ -365,12 +401,12 @@ function extractPlayerCountFromLabel(label: string | null | undefined) {
 
   const rangeMatch = text.match(/(\d+)\s*[~\-]\s*(\d+)\s*인/);
   if (rangeMatch) {
-    return `${rangeMatch[1]}~${rangeMatch[2]}인`;
+    return `${rangeMatch[1]}~${rangeMatch[2]}`;
   }
 
   const singleMatch = text.match(/(\d+)\s*인/);
   if (singleMatch) {
-    return `${singleMatch[1]}인`;
+    return `${singleMatch[1]}`;
   }
 
   return "";
@@ -382,12 +418,12 @@ function extractMinutesFromLabel(label: string | null | undefined) {
 
   const rangeMatch = text.match(/(\d+)\s*[~\-]\s*(\d+)\s*분/);
   if (rangeMatch) {
-    return `${rangeMatch[2]}분`;
+    return `${rangeMatch[2]}`;
   }
 
   const singleMatch = text.match(/(\d+)\s*분/);
   if (singleMatch) {
-    return `${singleMatch[1]}분`;
+    return `${singleMatch[1]}`;
   }
 
   return "";
@@ -412,13 +448,13 @@ function formatPlayroomPlayerRange(
 
   if (minPlayerCount && maxPlayerCount) {
     return minPlayerCount === maxPlayerCount
-      ? `${minPlayerCount}인`
-      : `${minPlayerCount}~${maxPlayerCount}인`;
+      ? `${minPlayerCount}`
+      : `${minPlayerCount}~${maxPlayerCount}`;
   }
 
   const playerCount = minPlayerCount || maxPlayerCount;
   if (playerCount) {
-    return `${playerCount}인`;
+    return `${playerCount}`;
   }
 
   return (
@@ -439,7 +475,7 @@ function formatPlayroomTime(detailItem: PlayroomTemplateApiItem, summaryItem: Pl
   );
   const minutes = maxTimeMinutes || minTimeMinutes;
   if (minutes) {
-    return `${minutes}분`;
+    return `${minutes}`;
   }
 
   return (
@@ -618,7 +654,7 @@ async function fetchPlayroomReviewSummary(
     .filter((record) => !isTemplateReviewPreviewHidden(record))
     .map((record) => ({
       id: String(record.id || `${record.nickname || "익명"}:${record.sent_time || ""}`),
-      nickname: String(record.nickname || "익명").trim() || "익명",
+      nickname: String(record.nickname || "").trim(),
       comment: normalizeComment(record.additional_comment),
       satisfactionLabel: simplifySatisfaction(record.satisfaction),
       sentTime: String(record.sent_time || "").trim(),
@@ -918,16 +954,14 @@ function RecommendationQuadrantChart({
 }: {
   accentColor: string;
   quadrant: PlayroomReviewSummary["quadrant"];
-  locale: string;
+  locale: PlayroomSiteLocale;
 }) {
   const axis = getRecommendationCopy(locale).axis;
   const point = resolveQuadrantPoint(quadrant);
   if (!point) {
     return (
       <div className="flex h-[130px] w-[142px] items-center justify-center text-center text-[12px] leading-[18px] text-[#94a3b8]">
-        추천 대상 데이터가
-        <br />
-        아직 부족해요.
+        {DETAIL_UI_COPY[locale].noRecommendation}
       </div>
     );
   }
@@ -994,7 +1028,7 @@ function RecommendationQuadrantChart({
   );
 }
 
-export default async function PlayroomGameDetailPage({ params }: PageProps) {
+async function loadDetail(params: PageProps["params"]) {
   const { locale, gameSettingsId: routeGameSettingsId } = await params;
   // Route params retain URL encoding, while the API expects the original work ID.
   let gameSettingsId: string;
@@ -1013,6 +1047,23 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  return { item, normalizedLocale, gameSettingsId };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { item, normalizedLocale, gameSettingsId } = await loadDetail(params);
+  const title = item.title;
+  const url = `/playroom/${normalizedLocale}/${encodeURIComponent(gameSettingsId)}`;
+  return {
+    title: { absolute: `${title} | ssobig` },
+    description: item.description,
+    alternates: { canonical: url },
+    openGraph: { title, description: item.description, url },
+  };
+}
+
+export default async function PlayroomGameDetailPage({ params }: PageProps) {
+  const { item, normalizedLocale, gameSettingsId } = await loadDetail(params);
   const summaryItem = await fetchPlayroomTemplateSummary(
     normalizedLocale,
     gameSettingsId,
@@ -1048,14 +1099,17 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
         backgroundImage:
           "linear-gradient(180deg, rgba(201,226,255,0.95), rgba(235,244,255,0.95))",
       };
-  const heroCreditText = pickTemplateString(
+  const credit = pickTemplateString(
     String(item.credit ?? "").trim(),
     String(summaryItem?.credit ?? "").trim(),
     item.price_label,
     summaryItem?.price_label,
   );
-  const heroPlayerText = formatPlayroomPlayerRange(item, summaryItem) || "-";
-  const heroTimeText = formatPlayroomTime(item, summaryItem) || "-";
+  const heroCreditText = credit === "무료" ? dt.free : credit.replace(/^(\d+)\s*토큰$/, (_, count: string) => dt.tokens(count));
+  const players = formatPlayroomPlayerRange(item, summaryItem);
+  const minutes = formatPlayroomTime(item, summaryItem);
+  const heroPlayerText = players ? dt.players(players) : "-";
+  const heroTimeText = minutes ? dt.minutes(minutes) : "-";
   const heroRatingText =
     reviewSummary.rating?.toFixed(1) ||
     (pickTemplateNumber(item.rating_average, summaryItem?.rating_average)
@@ -1075,10 +1129,10 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
     ratedResponseCount,
   );
   const accentTrackColor = hexToRgbaString(heroAccentColor, 0.14);
-  const recommendationCopy = getRecommendationCopy(item.locale || summaryItem?.locale || "ko_KR");
+  const recommendationCopy = getRecommendationCopy(normalizedLocale);
   const recommendationNarrative = buildQuadrantNarrative(
     reviewSummary.quadrant,
-    item.locale || summaryItem?.locale || "ko_KR",
+    normalizedLocale,
   );
   const reviewListItems: PlayroomReviewListItem[] = reviewSummary.reviews.map(
     (review) => {
@@ -1086,7 +1140,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
 
       return {
         id: review.id,
-        nickname: review.nickname,
+        nickname: review.nickname || dt.anonymous,
         localeLabel: dt.localeLabel,
         satisfactionText: meta.text,
         satisfactionEmoji: meta.emoji,
@@ -1103,7 +1157,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
   const ctaTextColor = getContrastingTextColor(heroAccentColor);
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#ffffff_26%,#f8fafc_100%)] pb-[calc(env(safe-area-inset-bottom)+96px)] md:pb-[calc(env(safe-area-inset-bottom)+112px)]">
+    <main lang={normalizedLocale === "kr" ? "ko" : normalizedLocale} className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#ffffff_26%,#f8fafc_100%)] pb-[calc(env(safe-area-inset-bottom)+96px)] md:pb-[calc(env(safe-area-inset-bottom)+112px)]">
       <div className="mx-auto flex w-full max-w-[720px] flex-col gap-6 px-4 py-6 md:px-6 md:py-10">
         <section className="overflow-hidden rounded-[30px] bg-[#f8f8f8] shadow-[0_16px_40px_rgba(15,23,42,0.12)]">
           <div
@@ -1236,7 +1290,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
                       <RecommendationQuadrantChart
                         accentColor={heroAccentColor}
                         quadrant={reviewSummary.quadrant}
-                        locale={item.locale || summaryItem?.locale || "ko_KR"}
+                        locale={normalizedLocale}
                       />
                     </div>
                   </div>
@@ -1246,6 +1300,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
               <div className="bg-white p-5">
                 {shouldRenderHtml ? (
                   <PlayroomHtmlFrame
+                    lang={normalizedLocale === "kr" ? "ko" : normalizedLocale}
                     html={detailHtml}
                     messageKey={`${normalizedLocale}:${gameSettingsId}`}
                     title={`${item.title} ${dt.detailSuffix}`}
@@ -1300,6 +1355,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
                         reviews={reviewListItems}
                         accentColor={heroAccentColor}
                         loadMoreLabel={dt.loadingMoreReviews}
+                        spoilerLabel={dt.showSpoiler}
                       />
                     ) : null}
                   </div>
@@ -1322,7 +1378,7 @@ export default async function PlayroomGameDetailPage({ params }: PageProps) {
               color: ctaTextColor,
             }}
           >
-            바로 게임하러 가기
+            {dt.playNow}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="ml-2 h-5 w-5"
