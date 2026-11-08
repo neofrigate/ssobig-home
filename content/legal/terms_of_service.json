@@ -567,11 +567,11 @@
     "es": "Los períodos de validez, las condiciones de uso y los criterios de reembolso de membresías y tokens se comunican por separado al comprar cada producto."
   },
   {
-    "ko": "충전된 토큰의 이용기간과 환불가능기간은 결제시점으로부터 1년 이내로 제한됩니다.",
-    "en": "The use period and refund eligibility period for purchased tokens are limited to within 1 year of payment.",
-    "ja": "チャージしたトークンの利用期間および返金可能期間は、決済時点から1年以内に限定されます。",
-    "zh": "充值代币的使用期限及可退款期限均限制在付款之时起1年以内。",
-    "es": "El período de uso y el plazo durante el cual puede solicitarse el reembolso de los tokens adquiridos se limitan a 1 año desde el momento del pago."
+    "ko": "충전된 토큰의 이용기간은 결제시점으로부터 1년입니다. 환불은 제15조 및 환불정책에 따르며, 관계 법령에 따른 권리는 제한하지 않습니다.",
+    "en": "Purchased tokens have a validity period of 1 year from payment. Refunds follow Article 15 and the Refund Policy without limiting rights under applicable law.",
+    "ja": "チャージしたトークンの利用期間は決済時点から1年間です。返金は第15条および返金ポリシーに従い、関係法令上の権利を制限しません。",
+    "zh": "充值代币的使用期限为付款之时起1年。退款按第15条及退款政策处理，不限制适用法律规定的权利。",
+    "es": "Los tokens adquiridos tienen una validez de 1 año desde el pago. Los reembolsos se rigen por el artículo 15 y la política de reembolsos, sin limitar los derechos previstos en la legislación aplicable."
   },
   {
     "ko": "미성년자가 멤버십이나 토큰을 구매하는 경우, 법정대리인의 동의를 얻어야 하며, 동의 없이 구매한 경우 미성년자 본인 또는 법정대리인은 구매를 취소할 수 있습니다.",

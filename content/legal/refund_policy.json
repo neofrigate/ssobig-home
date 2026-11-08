@@ -14,18 +14,18 @@
     "es": "1. Plazo para solicitar un reembolso"
   },
   {
-    "ko": "모든 결제에 대해 결제일로부터 7일 이내에 환불을 요청할 수 있습니다.",
-    "en": "For all payments, you may request a refund within 7 days of the payment date.",
-    "ja": "すべてのお支払いについて、決済日から7日以内に返金を申請できます。",
-    "zh": "所有付款均可在付款之日起7日内申请退款。",
-    "es": "Puede solicitar el reembolso de cualquier pago dentro de los 7 días siguientes a la fecha de pago."
+    "ko": "토큰 및 Pro 이용권은 결제일부터 7일 이내에 해당 구매 상품을 사용하지 않은 경우 실제 결제금액 전액을 환불합니다.",
+    "en": "Tokens and Pro passes are eligible for a full refund of the amount actually paid within 7 days of payment if the purchased product has not been used.",
+    "ja": "トークンおよびPro利用券は、決済日から7日以内で、購入した商品が未使用の場合、実際のお支払額を全額返金します。",
+    "zh": "代币和Pro使用券在付款之日起7日内，如所购商品尚未使用，可退还实际支付的全部金额。",
+    "es": "Los tokens y los pases Pro pueden reembolsarse por el importe íntegro pagado dentro de los 7 días siguientes al pago si el producto adquirido no se ha utilizado."
   },
   {
-    "ko": "단, 해당 기간 내에 일부라도 토큰을 사용했거나 프로 멤버십 혜택을 이용한 경우에는 환불되지 않습니다.",
-    "en": "However, no refund is available if you have used any tokens or Pro membership benefits during that period.",
-    "ja": "ただし、その期間内にトークンを一部でも使用した場合、またはProメンバーシップの特典を利用した場合は返金されません。",
-    "zh": "但在该期间内，只要使用过任何代币或Pro会员权益，即不予退款。",
-    "es": "Sin embargo, no se realizará ningún reembolso si ha utilizado algún token o beneficio de la membresía Pro durante ese período."
+    "ko": "일반적인 중도해지에 따른 일할 계산 환불은 제공하지 않습니다. 다만 회사의 귀책사유 또는 관계 법령에 따라 환불이 필요한 경우에는 본 정책의 기간, 사용 여부 및 일할 환불 제한과 관계없이 해당 기준에 따라 환불합니다.",
+    "en": "We do not offer prorated refunds for ordinary early termination. However, refunds required due to the Company’s fault or applicable law will be provided under the applicable rules, regardless of this policy’s time limits, usage conditions or restrictions on prorated refunds.",
+    "ja": "通常の途中解約による日割り返金は行いません。ただし、会社の責めに帰すべき事由または関係法令により返金が必要な場合は、本ポリシーの期間、利用状況、日割り返金の制限にかかわらず、該当する基準に従って返金します。",
+    "zh": "一般中途终止不提供按日折算退款。但因公司责任或适用法律需要退款时，不受本政策的期限、使用情况及按日折算退款限制，按相应标准退款。",
+    "es": "No ofrecemos reembolsos prorrateados por una terminación anticipada ordinaria. No obstante, los reembolsos exigidos por causas imputables a la Empresa o por la legislación aplicable se realizarán conforme a las normas correspondientes, sin las limitaciones de plazo, uso o prorrateo de esta política."
   },
   {
     "ko": "2. 디지털 상품 특성",
@@ -35,18 +35,18 @@
     "es": "2. Naturaleza de los productos digitales"
   },
   {
-    "ko": "본 서비스의 토큰 및 멤버십은 무형의 디지털 상품으로, 결제 후 즉시 사용 가능한 특성을 지니고 있습니다.",
-    "en": "The tokens and memberships offered by this service are intangible digital products available for use immediately after payment.",
-    "ja": "本サービスのトークンおよびメンバーシップは、決済後すぐに利用できる無形のデジタル商品です。",
-    "zh": "本服务的代币和会员资格属于无形数字商品，付款后即可立即使用。",
-    "es": "Los tokens y las membresías de este servicio son productos digitales intangibles que pueden utilizarse inmediatamente después del pago."
+    "ko": "토큰 및 Pro 이용권은 결제 완료 후 즉시 이용할 수 있는 디지털 상품입니다. Pro는 결제일부터 1개월간 이용하는 단건 이용권으로, 자동갱신이나 정기결제가 없습니다.",
+    "en": "Tokens and Pro passes are digital products available immediately after payment. Pro is a one-time pass valid for 1 month from payment, with no automatic renewal or recurring charges.",
+    "ja": "トークンおよびPro利用券は、決済完了後すぐに利用できるデジタル商品です。Proは決済日から1か月間利用できる都度購入型の利用券で、自動更新や定期決済はありません。",
+    "zh": "代币和Pro使用券是付款完成后即可使用的数字商品。Pro为自付款日起可使用1个月的单次购买使用券，无自动续期或定期扣款。",
+    "es": "Los tokens y los pases Pro son productos digitales disponibles inmediatamente después del pago. Pro es un pase de compra única válido durante 1 mes desde el pago, sin renovación automática ni cobros recurrentes."
   },
   {
-    "ko": "결제 후 사용이 개시된 경우에는 전액 환불이 어려울 수 있으므로, 구매 전에 신중히 결정하시기 바랍니다.",
-    "en": "Once use has begun after payment, a full refund may be difficult. Please consider your purchase carefully.",
-    "ja": "決済後に利用を開始した場合、全額返金が難しくなることがありますので、購入前に慎重にご判断ください。",
-    "zh": "付款后如已开始使用，可能难以获得全额退款，请在购买前慎重决定。",
-    "es": "Si comienza a utilizarlos después del pago, puede resultar difícil obtener un reembolso íntegro. Considere cuidadosamente su compra."
+    "ko": "Pro 이용기간이 종료된 후 계속 이용하려면 별도로 구매해야 합니다. 구매 전에 상품 내용, 이용기간 및 환불 기준을 확인해 주세요.",
+    "en": "To continue using Pro after the pass expires, a separate purchase is required. Please review the product, validity period and refund terms before purchasing.",
+    "ja": "Proの利用期間終了後も利用する場合は、別途購入が必要です。購入前に商品内容、利用期間、返金基準をご確認ください。",
+    "zh": "Pro使用期限结束后如需继续使用，须另行购买。购买前请确认商品内容、使用期限及退款标准。",
+    "es": "Para seguir usando Pro una vez vencido el pase, debe realizar otra compra. Revise el producto, el período de validez y las condiciones de reembolso antes de comprar."
   },
   {
     "ko": "3. 토큰 환불 규정",
@@ -56,46 +56,46 @@
     "es": "3. Reembolsos de tokens"
   },
   {
-    "ko": "미사용 토큰 전액 환불: 결제일로부터 7일 이내에 토큰 사용 기록이 전혀 없을 경우 전액 환불 가능합니다.",
-    "en": "Full refund for unused tokens: A full refund is available within 7 days of payment if there is no record of any token use.",
-    "ja": "未使用トークンの全額返金：決済日から7日以内で、トークンの使用履歴が一切ない場合は全額返金が可能です。",
-    "zh": "未使用代币全额退款：付款之日起7日内，如完全没有代币使用记录，可获得全额退款。",
-    "es": "Reembolso íntegro de tokens no utilizados: se permite el reembolso íntegro dentro de los 7 días siguientes al pago si no existe ningún registro de uso de tokens."
+    "ko": "미사용 토큰 전액 환불: 결제일부터 7일 이내에 해당 구매 건의 토큰을 사용하지 않은 경우 실제 결제금액 전액을 환불합니다.",
+    "en": "Unused tokens: Within 7 days of payment, the amount actually paid is fully refundable if none of the tokens from that purchase have been used.",
+    "ja": "未使用トークンの全額返金：決済日から7日以内で、該当する購入分のトークンを使用していない場合、実際のお支払額を全額返金します。",
+    "zh": "未使用代币全额退款：付款之日起7日内，如该笔购买的代币尚未使用，可退还实际支付的全部金额。",
+    "es": "Tokens no utilizados: dentro de los 7 días siguientes al pago, se reembolsa íntegramente el importe pagado si no se ha utilizado ningún token de esa compra."
   },
   {
-    "ko": "부분 사용 후 환불: 부분 사용후에는 환불되지 않습니다.",
-    "en": "Refund after partial use: No refund is available after partial use.",
-    "ja": "一部使用後の返金：一部でも使用した後は返金されません。",
-    "zh": "部分使用后退款：部分使用后不予退款。",
-    "es": "Reembolso tras un uso parcial: no se realizan reembolsos después de un uso parcial."
+    "ko": "일부 사용한 토큰의 일반적인 중도 환불은 제공하지 않습니다. 회사 귀책 또는 법령상 환불 사유에는 제1항의 예외가 적용됩니다.",
+    "en": "Ordinary refunds after partial token use are not offered. The exceptions in section 1 apply to refunds due to the Company’s fault or required by law.",
+    "ja": "トークンを一部使用した後の通常の途中返金は行いません。会社の責めに帰すべき事由または法令上の返金事由には、第1項の例外が適用されます。",
+    "zh": "代币部分使用后不提供一般中途退款。因公司责任或法律规定需退款的，适用第1项的例外。",
+    "es": "No se ofrecen reembolsos ordinarios tras el uso parcial de los tokens. Se aplican las excepciones del apartado 1 por causas imputables a la Empresa o exigidas por ley."
   },
   {
-    "ko": "4. 프로 멤버십 환불 규정",
-    "en": "4. Pro membership refunds",
-    "ja": "4. Proメンバーシップの返金規定",
-    "zh": "4. Pro会员退款规则",
-    "es": "4. Reembolsos de la membresía Pro"
+    "ko": "4. Pro 단건 이용권 환불 규정",
+    "en": "4. Pro one-time pass refunds",
+    "ja": "4. Pro都度購入型利用券の返金規定",
+    "zh": "4. Pro单次购买使用券退款规则",
+    "es": "4. Reembolsos de pases Pro de compra única"
   },
   {
-    "ko": "7일 이내 전혀 사용 기록 없음: 멤버십 결제일로부터 7일 이내에 어떠한 혜택도 사용하지 않았다면 전액 환불 가능합니다.",
-    "en": "No use within 7 days: A full refund is available if no benefits have been used within 7 days of the membership payment date.",
-    "ja": "7日以内で利用履歴が一切ない場合：メンバーシップの決済日から7日以内で、いかなる特典も利用していない場合は全額返金が可能です。",
-    "zh": "7日内完全没有使用记录：会员付款之日起7日内，如未使用任何权益，可获得全额退款。",
-    "es": "Sin ningún uso dentro de los 7 días: si no ha utilizado ningún beneficio dentro de los 7 días siguientes al pago de la membresía, puede obtener un reembolso íntegro."
+    "ko": "Pro 이용권은 결제일부터 7일 이내에 해당 이용권의 혜택을 사용하지 않은 경우 실제 결제금액 전액을 환불합니다.",
+    "en": "A Pro pass is eligible for a full refund of the amount actually paid within 7 days of payment if none of that pass’s benefits have been used.",
+    "ja": "Pro利用券は、決済日から7日以内で、該当する利用券の特典を使用していない場合、実際のお支払額を全額返金します。",
+    "zh": "Pro使用券在付款之日起7日内，如尚未使用该使用券的权益，可退还实际支付的全部金额。",
+    "es": "Un pase Pro puede reembolsarse por el importe íntegro pagado dentro de los 7 días siguientes al pago si no se ha utilizado ninguno de sus beneficios."
   },
   {
-    "ko": "부분 사용 후 환불: 멤버십 시작 날짜로부터 1일이 지났거나, 멤버십 구매후, 멤버십 혜택을 이용한 경우에는 환불되지 않습니다.",
-    "en": "Refund after partial use: No refund is available if 1 day has passed since the membership start date or if any membership benefits have been used after purchase.",
-    "ja": "一部利用後の返金：メンバーシップの開始日から1日が経過した場合、または購入後にメンバーシップの特典を利用した場合は返金されません。",
-    "zh": "部分使用后退款：自会员开始日期起已过1日，或购买后使用过会员权益的，不予退款。",
-    "es": "Reembolso tras un uso parcial: no se realizan reembolsos si ha transcurrido 1 día desde la fecha de inicio de la membresía o si se ha utilizado algún beneficio después de la compra."
+    "ko": "이용 시작 후 1일이 경과했다는 이유만으로 미사용 환불을 제한하지 않습니다. 일반적인 중도해지에 따른 일할 계산 환불은 제공하지 않으며, 회사 귀책 또는 법령상 환불 사유에는 제1항의 예외가 적용됩니다.",
+    "en": "An unused-pass refund is not restricted merely because 1 day has passed since the start date. Ordinary early termination does not qualify for a prorated refund; the exceptions in section 1 apply to Company fault and statutory refunds.",
+    "ja": "利用開始から1日が経過したことだけを理由に、未使用の返金を制限しません。通常の途中解約による日割り返金は行いませんが、会社の責めに帰すべき事由または法令上の返金事由には、第1項の例外が適用されます。",
+    "zh": "不会仅因使用开始后已过1天而限制未使用退款。一般中途终止不提供按日折算退款；公司责任或法律规定的退款适用第1项例外。",
+    "es": "El mero transcurso de 1 día desde el inicio no impide el reembolso de un pase no utilizado. No hay reembolsos prorrateados por terminación anticipada ordinaria; se aplican las excepciones del apartado 1 por responsabilidad de la Empresa o exigencia legal."
   },
   {
-    "ko": "프로모션/할인 적용 결제: 환불 시에는 정상가 기준으로 환불액을 재산정할 수 있습니다.",
-    "en": "Promotional or discounted payments: The refund amount may be recalculated using the regular price.",
-    "ja": "プロモーション・割引が適用された決済：返金額は通常価格を基準に再計算されることがあります。",
-    "zh": "促销或折扣付款：退款时可能按原价重新计算退款金额。",
-    "es": "Pagos con promociones o descuentos: el importe del reembolso puede recalcularse según el precio habitual."
+    "ko": "프로모션 또는 할인을 적용한 구매도 위 전액 환불 조건을 충족하면 실제 결제금액 전액을 환불합니다.",
+    "en": "Promotional or discounted purchases also receive a full refund of the amount actually paid when the full-refund conditions above are met.",
+    "ja": "プロモーションや割引が適用された購入も、上記の全額返金条件を満たす場合は実際のお支払額を全額返金します。",
+    "zh": "促销或折扣购买满足上述全额退款条件时，同样退还实际支付的全部金额。",
+    "es": "Las compras con promociones o descuentos también se reembolsan por el importe íntegro pagado si cumplen las condiciones anteriores."
   },
   {
     "ko": "5. 환불 절차",
@@ -119,11 +119,11 @@
     "es": "Puede solicitar el reembolso directamente en Historial de pagos > Seleccionar el pago correspondiente > Solicitar reembolso."
   },
   {
-    "ko": "기타 이해가능한 사유에 의해 환불을 요청하는 경우",
-    "en": "Refund requests for other understandable reasons",
-    "ja": "その他の理解可能な理由による返金申請",
-    "zh": "因其他可理解的原因申请退款",
-    "es": "Solicitudes de reembolso por otros motivos comprensibles"
+    "ko": "회사 귀책 또는 법령상 환불 사유가 있거나 직접 환불 신청이 어려운 경우",
+    "en": "Company fault, statutory refund grounds, or difficulty requesting a refund directly",
+    "ja": "会社の責めに帰すべき事由、法令上の返金事由がある場合、または直接申請が難しい場合",
+    "zh": "存在公司责任或法定退款事由，或无法直接申请退款时",
+    "es": "Cuando haya responsabilidad de la Empresa, motivos legales de reembolso o dificultades para solicitarlo directamente"
   },
   {
     "ko": "마이페이지 > 고객센터를 통해 환불 요청을 접수",
@@ -147,11 +147,11 @@
     "es": "Tokens concedidos gratuitamente y beneficios adicionales obtenidos mediante promociones"
   },
   {
-    "ko": "그 외, 회사에서 환불 불가 대상으로 지정한 혜택(사전에 고지된 경우)",
-    "en": "Other benefits designated by the Company as non-refundable, where disclosed in advance",
-    "ja": "その他、会社が返金対象外と指定した特典（事前に告知された場合）",
-    "zh": "公司指定为不可退款的其他权益（已事先告知的情况）",
-    "es": "Otros beneficios que la Empresa haya declarado no reembolsables, siempre que se haya informado de ello previamente"
+    "ko": "무료 혜택은 현금 환불 대상이 아닙니다. 유료 구매의 환불 권리와 회사 귀책 또는 법령상 환불 사유는 제한하지 않습니다.",
+    "en": "Free benefits cannot be exchanged for a cash refund. This does not restrict refund rights for paid purchases or refunds due to Company fault or required by law.",
+    "ja": "無料特典は現金返金の対象ではありません。有料購入の返金権利、および会社の責めに帰すべき事由や法令上の返金は制限しません。",
+    "zh": "免费权益不予现金退款。这不限制付费购买的退款权利，以及因公司责任或法律规定产生的退款。",
+    "es": "Los beneficios gratuitos no se reembolsan en efectivo. Esto no limita los derechos de reembolso de compras pagadas ni los reembolsos por responsabilidad de la Empresa o exigidos por ley."
   },
   {
     "ko": "7. 문의 및 고객센터",
@@ -196,11 +196,11 @@
     "es": "9. Observaciones"
   },
   {
-    "ko": "충전된 토큰 이용기간과 환불가능기간은 결제시점으로부터 1년 이내로 제한됩니다.",
-    "en": "The use period and refund eligibility period for purchased tokens are limited to within 1 year of payment.",
-    "ja": "チャージしたトークンの利用期間および返金可能期間は、決済時点から1年以内に限定されます。",
-    "zh": "充值代币的使用期限及可退款期限均限制在付款之时起1年以内。",
-    "es": "El período de uso y el plazo durante el cual puede solicitarse el reembolso de los tokens adquiridos se limitan a 1 año desde el momento del pago."
+    "ko": "충전된 토큰의 이용기간은 결제시점으로부터 1년입니다. 환불은 위 환불 기준에 따르며, 관계 법령에 따른 권리는 제한하지 않습니다.",
+    "en": "Purchased tokens have a validity period of 1 year from payment. Refunds follow the criteria above without limiting rights under applicable law.",
+    "ja": "チャージしたトークンの利用期間は決済時点から1年間です。返金は上記の基準に従い、関係法令上の権利を制限しません。",
+    "zh": "充值代币的使用期限为付款之时起1年。退款按上述标准处理，不限制适用法律规定的权利。",
+    "es": "Los tokens adquiridos tienen una validez de 1 año desde el pago. Los reembolsos se rigen por los criterios anteriores, sin limitar los derechos previstos en la legislación aplicable."
   },
   {
     "ko": "충전된 토큰 사용자 간 양도가 불가합니다.",
