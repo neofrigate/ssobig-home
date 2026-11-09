@@ -549,7 +549,6 @@ const ElevenNammePage = () => {
                 </div>
                 <ul className="space-y-1.5 md:space-y-2.5 text-sm md:text-base text-[#333] leading-relaxed">
                   <li className="flex items-start gap-1"><span>•</span><span>소통을 위해 &apos;가급적&apos; 성비·연령대를 맞춰요!</span></li>
-                  <li className="flex items-start gap-1"><span>•</span><span>인스타를 보고 특히 잘 맞을 것 같은 분 위주로 수락!</span></li>
                   <li className="flex items-start gap-1"><span>•</span><span>세심히 고려하느라 수락에 시간이 걸릴 수 있어요!</span></li>
                 </ul>
               </div>
