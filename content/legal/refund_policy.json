@@ -70,6 +70,13 @@
     "es": "No se ofrecen reembolsos ordinarios tras el uso parcial de los tokens. Se aplican las excepciones del apartado 1 por causas imputables a la Empresa o exigidas por ley."
   },
   {
+    "ko": "토큰은 해당 구매 건의 사용 이력으로 미사용 여부를 판단합니다. 현재 잔액만으로 판단하지 않으며, 다른 구매분과 섞여 확인이 어려운 경우 고객센터에서 검토합니다.",
+    "en": "Unused tokens are assessed from the usage history of the specific purchase, not the current balance alone. If tokens from different purchases are mixed and usage cannot be determined, customer support will review the request.",
+    "ja": "トークンの未使用判定は、現在の残高だけでなく、対象の購入分の利用履歴に基づきます。他の購入分と混在し確認が難しい場合は、カスタマーサポートが審査します。",
+    "zh": "代币是否未使用以该笔购买的使用记录为准，不仅依据当前余额。不同购买批次混合而难以确认时，由客服审核。",
+    "es": "El uso de tokens se determina por el historial de la compra concreta, no solo por el saldo actual. Si se mezclan tokens de distintas compras y no es posible determinar su uso, atención al cliente revisará la solicitud."
+  },
+  {
     "ko": "4. Pro 단건 이용권 환불 규정",
     "en": "4. Pro one-time pass refunds",
     "ja": "4. Pro都度購入型利用券の返金規定",
@@ -96,6 +103,13 @@
     "ja": "プロモーションや割引が適用された購入も、上記の全額返金条件を満たす場合は実際のお支払額を全額返金します。",
     "zh": "促销或折扣购买满足上述全额退款条件时，同样退还实际支付的全部金额。",
     "es": "Las compras con promociones o descuentos también se reembolsan por el importe íntegro pagado si cumplen las condiciones anteriores."
+  },
+  {
+    "ko": "Pro는 참가자 초대 시 토큰 차감 면제, 동시 방 수 및 참가자 한도 확대 등 이용권 혜택을 사용하지 않은 경우 미사용으로 봅니다. 결제 후 시간이 지났다는 이유만으로 사용으로 보지 않으며, 고객센터에서 혜택 사용 이력을 확인합니다.",
+    "en": "Pro is unused if pass benefits, including waived participant invitation token charges and increased room and participant limits, have not been used. Elapsed time alone does not count as use. Customer support checks benefit usage history.",
+    "ja": "Proは、参加者招待時のトークン消費免除、同時ルーム数や参加者上限の拡大などの特典を利用していない場合に未使用とします。決済後の時間経過のみを利用とはみなさず、サポートが特典の利用履歴を確認します。",
+    "zh": "Pro未使用是指未使用邀请参与者免扣代币、增加同时房间数及参与者上限等权益。付款后仅经过一段时间不视为已使用，由客服核实权益使用记录。",
+    "es": "Pro se considera sin usar si no se han utilizado ventajas como la exención de tokens al invitar participantes o los límites ampliados de salas y participantes. El tiempo transcurrido por sí solo no cuenta como uso. Atención al cliente verifica el historial de uso de ventajas."
   },
   {
     "ko": "5. 환불 절차",
@@ -126,11 +140,18 @@
     "es": "Cuando haya responsabilidad de la Empresa, motivos legales de reembolso o dificultades para solicitarlo directamente"
   },
   {
-    "ko": "마이페이지 > 고객센터를 통해 환불 요청을 접수",
-    "en": "Submit your refund request via My Page > Customer Support.",
-    "ja": "「マイページ」>「カスタマーサポート」から返金を申請してください。",
-    "zh": "通过“我的页面”>“客服中心”提交退款申请。",
-    "es": "Presente su solicitud en Mi página > Atención al cliente."
+    "ko": "자동 환불이 어려운 경우 마이페이지 > 고객센터로 검토를 요청해주세요. 미사용 여부와 회사 귀책 또는 법령상 환불 사유를 확인합니다.",
+    "en": "If an automatic refund is unavailable, request a review via My Page > Customer Support. We review non-use and refund grounds arising from company fault or applicable law.",
+    "ja": "自動返金が難しい場合は、マイページ > カスタマーサポートから審査をご依頼ください。未使用状況および会社の責任や法令に基づく返金事由を確認します。",
+    "zh": "无法自动退款时，请通过我的页面 > 客服申请审核。我们会核实未使用情况以及公司责任或法律规定的退款事由。",
+    "es": "Si el reembolso automático no está disponible, solicite una revisión en Mi página > Atención al cliente. Revisamos la falta de uso y las causas de reembolso por responsabilidad de la empresa o por ley."
+  },
+  {
+    "ko": "환불은 최초 결제한 수단으로 처리합니다. 결제수단 또는 결제대행사의 제약으로 원결제수단 취소가 불가능한 경우에는 고객센터에서 본인 확인 후 가능한 환급 방법을 안내합니다.",
+    "en": "Refunds are issued to the original payment method. If the payment method or provider cannot process an original-payment cancellation, customer support will verify your identity and explain the available refund method.",
+    "ja": "返金は元の決済手段で行います。決済手段または決済代行会社の制約により元の決済を取り消せない場合、サポートが本人確認後に可能な返金方法をご案内します。",
+    "zh": "退款退回原支付方式。如支付方式或支付服务商限制导致原支付无法撤销，客服将在核实身份后说明可行的退款方式。",
+    "es": "Los reembolsos se realizan al método de pago original. Si las restricciones del método o proveedor impiden cancelar el pago original, atención al cliente verificará su identidad e indicará el método de reembolso disponible."
   },
   {
     "ko": "6. 환불 불가 항목",

@@ -714,32 +714,39 @@
     "es": "Otros supuestos previstos por la ley para garantizar la seguridad de las transacciones"
   },
   {
-    "ko": "청약 철회 시 환불은 이용자가 사용한 결제수단에 따라 다음과 같이 처리됩니다.",
-    "en": "Refunds upon withdrawal are processed according to the payment method used:",
-    "ja": "申込み撤回時の返金は、利用者が使用した支払方法に応じて次のとおり処理します。",
-    "zh": "撤回购买时，退款按用户所用付款方式处理如下：",
-    "es": "En caso de desistimiento, el reembolso se tramita según el medio de pago utilizado:"
+    "ko": "청약 철회 시 환불 방법과 미사용 확인 기준은 다음과 같습니다.",
+    "en": "The refund method and criteria for verifying non-use are as follows.",
+    "ja": "契約撤回時の返金方法と未使用の確認基準は次のとおりです。",
+    "zh": "撤回购买时的退款方式和未使用确认标准如下。",
+    "es": "El método de reembolso y los criterios para verificar la falta de uso son los siguientes."
   },
   {
-    "ko": "신용카드: 결제 취소",
-    "en": "Credit card: cancellation of payment",
-    "ja": "クレジットカード：決済取消し",
-    "zh": "信用卡：取消付款",
-    "es": "Tarjeta de crédito: cancelación del pago"
+    "ko": "환불은 최초 결제한 수단으로 처리합니다. 결제수단 또는 결제대행사의 제약으로 원결제수단 취소가 불가능한 경우에는 고객센터에서 본인 확인 후 가능한 환급 방법을 안내합니다.",
+    "en": "Refunds are issued to the original payment method. If the payment method or provider cannot process an original-payment cancellation, customer support will verify your identity and explain the available refund method.",
+    "ja": "返金は元の決済手段で行います。決済手段または決済代行会社の制約により元の決済を取り消せない場合、サポートが本人確認後に可能な返金方法をご案内します。",
+    "zh": "退款退回原支付方式。如支付方式或支付服务商限制导致原支付无法撤销，客服将在核实身份后说明可行的退款方式。",
+    "es": "Los reembolsos se realizan al método de pago original. Si las restricciones del método o proveedor impiden cancelar el pago original, atención al cliente verificará su identidad e indicará el método de reembolso disponible."
   },
   {
-    "ko": "계좌이체: 환불계좌로 입금",
-    "en": "Bank transfer: deposit into the refund account",
-    "ja": "銀行振込：返金口座への入金",
-    "zh": "银行转账：汇入退款账户",
-    "es": "Transferencia bancaria: ingreso en la cuenta de reembolso"
+    "ko": "토큰은 해당 구매 건의 사용 이력으로 미사용 여부를 판단합니다. 현재 잔액만으로 판단하지 않으며, 다른 구매분과 섞여 확인이 어려운 경우 고객센터에서 검토합니다.",
+    "en": "Unused tokens are assessed from the usage history of the specific purchase, not the current balance alone. If tokens from different purchases are mixed and usage cannot be determined, customer support will review the request.",
+    "ja": "トークンの未使用判定は、現在の残高だけでなく、対象の購入分の利用履歴に基づきます。他の購入分と混在し確認が難しい場合は、カスタマーサポートが審査します。",
+    "zh": "代币是否未使用以该笔购买的使用记录为准，不仅依据当前余额。不同购买批次混合而难以确认时，由客服审核。",
+    "es": "El uso de tokens se determina por el historial de la compra concreta, no solo por el saldo actual. Si se mezclan tokens de distintas compras y no es posible determinar su uso, atención al cliente revisará la solicitud."
   },
   {
-    "ko": "휴대폰 결제: 이동통신사 결제 취소 또는 환불계좌로 입금",
-    "en": "Mobile phone billing: cancellation through the carrier or deposit into the refund account",
-    "ja": "携帯電話決済：携帯電話会社による決済取消し、または返金口座への入金",
-    "zh": "手机账单付款：通过运营商取消付款或汇入退款账户",
-    "es": "Facturación móvil: cancelación del pago mediante el operador o ingreso en la cuenta de reembolso"
+    "ko": "Pro는 참가자 초대 시 토큰 차감 면제, 동시 방 수 및 참가자 한도 확대 등 이용권 혜택을 사용하지 않은 경우 미사용으로 봅니다. 결제 후 시간이 지났다는 이유만으로 사용으로 보지 않으며, 고객센터에서 혜택 사용 이력을 확인합니다.",
+    "en": "Pro is unused if pass benefits, including waived participant invitation token charges and increased room and participant limits, have not been used. Elapsed time alone does not count as use. Customer support checks benefit usage history.",
+    "ja": "Proは、参加者招待時のトークン消費免除、同時ルーム数や参加者上限の拡大などの特典を利用していない場合に未使用とします。決済後の時間経過のみを利用とはみなさず、サポートが特典の利用履歴を確認します。",
+    "zh": "Pro未使用是指未使用邀请参与者免扣代币、增加同时房间数及参与者上限等权益。付款后仅经过一段时间不视为已使用，由客服核实权益使用记录。",
+    "es": "Pro se considera sin usar si no se han utilizado ventajas como la exención de tokens al invitar participantes o los límites ampliados de salas y participantes. El tiempo transcurrido por sí solo no cuenta como uso. Atención al cliente verifica el historial de uso de ventajas."
+  },
+  {
+    "ko": "일반적인 중도해지에 따른 일할 계산 환불은 제공하지 않습니다. 다만 회사의 귀책사유 또는 관계 법령에 따라 환불이 필요한 경우에는 본 정책의 기간, 사용 여부 및 일할 환불 제한과 관계없이 해당 기준에 따라 환불합니다.",
+    "en": "We do not offer prorated refunds for ordinary early termination. However, refunds required due to the Company’s fault or applicable law will be provided under the applicable rules, regardless of this policy’s time limits, usage conditions or restrictions on prorated refunds.",
+    "ja": "通常の途中解約による日割り返金は行いません。ただし、会社の責めに帰すべき事由または関係法令により返金が必要な場合は、本ポリシーの期間、利用状況、日割り返金の制限にかかわらず、該当する基準に従って返金します。",
+    "zh": "一般中途终止不提供按日折算退款。但因公司责任或适用法律需要退款时，不受本政策的期限、使用情况及按日折算退款限制，按相应标准退款。",
+    "es": "No ofrecemos reembolsos prorrateados por una terminación anticipada ordinaria. No obstante, los reembolsos exigidos por causas imputables a la Empresa o por la legislación aplicable se realizarán conforme a las normas correspondientes, sin las limitaciones de plazo, uso o prorrateo de esta política."
   },
   {
     "ko": "제16조 (개인정보보호)",
