@@ -91,6 +91,9 @@ const QUALITY_SUPABASE_URL =
 const QUALITY_SUPABASE_KEY =
   process.env.QUALITY_SUPABASE_PUBLISHABLE_KEY?.trim() ||
   "sb_publishable_AdEHgXPGJ2gKGVAjb7RYSg_YzUuT6jB";
+// reviews의 ssobig_user_id·raw_data 등 비공개 열은 anon으로 읽을 수 없으므로 tly 서버 키로 조회한다.
+const QUALITY_SUPABASE_SECRET_KEY =
+  process.env.QUALITY_SUPABASE_SECRET_KEY?.trim() || "";
 const ZOMBIE_RUN_MARKETING_CONSENT_API_BASE_URL = (
   process.env.ZOMBIE_RUN_MARKETING_CONSENT_API_BASE_URL ||
   process.env.ZOMBIE_RUN_COUPON_API_BASE_URL ||
@@ -502,6 +505,12 @@ async function fetchExistingReview(
 ): Promise<ExistingReview | null> {
   if (!gameId || !ssobigUserId) return null;
 
+  if (!QUALITY_SUPABASE_SECRET_KEY) {
+    console.warn(
+      "[playroom-review] QUALITY_SUPABASE_SECRET_KEY missing; falling back to publishable key"
+    );
+  }
+  const reviewsKey = QUALITY_SUPABASE_SECRET_KEY || QUALITY_SUPABASE_KEY;
   const params = new URLSearchParams({
     game_id: `eq.${gameId}`,
     ssobig_user_id: `eq.${ssobigUserId}`,
@@ -514,8 +523,8 @@ async function fetchExistingReview(
     `${QUALITY_SUPABASE_URL.replace(/\/+$/, "")}/rest/v1/reviews?${params.toString()}`,
     {
       headers: {
-        apikey: QUALITY_SUPABASE_KEY,
-        Authorization: `Bearer ${QUALITY_SUPABASE_KEY}`,
+        apikey: reviewsKey,
+        Authorization: `Bearer ${reviewsKey}`,
       },
       cache: "no-store",
     }
