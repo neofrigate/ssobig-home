@@ -492,7 +492,7 @@ const DEFAULT_SUBMIT_ERROR_MESSAGE =
 const DEFAULT_COUPON_VALIDATE_ERROR_MESSAGE =
   "쿠폰 검증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
 const DEFAULT_COUPON_USE_ERROR_MESSAGE =
-  "신청서는 접수되었지만 쿠폰 처리에 실패했습니다. 쿠폰 코드를 다시 확인하거나 잠시 후 다시 시도해주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
+  "신청서는 접수되었습니다. 쿠폰 적용 결과를 다시 확인해 주세요. 문제가 계속되면 채널톡으로 문의해주세요.";
 const DEFAULT_WAITLIST_SUBMIT_SUCCESS_MESSAGE =
   "알림신청이 완료되었습니다. 신청 가능한 자리가 생기면 다시 안내드릴게요.";
 const COUPON_VALIDATE_DELAY_MS = 700;
@@ -1574,38 +1574,6 @@ async function requestCouponScheduleLookup(code: string) {
   }
 
   return payload as CouponScheduleLookupResult;
-}
-
-async function requestCouponUse(code: string, staffScheduleId: string) {
-  const response = await fetch(`${getDayNammeCouponApiBaseUrl()}/use`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ code, staffScheduleId }),
-  });
-
-  const payload = await parseJsonResponse<CouponUseResult | Record<string, unknown>>(
-    response
-  );
-
-  if (!response.ok) {
-    throw new Error(getCouponReason(payload, DEFAULT_COUPON_USE_ERROR_MESSAGE));
-  }
-
-  if (!payload || typeof payload !== "object") {
-    throw new Error(DEFAULT_COUPON_USE_ERROR_MESSAGE);
-  }
-
-  if (!("success" in payload) || payload.success !== true) {
-    throw new Error(getCouponReason(payload, "쿠폰을 사용할 수 없습니다."));
-  }
-
-  if (!("id" in payload) || typeof payload.id !== "number") {
-    throw new Error(DEFAULT_COUPON_USE_ERROR_MESSAGE);
-  }
-
-  return payload as CouponUseResult;
 }
 
 function getTodayDateParam() {
@@ -2883,14 +2851,13 @@ export default function LoveBuddiesApplyFlow({
       clientRequestId
     );
     const clientDebugContext = buildClientDebugContext(formValues.photo, clientRequestId);
-    let submitStage = submitState.applicationSubmitted
-      ? "client:coupon-use:retry"
-      : "client:prepare";
+    let submitStage = "client:prepare";
     let applicationSubmitted = submitState.applicationSubmitted;
     let submitResult: unknown = null;
 
     try {
-      if (!applicationSubmitted) {
+      // A coupon retry replays the same application ID to recover its saved receipt.
+      if (!applicationSubmitted || wantsCoupon) {
         const urlSearchParams =
           typeof window !== "undefined"
             ? getSafeSearchParams(window.location.search)
@@ -3024,12 +2991,8 @@ export default function LoveBuddiesApplyFlow({
         checkoutSource = getEdgeCouponUse(submitResult);
 
         if (!checkoutSource) {
-          submitStage = "client:coupon-use:start";
-          checkoutSource = await requestCouponUse(
-            validatedCoupon.code,
-            formValues.staffScheduleId
-          );
-          submitStage = "client:coupon-use:success";
+          submitStage = "client:coupon-receipt:missing";
+          throw new Error("신청서의 쿠폰 적용 결과를 확인하지 못했습니다.");
         }
         trackEvent("DN_UseCoupon", {
           code: checkoutSource.code || validatedCoupon.code,
