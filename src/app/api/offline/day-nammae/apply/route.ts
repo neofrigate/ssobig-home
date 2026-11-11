@@ -25,10 +25,6 @@ import {
 
 const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles-private";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
-const MARKETING_SUPABASE_URL = "https://flpcungrkapftfkbhxkm.supabase.co";
-const MARKETING_SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_IGB_G9pJ3Prdz_by7xK44g_wx6GkEFu";
-const DAY_NAMMAE_CAPI_RELAY_URL = `${MARKETING_SUPABASE_URL}/functions/v1/meta-day-nammae-conversions`;
 const DEFAULT_WAITLIST_ALERT_API_URL =
   "https://ferhwwjztseoegaizsko.supabase.co/functions/v1/ssobig-meeting-manage/public/day-nammae-waitlist-alert";
 const DEFAULT_CLIENT_ERROR_MESSAGE =
@@ -210,8 +206,6 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
     event_id: eventId,
     event_time: Math.floor(Date.now() / 1000),
     event_source_url: eventSourceUrl,
-    value: 35000,
-    currency: "KRW",
     schedule: params.schedule,
     user_data: {
       name: params.name,
@@ -225,38 +219,30 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
     },
   };
 
-  const relaySecret = process.env.DAY_NAMMAE_CAPI_RELAY_SECRET?.trim() || "";
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${MARKETING_SUPABASE_PUBLISHABLE_KEY}`,
-  };
-  if (relaySecret) {
-    headers["x-ssobig-relay-token"] = relaySecret;
-  }
-
   try {
-    const response = await fetch(DAY_NAMMAE_CAPI_RELAY_URL, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(relayPayload),
+    const client = createClient(DAY_NAMMAE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
     });
-    const responseBody = await response.json().catch(() => null);
+    const { error } = await client.from("day_nammae_meta_outbox").upsert({
+      event_id: eventId,
+      event_time: new Date(relayPayload.event_time * 1000).toISOString(),
+      payload: relayPayload,
+    }, { onConflict: "event_id", ignoreDuplicates: true });
+    if (error) throw new Error(error.message);
 
     logSubmitEvent(
       params.requestId,
-      response.ok ? "meta:capi:success" : "meta:capi:error",
+      "meta:capi:queued",
       {
         clientRequestId: params.clientRequestId,
         uuid: params.uuid,
         eventName: "CompleteRegistration",
         eventId,
         eventIdSource: params.eventId ? "client" : "server_fallback",
-        status: response.status,
         hasFbp: Boolean(params.fbp),
         hasFbc: Boolean(params.fbc),
-        responseBody,
       },
-      response.ok ? "log" : "error",
+      "log",
     );
   } catch (error) {
     logSubmitEvent(
@@ -272,6 +258,7 @@ async function sendDayNammaeCompleteRegistrationCapi(params: {
       },
       "error",
     );
+    Sentry.captureException(error, { tags: { feature: "day-nammae-capi-outbox" }, extra: { eventId } });
   }
 }
 
@@ -1244,6 +1231,10 @@ export async function POST(request: Request) {
         ? { metaCompleteRegistrationEventId }
         : {}),
       ...(metaCheckoutEventId ? { metaCheckoutEventId } : {}),
+      metaCapiContext: {
+        client_ip_address: getClientIp(request.headers),
+        client_user_agent: request.headers.get("user-agent") || "",
+      },
       "Q. 전화번호": phone,
       "Q. 기대되는점": "",
       "[일일남매] 일정 선택": schedule,

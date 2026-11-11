@@ -2977,7 +2977,6 @@ export default function LoveBuddiesApplyFlow({
           application_submitted: "true",
         });
         trackDayNammaeMetaStandardEvent("CompleteRegistration", {
-          value: BASE_PRICE,
           eventId: completeRegistrationEventId,
           schedule: formValues.schedule,
           couponApplied: wantsCoupon,

@@ -33,7 +33,7 @@ interface MetaPixelExtraEvent {
 }
 
 interface DayNammaeStandardEventParams {
-  value: number;
+  value?: number;
   eventId?: string;
   schedule?: string;
   couponApplied?: boolean;
@@ -50,8 +50,7 @@ function normalizeMetaValue(value: number) {
 
 function buildDayNammaeMetaParams(params: DayNammaeStandardEventParams) {
   return {
-    value: normalizeMetaValue(params.value),
-    currency: META_EVENT_CURRENCY,
+    ...(typeof params.value === "number" ? { value: normalizeMetaValue(params.value), currency: META_EVENT_CURRENCY } : {}),
     content_name: DAY_NAMMAE_CONTENT_NAME,
     content_ids: [DAY_NAMMAE_CONTENT_ID],
     content_type: "product",
