@@ -23,7 +23,7 @@ import {
   sanitizeDayNammaeSentryContext,
 } from "@/lib/day-nammae-application-integrity";
 
-const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles";
+const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles-private";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
 const MARKETING_SUPABASE_URL = "https://flpcungrkapftfkbhxkm.supabase.co";
 const MARKETING_SUPABASE_PUBLISHABLE_KEY =
@@ -808,10 +808,10 @@ export async function POST(request: Request) {
   const requestId = createRequestId();
   const apiStartedAt = Date.now();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const storageBucket =
-    process.env.SUPABASE_STORAGE_BUCKET_DAY_NAMMAE ||
-    process.env.SUPABASE_STORAGE_BUCKET ||
-    DEFAULT_STORAGE_BUCKET;
+  const configuredBucket = process.env.SUPABASE_STORAGE_BUCKET_DAY_NAMMAE ||
+    process.env.SUPABASE_STORAGE_BUCKET;
+  const storageBucket = configuredBucket && configuredBucket !== "day-nammae-profiles"
+    ? configuredBucket : DEFAULT_STORAGE_BUCKET;
   const requestHeaderContext = {
     contentType: request.headers.get("content-type") || "",
     contentLength: request.headers.get("content-length") || "",
@@ -1209,14 +1209,9 @@ export async function POST(request: Request) {
       storageUploadResult: summarizeStorageUploadData(uploadResult.data),
     });
 
-    const { data: publicUrlData } = supabase.storage
-      .from(storageBucket)
-      .getPublicUrl(uploadedPath);
-
-    logSubmitEvent(requestId, "storage:url:ready", {
-      uploadedPath,
-      publicUrl: publicUrlData.publicUrl,
-    });
+    const profilePhotoRef = DAY_NAMMAE_SUPABASE_URL + "/storage/v1/object/authenticated/" +
+      storageBucket + "/" + uploadedPath.split("/").map(encodeURIComponent).join("/");
+    logSubmitEvent(requestId, "storage:url:ready", { storageBucket });
 
     const payload = {
       requestId,
@@ -1230,7 +1225,7 @@ export async function POST(request: Request) {
       Nickname: name,
       GameTitle: "[일일남매] 콘텐츠 신청",
       "Q. 나이": birthYear,
-      "Q. 사진": publicUrlData.publicUrl,
+      "Q. 사진": profilePhotoRef,
       "Q. 성별": gender,
       "Q. 이름": name,
       "Q. 지역": "",
