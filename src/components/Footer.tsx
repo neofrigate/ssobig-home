@@ -146,7 +146,7 @@ const Footer = ({ mode = "dark" }: FooterProps) => {
               <p className="mb-1">전화번호 : 02-2635-7942</p>
               <p className="mb-1">E-mail : ssobigstudio@gmail.com</p>
               <p className="mb-1">
-                통신판매업신고번호 : 제2024-서울영등포-0816호
+                통신판매업신고번호 : 제2026-서울서초-3828호
               </p>
               <p className="mb-3">
                 주소 : 서울특별시 서초구 사평대로55길 37, (실란트로타워)지하2층

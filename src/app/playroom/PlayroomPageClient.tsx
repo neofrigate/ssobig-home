@@ -56,7 +56,7 @@ const PLAYROOM_UI_COPY: Record<
     ceo: "대표자 : 조원철, 김수린",
     businessNumber: "사업자등록번호 : 140-87-03096",
     phone: "전화번호 : 02-2635-7942",
-    salesRegistration: "통신판매업신고번호 : 제2024-서울영등포-0816호",
+    salesRegistration: "통신판매업신고번호 : 제2026-서울서초-3828호",
     address:
       "주소 : 서울특별시 서초구 사평대로55길 37, (실란트로타워)지하2층 (반포동)",
     privacyPolicy: "개인정보 처리방침",
@@ -83,7 +83,7 @@ const PLAYROOM_UI_COPY: Record<
     ceo: "Representatives: Wonchul Cho, Surin Kim",
     businessNumber: "Business Reg. No.: 140-87-03096",
     phone: "Phone: 02-2635-7942",
-    salesRegistration: "E-commerce Reg. No.: 2024-Seoul Yeongdeungpo-0816",
+    salesRegistration: "E-commerce Reg. No.: 2026-Seoul Seocho-3828",
     address:
       "Address: B2, Cilantro Tower, 37, Sapyeong-daero 55-gil, Seocho-gu, Seoul",
     privacyPolicy: "Privacy Policy",
@@ -110,7 +110,7 @@ const PLAYROOM_UI_COPY: Record<
     ceo: "代表者：チョ・ウォンチョル",
     businessNumber: "事業者登録番号：140-87-03096",
     phone: "電話番号：02-2635-7942",
-    salesRegistration: "通信販売業届出番号：第2024-ソウル永登浦-0816号",
+    salesRegistration: "通信販売業届出番号：第2026-ソウル瑞草-3828号",
     address:
       "住所：ソウル特別市瑞草区サピョンデロ55ギル37、(シラントロタワー)地下2階",
     privacyPolicy: "プライバシーポリシー",
@@ -137,7 +137,7 @@ const PLAYROOM_UI_COPY: Record<
     ceo: "代表人：赵元哲",
     businessNumber: "营业执照号：140-87-03096",
     phone: "电话：02-2635-7942",
-    salesRegistration: "通信销售业申报号：第2024-首尔永登浦-0816号",
+    salesRegistration: "通信销售业申报号：第2026-首尔瑞草-3828号",
     address: "地址：首尔特别市瑞草区沙坪大路55街37号，(Cilantro Tower)地下2层",
     privacyPolicy: "隐私政策",
     termsOfService: "使用条款",
