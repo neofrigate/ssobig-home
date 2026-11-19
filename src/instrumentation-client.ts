@@ -1,3 +1,4 @@
+import "@/lib/array-find-last-polyfill";
 import * as Sentry from "@sentry/nextjs";
 import {
   getClientSentryDebugContext,
