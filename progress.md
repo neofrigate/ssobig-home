@@ -17,6 +17,7 @@
 
 | 날짜 | 브랜치 | 작업 내용 | 상태 |
 |------|--------|----------|------|
+| 2026-11-19 | claude/elastic-morse-c64dbb | Sentry SSOBIG-HOME-35(`te.findLast is not a function`) 조사: 원인은 Vercel Speed Insights 호스팅 스크립트가 구형 브라우저(Chrome<97 등)에서 `findLast` 호출. `src/lib/array-find-last-polyfill.ts` 추가 후 `instrumentation-client.ts`에서 로드 | 로컬 커밋(미푸시) |
 | 2026-11-10 | security/reviews-rls | 플레이룸 리뷰 기존 응답 조회(`api/playroom/review`)를 tly 서버 키 `QUALITY_SUPABASE_SECRET_KEY`로 읽도록 변경(미설정 시 공개 키 폴백), Vercel 환경변수 추가 필요 | 로컬 커밋 |
 | 2026-05-23 | main | 마케팅/플레이테스트 신청 Slack 알림 연동, `invalid_blocks` 수정, 제목 이모지/요약형 포맷 정리, `14_ssobig_manage-story` `e9d6390` 푸시 | 완료 |
 | 2026-05-23 | main | 마케팅 리뷰어 폼 국가/지역 드롭다운 복구 및 `groupSize` 자동 보완으로 제출 오류 수정, `fffd341` 재배포 | 완료 |
