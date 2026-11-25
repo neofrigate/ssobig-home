@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import type { CSSProperties, ReactNode } from "react";
+import Image from "next/image";
+import type { ReactNode } from "react";
 import "./creator.css";
 
 export const metadata: Metadata = {
@@ -127,14 +128,6 @@ const PREPARE: [string, string, string][] = [
   ],
 ];
 
-const BARS = [
-  { m: "1월", v: 12, h: "35%" },
-  { m: "2월", v: 18, h: "53%" },
-  { m: "3월", v: 25, h: "74%" },
-  { m: "4월", v: 21, h: "62%" },
-  { m: "5월", v: 30, h: "88%" },
-  { m: "6월", v: 34, h: "100%", now: true },
-];
 
 function Flow({ items }: { items: string[] }) {
   return (
@@ -335,68 +328,36 @@ export default function CreatorPage() {
           </ul>
 
           <h3>보내 드리는 자료</h3>
-          <div className="report">
-            <div className="rcard">
-              <div className="rhead">
-                <b>정산 명세서</b>
-                <span className="ex-tag">예시</span>
-              </div>
-              <div className="rsub">○○○○년 상반기분 · 작품명</div>
-              <dl className="stmt">
-                {[
-                  ["판매 이용권", "○○건"],
-                  ["정가 합계", "○○토큰"],
-                  ["환불 조정", "○○원"],
-                  ["수익 배분율", "○○%"],
-                  ["작가님 몫 (세전)", "○○원"],
-                  ["원천징수", "○○원"],
-                ].map(([k, v]) => (
-                  <div key={k}>
-                    <dt>{k}</dt>
-                    <dd>{v}</dd>
-                  </div>
-                ))}
-                <div className="total">
-                  <dt>지급 금액</dt>
-                  <dd>○○원</dd>
-                </div>
-              </dl>
-            </div>
-            <div className="rcard">
-              <div className="rhead">
-                <b>판매 결과 공유</b>
-                <span className="ex-tag">예시</span>
-              </div>
-              <div className="rsub">월별 판매 이용권 · 예시 숫자</div>
-              <div
-                className="bars"
-                role="img"
-                aria-label="월별 판매 이용권 예시 막대그래프. 1월 12건, 2월 18건, 3월 25건, 4월 21건, 5월 30건, 6월 34건"
-              >
-                {BARS.map((b) => (
-                  <div
-                    key={b.m}
-                    className={b.now ? "bar now" : "bar"}
-                    style={{ "--h": b.h } as CSSProperties}
-                  >
-                    <span>{b.v}</span>
-                    <i>{b.m}</i>
-                  </div>
-                ))}
-              </div>
-              <div className="rstats">
-                <div>
-                  <small>플레이 현황</small>
-                  <b>○○회</b>
-                </div>
-                <div>
-                  <small>후기</small>
-                  <b>○○건</b>
-                </div>
-              </div>
-              <p className="rnote">판매 실적, 집계할 수 있는 플레이 현황, 후기를 모아 공유해 드립니다.</p>
-            </div>
+          <p className="shots-intro">
+            초대받은 이메일로 작가 대시보드에 로그인하시면 판매·리뷰·정산 내역을 직접 확인하실 수 있습니다.
+          </p>
+          <div className="shots">
+            <figure className="shot">
+              <Image
+                src="/creator/settlement-sample.jpg"
+                alt="작가 대시보드 정산 화면 예시. 누적 정산 수익과 채널별 판매, 정산 비율, 내 정산액이 표시됩니다."
+                width={2000}
+                height={1026}
+                sizes="(max-width: 760px) 100vw, 1032px"
+              />
+              <figcaption>
+                <b>정산</b> · 작품별·채널별 정산 금액
+              </figcaption>
+            </figure>
+            <figure className="shot">
+              <Image
+                src="/creator/dashboard-sample.jpg"
+                alt="작가 대시보드 화면 예시. 누적 판매, 채널별 판매, 만족도, 누적 판매 실적 그래프, 플레이어 분포, 최근 리뷰가 표시됩니다."
+                width={2000}
+                height={1628}
+                sizes="(max-width: 760px) 100vw, 1032px"
+              />
+              <figcaption>
+                <b>대시보드</b> · 판매 실적, 플레이어 분포, 리뷰
+              </figcaption>
+            </figure>
           </div>
+          <p className="shots-note">*연출된 이미지입니다.</p>
         </section>
 
         <footer className="creator-footer">쏘빅툴 작가 안내 · 주식회사 쏘빅</footer>

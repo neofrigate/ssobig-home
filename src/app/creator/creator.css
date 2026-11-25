@@ -142,3 +142,11 @@
   .creator-page .report { grid-template-columns: minmax(0, 1fr); }
   .creator-page section { padding-top: 72px; }
 }
+
+/* 작가 대시보드 화면 예시 */
+.creator-page .shots-intro { font-size: 15px; margin: 0 0 16px; }
+.creator-page .shots { display: flex; flex-direction: column; gap: 20px; }
+.creator-page .shot { margin: 0; border: 1px solid var(--c-line); border-radius: 14px; overflow: hidden; background: var(--c-soft); }
+.creator-page .shot img { display: block; width: 100%; height: auto; }
+.creator-page .shot figcaption { padding: 12px 18px; font-size: 14px; color: var(--c-ink-2); border-top: 1px solid var(--c-line); background: var(--c-bg); }
+.creator-page .shots-note { margin: 12px 0 0; font-size: 13px; color: var(--c-ink-3); }
