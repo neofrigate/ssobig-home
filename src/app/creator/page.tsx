@@ -32,7 +32,7 @@ const PATHS: Path[] = [
     title: "다른 곳에서 출시한 작품",
     desc: "해외 작품처럼 이미 출시된 작품을 쏘빅툴로 들여오는 경우입니다.",
     steps: [
-      { label: "페이지 아래 '문의하기'로 연락" },
+      { label: "쏘빅 홈페이지 오른쪽 아래 상담 버튼으로 연락" },
       { label: "작품과 자료 전달" },
       { label: "쏘빅툴로 제작할 수 있는지 확인" },
     ],
@@ -229,8 +229,8 @@ export default function CreatorPage() {
               <tbody>
                 {TERMS.map((t) => (
                   <tr key={t.name}>
-                    <td>{t.name}</td>
-                    <td className="chips-cell">
+                    <td className="cell-name">{t.name}</td>
+                    <td className="chips-cell" data-label="선택지">
                       <div className="chips">
                         {t.chips.map((c) => (
                           <span key={c.text} className={c.on ? "chip on" : "chip"}>
@@ -239,7 +239,7 @@ export default function CreatorPage() {
                         ))}
                       </div>
                     </td>
-                    <td>{t.desc}</td>
+                    <td data-label="설명">{t.desc}</td>
                   </tr>
                 ))}
               </tbody>
@@ -278,9 +278,9 @@ export default function CreatorPage() {
               <tbody>
                 {PREPARE.map(([step, ssobig, author]) => (
                   <tr key={step}>
-                    <td>{step}</td>
-                    <td>{ssobig}</td>
-                    <td>{author}</td>
+                    <td className="cell-name">{step}</td>
+                    <td data-label="쏘빅이 하는 일">{ssobig}</td>
+                    <td data-label="작가님이 하시는 일">{author}</td>
                   </tr>
                 ))}
               </tbody>
@@ -326,7 +326,7 @@ export default function CreatorPage() {
               1월~6월 판매분은 7월 31일까지, 7월~12월 판매분은 다음 해 1월 31일까지 정산 명세서와 함께
               지급합니다.
             </li>
-            <li>판매 현황은 6개월마다 보내 드리는 정산 명세서로 확인하실 수 있습니다.</li>
+            <li>판매 현황은 작가 대시보드에서 언제든 보실 수 있고, 확정된 정산 금액은 6개월마다 정산 명세서로 보내 드립니다.</li>
             <li>원천징수 대상이면 세금을 떼고 지급합니다.</li>
             <li>
               일본 계좌는 엔화로 보내 드립니다. 그 밖의 나라 계좌는 첫 지급 전에 지급 통화를 정합니다.
@@ -346,7 +346,7 @@ export default function CreatorPage() {
           <div className="shots">
             <figure className="shot">
               <Image
-                src="/creator/settlement-sample.jpg"
+                src="/creator/settlement-sample-v2.jpg"
                 alt="작가 대시보드 정산 화면 예시. 누적 정산 수익과 채널별 판매, 정산 비율, 내 정산액이 표시됩니다."
                 width={2000}
                 height={1026}
