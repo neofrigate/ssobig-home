@@ -22,7 +22,7 @@ const STAGES = [
   { name: "작품 확인", sub: "원고와 자료 검토" },
   { name: "계약", sub: "작품별 조건 협의, 계약 체결" },
   { name: "판매 준비", sub: "쏘빅툴 포팅, 테스트, 판매 시작" },
-  { name: "정산", sub: "월말 마감, 다음 달 말일 지급" },
+  { name: "정산", sub: "6개월마다 정산, 다음 달 말일 지급" },
 ];
 
 const PATHS: Path[] = [
@@ -299,7 +299,7 @@ export default function CreatorPage() {
 
         <section id="settle">
           <SecHead
-            small="4단계 · 월말 마감, 다음 달 말일 지급"
+            small="4단계 · 6개월마다 정산, 다음 달 말일 지급"
             title="정산"
             desc="작가님 몫은 할인 전 정가를 기준으로 계산합니다. 작가님이 부담하시는 비용은 없습니다."
           />
@@ -317,9 +317,13 @@ export default function CreatorPage() {
           </div>
 
           <h3>정산 일정</h3>
-          <Flow items={["월말 마감", "정산 명세서 발송", "원천징수 반영", "다음 달 말일까지 지급"]} />
+          <Flow items={["6개월 집계 마감", "정산 명세서 발송", "원천징수 반영", "다음 달 말일까지 지급"]} />
           <ul className="plain">
-            <li>판매 현황은 매달 보내 드리는 정산 명세서로 확인하실 수 있습니다.</li>
+            <li>
+              1월~6월 판매분은 7월 31일까지, 7월~12월 판매분은 다음 해 1월 31일까지 정산 명세서와 함께
+              지급합니다.
+            </li>
+            <li>판매 현황은 6개월마다 보내 드리는 정산 명세서로 확인하실 수 있습니다.</li>
             <li>원천징수 대상이면 세금을 떼고 지급합니다.</li>
             <li>
               일본 계좌는 엔화로 보내 드립니다. 그 밖의 나라 계좌는 첫 지급 전에 지급 통화를 정합니다.
@@ -339,7 +343,7 @@ export default function CreatorPage() {
                 <b>정산 명세서</b>
                 <span className="ex-tag">예시</span>
               </div>
-              <div className="rsub">○월분 · 작품명</div>
+              <div className="rsub">○○○○년 상반기분 · 작품명</div>
               <dl className="stmt">
                 {[
                   ["판매 이용권", "○○건"],
