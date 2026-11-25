@@ -44,6 +44,18 @@ const META_ANDROID_NAVIGATION_LOGGER_FILENAME =
 const META_ANDROID_POST_MESSAGE_ERROR =
   "Error invoking postMessage: Java exception was raised during method invocation";
 const KNOWN_META_WEBVIEW_NAMES = new Set(["facebook", "instagram"]);
+// Meta's in-app browsers inject a script that reads window._META.IABInnerFrame
+// (SSOBIG-HOME-36). Our code never touches _META, so match only the exact
+// engine messages for that read: WebKit names the expression, V8 the property.
+const META_IAB_INNER_FRAME_ERROR_MESSAGES = new Set([
+  "undefined is not an object (evaluating 'window._META.IABInnerFrame')",
+  "Cannot read properties of undefined (reading 'IABInnerFrame')",
+]);
+const META_IAB_INNER_FRAME_BROWSER_NAMES = new Set([
+  "facebook",
+  "instagram",
+  "threads",
+]);
 const KNOWN_PATHNAME_REDIRECTS: Record<string, string> = {
   "/offline/11namme에": "/offline/11namme",
 };
@@ -157,6 +169,19 @@ export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
     typeof event.tags?.in_app_browser_name === "string"
       ? event.tags.in_app_browser_name
       : undefined;
+
+  if (
+    browserName &&
+    META_IAB_INNER_FRAME_BROWSER_NAMES.has(browserName) &&
+    (event.exception?.values ?? []).some(
+      (value) =>
+        value.type === "TypeError" &&
+        typeof value.value === "string" &&
+        META_IAB_INNER_FRAME_ERROR_MESSAGES.has(value.value.trim())
+    )
+  ) {
+    return true;
+  }
 
   // Threads uses the Barcelona UA marker. Limit its filter to the observed
   // iOS bridge exception; do not inherit the other Meta browser filters.

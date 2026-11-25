@@ -72,3 +72,36 @@ for (const name of ["Instagram", "FBAN/FBIOS"]) {
     );
   });
 }
+
+const iabInnerFrameError =
+  "undefined is not an object (evaluating 'window._META.IABInnerFrame')";
+const iabInnerFrameV8Error =
+  "Cannot read properties of undefined (reading 'IABInnerFrame')";
+const androidUa =
+  "Mozilla/5.0 (Linux; Android 14; SM-S918N) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.0.0 Mobile Safari/537.36";
+
+for (const [name, ua, value] of [
+  ["Instagram iOS", `${iosUa} Instagram 400.0.0`, iabInnerFrameError],
+  ["Facebook iOS", `${iosUa} [FBAN/FBIOS;FBAV/480.0]`, iabInnerFrameError],
+  ["Threads iOS", `${iosUa} Barcelona 422.0.0.31.66`, iabInnerFrameError],
+  ["Instagram Android", `${androidUa} Instagram 400.0.0`, iabInnerFrameV8Error],
+  ["Facebook Android", `${androidUa} [FB_IAB/FB4A;FBAV/480.0]`, iabInnerFrameV8Error],
+]) {
+  test(`${name} _META.IABInnerFrame noise is filtered`, (t) => {
+    assert.equal(shouldIgnoreKnownInAppBrowserError(eventFor(t, ua, value)), true);
+  });
+}
+
+for (const [name, ua, value, type] of [
+  ["Safari IABInnerFrame", `${iosUa} Version/18.7 Safari/604.1`, iabInnerFrameError, "TypeError"],
+  ["Kakao IABInnerFrame", `${iosUa} KAKAOTALK`, iabInnerFrameError, "TypeError"],
+  ["Chrome IABInnerFrame", `${androidUa}`, iabInnerFrameV8Error, "TypeError"],
+  ["IABInnerFrame with non-TypeError", `${iosUa} Instagram`, iabInnerFrameError, "Error"],
+  ["wrapped IABInnerFrame message", `${iosUa} Instagram`, `apply failed: ${iabInnerFrameError}`, "TypeError"],
+  ["other undefined read in Instagram", `${iosUa} Instagram`, "undefined is not an object (evaluating 'window.form.value')", "TypeError"],
+  ["other V8 undefined read in Instagram", `${androidUa} Instagram`, "Cannot read properties of undefined (reading 'value')", "TypeError"],
+]) {
+  test(`${name} remains visible`, (t) => {
+    assert.equal(shouldIgnoreKnownInAppBrowserError(eventFor(t, ua, value, type)), false);
+  });
+}
