@@ -49,6 +49,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
   const isSocialingMainPage = pathname === "/socialing";
   // 메인 홈 페이지
   const isHomePage = pathname === "/";
+  // 작가 안내 페이지 (화이트 배경 고정)
+  const isCreatorPage = pathname === "/creator" || pathname.startsWith("/creator/");
   // 프로젝트 페이지 (화이트 배경 고정)
   const isProjectPage = pathname.startsWith("/project");
   // 디자인 시스템 페이지 (다크 배경 고정)
@@ -274,8 +276,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ toggleSidebar }) => {
       }
       return "light";
     }
-    // 홈페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
-    if (isHomePage) {
+    // 홈페이지·작가 안내 페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
+    if (isHomePage || isCreatorPage) {
       return "light";
     }
     // 플레이룸 페이지는 항상 light 모드 (흰 배경, 검정 텍스트)
