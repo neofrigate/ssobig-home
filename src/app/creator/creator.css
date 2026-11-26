@@ -128,16 +128,15 @@
 .creator-page ul.plain li { margin: 6px 0; }
 
 /* 정산 계산 */
-.creator-page .calc { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px; margin-bottom: 20px; }
-.creator-page .calc > div { border-radius: 14px; padding: 24px 26px; }
-.creator-page .calc .big { background: var(--c-ink); color: var(--c-bg); display: flex; flex-direction: column; gap: 10px; }
-.creator-page .calc .big small { font-size: 13px; font-weight: 700; opacity: 0.7; }
-.creator-page .calc .big b { color: var(--c-bg); font-size: 24px; line-height: 1.4; }
-.creator-page .calc .big p { color: var(--c-bg); opacity: 0.8; margin: 0; font-size: 15px; }
-.creator-page .calc .ex { background: var(--c-accent-soft); display: flex; flex-direction: column; gap: 8px; }
-.creator-page .calc .ex small { font-size: 13px; font-weight: 700; color: var(--c-accent-ink); }
-.creator-page .calc .ex .eq { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
-.creator-page .calc .ex p { margin: 0; font-size: 14px; }
+.creator-page .calc { border: 1px solid var(--c-line); border-radius: 14px; padding: 4px 26px; }
+.creator-page .calc .row { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 18px 0; border-top: 1px solid var(--c-line); }
+.creator-page .calc .row:first-child { border-top: 0; }
+.creator-page .calc .row small { font-size: 13px; font-weight: 700; color: var(--c-ink-3); }
+.creator-page .calc .formula { font-size: 22px; font-weight: 800; line-height: 1.45; color: var(--c-ink); }
+.creator-page .calc .row div { display: flex; flex-direction: column; gap: 4px; }
+.creator-page .calc .cond { font-size: 14px; line-height: 1.55; color: var(--c-ink-2); }
+.creator-page .calc .eq { font-size: 19px; font-weight: 800; line-height: 1.45; color: var(--c-ink); font-variant-numeric: tabular-nums; }
+.creator-page .calc .row p { margin: 0; font-size: 15px; color: var(--c-ink-2); }
 /* 정산 계산: 쏘빅툴·텀블벅 탭 */
 .creator-page .calc-tabs { position: relative; margin-bottom: 20px; }
 .creator-page .calc-tabs > input { position: absolute; top: 0; left: 0; opacity: 0; pointer-events: none; }
@@ -149,7 +148,7 @@
 .creator-page #calc-tab-1:focus-visible ~ .tabs label[for="calc-tab-1"] { outline: 2px solid var(--c-accent); outline-offset: 1px; }
 .creator-page #calc-tab-0:checked ~ .calc.p1,
 .creator-page #calc-tab-1:checked ~ .calc.p0 { display: none; }
-.creator-page .calc-tabs .calc { margin-bottom: 0; }
+
 
 /* 명세서 · 결과 공유 예시 */
 .creator-page .report { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -215,6 +214,10 @@
   .creator-page .tbl:not(.scroll) td.chips-cell, .creator-page .tbl:not(.scroll) td:nth-child(2) { width: 100%; white-space: normal; }
   .creator-page .tbl:not(.scroll) .chips { flex-wrap: wrap; }
   .creator-page .tbl:not(.scroll) .gauge { width: auto; }
+  .creator-page .calc { padding: 4px 20px; }
+  .creator-page .calc .row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .creator-page .calc .formula { font-size: 19px; }
+  .creator-page .calc .eq { font-size: 17px; }
   .creator-page .flow-item { gap: 6px; margin: 3px 6px 3px 0; }
   .creator-page .flow-step { font-size: 14px; padding: 5px 10px; }
   .creator-page .flow-item i { font-size: 14px; }

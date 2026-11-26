@@ -116,7 +116,7 @@ const CALC = [
     tab: "쏘빅툴",
     formula: "정가(토큰) × 100원 × 수익 배분율",
     note: "할인해서 팔려도 정가로 계산하고, 할인 금액과 결제 수수료는 쏘빅이 부담합니다. 테스트 구매는 매출에서 뺍니다.",
-    exampleTitle: "예시 · 쏘빅툴 정가 50토큰, 수익 배분율 30%",
+    exampleTitle: "정가 50토큰, 수익 배분율 30%",
     equation: "50 × 100원 × 30% = 1,500원",
     exampleNote: "할인가로 팔려도 1,500원이 그대로 작가님 몫입니다(세전 금액).",
   },
@@ -124,7 +124,7 @@ const CALC = [
     tab: "텀블벅",
     formula: "(총매출 − 텀블벅 수수료 − 마케팅 비용) × 수익 배분율",
     note: "마케팅 비용은 그 작품에 쓴 광고비·응원권·지인 페이백입니다.",
-    exampleTitle: "예시 · 총매출 1,440,000원, 수수료와 마케팅 비용 340,000원, 수익 배분율 30%",
+    exampleTitle: "총매출 1,440,000원, 수수료와 마케팅 비용 340,000원, 수익 배분율 30%",
     equation: "(1,440,000 − 340,000) × 30% = 330,000원",
     exampleNote: "순이익 1,100,000원의 30%가 작가님 몫입니다(세전 금액).",
   },
@@ -378,15 +378,21 @@ export default function CreatorPage() {
             </div>
             {CALC.map((c, i) => (
               <div className={`calc p${i}`} key={c.tab}>
-                <div className="big">
-                  <small>작가님 몫 · {c.tab}</small>
-                  <b>{c.formula}</b>
-                  <p>{c.note}</p>
+                <div className="row">
+                  <small>계산식</small>
+                  <b className="formula">{c.formula}</b>
                 </div>
-                <div className="ex">
-                  <small>{c.exampleTitle}</small>
-                  <div className="eq">{c.equation}</div>
-                  <p>{c.exampleNote}</p>
+                <div className="row">
+                  <small>예시</small>
+                  <div>
+                    <span className="cond">{c.exampleTitle}</span>
+                    <b className="eq">{c.equation}</b>
+                    <span className="cond">{c.exampleNote}</span>
+                  </div>
+                </div>
+                <div className="row">
+                  <small>설명</small>
+                  <p>{c.note}</p>
                 </div>
               </div>
             ))}
