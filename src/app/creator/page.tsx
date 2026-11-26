@@ -284,7 +284,7 @@ export default function CreatorPage() {
             title="계약"
             desc="작품 확인 결과를 바탕으로 쏘빅이 작품별 조건표를 제안하고, 작가님과 협의해 정합니다."
           />
-          <div className="tbl scroll">
+          <div className="tbl">
             <table>
               <thead>
                 <tr>
