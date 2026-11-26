@@ -78,7 +78,7 @@ const PLAYROOM_UI_COPY: Record<
     loadingTemplates: "Loading templates",
     storyMystery: "Story Mystery Games",
     playWithFriends: "Play with Friends",
-    companyName: "SSOBIG Inc.",
+    companyName: "ssobig Corp.",
     businessInfo: "Business Info",
     ceo: "Representatives: Wonchul Cho, Surin Kim",
     businessNumber: "Business Reg. No.: 140-87-03096",

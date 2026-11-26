@@ -119,7 +119,7 @@ export const FOOTER_COPY: Record<
     businessInfoToggle: "사업자 정보 토글",
   },
   en: {
-    company: "SsoBig Co., Ltd.",
+    company: "ssobig Corp.",
     toolIntro: "About SsoBig Tool",
     privacy: "Privacy Policy",
     terms: "Terms of Service",
