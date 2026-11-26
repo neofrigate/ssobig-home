@@ -426,7 +426,7 @@ export default function CreatorPage() {
           <div className="shots">
             <figure className="shot">
               <Image
-                src="/creator/settlement-sample-v4.jpg"
+                src="/creator/settlement-sample-v5.jpg"
                 alt="작가 대시보드 정산 화면 예시. 누적 정산 수익과 채널별 판매, 정산 비율, 내 정산액이 표시됩니다."
                 width={2000}
                 height={1026}
