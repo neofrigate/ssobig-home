@@ -98,8 +98,9 @@
 .creator-page .gauge .stop.on .lab { color: var(--c-ink); }
 
 /* 흐름 */
-.creator-page .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 8px 0 20px; }
-.creator-page .flow-item { display: inline-flex; align-items: center; gap: 10px; }
+/* 줄이 넘칠 때 마지막 하나만 떨어지지 않게 줄마다 개수를 고르게 나눈다 */
+.creator-page .flow { margin: 4px 0 16px; text-wrap: balance; }
+.creator-page .flow-item { display: inline-flex; align-items: center; gap: 10px; margin: 4px 10px 4px 0; vertical-align: middle; }
 .creator-page .flow-item i { font-style: normal; color: var(--c-ink-3); }
 .creator-page .flow-step { background: var(--c-soft); border-radius: 8px; padding: 6px 14px; font-size: 15px; font-weight: 700; }
 .creator-page .flow-step.last { background: var(--c-accent); color: var(--c-on-accent); }
@@ -184,5 +185,8 @@
   .creator-page .tbl td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; font-weight: 700; color: var(--c-ink-3); margin-bottom: 4px; }
   .creator-page td.chips-cell { width: 100%; }
   .creator-page .chips { flex-wrap: wrap; }
+  .creator-page .flow-item { gap: 6px; margin: 3px 6px 3px 0; }
+  .creator-page .flow-step { font-size: 14px; padding: 5px 10px; }
+  .creator-page .flow-item i { font-size: 14px; }
   .creator-page .gauge { width: auto; }
 }
