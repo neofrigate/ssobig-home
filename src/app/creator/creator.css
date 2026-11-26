@@ -55,6 +55,8 @@
 
 /* 절 */
 .creator-page section { padding-top: 96px; scroll-margin-top: 96px; }
+/* 단계 사이 연한 가로선 (맨 위 단계 카드 아래 선과 같은 간격) */
+.creator-page section + section { margin-top: 48px; border-top: 1px solid var(--c-line); }
 .creator-page .sec-head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
 .creator-page .sec-head small { font-size: 14px; font-weight: 700; color: var(--c-accent); }
 .creator-page .sec-head h2 { font-size: clamp(28px, 4vw, 36px); line-height: 1.3; font-weight: 800; letter-spacing: -0.01em; }
@@ -136,6 +138,18 @@
 .creator-page .calc .ex small { font-size: 13px; font-weight: 700; color: var(--c-accent-ink); }
 .creator-page .calc .ex .eq { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .creator-page .calc .ex p { margin: 0; font-size: 14px; }
+/* 정산 계산: 쏘빅툴·텀블벅 탭 */
+.creator-page .calc-tabs { position: relative; margin-bottom: 20px; }
+.creator-page .calc-tabs > input { position: absolute; top: 0; left: 0; opacity: 0; pointer-events: none; }
+.creator-page .calc-tabs .tabs { display: inline-grid; grid-template-columns: repeat(2, minmax(96px, 1fr)); gap: 4px; padding: 4px; margin-bottom: 12px; background: var(--c-soft); border: 1px solid var(--c-line); border-radius: 10px; }
+.creator-page .calc-tabs .tabs label { text-align: center; padding: 7px 16px; border-radius: 7px; font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--c-ink-3); cursor: pointer; }
+.creator-page #calc-tab-0:checked ~ .tabs label[for="calc-tab-0"],
+.creator-page #calc-tab-1:checked ~ .tabs label[for="calc-tab-1"] { background: #fff; color: var(--c-ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+.creator-page #calc-tab-0:focus-visible ~ .tabs label[for="calc-tab-0"],
+.creator-page #calc-tab-1:focus-visible ~ .tabs label[for="calc-tab-1"] { outline: 2px solid var(--c-accent); outline-offset: 1px; }
+.creator-page #calc-tab-0:checked ~ .calc.p1,
+.creator-page #calc-tab-1:checked ~ .calc.p0 { display: none; }
+.creator-page .calc-tabs .calc { margin-bottom: 0; }
 
 /* 명세서 · 결과 공유 예시 */
 .creator-page .report { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -172,6 +186,7 @@
   .creator-page .calc,
   .creator-page .report { grid-template-columns: minmax(0, 1fr); }
   .creator-page section { padding-top: 72px; }
+  .creator-page section + section { margin-top: 40px; }
 }
 
 /* 작가 대시보드 화면 예시 */
@@ -183,10 +198,6 @@
 .creator-page .shots-note { margin: 12px 0 0; font-size: 13px; color: var(--c-ink-3); }
 
 /* 채널별 계산식 */
-.creator-page .calc .formulas { display: flex; flex-direction: column; gap: 10px; }
-.creator-page .calc .formulas div { display: flex; flex-direction: column; gap: 2px; }
-.creator-page .calc .formulas em { font-style: normal; font-size: 13px; font-weight: 700; opacity: 0.7; }
-.creator-page .calc .formulas b { font-size: 20px; line-height: 1.4; }
 
 /* 휴대폰: 표를 항목별 카드로 쌓아 보여 준다 */
 @media (max-width: 760px) {

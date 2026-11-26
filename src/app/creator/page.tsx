@@ -111,6 +111,25 @@ const TERMS: { name: string; chips: { text: string; on?: boolean }[]; gauge?: Ga
   },
 ];
 
+const CALC = [
+  {
+    tab: "쏘빅툴",
+    formula: "정가(토큰) × 100원 × 수익 배분율",
+    note: "할인해서 팔려도 정가로 계산하고, 할인 금액과 결제 수수료는 쏘빅이 부담합니다. 테스트 구매는 매출에서 뺍니다.",
+    exampleTitle: "예시 · 쏘빅툴 정가 50토큰, 수익 배분율 30%",
+    equation: "50 × 100원 × 30% = 1,500원",
+    exampleNote: "할인가로 팔려도 1,500원이 그대로 작가님 몫입니다(세전 금액).",
+  },
+  {
+    tab: "텀블벅",
+    formula: "(총매출 − 텀블벅 수수료 − 마케팅 비용) × 수익 배분율",
+    note: "마케팅 비용은 그 작품에 쓴 광고비·응원권·지인 페이백입니다.",
+    exampleTitle: "예시 · 총매출 1,440,000원, 수수료와 마케팅 비용 340,000원, 수익 배분율 30%",
+    equation: "(1,440,000 − 340,000) × 30% = 330,000원",
+    exampleNote: "순이익 1,100,000원의 30%가 작가님 몫입니다(세전 금액).",
+  },
+];
+
 const PREPARE: [string, string, string][] = [
   [
     "쏘빅툴로 제작",
@@ -346,29 +365,31 @@ export default function CreatorPage() {
             title="정산"
             desc="쏘빅툴은 정가, 텀블벅은 순이익을 기준으로 정산합니다. 작가님이 따로 내시는 비용은 없습니다."
           />
-          <div className="calc">
-            <div className="big">
-              <small>작가님 몫</small>
-              <div className="formulas">
-                <div>
-                  <em>쏘빅툴</em>
-                  <b>정가(토큰) × 100원 × 수익 배분율</b>
+          <div className="calc-tabs">
+            {CALC.map((c, i) => (
+              <input key={c.tab} type="radio" name="calc-tab" id={`calc-tab-${i}`} defaultChecked={i === 0} aria-label={c.tab} />
+            ))}
+            <div className="tabs" aria-hidden="true">
+              {CALC.map((c, i) => (
+                <label key={c.tab} htmlFor={`calc-tab-${i}`}>
+                  {c.tab}
+                </label>
+              ))}
+            </div>
+            {CALC.map((c, i) => (
+              <div className={`calc p${i}`} key={c.tab}>
+                <div className="big">
+                  <small>작가님 몫 · {c.tab}</small>
+                  <b>{c.formula}</b>
+                  <p>{c.note}</p>
                 </div>
-                <div>
-                  <em>텀블벅</em>
-                  <b>(총매출 − 텀블벅 수수료 − 마케팅 비용) × 수익 배분율</b>
+                <div className="ex">
+                  <small>{c.exampleTitle}</small>
+                  <div className="eq">{c.equation}</div>
+                  <p>{c.exampleNote}</p>
                 </div>
               </div>
-              <p>
-                쏘빅툴은 할인해서 팔려도 정가로 계산하고, 할인 금액과 결제 수수료는 쏘빅이 부담합니다. 쏘빅툴
-                매출은 테스트 구매를 빼고 계산합니다.
-              </p>
-            </div>
-            <div className="ex">
-              <small>예시 · 쏘빅툴 정가 50토큰, 수익 배분율 30%</small>
-              <div className="eq">50 × 100원 × 30% = 1,500원</div>
-              <p>할인가로 팔려도 1,500원이 그대로 작가님 몫입니다(세전 금액).</p>
-            </div>
+            ))}
           </div>
 
           <h3>정산 일정</h3>
