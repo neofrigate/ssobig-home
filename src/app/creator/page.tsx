@@ -14,6 +14,17 @@ export const metadata: Metadata = {
     description:
       "작품 확인 · 계약 · 판매 준비 · 정산. 쏘빅툴에서 작품을 판매하기까지의 과정을 안내합니다.",
     url: "https://www.ssobig.com/creator",
+    siteName: "쏘빅 ssobig",
+    locale: "ko_KR",
+    type: "website",
+    images: [{ url: "/creator/og-creator.png", width: 1200, height: 630, alt: "쏘빅툴 작가 안내" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "쏘빅툴 작가 안내",
+    description:
+      "작품 확인 · 계약 · 판매 준비 · 정산. 쏘빅툴에서 작품을 판매하기까지의 과정을 안내합니다.",
+    images: ["/creator/og-creator.png"],
   },
 };
 
