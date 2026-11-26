@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 type Step = { label: string; detail?: ReactNode };
-type Path = { tag: string; title: string; desc: string; steps: Step[] };
+type Path = { tag: string; tab: string; title: string; desc: string; steps: Step[] };
 
 const STAGES = [
   { id: "check", name: "작품 확인", sub: "원고와 자료 검토" },
@@ -29,6 +29,7 @@ const STAGES = [
 const PATHS: Path[] = [
   {
     tag: "이미 출시된 작품",
+    tab: "이미 출시된 작품",
     title: "다른 곳에서 출시한 작품",
     desc: "해외 작품처럼 이미 출시된 작품을 쏘빅툴로 들여오는 경우입니다.",
     steps: [
@@ -39,6 +40,7 @@ const PATHS: Path[] = [
   },
   {
     tag: "작품 파일이 있는 경우",
+    tab: "작품 파일",
     title: "작품 파일을 보내 주시는 작가님",
     desc: "PDF, Docs, HWP 파일 등으로 작업한 작품이 있는 경우입니다.",
     steps: [
@@ -50,8 +52,9 @@ const PATHS: Path[] = [
   },
   {
     tag: "쏘빅 라이터 작가님",
+    tab: "쏘빅 라이터",
     title: "쏘빅 라이터에서 쓴 작품",
-    desc: "쏘빅 라이터에서 작품을 쓰신 경우입니다. 원고가 라이터에 있어 따로 보내실 파일이 없습니다.",
+    desc: "쏘빅 라이터에서 작품을 쓰신 경우에는 원고가 라이터에 있어 따로 보내실 파일이 없습니다.",
     steps: [
       {
         label: "쏘빅 라이터에서 출품 신청",
@@ -207,6 +210,24 @@ export default function CreatorPage() {
             title="작품 확인"
             desc="이미 출시한 작품, 파일로 가진 작품, 쏘빅 라이터에서 쓴 작품 모두 등록하실 수 있습니다."
           />
+          <div className="path-tabs">
+            {PATHS.map((p, i) => (
+              <input
+                key={p.tab}
+                type="radio"
+                name="path-tab"
+                id={`path-tab-${i}`}
+                defaultChecked={i === 0}
+                aria-label={p.tab}
+              />
+            ))}
+            <div className="tabs" aria-hidden="true">
+              {PATHS.map((p, i) => (
+                <label key={p.tab} htmlFor={`path-tab-${i}`}>
+                  {p.tab}
+                </label>
+              ))}
+            </div>
           <div className="paths">
             {PATHS.map((p) => (
               <article className="path" key={p.title}>
@@ -226,6 +247,7 @@ export default function CreatorPage() {
                 </ol>
               </article>
             ))}
+          </div>
           </div>
           <div className="note">
             작품에 쓰는 그림·음원 같은 자료를 직접 제작하신 경우, 작가님께서 직접 제작권을 확보해
