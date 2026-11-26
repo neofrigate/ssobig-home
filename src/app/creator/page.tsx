@@ -71,7 +71,9 @@ const PATHS: Path[] = [
   },
 ];
 
-const TERMS: { name: string; chips: { text: string; on?: boolean }[]; desc: string }[] = [
+type Gauge = { stops: string[]; on: number; label: string };
+
+const TERMS: { name: string; chips: { text: string; on?: boolean }[]; gauge?: Gauge; desc: string }[] = [
   {
     name: "이용 방식",
     chips: [{ text: "독점" }, { text: "비독점" }],
@@ -94,12 +96,14 @@ const TERMS: { name: string; chips: { text: string; on?: boolean }[]; desc: stri
   },
   {
     name: "수익 배분율",
-    chips: [{ text: "작가 10%" }, { text: "작가 30% · 기본", on: true }, { text: "작가 50%" }],
+    chips: [],
+    gauge: { stops: ["10%", "20%", "30%", "40%", "50%"], on: 2, label: "작가 몫 10%에서 50% 사이, 기본 30%" },
     desc: "기본은 작가님이 30%를 가져가시는 방식입니다. 쏘빅의 참여 정도에 따라 비율은 10~50% 사이에서 조정될 수 있습니다. 이미 완성도가 높은 작품은 정산 비율이 올라가고, 게임에 쓰이는 BGM·일러스트와 여러 기믹 등 쏘빅의 제작 참여가 많아지면 정산 비율이 내려갑니다.",
   },
   {
     name: "계약 기간",
-    chips: [{ text: "1년" }, { text: "2년" }, { text: "5년" }],
+    chips: [],
+    gauge: { stops: ["1년", "2년", "3년", "4년", "5년"], on: 2, label: "1년에서 5년 사이, 기본 3년" },
     desc: "판매개시일부터 정한 기간마다 갱신합니다. 변경 요청이 없으면 같은 조건으로 자동 갱신합니다. 변경을 협의해도 합의가 되지 않으면 갱신일부터 신규 판매를 끝냅니다.",
   },
 ];
@@ -128,6 +132,24 @@ const PREPARE: [string, string, string][] = [
   ],
 ];
 
+
+function GaugeBar({ gauge }: { gauge: Gauge }) {
+  const pos = (i: number) => `${(i / (gauge.stops.length - 1)) * 100}%`;
+  return (
+    <div className="gauge" role="img" aria-label={gauge.label}>
+      <span className="band" aria-hidden="true" />
+      <span className="bubble" style={{ left: pos(gauge.on) }} aria-hidden="true">
+        기본
+      </span>
+      {gauge.stops.map((s, i) => (
+        <span key={s} className={i === gauge.on ? "stop on" : "stop"} style={{ left: pos(i) }} aria-hidden="true">
+          <i className="dot" />
+          <span className="lab">{s}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function Flow({ items }: { items: string[] }) {
   return (
@@ -237,13 +259,17 @@ export default function CreatorPage() {
                   <tr key={t.name}>
                     <td className="cell-name">{t.name}</td>
                     <td className="chips-cell" data-label="선택지">
-                      <div className="chips">
-                        {t.chips.map((c) => (
-                          <span key={c.text} className={c.on ? "chip on" : "chip"}>
-                            {c.text}
-                          </span>
-                        ))}
-                      </div>
+                      {t.gauge ? (
+                        <GaugeBar gauge={t.gauge} />
+                      ) : (
+                        <div className="chips">
+                          {t.chips.map((c) => (
+                            <span key={c.text} className={c.on ? "chip on" : "chip"}>
+                              {c.text}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </td>
                     <td data-label="설명">{t.desc}</td>
                   </tr>
