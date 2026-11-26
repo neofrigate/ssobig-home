@@ -42,14 +42,16 @@
 
 /* 네 단계 */
 .creator-page .stages { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.creator-page .stages li { background: var(--c-soft); border-radius: 12px; padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 6px; }
+.creator-page .stages li { display: flex; }
+.creator-page .stages a { flex: 1; background: var(--c-soft); border-radius: 12px; padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 6px; color: var(--c-ink); text-decoration: none; transition: background-color .15s; }
 .creator-page .stages small { font-size: 13px; font-weight: 700; color: var(--c-accent); }
 .creator-page .stages b { font-size: 20px; }
 .creator-page .stages span { font-size: 14px; line-height: 1.55; color: var(--c-ink-2); }
-.creator-page .stages li:last-child { background: var(--c-accent); }
-.creator-page .stages li:last-child small,
-.creator-page .stages li:last-child b,
-.creator-page .stages li:last-child span { color: var(--c-on-accent); }
+/* 눌러서 해당 단계로 이동. 파란색은 마우스를 올리거나 선택했을 때만 */
+.creator-page .stages a:hover,
+.creator-page .stages a:focus-visible { background: var(--c-accent); text-decoration: none; }
+.creator-page .stages a:hover small, .creator-page .stages a:hover b, .creator-page .stages a:hover span,
+.creator-page .stages a:focus-visible small, .creator-page .stages a:focus-visible b, .creator-page .stages a:focus-visible span { color: var(--c-on-accent); }
 
 /* 절 */
 .creator-page section { padding-top: 96px; scroll-margin-top: 96px; }

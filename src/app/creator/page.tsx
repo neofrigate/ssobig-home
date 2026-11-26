@@ -20,10 +20,10 @@ type Step = { label: string; detail?: ReactNode };
 type Path = { tag: string; title: string; desc: string; steps: Step[] };
 
 const STAGES = [
-  { name: "작품 확인", sub: "원고와 자료 검토" },
-  { name: "계약", sub: "작품별 조건 협의, 계약 체결" },
-  { name: "판매 준비", sub: "쏘빅툴 제작, 테스트, 판매 시작" },
-  { name: "정산", sub: "6개월마다 정산, 다음 달 말일 지급" },
+  { id: "check", name: "작품 확인", sub: "원고와 자료 검토" },
+  { id: "contract", name: "계약", sub: "작품별 조건 협의, 계약 체결" },
+  { id: "prepare", name: "판매 준비", sub: "쏘빅툴 제작, 테스트, 판매 시작" },
+  { id: "settle", name: "정산", sub: "6개월마다 정산, 다음 달 말일 지급" },
 ];
 
 const PATHS: Path[] = [
@@ -170,10 +170,12 @@ export default function CreatorPage() {
           </p>
           <ol className="stages" aria-label="네 단계">
             {STAGES.map((s, i) => (
-              <li key={s.name}>
-                <small>{i + 1}단계</small>
-                <b>{s.name}</b>
-                <span>{s.sub}</span>
+              <li key={s.id}>
+                <a href={`#${s.id}`}>
+                  <small>{i + 1}단계</small>
+                  <b>{s.name}</b>
+                  <span>{s.sub}</span>
+                </a>
               </li>
             ))}
           </ol>
