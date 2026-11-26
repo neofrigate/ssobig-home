@@ -418,7 +418,7 @@ export default function CreatorPage() {
             </li>
           </ul>
 
-          <h3>보내 드리는 자료</h3>
+          <h3>작가 대시보드에서 확인하세요</h3>
           <p className="shots-intro">
             초대받은 이메일로 작가 대시보드에 로그인하시면 판매·리뷰·정산 내역을 직접 확인하실 수 있습니다.
           </p>
