@@ -17,18 +17,19 @@ export const metadata: Metadata = {
 };
 
 type Step = { label: string; detail?: ReactNode };
-type Path = { tag: string; title: string; desc: string; steps: Step[] };
+type Path = { tag: string; tab: string; title: string; desc: string; steps: Step[] };
 
 const STAGES = [
-  { name: "작품 확인", sub: "원고와 자료 검토" },
-  { name: "계약", sub: "작품별 조건 협의, 계약 체결" },
-  { name: "판매 준비", sub: "쏘빅툴 제작, 테스트, 판매 시작" },
-  { name: "정산", sub: "6개월마다 정산, 다음 달 말일 지급" },
+  { id: "check", name: "작품 확인", sub: "원고와 자료 검토" },
+  { id: "contract", name: "계약", sub: "작품별 조건 협의, 계약 체결" },
+  { id: "prepare", name: "판매 준비", sub: "쏘빅툴 제작, 테스트, 판매 시작" },
+  { id: "settle", name: "정산", sub: "6개월마다 정산, 다음 달 말일 지급" },
 ];
 
 const PATHS: Path[] = [
   {
     tag: "이미 출시된 작품",
+    tab: "이미 출시된 작품",
     title: "다른 곳에서 출시한 작품",
     desc: "해외 작품처럼 이미 출시된 작품을 쏘빅툴로 들여오는 경우입니다.",
     steps: [
@@ -39,8 +40,9 @@ const PATHS: Path[] = [
   },
   {
     tag: "작품 파일이 있는 경우",
-    title: "작품 파일을 보내 주시는 작가님",
-    desc: "원고·진행 규칙·그림 등 작품 파일을 보내 주시는 경우입니다. 형식은 상관없고, 여러 작품을 함께 보내셔도 됩니다.",
+    tab: "작품 파일",
+    title: "파일로 작업한 작품",
+    desc: "PDF, Docs, HWP 파일 등으로 작업한 작품이 있는 경우입니다.",
     steps: [
       { label: "작품 파일 전달", detail: <span className="copyable">team@ssobig.com</span> },
       { label: "쏘빅 라이터에 올리기" },
@@ -50,8 +52,9 @@ const PATHS: Path[] = [
   },
   {
     tag: "쏘빅 라이터 작가님",
+    tab: "쏘빅 라이터",
     title: "쏘빅 라이터에서 쓴 작품",
-    desc: "쏘빅 라이터에서 작품을 쓰신 경우입니다. 원고가 이미 라이터에 있어서 따로 보내실 파일이 없습니다.",
+    desc: "쏘빅 라이터에서 작품을 쓰신 경우에는 원고가 라이터에 있어 따로 보내실 파일이 없습니다.",
     steps: [
       {
         label: "쏘빅 라이터에서 출품 신청",
@@ -60,7 +63,7 @@ const PATHS: Path[] = [
             <a href="https://writer.ssobig.com" target="_blank" rel="noopener noreferrer">
               writer.ssobig.com
             </a>{" "}
-            → 출력하기 → 출품하기. 7일 안에 답을 드립니다
+            → 작품 출품하기. 7일 안에 답을 드립니다
           </>
         ),
       },
@@ -71,7 +74,9 @@ const PATHS: Path[] = [
   },
 ];
 
-const TERMS: { name: string; chips: { text: string; on?: boolean }[]; desc: string }[] = [
+type Gauge = { stops: string[]; on: number; label: string };
+
+const TERMS: { name: string; chips: { text: string; on?: boolean }[]; gauge?: Gauge; desc: string }[] = [
   {
     name: "이용 방식",
     chips: [{ text: "독점" }, { text: "비독점" }],
@@ -90,44 +95,81 @@ const TERMS: { name: string; chips: { text: string; on?: boolean }[]; desc: stri
   {
     name: "가격",
     chips: [{ text: "텀블벅(펀딩)가" }, { text: "쏘빅툴 이용권" }],
-    desc: "보통 펀딩은 쏘빅툴 이용권 정가보다 조금 더 저렴하게 진행합니다. 크라우드펀딩 특성상 미리 믿고 펀딩해 주시는 분들을 위한 혜택으로 이해해 주시면 됩니다. 정가를 비롯한 최종 가격은 작가님과 협의해 작품마다 정하며, 작가님과 쏘빅 모두의 수익이 커지는 쪽으로 정합니다.",
+    desc: "펀딩가는 미리 참여해 주시는 분들을 위한 혜택으로 쏘빅툴 정가보다 조금 낮습니다. 가격은 작품마다 작가님과 협의해 함께 수익이 커지는 쪽으로 정합니다.",
   },
   {
     name: "수익 배분율",
-    chips: [{ text: "작가 10%" }, { text: "작가 30% · 기본", on: true }, { text: "작가 50%" }],
-    desc: "기본은 작가님이 30%를 가져가시는 방식입니다. 쏘빅의 참여 정도에 따라 비율은 10~50% 사이에서 조정될 수 있습니다. 이미 완성도가 높은 작품은 정산 비율이 올라가고, 게임에 쓰이는 BGM·일러스트와 여러 기믹 등 쏘빅의 제작 참여가 많아지면 정산 비율이 내려갑니다.",
+    chips: [],
+    gauge: { stops: ["10%", "20%", "30%", "40%", "50%"], on: 2, label: "작가 몫 10%에서 50% 사이, 기본 30%" },
+    desc: "기본은 작가님 30%이고, 10~50% 사이에서 조정됩니다. 완성도가 높은 작품은 올라가고, BGM·일러스트·기믹 등 쏘빅의 제작 참여가 많아지면 내려갑니다.",
   },
   {
     name: "계약 기간",
-    chips: [{ text: "1년" }, { text: "2년" }, { text: "5년" }],
+    chips: [],
+    gauge: { stops: ["1년", "2년", "3년", "4년", "5년"], on: 2, label: "1년에서 5년 사이, 기본 3년" },
     desc: "판매개시일부터 정한 기간마다 갱신합니다. 변경 요청이 없으면 같은 조건으로 자동 갱신합니다. 변경을 협의해도 합의가 되지 않으면 갱신일부터 신규 판매를 끝냅니다.",
+  },
+];
+
+const CALC = [
+  {
+    tab: "쏘빅툴",
+    formula: "정가(토큰) × 100원 × 수익 배분율",
+    note: "할인해서 팔려도 정가로 계산하고, 할인 금액과 결제 수수료는 쏘빅이 부담합니다. 테스트 구매는 매출에서 뺍니다.",
+    exampleTitle: "정가 300토큰, 수익 배분율 30%",
+    equation: "300 × 100원 × 30% = 9,000원",
+    exampleNote: "할인가로 팔려도 9,000원이 그대로 작가님 몫입니다(세전 금액).",
+  },
+  {
+    tab: "텀블벅",
+    formula: "(총매출 − 텀블벅 수수료 − 마케팅 비용) × 수익 배분율",
+    note: "마케팅 비용은 그 작품에 쓴 광고비·응원권·지인 페이백입니다.",
+    exampleTitle: "총매출 5,122,000원, 수수료와 마케팅 비용 1,032,000원, 수익 배분율 30%",
+    equation: "(5,122,000 − 1,032,000) × 30% = 1,227,000원",
+    exampleNote: "순이익 4,090,000원의 30%가 작가님 몫입니다(세전 금액).",
   },
 ];
 
 const PREPARE: [string, string, string][] = [
   [
     "쏘빅툴로 제작",
-    "자료 정리 · 번역 · 디지털 구현 중 정한 일을 맡고, 화면 · 정보 공개 순서 · 분기 · 연출을 구성합니다",
+    "자료 정리 · 번역 · 디지털 구현 중 정한 일을 맡고, 화면 · 정보 공개 순서 · 분기 · 연출을 구성합니다.",
     "—",
   ],
   [
     "테스트 플레이",
-    "기본으로 쏘빅이 테스터를 모아 플레이 테스트를 하고 결과를 공유합니다. 원하시면 작가님께도 테스트 링크를 드립니다",
-    "결과를 보시고 의견을 주세요. 테스트 링크를 받으시면 혼자 또는 지인들과 직접 플레이해 보실 수도 있습니다",
+    "기본으로 쏘빅이 테스터를 모아 플레이 테스트를 하고 결과를 공유합니다. 원하시면 작가님께도 테스트 링크를 드립니다.",
+    "결과를 보시고 의견을 주세요. 테스트 링크를 받으시면 혼자 또는 지인들과 직접 플레이해 보실 수도 있습니다.",
   ],
-  ["보완", "의견을 반영해 고칩니다", "줄거리·결말을 바꿔야 할 때는 동의 여부를 정해 주세요"],
+  ["보완", "의견을 반영해 고칩니다.", "줄거리·결말을 바꿔야 할 때는 동의 여부를 정해 주세요."],
   [
     "판매 페이지 준비",
-    "판매 페이지와 구매 안내를 준비하고, 쏘빅 채널 · SNS · 관련 커뮤니티에서 작품을 소개합니다",
-    "소개 문구를 확인해 주세요",
+    "판매 페이지와 구매 안내를 준비하고, 쏘빅 채널 · SNS · 관련 커뮤니티에서 작품을 소개합니다.",
+    "소개 문구를 확인해 주세요.",
   ],
   [
     "판매 시작",
-    "판매개시일에 판매를 시작합니다. 구매자 문의는 쏘빅이 받아 답하고 환불도 처리합니다. 작품 내용과 관련된 문의는 작가님께 연락드려 함께 답합니다. 오류 수정과 업데이트도 반영합니다",
-    "작품 내용 관련 문의로 연락드리면 답변을 함께 정해 주세요. 그 밖의 문의와 환불은 따로 하실 일이 없습니다",
+    "판매개시일에 판매를 시작합니다. 구매자 문의는 쏘빅이 받아 답하고 환불도 처리합니다. 작품 내용과 관련된 문의는 작가님께 연락드려 함께 답합니다. 오류 수정과 업데이트도 반영합니다.",
+    "작품 내용 관련 문의로 연락드리면 답변을 함께 정해 주세요. 그 밖의 문의와 환불은 따로 하실 일이 없습니다.",
   ],
 ];
 
+
+function GaugeBar({ gauge }: { gauge: Gauge }) {
+  const pos = (i: number) => `${(i / (gauge.stops.length - 1)) * 100}%`;
+  return (
+    <div className="gauge" role="img" aria-label={gauge.label}>
+      <span className="track" aria-hidden="true" />
+      <span className="fill" style={{ width: pos(gauge.on) }} aria-hidden="true" />
+      {gauge.stops.map((s, i) => (
+        <span key={s} className={i === gauge.on ? "stop on" : "stop"} style={{ left: pos(i) }} aria-hidden="true">
+          <i className="dot" />
+          <span className="lab">{i === gauge.on ? `${s} · 기본` : s}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function Flow({ items }: { items: string[] }) {
   return (
@@ -170,10 +212,12 @@ export default function CreatorPage() {
           </p>
           <ol className="stages" aria-label="네 단계">
             {STAGES.map((s, i) => (
-              <li key={s.name}>
-                <small>{i + 1}단계</small>
-                <b>{s.name}</b>
-                <span>{s.sub}</span>
+              <li key={s.id}>
+                <a href={`#${s.id}`}>
+                  <small>{i + 1}단계</small>
+                  <b>{s.name}</b>
+                  <span>{s.sub}</span>
+                </a>
               </li>
             ))}
           </ol>
@@ -183,8 +227,26 @@ export default function CreatorPage() {
           <SecHead
             small="1단계 · 원고와 자료 검토"
             title="작품 확인"
-            desc="작품은 세 가지 경로로 받습니다. 경로마다 확인 방법이 다릅니다."
+            desc="이미 출시한 작품, 파일로 가진 작품, 쏘빅 라이터에서 쓴 작품 모두 등록하실 수 있습니다."
           />
+          <div className="path-tabs">
+            {PATHS.map((p, i) => (
+              <input
+                key={p.tab}
+                type="radio"
+                name="path-tab"
+                id={`path-tab-${i}`}
+                defaultChecked={i === 0}
+                aria-label={p.tab}
+              />
+            ))}
+            <div className="tabs" aria-hidden="true">
+              {PATHS.map((p, i) => (
+                <label key={p.tab} htmlFor={`path-tab-${i}`}>
+                  {p.tab}
+                </label>
+              ))}
+            </div>
           <div className="paths">
             {PATHS.map((p) => (
               <article className="path" key={p.title}>
@@ -205,9 +267,14 @@ export default function CreatorPage() {
               </article>
             ))}
           </div>
+          </div>
           <div className="note">
             작품에 쓰는 그림·음원 같은 자료를 직접 제작하신 경우, 작가님께서 직접 제작권을 확보해
             주세요.
+            <br />
+            검토를 위해 받은 원고와 자료는 쏘빅 안에서만 보며, 어디에도 공개하지 않습니다.
+            <br />
+            계약하지 않으시더라도 작품에 대한 권리는 그대로 작가님께 있습니다.
           </div>
         </section>
 
@@ -230,16 +297,20 @@ export default function CreatorPage() {
                 {TERMS.map((t) => (
                   <tr key={t.name}>
                     <td className="cell-name">{t.name}</td>
-                    <td className="chips-cell" data-label="선택지">
-                      <div className="chips">
-                        {t.chips.map((c) => (
-                          <span key={c.text} className={c.on ? "chip on" : "chip"}>
-                            {c.text}
-                          </span>
-                        ))}
-                      </div>
+                    <td className="chips-cell">
+                      {t.gauge ? (
+                        <GaugeBar gauge={t.gauge} />
+                      ) : (
+                        <div className="chips">
+                          {t.chips.map((c) => (
+                            <span key={c.text} className={c.on ? "chip on" : "chip"}>
+                              {c.text}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </td>
-                    <td data-label="설명">{t.desc}</td>
+                    <td>{t.desc}</td>
                   </tr>
                 ))}
               </tbody>
@@ -266,7 +337,7 @@ export default function CreatorPage() {
             title="판매 준비"
             desc="계약을 마치면 쏘빅이 작품을 쏘빅툴로 제작하고, 테스트와 보완을 거쳐 판매를 시작합니다."
           />
-          <div className="tbl">
+          <div className="tbl scroll">
             <table>
               <thead>
                 <tr>
@@ -292,31 +363,39 @@ export default function CreatorPage() {
           <SecHead
             small="4단계 · 6개월마다 정산, 다음 달 말일 지급"
             title="정산"
-            desc="쏘빅툴 판매는 작품 정가를 기준으로, 텀블벅 판매는 총매출에서 텀블벅 수수료와 작품별 마케팅 비용(광고비·응원권·지인 페이백)을 뺀 순이익을 기준으로 정산합니다. 작가님이 따로 내시는 비용은 없습니다."
+            desc="쏘빅툴은 정가, 텀블벅은 순이익을 기준으로 정산합니다. 작가님이 따로 내시는 비용은 없습니다."
           />
-          <div className="calc">
-            <div className="big">
-              <small>작가님 몫</small>
-              <div className="formulas">
-                <div>
-                  <em>쏘빅툴</em>
-                  <b>정가(토큰) × 100원 × 수익 배분율</b>
+          <div className="calc-tabs">
+            {CALC.map((c, i) => (
+              <input key={c.tab} type="radio" name="calc-tab" id={`calc-tab-${i}`} defaultChecked={i === 0} aria-label={c.tab} />
+            ))}
+            <div className="tabs" aria-hidden="true">
+              {CALC.map((c, i) => (
+                <label key={c.tab} htmlFor={`calc-tab-${i}`}>
+                  {c.tab}
+                </label>
+              ))}
+            </div>
+            {CALC.map((c, i) => (
+              <div className={`calc p${i}`} key={c.tab}>
+                <div className="row">
+                  <small>계산식</small>
+                  <b className="formula">{c.formula}</b>
                 </div>
-                <div>
-                  <em>텀블벅</em>
-                  <b>(총매출 − 텀블벅 수수료 − 마케팅 비용) × 수익 배분율</b>
+                <div className="row">
+                  <small>예시</small>
+                  <div>
+                    <span className="cond">{c.exampleTitle}</span>
+                    <b className="eq">{c.equation}</b>
+                    <span className="cond">{c.exampleNote}</span>
+                  </div>
+                </div>
+                <div className="row">
+                  <small>설명</small>
+                  <p>{c.note}</p>
                 </div>
               </div>
-              <p>
-                쏘빅툴은 할인해서 팔려도 정가로 계산하고, 할인 금액과 결제 수수료는 쏘빅이 부담합니다. 쏘빅툴
-                매출은 테스트 구매를 빼고 계산합니다.
-              </p>
-            </div>
-            <div className="ex">
-              <small>예시 · 쏘빅툴 정가 50토큰, 수익 배분율 30%</small>
-              <div className="eq">50 × 100원 × 30% = 1,500원</div>
-              <p>할인가로 팔려도 1,500원이 그대로 작가님 몫입니다(세전 금액).</p>
-            </div>
+            ))}
           </div>
 
           <h3>정산 일정</h3>
@@ -339,14 +418,14 @@ export default function CreatorPage() {
             </li>
           </ul>
 
-          <h3>보내 드리는 자료</h3>
+          <h3>작가 대시보드에서 확인하세요</h3>
           <p className="shots-intro">
-            초대받은 이메일로 작가 대시보드에 로그인하시면 판매·리뷰·정산 내역을 직접 확인하실 수 있습니다.
+            매출 현황을 실시간으로 확인하실 수 있도록 작가 대시보드를 제공해 드립니다. 초대받은 이메일로 로그인하시면 판매·리뷰·정산 내역을 직접 보실 수 있습니다.
           </p>
           <div className="shots">
             <figure className="shot">
               <Image
-                src="/creator/settlement-sample-v2.jpg"
+                src="/creator/settlement-sample-v4.jpg"
                 alt="작가 대시보드 정산 화면 예시. 누적 정산 수익과 채널별 판매, 정산 비율, 내 정산액이 표시됩니다."
                 width={2000}
                 height={1026}
@@ -358,7 +437,7 @@ export default function CreatorPage() {
             </figure>
             <figure className="shot">
               <Image
-                src="/creator/dashboard-sample.jpg"
+                src="/creator/dashboard-sample-v5.jpg"
                 alt="작가 대시보드 화면 예시. 누적 판매, 채널별 판매, 만족도, 누적 판매 실적 그래프, 플레이어 분포, 최근 리뷰가 표시됩니다."
                 width={2000}
                 height={1628}
@@ -369,7 +448,7 @@ export default function CreatorPage() {
               </figcaption>
             </figure>
           </div>
-          <p className="shots-note">*연출된 이미지입니다.</p>
+          <p className="shots-note">*실제 작가 대시보드 화면이며, 작품 정보와 수치는 예시입니다.</p>
         </section>
 
         <footer className="creator-footer">쏘빅툴 작가 안내 · 주식회사 쏘빅</footer>
