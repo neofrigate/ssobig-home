@@ -448,7 +448,7 @@ export default function CreatorPage() {
               </figcaption>
             </figure>
           </div>
-          <p className="shots-note">*연출된 이미지입니다.</p>
+          <p className="shots-note">*실제 작가 대시보드 화면이며, 작품 정보와 수치는 예시입니다.</p>
         </section>
 
         <footer className="creator-footer">쏘빅툴 작가 안내 · 주식회사 쏘빅</footer>
