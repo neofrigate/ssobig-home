@@ -17,6 +17,7 @@
 
 | 날짜 | 브랜치 | 작업 내용 | 상태 |
 |------|--------|----------|------|
+| 2026-11-26 | claude/creator-wording | `/creator` 문구 수정: 1단계 자료 저작권 안내문을 "직접 준비하시는 경우, 상업적 이용에 필요한 저작권(이용권)"으로, 4단계 텀블벅 마케팅 비용 설명의 `지인 페이백`을 `프로모션 비용`으로 변경. 정산 예시 이미지(`public/creator/settlement-sample-v4.jpg`) 하단 각주는 이미지 안 글자라 미수정 — 원본 문구는 ssobig-story `settlement/index.html:824`, 수정 후 재캡처 필요 | 로컬 커밋(미푸시) |
 | 2026-11-25 | claude/eloquent-bhabha-230902 | Sentry SSOBIG-HOME-36(`window._META.IABInnerFrame` TypeError) 소음 필터 추가: `src/lib/sentry-debug.ts`에서 브라우저가 facebook·instagram·threads이고 TypeError 문구가 정확히 일치할 때만(WebKit·V8 표현 둘 다) 걸러 냄. `test/sentry-debug.test.mjs`에 12건 추가. Sentry 이벤트의 실제 UA는 미확인(로그인 필요) | 로컬 커밋(미푸시) |
 | 2026-11-19 | claude/elastic-morse-c64dbb | Sentry SSOBIG-HOME-35(`te.findLast is not a function`) 조사: 원인은 Vercel Speed Insights 호스팅 스크립트가 구형 브라우저(Chrome<97 등)에서 `findLast` 호출. `src/lib/array-find-last-polyfill.ts` 추가 후 `instrumentation-client.ts`에서 로드 | 로컬 커밋(미푸시) |
 | 2026-11-10 | security/reviews-rls | 플레이룸 리뷰 기존 응답 조회(`api/playroom/review`)를 tly 서버 키 `QUALITY_SUPABASE_SECRET_KEY`로 읽도록 변경(미설정 시 공개 키 폴백), Vercel 환경변수 추가 필요 | 로컬 커밋 |
