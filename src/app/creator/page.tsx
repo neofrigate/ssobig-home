@@ -322,7 +322,7 @@ export default function CreatorPage() {
           <SecHead
             small="4단계 · 6개월마다 정산, 다음 달 말일 지급"
             title="정산"
-            desc="쏘빅툴 판매는 작품 정가를 기준으로, 텀블벅 판매는 총매출에서 텀블벅 수수료와 작품별 마케팅 비용(광고비·응원권·지인 페이백)을 뺀 순이익을 기준으로 정산합니다. 작가님이 따로 내시는 비용은 없습니다."
+            desc="쏘빅툴 판매는 작품 정가를 기준으로 한 순이익으로 정산합니다. 작가님이 따로 내시는 비용은 없습니다."
           />
           <div className="calc">
             <div className="big">
