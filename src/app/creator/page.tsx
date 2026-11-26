@@ -124,9 +124,9 @@ const CALC = [
     tab: "텀블벅",
     formula: "(총매출 − 텀블벅 수수료 − 마케팅 비용) × 수익 배분율",
     note: "마케팅 비용은 그 작품에 쓴 광고비·응원권·지인 페이백입니다.",
-    exampleTitle: "총매출 5,000,000원, 수수료와 마케팅 비용 1,000,000원, 수익 배분율 30%",
-    equation: "(5,000,000 − 1,000,000) × 30% = 1,200,000원",
-    exampleNote: "순이익 4,000,000원의 30%가 작가님 몫입니다(세전 금액).",
+    exampleTitle: "총매출 5,122,000원, 수수료와 마케팅 비용 1,032,000원, 수익 배분율 30%",
+    equation: "(5,122,000 − 1,032,000) × 30% = 1,227,000원",
+    exampleNote: "순이익 4,090,000원의 30%가 작가님 몫입니다(세전 금액).",
   },
 ];
 
@@ -425,7 +425,7 @@ export default function CreatorPage() {
           <div className="shots">
             <figure className="shot">
               <Image
-                src="/creator/settlement-sample-v2.jpg"
+                src="/creator/settlement-sample-v3.jpg"
                 alt="작가 대시보드 정산 화면 예시. 누적 정산 수익과 채널별 판매, 정산 비율, 내 정산액이 표시됩니다."
                 width={2000}
                 height={1026}
@@ -437,7 +437,7 @@ export default function CreatorPage() {
             </figure>
             <figure className="shot">
               <Image
-                src="/creator/dashboard-sample.jpg"
+                src="/creator/dashboard-sample-v2.jpg"
                 alt="작가 대시보드 화면 예시. 누적 판매, 채널별 판매, 만족도, 누적 판매 실적 그래프, 플레이어 분포, 최근 리뷰가 표시됩니다."
                 width={2000}
                 height={1628}
