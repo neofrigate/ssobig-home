@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import "./creator.css";
+import CopyChip from "./CopyChip";
 
 export const metadata: Metadata = {
   title: "쏘빅툴 작가 안내",
@@ -44,7 +45,7 @@ const PATHS: Path[] = [
     title: "파일로 작업한 작품",
     desc: "PDF, Docs, HWP 파일 등으로 작업한 작품이 있는 경우입니다.",
     steps: [
-      { label: "작품 파일 전달", detail: <a href="mailto:team@ssobig.com">team@ssobig.com</a> },
+      { label: "작품 파일 전달", detail: <CopyChip text="team@ssobig.com" /> },
       { label: "쏘빅이 라이터에 옮기기" },
       { label: "코멘트로 함께 보기" },
       { label: "쏘빅툴 구현 시 주의사항 검토" },
@@ -408,7 +409,7 @@ export default function CreatorPage() {
             <li>판매 현황은 작가 대시보드에서 언제든 보실 수 있고, 확정된 정산 금액은 6개월마다 정산 명세서로 보내 드립니다.</li>
             <li>원천징수 대상이면 세금을 떼고 지급합니다.</li>
             <li>
-              일본 계좌는 엔화로 보내 드립니다. 그 밖의 나라 계좌는 첫 지급 전에 지급 통화를 정합니다.
+              국내 계좌는 원화로, 일본 계좌는 엔화로 보내 드립니다. 그 밖의 해외 계좌는 첫 지급 전에 지급 통화를 정합니다.
               해외 송금 수수료는 쏘빅이 부담합니다.
             </li>
             <li>
