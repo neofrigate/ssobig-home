@@ -256,7 +256,7 @@ export default function CreatorPage() {
                 {TERMS.map((t) => (
                   <tr key={t.name}>
                     <td className="cell-name">{t.name}</td>
-                    <td className="chips-cell" data-label="선택지">
+                    <td className="chips-cell">
                       {t.gauge ? (
                         <GaugeBar gauge={t.gauge} />
                       ) : (
@@ -269,7 +269,7 @@ export default function CreatorPage() {
                         </div>
                       )}
                     </td>
-                    <td data-label="설명">{t.desc}</td>
+                    <td>{t.desc}</td>
                   </tr>
                 ))}
               </tbody>
