@@ -44,10 +44,10 @@ const PATHS: Path[] = [
     title: "파일로 작업한 작품",
     desc: "PDF, Docs, HWP 파일 등으로 작업한 작품이 있는 경우입니다.",
     steps: [
-      { label: "작품 파일 전달", detail: <span className="copyable">team@ssobig.com</span> },
-      { label: "쏘빅 라이터에 올리기" },
+      { label: "작품 파일 전달", detail: <a href="mailto:team@ssobig.com">team@ssobig.com</a> },
+      { label: "쏘빅이 라이터에 옮기기" },
       { label: "코멘트로 함께 보기" },
-      { label: "제작 주의 내용 검토" },
+      { label: "쏘빅툴 구현 시 주의사항 검토" },
     ],
   },
   {
