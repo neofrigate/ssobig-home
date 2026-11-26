@@ -296,7 +296,7 @@ export default function CreatorPage() {
             title="판매 준비"
             desc="계약을 마치면 쏘빅이 작품을 쏘빅툴로 제작하고, 테스트와 보완을 거쳐 판매를 시작합니다."
           />
-          <div className="tbl">
+          <div className="tbl scroll">
             <table>
               <thead>
                 <tr>
