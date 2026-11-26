@@ -40,7 +40,7 @@ const PATHS: Path[] = [
   {
     tag: "작품 파일이 있는 경우",
     title: "작품 파일을 보내 주시는 작가님",
-    desc: "원고·진행 규칙·그림 등 작품 파일을 보내 주시는 경우입니다. 형식·개수는 상관없습니다.",
+    desc: "PDF, Docs, HWP 파일 등으로 작업한 작품이 있는 경우입니다.",
     steps: [
       { label: "작품 파일 전달", detail: <span className="copyable">team@ssobig.com</span> },
       { label: "쏘빅 라이터에 올리기" },
