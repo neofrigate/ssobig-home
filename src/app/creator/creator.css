@@ -183,14 +183,11 @@
   .creator-page .tbl:not(.scroll) td + td { margin-top: 10px; }
   .creator-page .tbl:not(.scroll) td.cell-name { font-size: 16px; }
   .creator-page .tbl:not(.scroll) td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; font-weight: 700; color: var(--c-ink-3); margin-bottom: 4px; }
-  .creator-page td.chips-cell { width: 100%; }
-  .creator-page .chips { flex-wrap: wrap; }
   .creator-page .flow-item { gap: 6px; margin: 3px 6px 3px 0; }
   .creator-page .flow-step { font-size: 14px; padding: 5px 10px; }
   .creator-page .flow-item i { font-size: 14px; }
-  .creator-page .gauge { width: auto; }
-  /* 판매 준비 표는 카드로 쌓지 않고 옆으로 밀어 보는 표로 둔다 */
-  .creator-page .tbl.scroll table { min-width: 640px; }
+  /* 계약·판매 준비 표는 카드로 쌓지 않고 옆으로 밀어 보는 표로 둔다 */
+  .creator-page .tbl.scroll table { min-width: 680px; }
   .creator-page .tbl.scroll th, .creator-page .tbl.scroll td { padding: 12px 14px; font-size: 14px; }
   .creator-page .tbl.scroll td:first-child { white-space: nowrap; }
 }
