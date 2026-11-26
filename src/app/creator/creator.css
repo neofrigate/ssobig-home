@@ -92,7 +92,10 @@
 .creator-page .path ol li em { font-style: normal; color: var(--c-accent-ink); font-size: 13px; padding-top: 2px; }
 .creator-page .path ol li span { display: flex; flex-direction: column; min-width: 0; }
 .creator-page .path ol li small { font-size: 13px; font-weight: 500; color: var(--c-ink-2); line-height: 1.5; margin-top: 2px; }
-.creator-page .copyable { user-select: all; }
+.creator-page .copy-chip { display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; padding: 2px 9px 2px 7px; border: 1px solid var(--c-line); border-radius: 6px; background: #fff; color: var(--c-ink); font: inherit; font-size: 13px; font-weight: 600; line-height: 1.5; cursor: pointer; }
+.creator-page .copy-chip svg { flex: none; color: var(--c-ink-3); }
+.creator-page .copy-chip:hover { border-color: var(--c-ink-3); }
+.creator-page .copy-chip:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 1px; }
 .creator-page .note { margin-top: 18px; background: var(--c-soft); border-radius: 12px; padding: 16px 20px; font-size: 15px; color: var(--c-ink-2); }
 
 /* 표 */

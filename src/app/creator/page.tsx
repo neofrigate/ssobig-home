@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import "./creator.css";
+import CopyChip from "./CopyChip";
 
 export const metadata: Metadata = {
   title: "쏘빅툴 작가 안내",
@@ -13,6 +14,17 @@ export const metadata: Metadata = {
     description:
       "작품 확인 · 계약 · 판매 준비 · 정산. 쏘빅툴에서 작품을 판매하기까지의 과정을 안내합니다.",
     url: "https://www.ssobig.com/creator",
+    siteName: "쏘빅 ssobig",
+    locale: "ko_KR",
+    type: "website",
+    images: [{ url: "/creator/og-creator.png", width: 1200, height: 630, alt: "쏘빅툴 작가 안내" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "쏘빅툴 작가 안내",
+    description:
+      "작품 확인 · 계약 · 판매 준비 · 정산. 쏘빅툴에서 작품을 판매하기까지의 과정을 안내합니다.",
+    images: ["/creator/og-creator.png"],
   },
 };
 
@@ -44,10 +56,10 @@ const PATHS: Path[] = [
     title: "파일로 작업한 작품",
     desc: "PDF, Docs, HWP 파일 등으로 작업한 작품이 있는 경우입니다.",
     steps: [
-      { label: "작품 파일 전달", detail: <span className="copyable">team@ssobig.com</span> },
-      { label: "쏘빅 라이터에 올리기" },
-      { label: "코멘트로 함께 보기" },
-      { label: "제작 주의 내용 검토" },
+      { label: "작품 파일 전달", detail: <CopyChip text="team@ssobig.com" /> },
+      { label: "쏘빅이 라이터에 옮기기" },
+      { label: "코멘트로 함께 검수" },
+      { label: "쏘빅툴 구현 시 주의사항 검토" },
     ],
   },
   {
@@ -68,7 +80,7 @@ const PATHS: Path[] = [
         ),
       },
       { label: "코멘트로 함께 검수" },
-      { label: "쏘빅툴로 1차 제작" },
+      { label: "쏘빅툴로 1차 제작", detail: "라이터 원고는 바로 옮길 수 있어 계약 전에 먼저 만들어 봅니다" },
       { label: "작가님 확인" },
     ],
   },
@@ -90,7 +102,7 @@ const TERMS: { name: string; chips: { text: string; on?: boolean }[]; gauge?: Ga
   {
     name: "판매 채널",
     chips: [{ text: "쏘빅툴" }, { text: "텀블벅" }, { text: "기타" }],
-    desc: "텀블벅 같은 크라우드펀딩은 대략 1달 동안 판매하며, 이 계약이 아니라 별도 특약을 따릅니다.",
+    desc: "텀블벅 같은 크라우드펀딩은 약 한 달 동안 판매하며, 이 계약이 아니라 별도 특약을 따릅니다.",
   },
   {
     name: "가격",
@@ -118,7 +130,7 @@ const CALC = [
     note: "할인해서 팔려도 정가로 계산하고, 할인 금액과 결제 수수료는 쏘빅이 부담합니다. 테스트 구매는 매출에서 뺍니다.",
     exampleTitle: "정가 300토큰, 수익 배분율 30%",
     equation: "300 × 100원 × 30% = 9,000원",
-    exampleNote: "할인가로 팔려도 9,000원이 그대로 작가님 몫입니다(세전 금액).",
+    exampleNote: "할인가로 팔려도 9,000원이 그대로 작가님 몫(세전 금액)입니다.",
   },
   {
     tab: "텀블벅",
@@ -126,7 +138,7 @@ const CALC = [
     note: "마케팅 비용은 그 작품에 쓴 광고비, 응원권, 프로모션 비용을 합한 금액입니다.",
     exampleTitle: "총매출 5,122,000원, 수수료와 마케팅 비용 1,032,000원, 수익 배분율 30%",
     equation: "(5,122,000 − 1,032,000) × 30% = 1,227,000원",
-    exampleNote: "순이익 4,090,000원의 30%가 작가님 몫입니다(세전 금액).",
+    exampleNote: "순이익 4,090,000원의 30%가 작가님 몫(세전 금액)입니다.",
   },
 ];
 
@@ -138,7 +150,7 @@ const PREPARE: [string, string, string][] = [
   ],
   [
     "테스트 플레이",
-    "기본으로 쏘빅이 테스터를 모아 플레이 테스트를 하고 결과를 공유합니다. 원하시면 작가님께도 테스트 링크를 드립니다.",
+    "기본으로 쏘빅이 테스터를 모아 테스트 플레이를 하고 결과를 공유합니다. 원하시면 작가님께도 테스트 링크를 드립니다.",
     "결과를 보시고 의견을 주세요. 테스트 링크를 받으시면 혼자 또는 지인들과 직접 플레이해 보실 수도 있습니다.",
   ],
   ["보완", "의견을 반영해 고칩니다.", "줄거리·결말을 바꿔야 할 때는 동의 여부를 정해 주세요."],
@@ -201,7 +213,7 @@ export default function CreatorPage() {
         <header className="cover">
           <div className="eyebrow">쏘빅툴 작가 안내</div>
           <h1>
-            작품을 쏘빅툴에서
+            작품을 쏘빅툴에서{" "}
             <br />
             판매하기까지
           </h1>
@@ -324,10 +336,15 @@ export default function CreatorPage() {
               <b>저작권은 작가님께 그대로 있습니다.</b>
             </li>
             <li>
-              첫 계약에 한 번만 동의하시면, 이후 작품 계약은 한 편씩 등록을 신청해 범위를 정하시면
+              첫 계약에 한 번만 동의하시면, 이후 작품은 한 편씩 등록을 신청해 작품별 조건을 정하시면
               됩니다.
             </li>
-            <li>쏘빅이 확정 조건과 판매개시일을 안내하고, 보관하실 계약본을 드립니다.</li>
+            <li>쏘빅이 확정 조건과 판매개시일을 안내하고, 보관용 계약서를 드립니다.</li>
+            <li>
+              판매를 그만두고 싶으셔도 계약 만료일까지는 계약한 대로 판매합니다. 만료 뒤에는 작품을
+              숨김 처리해 더 팔리지 않게 합니다. 작품을 지우는 것이 아니라서 이미 구매한 분은 계속
+              이용할 수 있고, 남은 작가님 몫도 정산해 드립니다.
+            </li>
           </ul>
         </section>
 
@@ -408,13 +425,8 @@ export default function CreatorPage() {
             <li>판매 현황은 작가 대시보드에서 언제든 보실 수 있고, 확정된 정산 금액은 6개월마다 정산 명세서로 보내 드립니다.</li>
             <li>원천징수 대상이면 세금을 떼고 지급합니다.</li>
             <li>
-              일본 계좌는 엔화로 보내 드립니다. 그 밖의 나라 계좌는 첫 지급 전에 지급 통화를 정합니다.
+              국내 계좌는 원화로, 일본 계좌는 엔화로 보내 드립니다. 그 밖의 해외 계좌는 첫 지급 전에 지급 통화를 정합니다.
               해외 송금 수수료는 쏘빅이 부담합니다.
-            </li>
-            <li>
-              판매를 그만두고 싶으셔도 계약 만료일까지는 계약한 대로 판매합니다. 만료 뒤에는 작품을
-              숨김 처리해 더 팔리지 않게 합니다. 작품을 지우는 것이 아니라서 이미 구매한 분은 계속
-              이용할 수 있고, 남은 작가님 몫도 정산해 드립니다.
             </li>
           </ul>
 
@@ -425,7 +437,7 @@ export default function CreatorPage() {
           <div className="shots">
             <figure className="shot">
               <Image
-                src="/creator/settlement-sample-v4.jpg"
+                src="/creator/settlement-sample-v5.jpg"
                 alt="작가 대시보드 정산 화면 예시. 누적 정산 수익과 채널별 판매, 정산 비율, 내 정산액이 표시됩니다."
                 width={2000}
                 height={1026}
