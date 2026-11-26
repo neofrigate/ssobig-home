@@ -185,7 +185,7 @@ export default function CreatorPage() {
           <SecHead
             small="1단계 · 원고와 자료 검토"
             title="작품 확인"
-            desc="작품은 세 가지 경로로 받습니다. 경로마다 확인 방법이 다릅니다."
+            desc="이미 출시한 작품, 파일로 가진 작품, 쏘빅 라이터에서 쓴 작품 모두 등록하실 수 있습니다."
           />
           <div className="paths">
             {PATHS.map((p) => (
