@@ -201,7 +201,7 @@ export default function CreatorPage() {
         <header className="cover">
           <div className="eyebrow">쏘빅툴 작가 안내</div>
           <h1>
-            작품을 쏘빅툴에서
+            작품을 쏘빅툴에서{" "}
             <br />
             판매하기까지
           </h1>
