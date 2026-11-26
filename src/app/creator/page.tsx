@@ -60,7 +60,7 @@ const PATHS: Path[] = [
             <a href="https://writer.ssobig.com" target="_blank" rel="noopener noreferrer">
               writer.ssobig.com
             </a>{" "}
-            → 출력하기 → 출품하기. 7일 안에 답을 드립니다
+            → 작품 출품하기. 7일 안에 답을 드립니다
           </>
         ),
       },
