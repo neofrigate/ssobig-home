@@ -134,11 +134,15 @@ const PREPARE: [string, string, string][] = [
 
 
 function GaugeBar({ gauge }: { gauge: Gauge }) {
+  const pos = (i: number) => `${(i / (gauge.stops.length - 1)) * 100}%`;
   return (
-    <div className="seg" role="img" aria-label={gauge.label}>
+    <div className="gauge" role="img" aria-label={gauge.label}>
+      <span className="track" aria-hidden="true" />
+      <span className="fill" style={{ width: pos(gauge.on) }} aria-hidden="true" />
       {gauge.stops.map((s, i) => (
-        <span key={s} className={i === gauge.on ? "on" : undefined} aria-hidden="true">
-          {s}
+        <span key={s} className={i === gauge.on ? "stop on" : "stop"} style={{ left: pos(i) }} aria-hidden="true">
+          <i className="dot" />
+          <span className="lab">{i === gauge.on ? `${s} · 기본` : s}</span>
         </span>
       ))}
     </div>
