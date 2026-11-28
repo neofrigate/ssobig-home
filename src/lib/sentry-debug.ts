@@ -15,6 +15,7 @@ type SentryLikeEvent = {
       stacktrace?: {
         frames?: Array<{
           filename?: string;
+          function?: string;
         }>;
       };
     }>;
@@ -244,6 +245,73 @@ export function shouldIgnoreKnownInAppBrowserError(event: SentryLikeEvent) {
     errorTexts.some((text) =>
       KNOWN_META_WEBVIEW_ERROR_PATTERNS.some((pattern) => pattern.test(text))
     )
+  );
+}
+
+// iOS browsers (observed: Whale) inject an autofill script that walks every
+// frame looking for password fields and trips over sandboxed iframes
+// (SSOBIG-HOME-2H, 2J). Its frames carry these function names.
+const AUTOFILL_SANDBOX_ERROR_PREFIX = "Sandbox access violation";
+const AUTOFILL_INJECTED_FUNCTION_PATTERN =
+  /^(hasPasswordField_|extractFormsAndFormElements_)$/;
+// Browser/extension messages that our code never produces. Ignore them only
+// when no frame comes from our Next.js bundle (SSOBIG-HOME-2R, 2V).
+const THIRD_PARTY_ONLY_ERROR_MESSAGES = new Set([
+  "Could not establish connection. Receiving end does not exist.",
+  "callback `timer callback` was terminated",
+]);
+// Microsoft Outlook SafeLinks crawler rejects with this object (SSOBIG-HOME-2X).
+const OUTLOOK_SAFELINKS_REJECTION_PATTERN =
+  /Object Not Found Matching Id:\d+, MethodName:\w+, ParamCount:\d+/;
+const OUR_BUNDLE_PATH_SEGMENT = "/_next/";
+
+function hasOurBundleFrame(event: SentryLikeEvent) {
+  return (event.exception?.values ?? []).some((value) =>
+    value.stacktrace?.frames?.some(
+      (frame) =>
+        typeof frame.filename === "string" &&
+        frame.filename.includes(OUR_BUNDLE_PATH_SEGMENT)
+    )
+  );
+}
+
+export function shouldIgnoreKnownThirdPartyError(event: SentryLikeEvent) {
+  const exceptionValues = event.exception?.values ?? [];
+
+  const isAutofillSandboxNoise = exceptionValues.some(
+    (value) =>
+      value.type === "SecurityError" &&
+      typeof value.value === "string" &&
+      value.value.startsWith(AUTOFILL_SANDBOX_ERROR_PREFIX) &&
+      (value.stacktrace?.frames ?? []).some(
+        (frame) =>
+          typeof frame.function === "string" &&
+          AUTOFILL_INJECTED_FUNCTION_PATTERN.test(frame.function)
+      )
+  );
+
+  if (isAutofillSandboxNoise) {
+    return true;
+  }
+
+  const isOutlookSafeLinksNoise = [
+    event.message,
+    ...exceptionValues.map((value) => value.value),
+  ].some(
+    (text) =>
+      typeof text === "string" && OUTLOOK_SAFELINKS_REJECTION_PATTERN.test(text)
+  );
+
+  if (isOutlookSafeLinksNoise) {
+    return true;
+  }
+
+  return (
+    exceptionValues.some(
+      (value) =>
+        typeof value.value === "string" &&
+        THIRD_PARTY_ONLY_ERROR_MESSAGES.has(value.value.trim())
+    ) && !hasOurBundleFrame(event)
   );
 }
 
