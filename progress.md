@@ -9,7 +9,7 @@
 
 - **현재 브랜치**: `main`
 - **워킹 트리**: `progress.md` 수정 1건
-- **마지막 업데이트**: 2026-05-23
+- **마지막 업데이트**: 2026-11-28
 
 ---
 
@@ -17,6 +17,7 @@
 
 | 날짜 | 브랜치 | 작업 내용 | 상태 |
 |------|--------|----------|------|
+| 2026-11-28 | refactor/sentry-quality-2026-11-28 | Sentry 미해결 25건 원인별 정리, 일일남매 신청 업무 거절(400/409/422)을 사용자 사유 그대로 응답·Sentry 제외, Sentry 제목 영어 고정·화면 문구/파일명 제외, 브라우저·확장 노이즈 필터, 개발환경 전송 끔, 이미지 프록시 2곳 호스트 허용목록·TLS 검증 복구 (로컬 커밋, 배포 전) | 승인 대기 |
 | 2026-11-26 | claude/creator-wording | `/creator` 문구 수정: 1단계 자료 저작권 안내문을 "직접 준비하시는 경우, 상업적 이용에 필요한 저작권(이용권)"으로, 4단계 텀블벅 마케팅 비용 설명의 `지인 페이백`을 `프로모션 비용`으로 변경. 정산 예시 이미지(`public/creator/settlement-sample-v4.jpg`) 하단 각주는 이미지 안 글자라 미수정 — 원본 문구는 ssobig-story `settlement/index.html:824`, 수정 후 재캡처 필요 | 로컬 커밋(미푸시) |
 | 2026-11-25 | claude/eloquent-bhabha-230902 | Sentry SSOBIG-HOME-36(`window._META.IABInnerFrame` TypeError) 소음 필터 추가: `src/lib/sentry-debug.ts`에서 브라우저가 facebook·instagram·threads이고 TypeError 문구가 정확히 일치할 때만(WebKit·V8 표현 둘 다) 걸러 냄. `test/sentry-debug.test.mjs`에 12건 추가. Sentry 이벤트의 실제 UA는 미확인(로그인 필요) | 로컬 커밋(미푸시) |
 | 2026-11-19 | claude/elastic-morse-c64dbb | Sentry SSOBIG-HOME-35(`te.findLast is not a function`) 조사: 원인은 Vercel Speed Insights 호스팅 스크립트가 구형 브라우저(Chrome<97 등)에서 `findLast` 호출. `src/lib/array-find-last-polyfill.ts` 추가 후 `instrumentation-client.ts`에서 로드 | 로컬 커밋(미푸시) |
@@ -54,6 +55,8 @@
 ---
 
 ## 보류/이슈
+
+- 2026-11-28 리팩토링 계획(R1~R5): 미사용 파일 정리·npm test/CI, 일일남매 신청 API(1,621줄)·신청 화면(3,757줄) 분해, 플레이룸 대형 파일 분해, legacy 페이지 정리. 사용자 선택 대기.
 
 - 로컬 preview는 `next dev`/`turbopack`에서 `_next/static/chunks/main-app.js` 계열 404와 `.next` 캐시 꼬임이 반복됨.
 - 현재 확인용으로는 `npm run build` 후 `npx next start -H 0.0.0.0 -p 3010` production preview 사용이 더 안정적임.

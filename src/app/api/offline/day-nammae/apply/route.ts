@@ -22,6 +22,14 @@ import {
   resolveDayNammaeDuplicateUpload,
   sanitizeDayNammaeSentryContext,
 } from "@/lib/day-nammae-application-integrity";
+import {
+  DAY_NAMMAE_NON_ERROR_THROWN_MESSAGE,
+  DayNammaeEdgeRequestError,
+  classifyDayNammaeEdgeRejection,
+  createDayNammaeSupabaseError,
+  describeThrownValueType,
+  sanitizeDayNammaeEdgeSummaryForSentry,
+} from "@/lib/day-nammae-edge-errors";
 
 const DEFAULT_STORAGE_BUCKET = "day-nammae-profiles-private";
 const DAY_NAMMAE_SUPABASE_URL = "https://ferhwwjztseoegaizsko.supabase.co";
@@ -350,7 +358,7 @@ async function validateApplicationScheduleAndBirthYear(params: {
     .maybeSingle();
 
   if (error) {
-    throw error;
+    throw createDayNammaeSupabaseError("staff_schedules lookup", error);
   }
 
   const scheduleRow = data as {
@@ -848,6 +856,9 @@ export async function POST(request: Request) {
   let edgeStatus: number | null = null;
   let edgeContentType = "";
   let edgeResponseSummary: Record<string, unknown> | null = null;
+  // Edge-provided text kept out of the thrown Error (and Sentry); only used
+  // for the existing safe-client-message check.
+  let edgeClientMessage = "";
 
   try {
     currentStage = "submit:parse";
@@ -938,6 +949,9 @@ export async function POST(request: Request) {
       });
 
       const edgeBody = await parseEdgeFunctionResponse(edgeResponse);
+      edgeStatus = edgeResponse.status;
+      edgeContentType = edgeResponse.headers.get("content-type") || "";
+      edgeResponseSummary = summarizeEdgeResponse(edgeBody);
 
       logSubmitEvent(requestId, "edge:request:complete", {
         clientRequestId,
@@ -951,6 +965,10 @@ export async function POST(request: Request) {
         const applicationError = getDayNammaeApplicationEdgeError(edgeBody);
         const safeWaitlistAlertMessage =
           getWaitlistAlertSafeClientMessage(edgeBody);
+        const edgeRejection = classifyDayNammaeEdgeRejection(
+          edgeResponse.status,
+          edgeBody,
+        );
 
         logSubmitEvent(
           requestId,
@@ -961,7 +979,9 @@ export async function POST(request: Request) {
             edgeBody,
             applicationMode,
           },
-          applicationError || safeWaitlistAlertMessage ? "warn" : "error",
+          applicationError || safeWaitlistAlertMessage || edgeRejection
+            ? "warn"
+            : "error",
         );
 
         if (applicationError) {
@@ -1000,10 +1020,29 @@ export async function POST(request: Request) {
           );
         }
 
-        throw new Error(
-          getEdgeErrorMessage(edgeBody) ||
-            "대기 알림 신청 요청에 실패했습니다.",
-        );
+        if (edgeRejection) {
+          return NextResponse.json(
+            {
+              success: false,
+              requestId,
+              clientRequestId,
+              errorCode: edgeRejection.errorCode,
+              error: edgeRejection.message,
+              userMessage: edgeRejection.message,
+            },
+            {
+              status: edgeRejection.status,
+              headers: buildResponseHeaders(requestId, clientRequestId),
+            },
+          );
+        }
+
+        edgeClientMessage = getEdgeErrorMessage(edgeBody);
+        throw new DayNammaeEdgeRequestError({
+          status: edgeResponse.status,
+          errorCode: String(edgeResponseSummary?.errorCode || ""),
+          kind: "waitlist_alert",
+        });
       }
 
       currentStage = "submit:success";
@@ -1285,6 +1324,10 @@ export async function POST(request: Request) {
     if (!edgeResponse.ok) {
       currentStage = "edge:request:error";
       const applicationError = getDayNammaeApplicationEdgeError(edgeBody);
+      const edgeRejection = classifyDayNammaeEdgeRejection(
+        edgeResponse.status,
+        edgeBody,
+      );
       logSubmitEvent(
         requestId,
         "edge:request:error",
@@ -1297,7 +1340,7 @@ export async function POST(request: Request) {
           edge_request_ms: edgeRequestMs,
           total_api_ms: Date.now() - apiStartedAt,
         },
-        applicationError ? "warn" : "error",
+        applicationError || edgeRejection ? "warn" : "error",
       );
 
       if (edgeBodyRecord?.applicationSubmitted === true) {
@@ -1336,11 +1379,33 @@ export async function POST(request: Request) {
       if (applicationError) {
         throw applicationError;
       }
-      throw new Error(
+      if (edgeRejection) {
+        return NextResponse.json(
+          {
+            success: false,
+            applicationSubmitted: false,
+            requestId,
+            clientRequestId,
+            errorCode: edgeRejection.errorCode,
+            error: edgeRejection.message,
+            userMessage: edgeRejection.message,
+          },
+          {
+            status: edgeRejection.status,
+            headers: buildResponseHeaders(requestId, clientRequestId),
+          },
+        );
+      }
+      edgeClientMessage =
         typeof edgeBody === "string"
           ? edgeBody
-          : edgeBody?.error || "Edge Function 요청에 실패했습니다.",
-      );
+          : typeof edgeBodyRecord?.error === "string"
+            ? edgeBodyRecord.error
+            : "";
+      throw new DayNammaeEdgeRequestError({
+        status: edgeResponse.status,
+        errorCode: String(edgeResponseSummary?.errorCode || ""),
+      });
     }
 
     const { persistedUuid, duplicate, shouldCleanupUpload } =
@@ -1431,15 +1496,19 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : "신청서를 제출하지 못했습니다.";
+      error instanceof Error ? error.message : DAY_NAMMAE_NON_ERROR_THROWN_MESSAGE;
     const applicationError =
       error instanceof DayNammaeApplicationError ? error : null;
+    const clientFacingMessage =
+      error instanceof DayNammaeEdgeRequestError ? edgeClientMessage : errorMessage;
     const safeClientMessage =
       (currentStage.startsWith("storage:")
         ? "사진 업로드에 실패해 신청이 접수되지 않았습니다. 입력과 사진은 그대로 유지됩니다. 연결을 확인한 뒤 다시 시도하거나 JPG·PNG 사진을 다시 선택해 주세요."
         : undefined) ||
       applicationError?.message ||
-      (isSafeClientErrorMessage(errorMessage) ? errorMessage : undefined);
+      (isSafeClientErrorMessage(clientFacingMessage)
+        ? clientFacingMessage
+        : undefined);
 
     logSubmitEvent(
       requestId,
@@ -1546,7 +1615,11 @@ export async function POST(request: Request) {
           edgeStatus,
           edgeContentType,
           edgeRequestMs,
-          edgeResponseSummary,
+          edgeResponseSummary:
+            sanitizeDayNammaeEdgeSummaryForSentry(edgeResponseSummary),
+          ...(error instanceof Error
+            ? {}
+            : { thrownValueType: describeThrownValueType(error) }),
         });
         if (storageUploadErrorContext) {
           scope.setContext("storage_upload", {
@@ -1561,7 +1634,9 @@ export async function POST(request: Request) {
           });
         }
         Sentry.captureException(
-          error instanceof Error ? error : new Error(errorMessage),
+          error instanceof Error
+            ? error
+            : new Error(DAY_NAMMAE_NON_ERROR_THROWN_MESSAGE),
         );
       });
     }

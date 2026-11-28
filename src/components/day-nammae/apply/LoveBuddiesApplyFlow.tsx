@@ -1348,6 +1348,40 @@ function buildResponseFailureMessage(meta: SubmitResponseMeta, photo: File | nul
   return buildSubmitErrorMessage(supportCode);
 }
 
+// Handled submit errors carry user-facing copy as their message, so Sentry
+// gets a stable English message instead (see getSentrySubmitError).
+const HANDLED_SUBMIT_ERRORS = new WeakSet<Error>();
+const SENTRY_TRANSPORT_SUBMIT_STAGES = new Set([
+  "client:fetch:aborted",
+  "client:fetch:timeout",
+  "client:fetch:transport_error",
+]);
+
+function getSentrySubmitError(error: unknown, stage: string) {
+  if (error instanceof Error && HANDLED_SUBMIT_ERRORS.has(error)) {
+    return new Error(`Day Nammae client submit failed: ${stage}`);
+  }
+
+  return error instanceof Error ? error : new Error("Unknown client submit error");
+}
+
+// Keep the photo file name out of Sentry; the extension is enough to debug.
+function getSentryClientDebugContext(
+  context: ReturnType<typeof buildClientDebugContext>
+) {
+  if (!context) {
+    return null;
+  }
+
+  const { photoName, ...rest } = context;
+  const extensionMatch = /\.([a-z0-9]{1,10})$/i.exec(photoName);
+
+  return {
+    ...rest,
+    photoExtension: extensionMatch ? extensionMatch[1].toLowerCase() : "",
+  };
+}
+
 function createHandledSubmitError(
   message: string,
   options: {
@@ -1388,6 +1422,7 @@ function createHandledSubmitError(
   error.parseError = options.parseError || "";
   error.stage = options.stage || "";
   error.transportContext = options.transportContext || null;
+  HANDLED_SUBMIT_ERRORS.add(error);
   return error;
 }
 
@@ -3067,8 +3102,24 @@ export default function LoveBuddiesApplyFlow({
       } = getHandledSubmitErrorState(error);
       const supportCode = requestId || capturedClientRequestId || clientRequestId;
 
-      if (!alreadyReported && errorCode !== WAITLIST_ALERT_ALREADY_APPROVED_CODE) {
+      // A JSON 400/409/422 is a deliberate rejection (validation, coupon,
+      // closed schedule); the server already decided not to report it.
+      const isExpectedServerRejection =
+        (responseStatus === 400 ||
+          responseStatus === 409 ||
+          responseStatus === 422) &&
+        /json/i.test(responseContentType || "");
+
+      if (
+        !alreadyReported &&
+        !isExpectedServerRejection &&
+        errorCode !== WAITLIST_ALERT_ALREADY_APPROVED_CODE
+      ) {
+        const sentryStage = stage || submitStage || "unknown";
         Sentry.withScope((scope) => {
+          if (SENTRY_TRANSPORT_SUBMIT_STAGES.has(sentryStage)) {
+            scope.setLevel("warning");
+          }
           scope.setTag("feature", "day-nammae-apply");
           scope.setTag("submit_stage", stage || submitStage);
           scope.setTag("coupon_flow", wantsCoupon ? "with_coupon" : "without_coupon");
@@ -3097,17 +3148,20 @@ export default function LoveBuddiesApplyFlow({
           }
           scope.setFingerprint([
             "day-nammae-submit",
-            stage || submitStage || "unknown",
+            sentryStage,
             String(responseStatus || 0),
           ]);
           scope.setContext(
             "submit_client_context",
-            clientDebugContext || buildClientDebugContext(formValues.photo, clientRequestId)
+            getSentryClientDebugContext(
+              clientDebugContext || buildClientDebugContext(formValues.photo, clientRequestId)
+            )
           );
+          // The response body can carry server-written user copy; send its size only.
           scope.setContext("submit_response_context", {
             responseStatus,
             responseContentType,
-            responseTextSnippet,
+            responseTextLength: responseTextSnippet.length,
             responseUrl,
             parseError,
           });
@@ -3116,9 +3170,7 @@ export default function LoveBuddiesApplyFlow({
               ...transportContext,
             });
           }
-          Sentry.captureException(
-            error instanceof Error ? error : new Error("Unknown client submit error")
-          );
+          Sentry.captureException(getSentrySubmitError(error, sentryStage));
         });
       }
 

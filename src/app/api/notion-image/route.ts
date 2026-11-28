@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import {
+  IMAGE_FETCH_TIMEOUT_MS,
+  IMAGE_RESPONSE_SECURITY_HEADERS,
+  fetchGuardedImage,
+  normalizeNotionPageId,
+} from "@/lib/image-proxy-guard";
 
 export const dynamic = 'force-dynamic';
 
@@ -10,11 +16,16 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const pageId = searchParams.get('pageId');
+    const rawPageId = searchParams.get('pageId');
     const property = searchParams.get('property') || '썸네일';
 
-    if (!pageId) {
+    if (!rawPageId) {
       return NextResponse.json({ error: 'pageId is required' }, { status: 400 });
+    }
+
+    const pageId = normalizeNotionPageId(rawPageId);
+    if (!pageId) {
+      return NextResponse.json({ error: 'Invalid pageId' }, { status: 400 });
     }
 
     const apiKey = process.env.NOTION_API_KEY;
@@ -24,18 +35,13 @@ export async function GET(request: NextRequest) {
 
     // Fetch fresh page data from Notion
     const url = `https://api.notion.com/v1/pages/${pageId}`;
-    
-    const https = await import('https');
-    const httpsAgent = new https.Agent({
-      rejectUnauthorized: false,
-    });
-    
+
     const response = await axios.get(url, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Notion-Version': '2022-06-28',
       },
-      httpsAgent,
+      timeout: IMAGE_FETCH_TIMEOUT_MS,
     });
 
     const page = response.data;
@@ -64,21 +70,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No image URL found' }, { status: 404 });
     }
 
-    // Fetch the actual image
-    const imageResponse = await axios.get(imageUrl, {
-      responseType: 'arraybuffer',
+    // Fetch the actual image (host allowlist, image/* only, size/time limits)
+    const imageResult = await fetchGuardedImage(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0',
       },
-      httpsAgent,
     });
 
+    if (!imageResult.ok) {
+      return NextResponse.json({ error: imageResult.error }, { status: imageResult.status });
+    }
+
     // Return the image with caching headers (short cache since URL refreshes)
-    const contentType = imageResponse.headers['content-type'] || 'image/jpeg';
-    
-    return new NextResponse(imageResponse.data, {
+    return new NextResponse(imageResult.body, {
       headers: {
-        'Content-Type': contentType,
+        ...IMAGE_RESPONSE_SECURITY_HEADERS,
+        'Content-Type': imageResult.contentType,
         'Cache-Control': 'public, max-age=3000, must-revalidate', // 50 minutes (before 1h expiry)
       },
     });
@@ -86,13 +93,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Notion image fetch error:', errorMessage);
-    return NextResponse.json(
-      { 
-        error: 'Failed to fetch image',
-        details: errorMessage 
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch image' }, { status: 500 });
   }
 }
 

@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   getClientSentryDebugContext,
   shouldIgnoreKnownInAppBrowserError,
+  shouldIgnoreKnownThirdPartyError,
 } from "../src/lib/sentry-debug.ts";
 
 const iosUa =
@@ -103,5 +104,61 @@ for (const [name, ua, value, type] of [
 ]) {
   test(`${name} remains visible`, (t) => {
     assert.equal(shouldIgnoreKnownInAppBrowserError(eventFor(t, ua, value, type)), false);
+  });
+}
+
+const ourChunkFrame = {
+  filename: "app:///_next/static/chunks/app/layout-0a1b2c3d.js",
+  function: "submitApplication",
+};
+
+function exceptionEvent(type, value, frames) {
+  return {
+    exception: {
+      values: [{ type, value, ...(frames ? { stacktrace: { frames } } : {}) }],
+    },
+  };
+}
+
+const sandboxError =
+  'Sandbox access violation: Blocked a frame at "https://www.ssobig.com" from accessing a cross-origin frame. The frame being accessed is sandboxed and lacks the "allow-same-origin" flag.';
+const autofillFrames = [
+  { filename: "app:///playroom/kr/abc", function: "extractFormsAndFormElements_" },
+  { filename: "app:///playroom/kr/abc", function: "hasPasswordField_" },
+];
+const extensionConnectionError =
+  "Could not establish connection. Receiving end does not exist.";
+const timerCallbackError = "callback `timer callback` was terminated";
+const safeLinksRejection =
+  "Non-Error promise rejection captured with value: Object Not Found Matching Id:3, MethodName:update, ParamCount:4";
+
+for (const [name, event] of [
+  ["iOS autofill sandbox SecurityError", exceptionEvent("SecurityError", sandboxError, autofillFrames)],
+  ["autofill frame hasPasswordField_ only", exceptionEvent("SecurityError", sandboxError, [autofillFrames[1]])],
+  ["extension connection error from injected script", exceptionEvent("Error", extensionConnectionError, [{ filename: "app:///injectedScript.bundle.js" }])],
+  ["extension connection error without frames", exceptionEvent("Error", extensionConnectionError)],
+  ["timer callback termination", exceptionEvent("Error", timerCallbackError, [{ filename: "app:///", lineno: 0 }])],
+  ["Outlook SafeLinks rejection", exceptionEvent("UnhandledRejection", safeLinksRejection)],
+  ["Outlook SafeLinks message event", { message: "Object Not Found Matching Id:12, MethodName:get, ParamCount:2" }],
+]) {
+  test(`${name} is filtered as third-party noise`, () => {
+    assert.equal(shouldIgnoreKnownThirdPartyError(event), true);
+  });
+}
+
+for (const [name, event] of [
+  ["sandbox SecurityError from our code", exceptionEvent("SecurityError", sandboxError, [ourChunkFrame])],
+  ["sandbox SecurityError without frames", exceptionEvent("SecurityError", sandboxError)],
+  ["autofill frames with a different error", exceptionEvent("TypeError", "Cannot read properties of null (reading 'contentDocument')", autofillFrames)],
+  ["sandbox message with non-SecurityError type", exceptionEvent("Error", sandboxError, autofillFrames)],
+  ["extension connection error in our bundle", exceptionEvent("Error", extensionConnectionError, [{ filename: "app:///injectedScript.bundle.js" }, ourChunkFrame])],
+  ["wrapped extension connection error", exceptionEvent("Error", `apply failed: ${extensionConnectionError}`)],
+  ["timer callback termination in our bundle", exceptionEvent("Error", timerCallbackError, [ourChunkFrame])],
+  ["Trusted Types sink error (filter on hold)", exceptionEvent("TypeError", "Failed to execute 'src': This document requires 'TrustedScriptURL' assignment for the 'HTMLScriptElement src' sink.", [ourChunkFrame])],
+  ["similar Object Not Found message", exceptionEvent("Error", "Object Not Found: schedule 3")],
+  ["our application error", exceptionEvent("Error", "Day Nammae client submit failed: client:fetch:transport_error", [ourChunkFrame])],
+]) {
+  test(`${name} remains visible`, () => {
+    assert.equal(shouldIgnoreKnownThirdPartyError(event), false);
   });
 }

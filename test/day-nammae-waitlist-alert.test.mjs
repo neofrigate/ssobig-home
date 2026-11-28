@@ -6,6 +6,7 @@ import ts from "typescript";
 import * as errors from "../src/features/day-nammae/waitlistAlertErrors.ts";
 import * as cutoff from "../src/features/day-nammae/applicationCutoff.ts";
 import * as integrity from "../src/lib/day-nammae-application-integrity.ts";
+import * as edgeErrors from "../src/lib/day-nammae-edge-errors.ts";
 
 async function submitWithEdgeResponse(status, body) {
   const captured = [];
@@ -20,6 +21,7 @@ async function submitWithEdgeResponse(status, body) {
     "@/features/day-nammae/waitlistAlertErrors": errors,
     "@/features/day-nammae/applicationCutoff": cutoff,
     "@/lib/day-nammae-application-integrity": integrity,
+    "@/lib/day-nammae-edge-errors": edgeErrors,
     "@/features/day-nammae/referral": {},
     "@sentry/nextjs": { withScope: fn => fn(scope), captureException: e => captured.push(e) },
     "next/server": { NextResponse: Response },
@@ -31,7 +33,7 @@ async function submitWithEdgeResponse(status, body) {
     process: { env: { SUPABASE_SERVICE_ROLE_KEY: "test-only" } },
     console: Object.fromEntries(["log", "warn", "error"].map(level => [level, (...args) => logs.push({ level, args })])),
     fetch: async () => Response.json(body, { status }),
-    Request, Response, Headers, URL, FormData, File, Blob, Date, Math, crypto: globalThis.crypto,
+    Request, Response, Headers, URL, FormData, File, Blob, Date, Math, Error, crypto: globalThis.crypto,
   });
   const form = new FormData();
   for (const [key, value] of Object.entries({
@@ -65,6 +67,23 @@ test("unexpected backend failure remains a server error reported to Sentry", asy
   assert.equal(result.captured.length, 1);
   assert.match(result.body.userMessage, /문의 코드/);
   assert.doesNotMatch(result.body.userMessage, /database/);
+});
+
+test("4xx with errorCode and message is returned to the user without Sentry", async () => {
+  const result = await submitWithEdgeResponse(409, { errorCode: "WAITLIST_REJECTED", error: "알림 신청 대상이 아닙니다." });
+  assert.equal(result.response.status, 409);
+  assert.equal(result.body.errorCode, "WAITLIST_REJECTED");
+  assert.equal(result.body.userMessage, "알림 신청 대상이 아닙니다.");
+  assert.equal(result.body.error, "알림 신청 대상이 아닙니다.");
+  assert.equal(result.captured.length, 0);
+  assert.equal(result.logs.filter(log => log.level === "error").length, 0);
+});
+
+test("edge failures reach Sentry with a stable English message", async () => {
+  const result = await submitWithEdgeResponse(502, { errorCode: "UPSTREAM", error: "서버 오류" });
+  assert.equal(result.response.status, 500);
+  assert.equal(result.captured.length, 1);
+  assert.equal(result.captured[0].message, "Day Nammae waitlist alert edge request failed (status 502)");
 });
 
 test("client preserves the approved refusal code and server guidance", () => {
